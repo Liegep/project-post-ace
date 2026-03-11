@@ -114,8 +114,8 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
         )}
       </div>
 
-      {/* Expanded comments section */}
-      {expanded && (
+      {/* Comments section - always visible for client, expandable for admin */}
+      {(expanded || !isAdmin) && (
         <div className="border-t bg-muted/30 p-4">
           <div className="space-y-3">
             {post.comments.length === 0 && (
