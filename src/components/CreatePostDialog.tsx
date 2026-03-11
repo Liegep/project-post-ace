@@ -63,6 +63,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
     setCaption("");
     setDeadline("");
     setStatus("em_desenvolvimento");
+    setSelectedTags([]);
     onOpenChange(false);
   };
 
