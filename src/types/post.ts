@@ -1,5 +1,5 @@
 export type PostStatus = "em_desenvolvimento" | "escrevendo_legenda" | "pronto";
-export type ClientLabel = "aprovado" | "alteracao_solicitada" | "leia_comentario" | "pendente";
+export type ClientLabel = "aprovado" | "alteracao_solicitada" | "leia_comentario" | "pendente" | "de_seu_feedback";
 
 export interface Tag {
   id: string;
@@ -46,4 +46,5 @@ export const LABEL_CONFIG: Record<ClientLabel, { label: string; color: string }>
   aprovado: { label: "Aprovado", color: "bg-success text-success-foreground" },
   alteracao_solicitada: { label: "Alteração Solicitada", color: "bg-destructive text-destructive-foreground" },
   leia_comentario: { label: "Leia Comentário", color: "bg-warning text-warning-foreground" },
+  de_seu_feedback: { label: "Dê seu Feedback", color: "bg-info text-info-foreground" },
 };
