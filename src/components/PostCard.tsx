@@ -54,6 +54,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
             </div>
           </div>
 
+          <TagDisplay tagIds={post.tags} tags={tags} />
           <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.caption}</p>
 
           <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
