@@ -1,6 +1,12 @@
 export type PostStatus = "em_desenvolvimento" | "escrevendo_legenda" | "pronto";
 export type ClientLabel = "aprovado" | "alteracao_solicitada" | "leia_comentario" | "pendente";
 
+export interface Tag {
+  id: string;
+  name: string;
+  color: string; // hex color
+}
+
 export interface Comment {
   id: string;
   postId: string;
@@ -18,8 +24,16 @@ export interface Post {
   status: PostStatus;
   clientLabel: ClientLabel;
   comments: Comment[];
+  tags: string[]; // tag ids
   createdAt: Date;
 }
+
+export const DEFAULT_TAGS: Tag[] = [
+  { id: "seo", name: "SEO", color: "#3b82f6" },
+  { id: "alterado", name: "Alterado", color: "#f59e0b" },
+  { id: "agendado", name: "Agendado", color: "#8b5cf6" },
+  { id: "publicado", name: "Publicado", color: "#22c55e" },
+];
 
 export const STATUS_CONFIG: Record<PostStatus, { label: string; color: string }> = {
   em_desenvolvimento: { label: "Em Desenvolvimento", color: "bg-info text-info-foreground" },
