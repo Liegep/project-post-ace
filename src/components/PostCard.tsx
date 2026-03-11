@@ -18,7 +18,7 @@ interface PostCardProps {
 }
 
 export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardProps) => {
-  const { addComment, updateClientLabel } = usePosts();
+  const { addComment, updateClientLabel, updatePost, tags } = usePosts();
   const [expanded, setExpanded] = useState(false);
   const [commentText, setCommentText] = useState("");
 
