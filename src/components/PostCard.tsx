@@ -33,12 +33,12 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
 
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-md">
-      <div className="flex gap-4 p-4">
-        {/* Thumbnail */}
-        <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg">
-          <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover" />
-        </div>
+      {/* Image - 1080x1350 aspect ratio (4:5) */}
+      <div className="w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
+        <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover" />
+      </div>
 
+      <div className="flex gap-4 p-4">
         {/* Content */}
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
