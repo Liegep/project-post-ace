@@ -4,6 +4,7 @@ import { usePosts } from "@/context/PostsContext";
 import { TagDisplay } from "@/components/TagSelector";
 import { TagSelector } from "@/components/TagSelector";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send } from "lucide-react";
