@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { STATUS_CONFIG } from "@/types/post";
 import { ImagePlus, X } from "lucide-react";
+import { TagSelector } from "@/components/TagSelector";
 
 interface CreatePostDialogProps {
   open: boolean;
