@@ -1,5 +1,5 @@
 export type PostStatus = "em_desenvolvimento" | "escrevendo_legenda" | "pronto";
-export type ClientLabel = "aprovado" | "alteracao_solicitada" | "leia_comentario" | "pendente";
+export type ClientLabel = "aprovado" | "alteracao_solicitada" | "leia_comentario" | "pendente" | "de_seu_feedback";
 
 export interface Tag {
   id: string;
