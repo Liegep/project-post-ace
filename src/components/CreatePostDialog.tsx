@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { STATUS_CONFIG } from "@/types/post";
 import { ImagePlus, X } from "lucide-react";
+import { TagSelector } from "@/components/TagSelector";
 
 interface CreatePostDialogProps {
   open: boolean;
@@ -23,6 +24,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState<PostStatus>("em_desenvolvimento");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +55,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
       caption,
       deadline: new Date(deadline),
       status,
+      tags: selectedTags,
     });
 
     setTitle("");
@@ -60,6 +63,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
     setCaption("");
     setDeadline("");
     setStatus("em_desenvolvimento");
+    setSelectedTags([]);
     onOpenChange(false);
   };
 
@@ -126,6 +130,12 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+          <div>
+            <Label>Etiquetas</Label>
+            <div className="mt-1">
+              <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
             </div>
           </div>
           <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">

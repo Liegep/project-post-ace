@@ -1,14 +1,17 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { Post, PostStatus, ClientLabel, Comment } from "@/types/post";
+import { Post, PostStatus, ClientLabel, Comment, Tag, DEFAULT_TAGS } from "@/types/post";
 
 interface PostsContextType {
   posts: Post[];
+  tags: Tag[];
   addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => void;
   updatePostStatus: (id: string, status: PostStatus) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
   addComment: (postId: string, author: string, text: string) => void;
   deletePost: (id: string) => void;
   updatePost: (id: string, updates: Partial<Post>) => void;
+  addTag: (name: string, color: string) => Tag;
+  deleteTag: (id: string) => void;
 }
 
 const PostsContext = createContext<PostsContextType | undefined>(undefined);
@@ -23,6 +26,7 @@ const SAMPLE_POSTS: Post[] = [
     status: "em_desenvolvimento",
     clientLabel: "pendente",
     comments: [],
+    tags: ["seo"],
     createdAt: new Date("2026-03-08"),
   },
   {
@@ -36,6 +40,7 @@ const SAMPLE_POSTS: Post[] = [
     comments: [
       { id: "c1", postId: "2", author: "Cliente", text: "Podemos trocar a cor de fundo?", createdAt: new Date("2026-03-10") },
     ],
+    tags: ["agendado"],
     createdAt: new Date("2026-03-05"),
   },
   {
@@ -49,12 +54,14 @@ const SAMPLE_POSTS: Post[] = [
     comments: [
       { id: "c2", postId: "3", author: "Cliente", text: "Perfeito! Aprovado!", createdAt: new Date("2026-03-11") },
     ],
+    tags: ["publicado", "seo"],
     createdAt: new Date("2026-03-01"),
   },
 ];
 
 export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [posts, setPosts] = useState<Post[]>(SAMPLE_POSTS);
+  const [tags, setTags] = useState<Tag[]>(DEFAULT_TAGS);
 
   const addPost = useCallback((post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => {
     setPosts((prev) => [
@@ -92,8 +99,19 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
   }, []);
 
+  const addTag = useCallback((name: string, color: string): Tag => {
+    const tag: Tag = { id: crypto.randomUUID(), name, color };
+    setTags((prev) => [...prev, tag]);
+    return tag;
+  }, []);
+
+  const deleteTag = useCallback((id: string) => {
+    setTags((prev) => prev.filter((t) => t.id !== id));
+    setPosts((prev) => prev.map((p) => ({ ...p, tags: p.tags.filter((t) => t !== id) })));
+  }, []);
+
   return (
-    <PostsContext.Provider value={{ posts, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost }}>
+    <PostsContext.Provider value={{ posts, tags, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag }}>
       {children}
     </PostsContext.Provider>
   );

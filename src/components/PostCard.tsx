@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Post, PostStatus, ClientLabel, STATUS_CONFIG, LABEL_CONFIG } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
+import { TagDisplay } from "@/components/TagSelector";
+import { TagSelector } from "@/components/TagSelector";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +19,7 @@ interface PostCardProps {
 }
 
 export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardProps) => {
-  const { addComment, updateClientLabel } = usePosts();
+  const { addComment, updateClientLabel, updatePost, tags } = usePosts();
   const [expanded, setExpanded] = useState(false);
   const [commentText, setCommentText] = useState("");
 
@@ -53,6 +55,13 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
             </div>
           </div>
 
+          {isAdmin ? (
+            <div className="mt-1">
+              <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
+            </div>
+          ) : (
+            <TagDisplay tagIds={post.tags} tags={tags} />
+          )}
           <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.caption}</p>
 
           <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
