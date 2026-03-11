@@ -132,6 +132,12 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
               </Select>
             </div>
           </div>
+          <div>
+            <Label>Etiquetas</Label>
+            <div className="mt-1">
+              <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
+            </div>
+          </div>
           <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
             Criar Post
           </Button>
