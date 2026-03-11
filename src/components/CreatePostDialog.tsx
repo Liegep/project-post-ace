@@ -84,8 +84,8 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
               className="hidden"
             />
             {imagePreview ? (
-              <div className="relative mt-1 rounded-lg border overflow-hidden">
-                <img src={imagePreview} alt="Preview" className="w-full max-h-48 object-cover" />
+              <div className="relative mt-1 rounded-lg border overflow-hidden" style={{ aspectRatio: "4/5" }}>
+                <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
                 <button
                   type="button"
                   onClick={clearImage}
