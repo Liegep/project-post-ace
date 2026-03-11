@@ -55,6 +55,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
       caption,
       deadline: new Date(deadline),
       status,
+      tags: selectedTags,
     });
 
     setTitle("");
