@@ -15,6 +15,7 @@ const ClientPage = () => {
       </header>
 
       <main className="mx-auto max-w-7xl p-6">
+        <h2 className="mb-6 text-center text-xl font-bold text-foreground">Posts para aprovação</h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {posts.length === 0 && (
             <p className="col-span-full py-12 text-center text-muted-foreground">Nenhum post para revisar no momento.</p>
