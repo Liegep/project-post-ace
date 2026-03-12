@@ -1,0 +1,274 @@
+export type Locale = "pt" | "en" | "it" | "es" | "sv";
+
+export const LOCALE_LABELS: Record<Locale, string> = {
+  pt: "Português",
+  en: "English",
+  it: "Italiano",
+  es: "Español",
+  sv: "Svenska",
+};
+
+export const LOCALE_FLAGS: Record<Locale, string> = {
+  pt: "🇧🇷",
+  en: "🇺🇸",
+  it: "🇮🇹",
+  es: "🇪🇸",
+  sv: "🇸🇪",
+};
+
+type TranslationKeys = {
+  // Admin header
+  adminTitle: string;
+  adminSubtitle: string;
+  newPost: string;
+  // Status labels
+  statusInDevelopment: string;
+  statusWritingCaption: string;
+  statusReady: string;
+  // Client labels
+  labelPending: string;
+  labelApproved: string;
+  labelChangeRequested: string;
+  labelReadComment: string;
+  labelGiveFeedback: string;
+  // Post card
+  overdue: string;
+  comments: string;
+  comment: string;
+  noComments: string;
+  writeComment: string;
+  // Create dialog
+  createNewPost: string;
+  title: string;
+  titlePlaceholder: string;
+  image: string;
+  clickToSelectImage: string;
+  caption: string;
+  captionPlaceholder: string;
+  deadline: string;
+  status: string;
+  tags: string;
+  createPost: string;
+  // Tags
+  newTag: string;
+  createTag: string;
+  tagNamePlaceholder: string;
+  color: string;
+  create: string;
+  // Kanban
+  noPosts: string;
+  // Client page
+  postsForApproval: string;
+  clientTitle: string;
+  clientSubtitle: string;
+  noPostsToReview: string;
+  // Language
+  language: string;
+};
+
+const pt: TranslationKeys = {
+  adminTitle: "Painel de Conteúdo",
+  adminSubtitle: "Gerencie seus posts e aprovações",
+  newPost: "Novo Post",
+  statusInDevelopment: "Em Desenvolvimento",
+  statusWritingCaption: "Escrevendo Legenda",
+  statusReady: "Pronto",
+  labelPending: "Pendente",
+  labelApproved: "Aprovado",
+  labelChangeRequested: "Alteração Solicitada",
+  labelReadComment: "Leia Comentário",
+  labelGiveFeedback: "Dê seu Feedback",
+  overdue: "atrasado",
+  comments: "comentários",
+  comment: "comentário",
+  noComments: "Nenhum comentário ainda.",
+  writeComment: "Escreva um comentário...",
+  createNewPost: "Criar Novo Post",
+  title: "Título",
+  titlePlaceholder: "Ex: Post Instagram - Campanha",
+  image: "Imagem",
+  clickToSelectImage: "Clique para selecionar uma imagem",
+  caption: "Legenda",
+  captionPlaceholder: "Escreva a legenda do post...",
+  deadline: "Deadline",
+  status: "Status",
+  tags: "Etiquetas",
+  createPost: "Criar Post",
+  newTag: "Nova",
+  createTag: "Criar Etiqueta",
+  tagNamePlaceholder: "Nome da etiqueta",
+  color: "Cor",
+  create: "Criar",
+  noPosts: "Nenhum post",
+  postsForApproval: "Posts para aprovação",
+  clientTitle: "Portal do Cliente",
+  clientSubtitle: "Visualize e aprove seus conteúdos",
+  noPostsToReview: "Nenhum post para revisar no momento.",
+  language: "Idioma",
+};
+
+const en: TranslationKeys = {
+  adminTitle: "Content Dashboard",
+  adminSubtitle: "Manage your posts and approvals",
+  newPost: "New Post",
+  statusInDevelopment: "In Development",
+  statusWritingCaption: "Writing Caption",
+  statusReady: "Ready",
+  labelPending: "Pending",
+  labelApproved: "Approved",
+  labelChangeRequested: "Change Requested",
+  labelReadComment: "Read Comment",
+  labelGiveFeedback: "Give Feedback",
+  overdue: "overdue",
+  comments: "comments",
+  comment: "comment",
+  noComments: "No comments yet.",
+  writeComment: "Write a comment...",
+  createNewPost: "Create New Post",
+  title: "Title",
+  titlePlaceholder: "E.g.: Instagram Post - Campaign",
+  image: "Image",
+  clickToSelectImage: "Click to select an image",
+  caption: "Caption",
+  captionPlaceholder: "Write the post caption...",
+  deadline: "Deadline",
+  status: "Status",
+  tags: "Tags",
+  createPost: "Create Post",
+  newTag: "New",
+  createTag: "Create Tag",
+  tagNamePlaceholder: "Tag name",
+  color: "Color",
+  create: "Create",
+  noPosts: "No posts",
+  postsForApproval: "Posts for approval",
+  clientTitle: "Client Portal",
+  clientSubtitle: "View and approve your content",
+  noPostsToReview: "No posts to review at this time.",
+  language: "Language",
+};
+
+const it: TranslationKeys = {
+  adminTitle: "Pannello Contenuti",
+  adminSubtitle: "Gestisci i tuoi post e le approvazioni",
+  newPost: "Nuovo Post",
+  statusInDevelopment: "In Sviluppo",
+  statusWritingCaption: "Scrittura Didascalia",
+  statusReady: "Pronto",
+  labelPending: "In Attesa",
+  labelApproved: "Approvato",
+  labelChangeRequested: "Modifica Richiesta",
+  labelReadComment: "Leggi Commento",
+  labelGiveFeedback: "Dai il tuo Feedback",
+  overdue: "in ritardo",
+  comments: "commenti",
+  comment: "commento",
+  noComments: "Nessun commento ancora.",
+  writeComment: "Scrivi un commento...",
+  createNewPost: "Crea Nuovo Post",
+  title: "Titolo",
+  titlePlaceholder: "Es: Post Instagram - Campagna",
+  image: "Immagine",
+  clickToSelectImage: "Clicca per selezionare un'immagine",
+  caption: "Didascalia",
+  captionPlaceholder: "Scrivi la didascalia del post...",
+  deadline: "Scadenza",
+  status: "Stato",
+  tags: "Etichette",
+  createPost: "Crea Post",
+  newTag: "Nuova",
+  createTag: "Crea Etichetta",
+  tagNamePlaceholder: "Nome etichetta",
+  color: "Colore",
+  create: "Crea",
+  noPosts: "Nessun post",
+  postsForApproval: "Post da approvare",
+  clientTitle: "Portale Cliente",
+  clientSubtitle: "Visualizza e approva i tuoi contenuti",
+  noPostsToReview: "Nessun post da revisionare al momento.",
+  language: "Lingua",
+};
+
+const es: TranslationKeys = {
+  adminTitle: "Panel de Contenido",
+  adminSubtitle: "Gestiona tus publicaciones y aprobaciones",
+  newPost: "Nueva Publicación",
+  statusInDevelopment: "En Desarrollo",
+  statusWritingCaption: "Escribiendo Leyenda",
+  statusReady: "Listo",
+  labelPending: "Pendiente",
+  labelApproved: "Aprobado",
+  labelChangeRequested: "Cambio Solicitado",
+  labelReadComment: "Leer Comentario",
+  labelGiveFeedback: "Da tu Feedback",
+  overdue: "atrasado",
+  comments: "comentarios",
+  comment: "comentario",
+  noComments: "Sin comentarios aún.",
+  writeComment: "Escribe un comentario...",
+  createNewPost: "Crear Nueva Publicación",
+  title: "Título",
+  titlePlaceholder: "Ej: Post Instagram - Campaña",
+  image: "Imagen",
+  clickToSelectImage: "Haz clic para seleccionar una imagen",
+  caption: "Leyenda",
+  captionPlaceholder: "Escribe la leyenda del post...",
+  deadline: "Fecha límite",
+  status: "Estado",
+  tags: "Etiquetas",
+  createPost: "Crear Publicación",
+  newTag: "Nueva",
+  createTag: "Crear Etiqueta",
+  tagNamePlaceholder: "Nombre de la etiqueta",
+  color: "Color",
+  create: "Crear",
+  noPosts: "Sin publicaciones",
+  postsForApproval: "Publicaciones para aprobación",
+  clientTitle: "Portal del Cliente",
+  clientSubtitle: "Visualiza y aprueba tu contenido",
+  noPostsToReview: "No hay publicaciones para revisar en este momento.",
+  language: "Idioma",
+};
+
+const sv: TranslationKeys = {
+  adminTitle: "Innehållspanel",
+  adminSubtitle: "Hantera dina inlägg och godkännanden",
+  newPost: "Nytt Inlägg",
+  statusInDevelopment: "Under Utveckling",
+  statusWritingCaption: "Skriver Bildtext",
+  statusReady: "Klart",
+  labelPending: "Väntande",
+  labelApproved: "Godkänt",
+  labelChangeRequested: "Ändring Begärd",
+  labelReadComment: "Läs Kommentar",
+  labelGiveFeedback: "Ge din Feedback",
+  overdue: "försenad",
+  comments: "kommentarer",
+  comment: "kommentar",
+  noComments: "Inga kommentarer ännu.",
+  writeComment: "Skriv en kommentar...",
+  createNewPost: "Skapa Nytt Inlägg",
+  title: "Titel",
+  titlePlaceholder: "T.ex.: Instagram-inlägg - Kampanj",
+  image: "Bild",
+  clickToSelectImage: "Klicka för att välja en bild",
+  caption: "Bildtext",
+  captionPlaceholder: "Skriv inläggets bildtext...",
+  deadline: "Deadline",
+  status: "Status",
+  tags: "Etiketter",
+  createPost: "Skapa Inlägg",
+  newTag: "Ny",
+  createTag: "Skapa Etikett",
+  tagNamePlaceholder: "Etikettnamn",
+  color: "Färg",
+  create: "Skapa",
+  noPosts: "Inga inlägg",
+  postsForApproval: "Inlägg för godkännande",
+  clientTitle: "Kundportal",
+  clientSubtitle: "Visa och godkänn ditt innehåll",
+  noPostsToReview: "Inga inlägg att granska just nu.",
+  language: "Språk",
+};
+
+export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };
