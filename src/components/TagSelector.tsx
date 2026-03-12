@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Tag } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
+import { useI18n } from "@/i18n/I18nContext";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, X, Check } from "lucide-react";
+import { Plus, Check } from "lucide-react";
 
 interface TagSelectorProps {
   selectedTagIds: string[];
@@ -12,7 +13,8 @@ interface TagSelectorProps {
 }
 
 export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
-  const { tags, addTag, deleteTag } = usePosts();
+  const { tags, addTag } = usePosts();
+  const { t } = useI18n();
   const [createOpen, setCreateOpen] = useState(false);
   const [newName, setNewName] = useState("");
   const [newColor, setNewColor] = useState("#6366f1");
@@ -63,19 +65,19 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
               type="button"
               className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/40 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-accent hover:text-accent"
             >
-              <Plus className="h-3 w-3" /> Nova
+              <Plus className="h-3 w-3" /> {t("newTag")}
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-64 space-y-3" align="start">
-            <p className="text-sm font-medium text-foreground">Criar Etiqueta</p>
+            <p className="text-sm font-medium text-foreground">{t("createTag")}</p>
             <Input
-              placeholder="Nome da etiqueta"
+              placeholder={t("tagNamePlaceholder")}
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               className="h-8 text-sm"
             />
             <div className="flex items-center gap-2">
-              <label className="text-xs text-muted-foreground">Cor:</label>
+              <label className="text-xs text-muted-foreground">{t("color")}:</label>
               <input
                 type="color"
                 value={newColor}
@@ -85,7 +87,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
               <span className="text-xs text-muted-foreground">{newColor}</span>
             </div>
             <Button size="sm" onClick={handleCreate} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              Criar
+              {t("create")}
             </Button>
           </PopoverContent>
         </Popover>

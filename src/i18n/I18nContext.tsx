@@ -1,0 +1,31 @@
+import React, { createContext, useContext, useState, useCallback } from "react";
+import { Locale, translations } from "./translations";
+
+interface I18nContextType {
+  locale: Locale;
+  setLocale: (locale: Locale) => void;
+  t: (key: keyof typeof translations.pt) => string;
+}
+
+const I18nContext = createContext<I18nContextType | undefined>(undefined);
+
+export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [locale, setLocale] = useState<Locale>("pt");
+
+  const t = useCallback(
+    (key: keyof typeof translations.pt) => translations[locale][key] || key,
+    [locale]
+  );
+
+  return (
+    <I18nContext.Provider value={{ locale, setLocale, t }}>
+      {children}
+    </I18nContext.Provider>
+  );
+};
+
+export const useI18n = () => {
+  const ctx = useContext(I18nContext);
+  if (!ctx) throw new Error("useI18n must be used within I18nProvider");
+  return ctx;
+};
