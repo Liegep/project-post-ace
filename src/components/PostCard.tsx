@@ -35,54 +35,50 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
 
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-md">
-      {/* Image - 1080x1350 aspect ratio (4:5) */}
-      <div className="w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
-        <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover" />
+      {/* Title - above the image, multi-line like Trello */}
+      <div className="p-4 pb-2">
+        <h3 className="text-lg font-bold leading-snug text-foreground">{post.title}</h3>
       </div>
 
-      <div className="flex gap-4 p-4">
-        {/* Content */}
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-foreground">{post.title}</h3>
-            <div className="flex flex-shrink-0 items-center gap-2">
-              <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${statusConfig.color}`}>
-                {statusConfig.label}
-              </span>
-              <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${labelConfig.color}`}>
-                {labelConfig.label}
-              </span>
-            </div>
-          </div>
+      {/* Image with status badge overlay */}
+      <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
+        <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover" />
+        <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+          <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${statusConfig.color}`}>
+            {statusConfig.label}
+          </span>
+          <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}>
+            {labelConfig.label}
+          </span>
+        </div>
+      </div>
 
-          {isAdmin ? (
-            <div className="mt-1">
-              <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
-            </div>
-          ) : (
-            <TagDisplay tagIds={post.tags} tags={tags} />
-          )}
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.caption}</p>
+      <div className="p-4 pt-3 space-y-2">
+        {isAdmin ? (
+          <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
+        ) : (
+          <TagDisplay tagIds={post.tags} tags={tags} />
+        )}
+        <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
 
-          <div className="mt-2 flex items-center gap-4 text-xs text-muted-foreground">
-            <span className={`flex items-center gap-1 ${isOverdue ? "text-destructive font-medium" : ""}`}>
-              <Calendar className="h-3 w-3" />
-              {format(post.deadline, "dd MMM yyyy", { locale: ptBR })}
-              {isOverdue && " (atrasado)"}
-            </span>
-            <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-1 hover:text-foreground">
-              <MessageCircle className="h-3 w-3" />
-              {post.comments.length} comentário{post.comments.length !== 1 ? "s" : ""}
-              {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-            </button>
-          </div>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <span className={`flex items-center gap-1 ${isOverdue ? "text-destructive font-medium" : ""}`}>
+            <Calendar className="h-3 w-3" />
+            {format(post.deadline, "dd MMM yyyy", { locale: ptBR })}
+            {isOverdue && " (atrasado)"}
+          </span>
+          <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-1 hover:text-foreground">
+            <MessageCircle className="h-3 w-3" />
+            {post.comments.length} comentário{post.comments.length !== 1 ? "s" : ""}
+            {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+          </button>
         </div>
 
         {/* Admin actions */}
         {isAdmin && (
-          <div className="flex flex-shrink-0 flex-col gap-2">
+          <div className="flex items-center gap-2 pt-1">
             <Select value={post.status} onValueChange={(v) => onStatusChange?.(v as PostStatus)}>
-              <SelectTrigger className="h-8 w-[180px] text-xs">
+              <SelectTrigger className="h-8 flex-1 text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -91,7 +87,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="ghost" size="sm" onClick={onDelete} className="text-destructive hover:text-destructive">
+            <Button variant="ghost" size="icon" onClick={onDelete} className="h-8 w-8 text-destructive hover:text-destructive">
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
@@ -99,18 +95,16 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
 
         {/* Client label control */}
         {!isAdmin && (
-          <div className="flex-shrink-0">
-            <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
-              <SelectTrigger className="h-8 w-[180px] text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(LABEL_CONFIG).map(([key, cfg]) => (
-                  <SelectItem key={key} value={key}>{cfg.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
+            <SelectTrigger className="h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(LABEL_CONFIG).map(([key, cfg]) => (
+                <SelectItem key={key} value={key}>{cfg.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         )}
       </div>
 
