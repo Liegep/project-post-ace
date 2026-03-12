@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Post, PostStatus, ClientLabel, STATUS_CONFIG, LABEL_CONFIG } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
+import { useI18n } from "@/i18n/I18nContext";
 import { TagDisplay } from "@/components/TagSelector";
 import { TagSelector } from "@/components/TagSelector";
 import { Card } from "@/components/ui/card";
@@ -11,6 +12,20 @@ import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send } from "l
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+const STATUS_KEYS: Record<PostStatus, "statusInDevelopment" | "statusWritingCaption" | "statusReady"> = {
+  em_desenvolvimento: "statusInDevelopment",
+  escrevendo_legenda: "statusWritingCaption",
+  pronto: "statusReady",
+};
+
+const LABEL_KEYS: Record<ClientLabel, "labelPending" | "labelApproved" | "labelChangeRequested" | "labelReadComment" | "labelGiveFeedback"> = {
+  pendente: "labelPending",
+  aprovado: "labelApproved",
+  alteracao_solicitada: "labelChangeRequested",
+  leia_comentario: "labelReadComment",
+  de_seu_feedback: "labelGiveFeedback",
+};
+
 interface PostCardProps {
   post: Post;
   isAdmin: boolean;
@@ -20,6 +35,7 @@ interface PostCardProps {
 
 export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags } = usePosts();
+  const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
   const [commentText, setCommentText] = useState("");
 
@@ -35,20 +51,18 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
 
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-md">
-      {/* Title - above the image, multi-line like Trello */}
       <div className="p-4 pb-2">
         <h3 className="text-lg font-bold leading-snug text-foreground">{post.title}</h3>
       </div>
 
-      {/* Image with status badge overlay */}
       <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
         <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover" />
         <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
           <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${statusConfig.color}`}>
-            {statusConfig.label}
+            {t(STATUS_KEYS[post.status])}
           </span>
           <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}>
-            {labelConfig.label}
+            {t(LABEL_KEYS[post.clientLabel])}
           </span>
         </div>
       </div>
@@ -65,16 +79,15 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
           <span className={`flex items-center gap-1 ${isOverdue ? "text-destructive font-medium" : ""}`}>
             <Calendar className="h-3 w-3" />
             {format(post.deadline, "dd MMM yyyy", { locale: ptBR })}
-            {isOverdue && " (atrasado)"}
+            {isOverdue && ` (${t("overdue")})`}
           </span>
           <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-1 hover:text-foreground">
             <MessageCircle className="h-3 w-3" />
-            {post.comments.length} comentário{post.comments.length !== 1 ? "s" : ""}
+            {post.comments.length} {post.comments.length !== 1 ? t("comments") : t("comment")}
             {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
           </button>
         </div>
 
-        {/* Admin actions */}
         {isAdmin && (
           <div className="flex items-center gap-2 pt-1">
             <Select value={post.status} onValueChange={(v) => onStatusChange?.(v as PostStatus)}>
@@ -82,8 +95,8 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-                  <SelectItem key={key} value={key}>{cfg.label}</SelectItem>
+                {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
+                  <SelectItem key={key} value={key}>{t(STATUS_KEYS[key])}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -93,30 +106,28 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
           </div>
         )}
 
-        {/* Client label control */}
         {!isAdmin && (
           <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
             <SelectTrigger className="h-9 w-full text-sm font-semibold bg-info text-info-foreground border-info hover:bg-info/90 rounded-lg">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="de_seu_feedback">💬 Dê seu Feedback</SelectItem>
-              {Object.entries(LABEL_CONFIG)
-                .filter(([key]) => key !== "de_seu_feedback")
-                .map(([key, cfg]) => (
-                  <SelectItem key={key} value={key}>{cfg.label}</SelectItem>
+              <SelectItem value="de_seu_feedback">💬 {t("labelGiveFeedback")}</SelectItem>
+              {(Object.keys(LABEL_KEYS) as ClientLabel[])
+                .filter((key) => key !== "de_seu_feedback")
+                .map((key) => (
+                  <SelectItem key={key} value={key}>{t(LABEL_KEYS[key])}</SelectItem>
                 ))}
             </SelectContent>
           </Select>
         )}
       </div>
 
-      {/* Comments section - always visible for client, expandable for admin */}
       {(expanded || !isAdmin) && (
         <div className="border-t bg-muted/30 p-4">
           <div className="space-y-3">
             {post.comments.length === 0 && (
-              <p className="text-sm text-muted-foreground">Nenhum comentário ainda.</p>
+              <p className="text-sm text-muted-foreground">{t("noComments")}</p>
             )}
             {post.comments.map((c) => (
               <div key={c.id} className="rounded-lg bg-card p-3">
@@ -132,7 +143,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
           </div>
           <div className="mt-3 flex gap-2">
             <Textarea
-              placeholder="Escreva um comentário..."
+              placeholder={t("writeComment")}
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               className="min-h-[60px] resize-none text-sm"

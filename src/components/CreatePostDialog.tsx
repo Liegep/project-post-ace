@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { usePosts } from "@/context/PostsContext";
+import { useI18n } from "@/i18n/I18nContext";
 import { PostStatus } from "@/types/post";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,12 @@ import { STATUS_CONFIG } from "@/types/post";
 import { ImagePlus, X } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 
+const STATUS_KEYS = {
+  em_desenvolvimento: "statusInDevelopment",
+  escrevendo_legenda: "statusWritingCaption",
+  pronto: "statusReady",
+} as const;
+
 interface CreatePostDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -18,6 +25,7 @@ interface CreatePostDialogProps {
 
 export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) => {
   const { addPost } = usePosts();
+  const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState("");
@@ -71,15 +79,15 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Criar Novo Post</DialogTitle>
+          <DialogTitle>{t("createNewPost")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="title">Título</Label>
-            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Post Instagram - Campanha" />
+            <Label htmlFor="title">{t("title")}</Label>
+            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} />
           </div>
           <div>
-            <Label>Imagem</Label>
+            <Label>{t("image")}</Label>
             <input
               ref={fileInputRef}
               type="file"
@@ -105,41 +113,41 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
                 className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/30 py-8 text-sm text-muted-foreground transition-colors hover:border-accent hover:text-accent"
               >
                 <ImagePlus className="h-5 w-5" />
-                Clique para selecionar uma imagem
+                {t("clickToSelectImage")}
               </button>
             )}
           </div>
           <div>
-            <Label htmlFor="caption">Legenda</Label>
-            <Textarea id="caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Escreva a legenda do post..." className="min-h-[100px]" />
+            <Label htmlFor="caption">{t("caption")}</Label>
+            <Textarea id="caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("captionPlaceholder")} className="min-h-[100px]" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="deadline">Deadline</Label>
+              <Label htmlFor="deadline">{t("deadline")}</Label>
               <Input id="deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
             </div>
             <div>
-              <Label>Status</Label>
+              <Label>{t("status")}</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as PostStatus)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-                    <SelectItem key={key} value={key}>{cfg.label}</SelectItem>
+                  {(Object.keys(STATUS_KEYS) as PostStatus[]).map((key) => (
+                    <SelectItem key={key} value={key}>{t(STATUS_KEYS[key])}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div>
-            <Label>Etiquetas</Label>
+            <Label>{t("tags")}</Label>
             <div className="mt-1">
               <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
             </div>
           </div>
           <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-            Criar Post
+            {t("createPost")}
           </Button>
         </form>
       </DialogContent>
