@@ -95,26 +95,19 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
 
         {/* Client label control */}
         {!isAdmin && (
-          <div className="flex items-center gap-2">
-            <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
-              <SelectTrigger className="h-8 flex-1 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(LABEL_CONFIG).map(([key, cfg]) => (
+          <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
+            <SelectTrigger className="h-9 w-full text-sm font-semibold bg-info text-info-foreground border-info hover:bg-info/90 rounded-lg">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="de_seu_feedback">💬 Dê seu Feedback</SelectItem>
+              {Object.entries(LABEL_CONFIG)
+                .filter(([key]) => key !== "de_seu_feedback")
+                .map(([key, cfg]) => (
                   <SelectItem key={key} value={key}>{cfg.label}</SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-            <Button
-              size="sm"
-              variant={post.clientLabel === "de_seu_feedback" ? "default" : "outline"}
-              onClick={() => updateClientLabel(post.id, "de_seu_feedback")}
-              className="h-8 text-xs whitespace-nowrap bg-info text-info-foreground hover:bg-info/90 border-info"
-            >
-              💬 Dê seu Feedback
-            </Button>
-          </div>
+            </SelectContent>
+          </Select>
         )}
       </div>
 
