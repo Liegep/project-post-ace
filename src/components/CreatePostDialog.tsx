@@ -29,6 +29,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
   const [title, setTitle] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState("");
+  const [mediaType, setMediaType] = useState<MediaType>("image");
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState<PostStatus>("em_desenvolvimento");
