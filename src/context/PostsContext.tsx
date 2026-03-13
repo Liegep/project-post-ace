@@ -21,6 +21,7 @@ const SAMPLE_POSTS: Post[] = [
     id: "1",
     title: "Post Instagram - Campanha Verão",
     imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop",
+    mediaType: "image",
     caption: "☀️ O verão chegou e com ele nossas melhores ofertas! Aproveite descontos de até 50% em toda a coleção. #Verão2024 #Moda",
     deadline: new Date("2026-03-20"),
     status: "em_desenvolvimento",
