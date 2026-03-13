@@ -49,6 +49,7 @@ const SAMPLE_POSTS: Post[] = [
     id: "3",
     title: "Carrossel - Dicas de Bem-estar",
     imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop",
+    mediaType: "image",
     caption: "🧘 5 dicas para manter o equilíbrio no dia a dia. Swipe para ver todas! #BemEstar #Saúde",
     deadline: new Date("2026-03-12"),
     status: "pronto",

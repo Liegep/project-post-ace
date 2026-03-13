@@ -314,6 +314,12 @@ const sv: TranslationKeys = {
   language: "Språk",
   editPost: "Redigera Inlägg",
   saveChanges: "Spara Ändringar",
+  tagSEO: "SEO",
+  tagAltered: "Ändrad",
+  tagScheduled: "Schemalagd",
+  tagPublished: "Publicerad",
+  media: "Media",
+  clickToSelectMedia: "Klicka för att välja bild eller video",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };
