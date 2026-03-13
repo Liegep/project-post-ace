@@ -91,7 +91,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} />
           </div>
           <div>
-            <Label>{t("image")}</Label>
+            <Label>{t("media")}</Label>
             <input
               ref={fileInputRef}
               type="file"
