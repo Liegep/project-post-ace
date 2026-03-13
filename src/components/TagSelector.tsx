@@ -1,11 +1,17 @@
 import { useState } from "react";
-import { Tag } from "@/types/post";
+import { Tag, TAG_TRANSLATION_KEYS } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
 import { useI18n } from "@/i18n/I18nContext";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Check } from "lucide-react";
+
+const useTagName = (tag: Tag) => {
+  const { t } = useI18n();
+  const translationKey = TAG_TRANSLATION_KEYS[tag.id];
+  return translationKey ? t(translationKey) : tag.name;
+};
 
 interface TagSelectorProps {
   selectedTagIds: string[];
