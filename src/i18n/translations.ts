@@ -237,6 +237,8 @@ const es: TranslationKeys = {
   clientSubtitle: "Visualiza y aprueba tu contenido",
   noPostsToReview: "No hay publicaciones para revisar en este momento.",
   language: "Idioma",
+  editPost: "Editar Publicación",
+  saveChanges: "Guardar Cambios",
 };
 
 const sv: TranslationKeys = {
