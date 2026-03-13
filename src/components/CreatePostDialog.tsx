@@ -101,7 +101,11 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
             />
             {imagePreview ? (
               <div className="relative mt-1 rounded-lg border overflow-hidden" style={{ aspectRatio: "4/5" }}>
-                <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                {mediaType === "video" ? (
+                  <video src={imagePreview} className="h-full w-full object-cover" controls muted />
+                ) : (
+                  <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                )}
                 <button
                   type="button"
                   onClick={clearImage}
