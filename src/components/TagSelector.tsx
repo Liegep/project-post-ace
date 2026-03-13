@@ -110,19 +110,22 @@ interface TagDisplayProps {
 }
 
 export const TagDisplay = ({ tagIds, tags }: TagDisplayProps) => {
+  const { t } = useI18n();
   if (tagIds.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-1">
       {tagIds.map((id) => {
         const tag = tags.find((t) => t.id === id);
         if (!tag) return null;
+        const translationKey = TAG_TRANSLATION_KEYS[tag.id];
+        const displayName = translationKey ? t(translationKey) : tag.name;
         return (
           <span
             key={id}
             className="inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold"
             style={{ backgroundColor: tag.color, color: "#fff" }}
           >
-            {tag.name}
+            {displayName}
           </span>
         );
       })}

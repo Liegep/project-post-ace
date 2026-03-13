@@ -38,6 +38,13 @@ export const DEFAULT_TAGS: Tag[] = [
   { id: "publicado", name: "Publicado", color: "#22c55e" },
 ];
 
+export const TAG_TRANSLATION_KEYS: Record<string, "tagSEO" | "tagAltered" | "tagScheduled" | "tagPublished"> = {
+  seo: "tagSEO",
+  alterado: "tagAltered",
+  agendado: "tagScheduled",
+  publicado: "tagPublished",
+};
+
 export const STATUS_CONFIG: Record<PostStatus, { label: string; color: string }> = {
   em_desenvolvimento: { label: "Em Desenvolvimento", color: "bg-info text-info-foreground" },
   escrevendo_legenda: { label: "Escrevendo Legenda", color: "bg-warning text-warning-foreground" },
