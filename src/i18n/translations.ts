@@ -280,6 +280,8 @@ const sv: TranslationKeys = {
   clientSubtitle: "Visa och godkänn ditt innehåll",
   noPostsToReview: "Inga inlägg att granska just nu.",
   language: "Språk",
+  editPost: "Redigera Inlägg",
+  saveChanges: "Spara Ändringar",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };

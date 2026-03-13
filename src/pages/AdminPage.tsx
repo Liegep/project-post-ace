@@ -104,6 +104,7 @@ const AdminPage = () => {
       </main>
 
       <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
     </div>
   );
 };
