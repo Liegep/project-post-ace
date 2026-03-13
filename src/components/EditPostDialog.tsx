@@ -76,6 +76,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
     updatePost(post.id, {
       title,
       imageUrl,
+      mediaType,
       caption,
       deadline: new Date(deadline),
       tags: selectedTags,
