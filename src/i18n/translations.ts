@@ -151,6 +151,8 @@ const en: TranslationKeys = {
   clientSubtitle: "View and approve your content",
   noPostsToReview: "No posts to review at this time.",
   language: "Language",
+  editPost: "Edit Post",
+  saveChanges: "Save Changes",
 };
 
 const it: TranslationKeys = {
