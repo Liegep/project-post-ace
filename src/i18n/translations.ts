@@ -108,6 +108,8 @@ const pt: TranslationKeys = {
   clientSubtitle: "Visualize e aprove seus conteúdos",
   noPostsToReview: "Nenhum post para revisar no momento.",
   language: "Idioma",
+  editPost: "Editar Post",
+  saveChanges: "Salvar Alterações",
 };
 
 const en: TranslationKeys = {
