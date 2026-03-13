@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { usePosts } from "@/context/PostsContext";
 import { useI18n } from "@/i18n/I18nContext";
-import { PostStatus } from "@/types/post";
+import { PostStatus, MediaType } from "@/types/post";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
