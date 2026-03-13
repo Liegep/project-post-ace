@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { usePosts } from "@/context/PostsContext";
 import { useI18n } from "@/i18n/I18nContext";
-import { PostStatus } from "@/types/post";
+import { PostStatus, MediaType } from "@/types/post";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { STATUS_CONFIG } from "@/types/post";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, X, Video } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 
 const STATUS_KEYS = {
@@ -29,6 +29,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
   const [title, setTitle] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState("");
+  const [mediaType, setMediaType] = useState<MediaType>("image");
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState<PostStatus>("em_desenvolvimento");
@@ -38,6 +39,8 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const isVideo = file.type.startsWith("video/");
+    setMediaType(isVideo ? "video" : "image");
     const reader = new FileReader();
     reader.onload = (ev) => {
       const dataUrl = ev.target?.result as string;
@@ -60,6 +63,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
     addPost({
       title,
       imageUrl,
+      mediaType,
       caption,
       deadline: new Date(deadline),
       status,
@@ -87,17 +91,21 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} />
           </div>
           <div>
-            <Label>{t("image")}</Label>
+            <Label>{t("media")}</Label>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/*,video/*"
               onChange={handleFileChange}
               className="hidden"
             />
             {imagePreview ? (
               <div className="relative mt-1 rounded-lg border overflow-hidden" style={{ aspectRatio: "4/5" }}>
-                <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                {mediaType === "video" ? (
+                  <video src={imagePreview} className="h-full w-full object-cover" controls muted />
+                ) : (
+                  <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                )}
                 <button
                   type="button"
                   onClick={clearImage}
@@ -113,7 +121,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
                 className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/30 py-8 text-sm text-muted-foreground transition-colors hover:border-accent hover:text-accent"
               >
                 <ImagePlus className="h-5 w-5" />
-                {t("clickToSelectImage")}
+                {t("clickToSelectMedia")}
               </button>
             )}
           </div>

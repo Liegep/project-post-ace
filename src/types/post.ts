@@ -15,10 +15,13 @@ export interface Comment {
   createdAt: Date;
 }
 
+export type MediaType = "image" | "video";
+
 export interface Post {
   id: string;
   title: string;
   imageUrl: string;
+  mediaType: MediaType;
   caption: string;
   deadline: Date;
   status: PostStatus;
@@ -34,6 +37,13 @@ export const DEFAULT_TAGS: Tag[] = [
   { id: "agendado", name: "Agendado", color: "#8b5cf6" },
   { id: "publicado", name: "Publicado", color: "#22c55e" },
 ];
+
+export const TAG_TRANSLATION_KEYS: Record<string, "tagSEO" | "tagAltered" | "tagScheduled" | "tagPublished"> = {
+  seo: "tagSEO",
+  alterado: "tagAltered",
+  agendado: "tagScheduled",
+  publicado: "tagPublished",
+};
 
 export const STATUS_CONFIG: Record<PostStatus, { label: string; color: string }> = {
   em_desenvolvimento: { label: "Em Desenvolvimento", color: "bg-info text-info-foreground" },

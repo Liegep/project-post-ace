@@ -67,6 +67,14 @@ type TranslationKeys = {
   // Edit
   editPost: string;
   saveChanges: string;
+  // Tags translated
+  tagSEO: string;
+  tagAltered: string;
+  tagScheduled: string;
+  tagPublished: string;
+  // Media
+  media: string;
+  clickToSelectMedia: string;
 };
 
 const pt: TranslationKeys = {
@@ -110,6 +118,12 @@ const pt: TranslationKeys = {
   language: "Idioma",
   editPost: "Editar Post",
   saveChanges: "Salvar Alterações",
+  tagSEO: "SEO",
+  tagAltered: "Alterado",
+  tagScheduled: "Agendado",
+  tagPublished: "Publicado",
+  media: "Mídia",
+  clickToSelectMedia: "Clique para selecionar imagem ou vídeo",
 };
 
 const en: TranslationKeys = {
@@ -153,6 +167,12 @@ const en: TranslationKeys = {
   language: "Language",
   editPost: "Edit Post",
   saveChanges: "Save Changes",
+  tagSEO: "SEO",
+  tagAltered: "Altered",
+  tagScheduled: "Scheduled",
+  tagPublished: "Published",
+  media: "Media",
+  clickToSelectMedia: "Click to select image or video",
 };
 
 const it: TranslationKeys = {
@@ -196,6 +216,12 @@ const it: TranslationKeys = {
   language: "Lingua",
   editPost: "Modifica Post",
   saveChanges: "Salva Modifiche",
+  tagSEO: "SEO",
+  tagAltered: "Modificato",
+  tagScheduled: "Programmato",
+  tagPublished: "Pubblicato",
+  media: "Media",
+  clickToSelectMedia: "Clicca per selezionare immagine o video",
 };
 
 const es: TranslationKeys = {
@@ -239,6 +265,12 @@ const es: TranslationKeys = {
   language: "Idioma",
   editPost: "Editar Publicación",
   saveChanges: "Guardar Cambios",
+  tagSEO: "SEO",
+  tagAltered: "Alterado",
+  tagScheduled: "Programado",
+  tagPublished: "Publicado",
+  media: "Medios",
+  clickToSelectMedia: "Haz clic para seleccionar imagen o video",
 };
 
 const sv: TranslationKeys = {
@@ -282,6 +314,12 @@ const sv: TranslationKeys = {
   language: "Språk",
   editPost: "Redigera Inlägg",
   saveChanges: "Spara Ändringar",
+  tagSEO: "SEO",
+  tagAltered: "Ändrad",
+  tagScheduled: "Schemalagd",
+  tagPublished: "Publicerad",
+  media: "Media",
+  clickToSelectMedia: "Klicka för att välja bild eller video",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };

@@ -1,11 +1,17 @@
 import { useState } from "react";
-import { Tag } from "@/types/post";
+import { Tag, TAG_TRANSLATION_KEYS } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
 import { useI18n } from "@/i18n/I18nContext";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Check } from "lucide-react";
+
+const useTagName = (tag: Tag) => {
+  const { t } = useI18n();
+  const translationKey = TAG_TRANSLATION_KEYS[tag.id];
+  return translationKey ? t(translationKey) : tag.name;
+};
 
 interface TagSelectorProps {
   selectedTagIds: string[];
@@ -41,6 +47,8 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
       <div className="flex flex-wrap gap-1.5">
         {tags.map((tag) => {
           const selected = selectedTagIds.includes(tag.id);
+          const translationKey = TAG_TRANSLATION_KEYS[tag.id];
+          const displayName = translationKey ? t(translationKey) : tag.name;
           return (
             <button
               key={tag.id}
@@ -54,7 +62,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
               }}
             >
               {selected && <Check className="h-3 w-3" />}
-              {tag.name}
+              {displayName}
             </button>
           );
         })}
@@ -102,19 +110,22 @@ interface TagDisplayProps {
 }
 
 export const TagDisplay = ({ tagIds, tags }: TagDisplayProps) => {
+  const { t } = useI18n();
   if (tagIds.length === 0) return null;
   return (
     <div className="flex flex-wrap gap-1">
       {tagIds.map((id) => {
         const tag = tags.find((t) => t.id === id);
         if (!tag) return null;
+        const translationKey = TAG_TRANSLATION_KEYS[tag.id];
+        const displayName = translationKey ? t(translationKey) : tag.name;
         return (
           <span
             key={id}
             className="inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold"
             style={{ backgroundColor: tag.color, color: "#fff" }}
           >
-            {tag.name}
+            {displayName}
           </span>
         );
       })}
