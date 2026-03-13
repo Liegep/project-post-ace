@@ -64,6 +64,9 @@ type TranslationKeys = {
   noPostsToReview: string;
   // Language
   language: string;
+  // Edit
+  editPost: string;
+  saveChanges: string;
 };
 
 const pt: TranslationKeys = {
@@ -105,6 +108,8 @@ const pt: TranslationKeys = {
   clientSubtitle: "Visualize e aprove seus conteúdos",
   noPostsToReview: "Nenhum post para revisar no momento.",
   language: "Idioma",
+  editPost: "Editar Post",
+  saveChanges: "Salvar Alterações",
 };
 
 const en: TranslationKeys = {
@@ -146,6 +151,8 @@ const en: TranslationKeys = {
   clientSubtitle: "View and approve your content",
   noPostsToReview: "No posts to review at this time.",
   language: "Language",
+  editPost: "Edit Post",
+  saveChanges: "Save Changes",
 };
 
 const it: TranslationKeys = {
@@ -187,6 +194,8 @@ const it: TranslationKeys = {
   clientSubtitle: "Visualizza e approva i tuoi contenuti",
   noPostsToReview: "Nessun post da revisionare al momento.",
   language: "Lingua",
+  editPost: "Modifica Post",
+  saveChanges: "Salva Modifiche",
 };
 
 const es: TranslationKeys = {
@@ -228,6 +237,8 @@ const es: TranslationKeys = {
   clientSubtitle: "Visualiza y aprueba tu contenido",
   noPostsToReview: "No hay publicaciones para revisar en este momento.",
   language: "Idioma",
+  editPost: "Editar Publicación",
+  saveChanges: "Guardar Cambios",
 };
 
 const sv: TranslationKeys = {
@@ -269,6 +280,8 @@ const sv: TranslationKeys = {
   clientSubtitle: "Visa och godkänn ditt innehåll",
   noPostsToReview: "Inga inlägg att granska just nu.",
   language: "Språk",
+  editPost: "Redigera Inlägg",
+  saveChanges: "Spara Ändringar",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };

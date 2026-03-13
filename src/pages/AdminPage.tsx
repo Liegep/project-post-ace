@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { usePosts } from "@/context/PostsContext";
-import { PostStatus, STATUS_CONFIG } from "@/types/post";
+import { Post, PostStatus, STATUS_CONFIG } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
+import { EditPostDialog } from "@/components/EditPostDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ const AdminPage = () => {
   const { t } = useI18n();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [createOpen, setCreateOpen] = useState(false);
+  const [editPost, setEditPost] = useState<Post | null>(null);
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,6 +77,7 @@ const AdminPage = () => {
                         isAdmin
                         onStatusChange={(s) => updatePostStatus(post.id, s)}
                         onDelete={() => deletePost(post.id)}
+                        onEdit={() => setEditPost(post)}
                       />
                     ))}
                     {columnPosts.length === 0 && (
@@ -94,6 +97,7 @@ const AdminPage = () => {
                 isAdmin
                 onStatusChange={(s) => updatePostStatus(post.id, s)}
                 onDelete={() => deletePost(post.id)}
+                onEdit={() => setEditPost(post)}
               />
             ))}
           </div>
@@ -101,6 +105,7 @@ const AdminPage = () => {
       </main>
 
       <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
     </div>
   );
 };

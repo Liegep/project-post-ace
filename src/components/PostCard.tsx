@@ -31,9 +31,10 @@ interface PostCardProps {
   isAdmin: boolean;
   onStatusChange?: (status: PostStatus) => void;
   onDelete?: () => void;
+  onEdit?: () => void;
 }
 
-export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardProps) => {
+export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags } = usePosts();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
@@ -50,7 +51,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
   };
 
   return (
-    <Card className="overflow-hidden transition-shadow hover:shadow-md">
+    <Card className={`overflow-hidden transition-shadow hover:shadow-md ${isAdmin ? "cursor-pointer" : ""}`} onClick={isAdmin ? onEdit : undefined}>
       <div className="p-4 pb-2">
         <h3 className="text-lg font-bold leading-snug text-foreground">{post.title}</h3>
       </div>
@@ -89,7 +90,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
         </div>
 
         {isAdmin && (
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
             <Select value={post.status} onValueChange={(v) => onStatusChange?.(v as PostStatus)}>
               <SelectTrigger className="h-8 flex-1 text-xs">
                 <SelectValue />
@@ -100,7 +101,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardPr
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="ghost" size="icon" onClick={onDelete} className="h-8 w-8 text-destructive hover:text-destructive">
+            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className="h-8 w-8 text-destructive hover:text-destructive">
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
