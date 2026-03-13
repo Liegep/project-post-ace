@@ -95,7 +95,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/*,video/*"
               onChange={handleFileChange}
               className="hidden"
             />
