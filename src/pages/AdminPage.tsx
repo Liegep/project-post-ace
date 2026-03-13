@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { usePosts } from "@/context/PostsContext";
-import { PostStatus, STATUS_CONFIG } from "@/types/post";
+import { Post, PostStatus, STATUS_CONFIG } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
+import { EditPostDialog } from "@/components/EditPostDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
