@@ -63,6 +63,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
     addPost({
       title,
       imageUrl,
+      mediaType,
       caption,
       deadline: new Date(deadline),
       status,
