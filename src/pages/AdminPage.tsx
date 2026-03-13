@@ -76,6 +76,7 @@ const AdminPage = () => {
                         isAdmin
                         onStatusChange={(s) => updatePostStatus(post.id, s)}
                         onDelete={() => deletePost(post.id)}
+                        onEdit={() => setEditPost(post)}
                       />
                     ))}
                     {columnPosts.length === 0 && (
