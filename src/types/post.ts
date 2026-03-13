@@ -15,10 +15,13 @@ export interface Comment {
   createdAt: Date;
 }
 
+export type MediaType = "image" | "video";
+
 export interface Post {
   id: string;
   title: string;
   imageUrl: string;
+  mediaType: MediaType;
   caption: string;
   deadline: Date;
   status: PostStatus;

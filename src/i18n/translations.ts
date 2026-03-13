@@ -67,6 +67,14 @@ type TranslationKeys = {
   // Edit
   editPost: string;
   saveChanges: string;
+  // Tags translated
+  tagSEO: string;
+  tagAltered: string;
+  tagScheduled: string;
+  tagPublished: string;
+  // Media
+  media: string;
+  clickToSelectMedia: string;
 };
 
 const pt: TranslationKeys = {
