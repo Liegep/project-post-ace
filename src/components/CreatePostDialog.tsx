@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { STATUS_CONFIG } from "@/types/post";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, X, Video } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 
 const STATUS_KEYS = {
