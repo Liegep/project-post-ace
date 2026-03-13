@@ -34,6 +34,7 @@ const SAMPLE_POSTS: Post[] = [
     id: "2",
     title: "Story - Lançamento Produto",
     imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
+    mediaType: "image",
     caption: "🚀 Novo produto chegando! Fique ligado para o grande lançamento desta semana.",
     deadline: new Date("2026-03-15"),
     status: "escrevendo_legenda",
