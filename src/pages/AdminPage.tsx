@@ -21,6 +21,7 @@ const AdminPage = () => {
   const { t } = useI18n();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [createOpen, setCreateOpen] = useState(false);
+  const [editPost, setEditPost] = useState<Post | null>(null);
 
   return (
     <div className="min-h-screen bg-background">
