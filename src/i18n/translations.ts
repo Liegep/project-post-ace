@@ -265,6 +265,12 @@ const es: TranslationKeys = {
   language: "Idioma",
   editPost: "Editar Publicación",
   saveChanges: "Guardar Cambios",
+  tagSEO: "SEO",
+  tagAltered: "Alterado",
+  tagScheduled: "Programado",
+  tagPublished: "Publicado",
+  media: "Medios",
+  clickToSelectMedia: "Haz clic para seleccionar imagen o video",
 };
 
 const sv: TranslationKeys = {
