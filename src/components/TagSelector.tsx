@@ -47,6 +47,8 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
       <div className="flex flex-wrap gap-1.5">
         {tags.map((tag) => {
           const selected = selectedTagIds.includes(tag.id);
+          const translationKey = TAG_TRANSLATION_KEYS[tag.id];
+          const displayName = translationKey ? t(translationKey) : tag.name;
           return (
             <button
               key={tag.id}
@@ -60,7 +62,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
               }}
             >
               {selected && <Check className="h-3 w-3" />}
-              {tag.name}
+              {displayName}
             </button>
           );
         })}
