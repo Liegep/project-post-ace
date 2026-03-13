@@ -32,6 +32,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [imagePreview, setImagePreview] = useState("");
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
+  const [mediaType, setMediaType] = useState<MediaType>("image");
   const [status, setStatus] = useState<PostStatus>("em_desenvolvimento");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
