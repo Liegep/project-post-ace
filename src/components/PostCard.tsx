@@ -34,7 +34,7 @@ interface PostCardProps {
   onEdit?: () => void;
 }
 
-export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardProps) => {
+export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags } = usePosts();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
