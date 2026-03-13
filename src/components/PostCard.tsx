@@ -90,7 +90,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
         </div>
 
         {isAdmin && (
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
             <Select value={post.status} onValueChange={(v) => onStatusChange?.(v as PostStatus)}>
               <SelectTrigger className="h-8 flex-1 text-xs">
                 <SelectValue />
@@ -101,7 +101,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="ghost" size="icon" onClick={onDelete} className="h-8 w-8 text-destructive hover:text-destructive">
+            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className="h-8 w-8 text-destructive hover:text-destructive">
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
