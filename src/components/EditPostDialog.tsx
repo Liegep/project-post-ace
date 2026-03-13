@@ -97,17 +97,21 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
             <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} />
           </div>
           <div>
-            <Label>{t("image")}</Label>
+            <Label>{t("media")}</Label>
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/*,video/*"
               onChange={handleFileChange}
               className="hidden"
             />
             {imagePreview ? (
               <div className="relative mt-1 rounded-lg border overflow-hidden" style={{ aspectRatio: "4/5" }}>
-                <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                {mediaType === "video" ? (
+                  <video src={imagePreview} className="h-full w-full object-cover" controls muted />
+                ) : (
+                  <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                )}
                 <div className="absolute top-2 right-2 flex gap-1">
                   <button
                     type="button"
