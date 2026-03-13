@@ -64,6 +64,9 @@ type TranslationKeys = {
   noPostsToReview: string;
   // Language
   language: string;
+  // Edit
+  editPost: string;
+  saveChanges: string;
 };
 
 const pt: TranslationKeys = {
