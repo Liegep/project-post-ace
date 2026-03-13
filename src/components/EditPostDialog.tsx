@@ -43,6 +43,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       setImageUrl(post.imageUrl);
       setImagePreview(post.imageUrl);
       setMediaType(post.mediaType || "image");
+      setCaption(post.caption);
       setDeadline(format(post.deadline, "yyyy-MM-dd"));
       setStatus(post.status);
       setSelectedTags(post.tags);
