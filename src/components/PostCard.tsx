@@ -57,7 +57,11 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
       </div>
 
       <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
-        <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover" />
+        {post.mediaType === "video" ? (
+          <video src={post.imageUrl} className="h-full w-full object-cover" controls muted />
+        ) : (
+          <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover" />
+        )}
         <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
           <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${statusConfig.color}`}>
             {t(STATUS_KEYS[post.status])}
