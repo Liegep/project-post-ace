@@ -31,6 +31,7 @@ interface PostCardProps {
   isAdmin: boolean;
   onStatusChange?: (status: PostStatus) => void;
   onDelete?: () => void;
+  onEdit?: () => void;
 }
 
 export const PostCard = ({ post, isAdmin, onStatusChange, onDelete }: PostCardProps) => {
