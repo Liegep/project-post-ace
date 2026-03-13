@@ -52,6 +52,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const isVideo = file.type.startsWith("video/");
+    setMediaType(isVideo ? "video" : "image");
     const reader = new FileReader();
     reader.onload = (ev) => {
       const dataUrl = ev.target?.result as string;
