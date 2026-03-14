@@ -19,11 +19,26 @@ const STATUS_KEYS: Record<PostStatus, "statusInDevelopment" | "statusWritingCapt
 };
 
 const AdminPage = () => {
-  const { posts, updatePostStatus, deletePost } = usePosts();
+  const { posts, updatePostStatus, deletePost, postingPeriod, setPostingPeriod } = usePosts();
   const { t } = useI18n();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
+  const [editingPeriod, setEditingPeriod] = useState(false);
+  const [periodDraft, setPeriodDraft] = useState(postingPeriod);
+  const periodInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingPeriod && periodInputRef.current) {
+      periodInputRef.current.focus();
+      periodInputRef.current.select();
+    }
+  }, [editingPeriod]);
+
+  const savePeriod = () => {
+    if (periodDraft.trim()) setPostingPeriod(periodDraft.trim());
+    setEditingPeriod(false);
+  };
 
   return (
     <div className="min-h-screen bg-background">
