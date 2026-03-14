@@ -117,7 +117,7 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   return (
-    <PostsContext.Provider value={{ posts, tags, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag }}>
+    <PostsContext.Provider value={{ posts, tags, postingPeriod, setPostingPeriod, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag }}>
       {children}
     </PostsContext.Provider>
   );

@@ -16,7 +16,8 @@ const ClientPage = () => {
       </header>
 
       <main className="mx-auto max-w-7xl p-6">
-        <h2 className="mb-6 text-center text-xl font-bold text-foreground">{t("postsForApproval")}</h2>
+        <h2 className="mb-2 text-center text-2xl font-bold text-foreground">{postingPeriod}</h2>
+        <p className="mb-6 text-center text-sm text-muted-foreground">{t("postsForApproval")}</p>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {posts.length === 0 && (
             <p className="col-span-full py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>

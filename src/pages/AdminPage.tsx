@@ -72,6 +72,27 @@ const AdminPage = () => {
       </header>
 
       <main className="mx-auto max-w-7xl p-6">
+        <div className="mb-8 flex items-center justify-center gap-2">
+          {editingPeriod ? (
+            <Input
+              ref={periodInputRef}
+              value={periodDraft}
+              onChange={(e) => setPeriodDraft(e.target.value)}
+              onBlur={savePeriod}
+              onKeyDown={(e) => { if (e.key === "Enter") savePeriod(); if (e.key === "Escape") { setPeriodDraft(postingPeriod); setEditingPeriod(false); } }}
+              placeholder={t("editPeriodPlaceholder")}
+              className="max-w-xs text-center text-2xl font-bold border-accent"
+            />
+          ) : (
+            <button
+              onClick={() => { setPeriodDraft(postingPeriod); setEditingPeriod(true); }}
+              className="group flex items-center gap-2 text-2xl font-bold text-foreground hover:text-accent transition-colors"
+            >
+              {postingPeriod}
+              <Pencil className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
+            </button>
+          )}
+        </div>
         {view === "kanban" ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {COLUMNS.map((status) => {
