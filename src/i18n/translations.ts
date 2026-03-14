@@ -178,6 +178,8 @@ const en: TranslationKeys = {
   tagPublished: "Published",
   media: "Media",
   clickToSelectMedia: "Click to select image or video",
+  postingPeriod: "Posting Period",
+  editPeriodPlaceholder: "E.g.: March 2026",
 };
 
 const it: TranslationKeys = {
