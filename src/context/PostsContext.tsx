@@ -4,6 +4,8 @@ import { Post, PostStatus, ClientLabel, Comment, Tag, DEFAULT_TAGS } from "@/typ
 interface PostsContextType {
   posts: Post[];
   tags: Tag[];
+  postingPeriod: string;
+  setPostingPeriod: (period: string) => void;
   addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => void;
   updatePostStatus: (id: string, status: PostStatus) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
