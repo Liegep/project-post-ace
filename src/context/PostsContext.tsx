@@ -4,6 +4,8 @@ import { Post, PostStatus, ClientLabel, Comment, Tag, DEFAULT_TAGS } from "@/typ
 interface PostsContextType {
   posts: Post[];
   tags: Tag[];
+  postingPeriod: string;
+  setPostingPeriod: (period: string) => void;
   addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => void;
   updatePostStatus: (id: string, status: PostStatus) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
@@ -65,6 +67,7 @@ const SAMPLE_POSTS: Post[] = [
 export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [posts, setPosts] = useState<Post[]>(SAMPLE_POSTS);
   const [tags, setTags] = useState<Tag[]>(DEFAULT_TAGS);
+  const [postingPeriod, setPostingPeriod] = useState("Março 2026");
 
   const addPost = useCallback((post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => {
     setPosts((prev) => [
@@ -114,7 +117,7 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   return (
-    <PostsContext.Provider value={{ posts, tags, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag }}>
+    <PostsContext.Provider value={{ posts, tags, postingPeriod, setPostingPeriod, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag }}>
       {children}
     </PostsContext.Provider>
   );

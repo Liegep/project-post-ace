@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePosts } from "@/context/PostsContext";
 import { Post, PostStatus, STATUS_CONFIG } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
@@ -7,7 +7,8 @@ import { EditPostDialog } from "@/components/EditPostDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutGrid, List } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Plus, LayoutGrid, List, Pencil } from "lucide-react";
 
 const COLUMNS: PostStatus[] = ["em_desenvolvimento", "escrevendo_legenda", "pronto"];
 
@@ -18,11 +19,26 @@ const STATUS_KEYS: Record<PostStatus, "statusInDevelopment" | "statusWritingCapt
 };
 
 const AdminPage = () => {
-  const { posts, updatePostStatus, deletePost } = usePosts();
+  const { posts, updatePostStatus, deletePost, postingPeriod, setPostingPeriod } = usePosts();
   const { t } = useI18n();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
+  const [editingPeriod, setEditingPeriod] = useState(false);
+  const [periodDraft, setPeriodDraft] = useState(postingPeriod);
+  const periodInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingPeriod && periodInputRef.current) {
+      periodInputRef.current.focus();
+      periodInputRef.current.select();
+    }
+  }, [editingPeriod]);
+
+  const savePeriod = () => {
+    if (periodDraft.trim()) setPostingPeriod(periodDraft.trim());
+    setEditingPeriod(false);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -56,6 +72,27 @@ const AdminPage = () => {
       </header>
 
       <main className="mx-auto max-w-7xl p-6">
+        <div className="mb-8 flex items-center justify-center gap-2">
+          {editingPeriod ? (
+            <Input
+              ref={periodInputRef}
+              value={periodDraft}
+              onChange={(e) => setPeriodDraft(e.target.value)}
+              onBlur={savePeriod}
+              onKeyDown={(e) => { if (e.key === "Enter") savePeriod(); if (e.key === "Escape") { setPeriodDraft(postingPeriod); setEditingPeriod(false); } }}
+              placeholder={t("editPeriodPlaceholder")}
+              className="max-w-xs text-center text-2xl font-bold border-accent"
+            />
+          ) : (
+            <button
+              onClick={() => { setPeriodDraft(postingPeriod); setEditingPeriod(true); }}
+              className="group flex items-center gap-2 text-2xl font-bold text-foreground hover:text-accent transition-colors"
+            >
+              {postingPeriod}
+              <Pencil className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
+            </button>
+          )}
+        </div>
         {view === "kanban" ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {COLUMNS.map((status) => {
