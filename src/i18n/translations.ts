@@ -75,6 +75,9 @@ type TranslationKeys = {
   // Media
   media: string;
   clickToSelectMedia: string;
+  // Posting period
+  postingPeriod: string;
+  editPeriodPlaceholder: string;
 };
 
 const pt: TranslationKeys = {
