@@ -24,7 +24,7 @@ interface CreatePostDialogProps {
 }
 
 export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) => {
-  const { addPost } = usePosts();
+  const { addPost, uploadMedia } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -34,17 +34,19 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState<PostStatus>("em_desenvolvimento");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pendingFileRef = useRef<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const isVideo = file.type.startsWith("video/");
     setMediaType(isVideo ? "video" : "image");
+    pendingFileRef.current = file;
     const reader = new FileReader();
     reader.onload = (ev) => {
       const dataUrl = ev.target?.result as string;
-      setImageUrl(dataUrl);
       setImagePreview(dataUrl);
     };
     reader.readAsDataURL(file);
@@ -53,30 +55,41 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
   const clearImage = () => {
     setImageUrl("");
     setImagePreview("");
+    pendingFileRef.current = null;
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !imageUrl || !caption || !deadline) return;
+    if (!title || (!imagePreview && !imageUrl) || !caption || !deadline) return;
 
-    addPost({
-      title,
-      imageUrl,
-      mediaType,
-      caption,
-      deadline: new Date(deadline),
-      status,
-      tags: selectedTags,
-    });
+    setUploading(true);
+    try {
+      let finalUrl = imageUrl;
+      if (pendingFileRef.current) {
+        finalUrl = await uploadMedia(pendingFileRef.current);
+      }
 
-    setTitle("");
-    clearImage();
-    setCaption("");
-    setDeadline("");
-    setStatus("em_desenvolvimento");
-    setSelectedTags([]);
-    onOpenChange(false);
+      await addPost({
+        title,
+        imageUrl: finalUrl,
+        mediaType,
+        caption,
+        deadline: new Date(deadline),
+        status,
+        tags: selectedTags,
+      });
+
+      setTitle("");
+      clearImage();
+      setCaption("");
+      setDeadline("");
+      setStatus("em_desenvolvimento");
+      setSelectedTags([]);
+      onOpenChange(false);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -154,8 +167,8 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
               <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
             </div>
           </div>
-          <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-            {t("createPost")}
+          <Button type="submit" disabled={uploading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+            {uploading ? "..." : t("createPost")}
           </Button>
         </form>
       </DialogContent>

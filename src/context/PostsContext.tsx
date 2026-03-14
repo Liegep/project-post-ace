@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
-import { Post, PostStatus, ClientLabel, Comment, Tag, DEFAULT_TAGS } from "@/types/post";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import { Post, PostStatus, ClientLabel, Comment, Tag, MediaType } from "@/types/post";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PostsContextType {
   posts: Post[];
@@ -14,110 +15,147 @@ interface PostsContextType {
   updatePost: (id: string, updates: Partial<Post>) => void;
   addTag: (name: string, color: string) => Tag;
   deleteTag: (id: string) => void;
+  uploadMedia: (file: File) => Promise<string>;
+  loading: boolean;
 }
 
 const PostsContext = createContext<PostsContextType | undefined>(undefined);
 
-const SAMPLE_POSTS: Post[] = [
-  {
-    id: "1",
-    title: "Post Instagram - Campanha Verão",
-    imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop",
-    mediaType: "image",
-    caption: "☀️ O verão chegou e com ele nossas melhores ofertas! Aproveite descontos de até 50% em toda a coleção. #Verão2024 #Moda",
-    deadline: new Date("2026-03-20"),
-    status: "em_desenvolvimento",
-    clientLabel: "pendente",
-    comments: [],
-    tags: ["seo"],
-    createdAt: new Date("2026-03-08"),
-  },
-  {
-    id: "2",
-    title: "Story - Lançamento Produto",
-    imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
-    mediaType: "image",
-    caption: "🚀 Novo produto chegando! Fique ligado para o grande lançamento desta semana.",
-    deadline: new Date("2026-03-15"),
-    status: "escrevendo_legenda",
-    clientLabel: "leia_comentario",
-    comments: [
-      { id: "c1", postId: "2", author: "Cliente", text: "Podemos trocar a cor de fundo?", createdAt: new Date("2026-03-10") },
-    ],
-    tags: ["agendado"],
-    createdAt: new Date("2026-03-05"),
-  },
-  {
-    id: "3",
-    title: "Carrossel - Dicas de Bem-estar",
-    imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=400&fit=crop",
-    mediaType: "image",
-    caption: "🧘 5 dicas para manter o equilíbrio no dia a dia. Swipe para ver todas! #BemEstar #Saúde",
-    deadline: new Date("2026-03-12"),
-    status: "pronto",
-    clientLabel: "aprovado",
-    comments: [
-      { id: "c2", postId: "3", author: "Cliente", text: "Perfeito! Aprovado!", createdAt: new Date("2026-03-11") },
-    ],
-    tags: ["publicado", "seo"],
-    createdAt: new Date("2026-03-01"),
-  },
-];
+function dbPostToPost(row: any, comments: Comment[]): Post {
+  return {
+    id: row.id,
+    title: row.title,
+    imageUrl: row.image_url,
+    mediaType: (row.media_type || "image") as MediaType,
+    caption: row.caption,
+    deadline: new Date(row.deadline),
+    status: row.status as PostStatus,
+    clientLabel: row.client_label as ClientLabel,
+    comments,
+    tags: row.tags || [],
+    createdAt: new Date(row.created_at),
+  };
+}
 
 export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [posts, setPosts] = useState<Post[]>(SAMPLE_POSTS);
-  const [tags, setTags] = useState<Tag[]>(DEFAULT_TAGS);
-  const [postingPeriod, setPostingPeriod] = useState("Março 2026");
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [postingPeriod, setPostingPeriodState] = useState("Março 2026");
+  const [loading, setLoading] = useState(true);
 
-  const addPost = useCallback((post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => {
-    setPosts((prev) => [
-      ...prev,
-      {
-        ...post,
-        id: crypto.randomUUID(),
-        comments: [],
-        clientLabel: "pendente",
-        createdAt: new Date(),
-      },
-    ]);
+  // Fetch all data on mount
+  useEffect(() => {
+    const fetchAll = async () => {
+      setLoading(true);
+      const [postsRes, commentsRes, tagsRes, settingsRes] = await Promise.all([
+        supabase.from("posts").select("*").order("created_at", { ascending: false }),
+        supabase.from("comments").select("*").order("created_at", { ascending: true }),
+        supabase.from("tags").select("*"),
+        supabase.from("app_settings").select("*").eq("key", "posting_period").single(),
+      ]);
+
+      const commentsMap: Record<string, Comment[]> = {};
+      (commentsRes.data || []).forEach((c: any) => {
+        const comment: Comment = { id: c.id, postId: c.post_id, author: c.author, text: c.text, createdAt: new Date(c.created_at) };
+        if (!commentsMap[c.post_id]) commentsMap[c.post_id] = [];
+        commentsMap[c.post_id].push(comment);
+      });
+
+      setPosts((postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || [])));
+      setTags((tagsRes.data || []).map((t: any) => ({ id: t.id, name: t.name, color: t.color })));
+      if (settingsRes.data) setPostingPeriodState(settingsRes.data.value);
+      setLoading(false);
+    };
+    fetchAll();
   }, []);
 
-  const updatePostStatus = useCallback((id: string, status: PostStatus) => {
+  const setPostingPeriod = useCallback(async (period: string) => {
+    setPostingPeriodState(period);
+    await supabase.from("app_settings").update({ value: period }).eq("key", "posting_period");
+  }, []);
+
+  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => {
+    const { data, error } = await supabase.from("posts").insert({
+      title: post.title,
+      image_url: post.imageUrl,
+      media_type: post.mediaType,
+      caption: post.caption,
+      deadline: post.deadline.toISOString(),
+      status: post.status,
+      tags: post.tags,
+    }).select().single();
+    if (data && !error) {
+      setPosts((prev) => [dbPostToPost(data, []), ...prev]);
+    }
+  }, []);
+
+  const updatePostStatus = useCallback(async (id: string, status: PostStatus) => {
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
+    await supabase.from("posts").update({ status }).eq("id", id);
   }, []);
 
-  const updateClientLabel = useCallback((id: string, label: ClientLabel) => {
+  const updateClientLabel = useCallback(async (id: string, label: ClientLabel) => {
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, clientLabel: label } : p)));
+    await supabase.from("posts").update({ client_label: label }).eq("id", id);
   }, []);
 
-  const addComment = useCallback((postId: string, author: string, text: string) => {
-    const comment: Comment = { id: crypto.randomUUID(), postId, author, text, createdAt: new Date() };
-    setPosts((prev) =>
-      prev.map((p) => (p.id === postId ? { ...p, comments: [...p.comments, comment] } : p))
-    );
+  const addComment = useCallback(async (postId: string, author: string, text: string) => {
+    const { data, error } = await supabase.from("comments").insert({
+      post_id: postId,
+      author,
+      text,
+    }).select().single();
+    if (data && !error) {
+      const comment: Comment = { id: data.id, postId: data.post_id, author: data.author, text: data.text, createdAt: new Date(data.created_at) };
+      setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, comments: [...p.comments, comment] } : p)));
+    }
   }, []);
 
-  const deletePost = useCallback((id: string) => {
+  const deletePost = useCallback(async (id: string) => {
     setPosts((prev) => prev.filter((p) => p.id !== id));
+    await supabase.from("posts").delete().eq("id", id);
   }, []);
 
-  const updatePost = useCallback((id: string, updates: Partial<Post>) => {
+  const updatePost = useCallback(async (id: string, updates: Partial<Post>) => {
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+    const dbUpdates: Record<string, any> = {};
+    if (updates.title !== undefined) dbUpdates.title = updates.title;
+    if (updates.imageUrl !== undefined) dbUpdates.image_url = updates.imageUrl;
+    if (updates.mediaType !== undefined) dbUpdates.media_type = updates.mediaType;
+    if (updates.caption !== undefined) dbUpdates.caption = updates.caption;
+    if (updates.deadline !== undefined) dbUpdates.deadline = updates.deadline instanceof Date ? updates.deadline.toISOString() : updates.deadline;
+    if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
+    if (updates.status !== undefined) dbUpdates.status = updates.status;
+    if (updates.clientLabel !== undefined) dbUpdates.client_label = updates.clientLabel;
+    if (Object.keys(dbUpdates).length > 0) {
+      await supabase.from("posts").update(dbUpdates).eq("id", id);
+    }
+  }, []);
+
+  const uploadMedia = useCallback(async (file: File): Promise<string> => {
+    const ext = file.name.split(".").pop();
+    const fileName = `${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("media").upload(fileName, file);
+    if (error) throw error;
+    const { data } = supabase.storage.from("media").getPublicUrl(fileName);
+    return data.publicUrl;
   }, []);
 
   const addTag = useCallback((name: string, color: string): Tag => {
     const tag: Tag = { id: crypto.randomUUID(), name, color };
     setTags((prev) => [...prev, tag]);
+    supabase.from("tags").insert({ id: tag.id, name, color });
     return tag;
   }, []);
 
   const deleteTag = useCallback((id: string) => {
     setTags((prev) => prev.filter((t) => t.id !== id));
     setPosts((prev) => prev.map((p) => ({ ...p, tags: p.tags.filter((t) => t !== id) })));
+    supabase.from("tags").delete().eq("id", id);
   }, []);
 
   return (
-    <PostsContext.Provider value={{ posts, tags, postingPeriod, setPostingPeriod, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag }}>
+    <PostsContext.Provider value={{ posts, tags, postingPeriod, setPostingPeriod, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag, uploadMedia, loading }}>
       {children}
     </PostsContext.Provider>
   );
