@@ -25,7 +25,7 @@ interface EditPostDialogProps {
 }
 
 export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps) => {
-  const { updatePost, updatePostStatus } = usePosts();
+  const { updatePost, updatePostStatus, uploadMedia } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -35,7 +35,9 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [mediaType, setMediaType] = useState<MediaType>("image");
   const [status, setStatus] = useState<PostStatus>("em_desenvolvimento");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pendingFileRef = useRef<File | null>(null);
 
   useEffect(() => {
     if (post) {
@@ -47,6 +49,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       setDeadline(format(post.deadline, "yyyy-MM-dd"));
       setStatus(post.status);
       setSelectedTags(post.tags);
+      pendingFileRef.current = null;
     }
   }, [post]);
 
@@ -55,10 +58,10 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
     if (!file) return;
     const isVideo = file.type.startsWith("video/");
     setMediaType(isVideo ? "video" : "image");
+    pendingFileRef.current = file;
     const reader = new FileReader();
     reader.onload = (ev) => {
       const dataUrl = ev.target?.result as string;
-      setImageUrl(dataUrl);
       setImagePreview(dataUrl);
     };
     reader.readAsDataURL(file);
@@ -67,23 +70,34 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const clearImage = () => {
     setImageUrl("");
     setImagePreview("");
+    pendingFileRef.current = null;
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!post || !title || !imageUrl || !caption || !deadline) return;
+    if (!post || !title || (!imagePreview && !imageUrl) || !caption || !deadline) return;
 
-    updatePost(post.id, {
-      title,
-      imageUrl,
-      mediaType,
-      caption,
-      deadline: new Date(deadline),
-      tags: selectedTags,
-    });
-    updatePostStatus(post.id, status);
-    onOpenChange(false);
+    setUploading(true);
+    try {
+      let finalUrl = imageUrl;
+      if (pendingFileRef.current) {
+        finalUrl = await uploadMedia(pendingFileRef.current);
+      }
+
+      await updatePost(post.id, {
+        title,
+        imageUrl: finalUrl,
+        mediaType,
+        caption,
+        deadline: new Date(deadline),
+        tags: selectedTags,
+      });
+      await updatePostStatus(post.id, status);
+      onOpenChange(false);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
