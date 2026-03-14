@@ -3,7 +3,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { PostCard } from "@/components/PostCard";
 
 const ClientPage = () => {
-  const { posts } = usePosts();
+  const { posts, postingPeriod } = usePosts();
   const { t } = useI18n();
 
   return (
