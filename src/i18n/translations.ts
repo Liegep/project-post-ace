@@ -229,6 +229,8 @@ const it: TranslationKeys = {
   tagPublished: "Pubblicato",
   media: "Media",
   clickToSelectMedia: "Clicca per selezionare immagine o video",
+  postingPeriod: "Periodo di Pubblicazione",
+  editPeriodPlaceholder: "Es: Marzo 2026",
 };
 
 const es: TranslationKeys = {
