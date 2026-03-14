@@ -167,8 +167,8 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
               <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
             </div>
           </div>
-          <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-            {t("createPost")}
+          <Button type="submit" disabled={uploading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+            {uploading ? "..." : t("createPost")}
           </Button>
         </form>
       </DialogContent>

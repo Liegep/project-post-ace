@@ -184,8 +184,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
             </div>
           </div>
-          <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-            <Save className="mr-2 h-4 w-4" /> {t("saveChanges")}
+          <Button type="submit" disabled={uploading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+            <Save className="mr-2 h-4 w-4" /> {uploading ? "..." : t("saveChanges")}
           </Button>
         </form>
       </DialogContent>
