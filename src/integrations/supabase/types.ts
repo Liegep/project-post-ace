@@ -14,7 +14,119 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      comments: {
+        Row: {
+          author: string
+          created_at: string
+          id: string
+          post_id: string
+          text: string
+        }
+        Insert: {
+          author: string
+          created_at?: string
+          id?: string
+          post_id: string
+          text: string
+        }
+        Update: {
+          author?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          caption: string
+          client_label: string
+          created_at: string
+          deadline: string
+          id: string
+          image_url: string
+          media_type: string
+          status: string
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          caption?: string
+          client_label?: string
+          created_at?: string
+          deadline: string
+          id?: string
+          image_url: string
+          media_type?: string
+          status?: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string
+          client_label?: string
+          created_at?: string
+          deadline?: string
+          id?: string
+          image_url?: string
+          media_type?: string
+          status?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          id: string
+          name: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
