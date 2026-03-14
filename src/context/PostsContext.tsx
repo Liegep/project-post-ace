@@ -67,6 +67,7 @@ const SAMPLE_POSTS: Post[] = [
 export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [posts, setPosts] = useState<Post[]>(SAMPLE_POSTS);
   const [tags, setTags] = useState<Tag[]>(DEFAULT_TAGS);
+  const [postingPeriod, setPostingPeriod] = useState("Março 2026");
 
   const addPost = useCallback((post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => {
     setPosts((prev) => [
