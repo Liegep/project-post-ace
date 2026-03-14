@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePosts } from "@/context/PostsContext";
 import { Post, PostStatus, STATUS_CONFIG } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
@@ -7,7 +7,8 @@ import { EditPostDialog } from "@/components/EditPostDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
-import { Plus, LayoutGrid, List } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Plus, LayoutGrid, List, Pencil } from "lucide-react";
 
 const COLUMNS: PostStatus[] = ["em_desenvolvimento", "escrevendo_legenda", "pronto"];
 
