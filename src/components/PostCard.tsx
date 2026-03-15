@@ -85,7 +85,11 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
         ) : (
           <TagDisplay tagIds={post.tags} tags={tags} />
         )}
-        <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
+        {isAdmin ? (
+          <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
+        ) : (
+          <CaptionText text={post.caption} />
+        )}
 
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="flex items-center gap-1 hover:text-foreground">
