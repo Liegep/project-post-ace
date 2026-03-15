@@ -12,6 +12,21 @@ import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send } from "l
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+const CaptionText = ({ text }: { text: string }) => {
+  const [expanded, setExpanded] = useState(false);
+  const isLong = text.length > 150;
+  return (
+    <div>
+      <p className={`text-sm text-muted-foreground ${!expanded && isLong ? "line-clamp-3" : ""}`}>{text}</p>
+      {isLong && (
+        <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="text-xs font-medium text-primary hover:underline mt-1">
+          {expanded ? "Ver menos" : "Ver mais"}
+        </button>
+      )}
+    </div>
+  );
+};
+
 const STATUS_KEYS: Record<PostStatus, "statusInDevelopment" | "statusWritingCaption" | "statusReady"> = {
   em_desenvolvimento: "statusInDevelopment",
   escrevendo_legenda: "statusWritingCaption",
@@ -85,7 +100,11 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
         ) : (
           <TagDisplay tagIds={post.tags} tags={tags} />
         )}
-        <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
+        {isAdmin ? (
+          <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
+        ) : (
+          <CaptionText text={post.caption} />
+        )}
 
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="flex items-center gap-1 hover:text-foreground">
