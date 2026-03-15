@@ -50,11 +50,12 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true);
-      const [postsRes, commentsRes, tagsRes, settingsRes] = await Promise.all([
+      const [postsRes, commentsRes, tagsRes, settingsRes, logoRes] = await Promise.all([
         supabase.from("posts").select("*").order("created_at", { ascending: false }),
         supabase.from("comments").select("*").order("created_at", { ascending: true }),
         supabase.from("tags").select("*"),
         supabase.from("app_settings").select("*").eq("key", "posting_period").single(),
+        supabase.from("app_settings").select("*").eq("key", "company_logo").single(),
       ]);
 
       const commentsMap: Record<string, Comment[]> = {};
