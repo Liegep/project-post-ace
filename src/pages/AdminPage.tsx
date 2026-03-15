@@ -8,7 +8,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus } from "lucide-react";
 
 const COLUMNS: PostStatus[] = ["em_desenvolvimento", "escrevendo_legenda", "pronto"];
 
@@ -19,7 +19,7 @@ const STATUS_KEYS: Record<PostStatus, "statusInDevelopment" | "statusWritingCapt
 };
 
 const AdminPage = () => {
-  const { posts, updatePostStatus, deletePost, postingPeriod, setPostingPeriod } = usePosts();
+  const { posts, updatePostStatus, deletePost, postingPeriod, setPostingPeriod, companyLogo, setCompanyLogo, uploadMedia } = usePosts();
   const { t } = useI18n();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [createOpen, setCreateOpen] = useState(false);
@@ -27,6 +27,18 @@ const AdminPage = () => {
   const [editingPeriod, setEditingPeriod] = useState(false);
   const [periodDraft, setPeriodDraft] = useState(postingPeriod);
   const periodInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const url = await uploadMedia(file);
+      setCompanyLogo(url);
+    } catch (err) {
+      console.error("Logo upload failed", err);
+    }
+  };
 
   useEffect(() => {
     if (editingPeriod && periodInputRef.current) {
@@ -44,9 +56,27 @@ const AdminPage = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card px-6 py-4">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">{t("adminTitle")}</h1>
-            <p className="text-sm text-muted-foreground">{t("adminSubtitle")}</p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => logoInputRef.current?.click()}
+              className="group relative flex h-14 w-14 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-primary overflow-hidden transition-colors"
+            >
+              {companyLogo ? (
+                <>
+                  <img src={companyLogo} alt="Logo" className="h-full w-full object-contain" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Pencil className="h-4 w-4 text-white" />
+                  </div>
+                </>
+              ) : (
+                <ImagePlus className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+              )}
+            </button>
+            <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">{t("adminTitle")}</h1>
+              <p className="text-sm text-muted-foreground">{t("adminSubtitle")}</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />

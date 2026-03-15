@@ -6,7 +6,9 @@ interface PostsContextType {
   posts: Post[];
   tags: Tag[];
   postingPeriod: string;
+  companyLogo: string;
   setPostingPeriod: (period: string) => void;
+  setCompanyLogo: (url: string) => void;
   addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => void;
   updatePostStatus: (id: string, status: PostStatus) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
@@ -41,17 +43,19 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [posts, setPosts] = useState<Post[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [postingPeriod, setPostingPeriodState] = useState("Março 2026");
+  const [companyLogo, setCompanyLogoState] = useState("");
   const [loading, setLoading] = useState(true);
 
   // Fetch all data on mount
   useEffect(() => {
     const fetchAll = async () => {
       setLoading(true);
-      const [postsRes, commentsRes, tagsRes, settingsRes] = await Promise.all([
+      const [postsRes, commentsRes, tagsRes, settingsRes, logoRes] = await Promise.all([
         supabase.from("posts").select("*").order("created_at", { ascending: false }),
         supabase.from("comments").select("*").order("created_at", { ascending: true }),
         supabase.from("tags").select("*"),
         supabase.from("app_settings").select("*").eq("key", "posting_period").single(),
+        supabase.from("app_settings").select("*").eq("key", "company_logo").single(),
       ]);
 
       const commentsMap: Record<string, Comment[]> = {};
@@ -64,6 +68,7 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setPosts((postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || [])));
       setTags((tagsRes.data || []).map((t: any) => ({ id: t.id, name: t.name, color: t.color })));
       if (settingsRes.data) setPostingPeriodState(settingsRes.data.value);
+      if (logoRes.data) setCompanyLogoState(logoRes.data.value);
       setLoading(false);
     };
     fetchAll();
@@ -154,8 +159,18 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     supabase.from("tags").delete().eq("id", id);
   }, []);
 
+  const setCompanyLogo = useCallback(async (url: string) => {
+    setCompanyLogoState(url);
+    const { data } = await supabase.from("app_settings").select("*").eq("key", "company_logo").single();
+    if (data) {
+      await supabase.from("app_settings").update({ value: url }).eq("key", "company_logo");
+    } else {
+      await supabase.from("app_settings").insert({ key: "company_logo", value: url });
+    }
+  }, []);
+
   return (
-    <PostsContext.Provider value={{ posts, tags, postingPeriod, setPostingPeriod, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag, uploadMedia, loading }}>
+    <PostsContext.Provider value={{ posts, tags, postingPeriod, companyLogo, setPostingPeriod, setCompanyLogo, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag, uploadMedia, loading }}>
       {children}
     </PostsContext.Provider>
   );

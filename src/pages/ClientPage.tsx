@@ -3,15 +3,20 @@ import { useI18n } from "@/i18n/I18nContext";
 import { PostCard } from "@/components/PostCard";
 
 const ClientPage = () => {
-  const { posts, postingPeriod } = usePosts();
+  const { posts, postingPeriod, companyLogo } = usePosts();
   const { t } = useI18n();
 
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto max-w-7xl">
-          <h1 className="text-2xl font-bold text-foreground">{t("clientTitle")}</h1>
-          <p className="text-sm text-muted-foreground">{t("clientSubtitle")}</p>
+        <div className="mx-auto flex max-w-7xl items-center gap-4">
+          {companyLogo && (
+            <img src={companyLogo} alt="Logo" className="h-12 w-12 rounded-lg object-contain" />
+          )}
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">{t("clientTitle")}</h1>
+            <p className="text-sm text-muted-foreground">{t("clientSubtitle")}</p>
+          </div>
         </div>
       </header>
 
