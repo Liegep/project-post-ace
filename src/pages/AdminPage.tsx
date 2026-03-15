@@ -56,7 +56,24 @@ const AdminPage = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card px-6 py-4">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => logoInputRef.current?.click()}
+              className="group relative flex h-14 w-14 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-primary overflow-hidden transition-colors"
+            >
+              {companyLogo ? (
+                <>
+                  <img src={companyLogo} alt="Logo" className="h-full w-full object-contain" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Pencil className="h-4 w-4 text-white" />
+                  </div>
+                </>
+              ) : (
+                <ImagePlus className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+              )}
+            </button>
+            <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+            <div>
             <h1 className="text-2xl font-bold text-foreground">{t("adminTitle")}</h1>
             <p className="text-sm text-muted-foreground">{t("adminSubtitle")}</p>
           </div>

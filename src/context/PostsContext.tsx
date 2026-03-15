@@ -159,8 +159,18 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     supabase.from("tags").delete().eq("id", id);
   }, []);
 
+  const setCompanyLogo = useCallback(async (url: string) => {
+    setCompanyLogoState(url);
+    const { data } = await supabase.from("app_settings").select("*").eq("key", "company_logo").single();
+    if (data) {
+      await supabase.from("app_settings").update({ value: url }).eq("key", "company_logo");
+    } else {
+      await supabase.from("app_settings").insert({ key: "company_logo", value: url });
+    }
+  }, []);
+
   return (
-    <PostsContext.Provider value={{ posts, tags, postingPeriod, setPostingPeriod, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag, uploadMedia, loading }}>
+    <PostsContext.Provider value={{ posts, tags, postingPeriod, companyLogo, setPostingPeriod, setCompanyLogo, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag, uploadMedia, loading }}>
       {children}
     </PostsContext.Provider>
   );
