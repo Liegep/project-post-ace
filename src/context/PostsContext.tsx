@@ -68,6 +68,7 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setPosts((postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || [])));
       setTags((tagsRes.data || []).map((t: any) => ({ id: t.id, name: t.name, color: t.color })));
       if (settingsRes.data) setPostingPeriodState(settingsRes.data.value);
+      if (logoRes.data) setCompanyLogoState(logoRes.data.value);
       setLoading(false);
     };
     fetchAll();
