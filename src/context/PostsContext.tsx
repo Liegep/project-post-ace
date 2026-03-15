@@ -43,6 +43,7 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [posts, setPosts] = useState<Post[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [postingPeriod, setPostingPeriodState] = useState("Março 2026");
+  const [companyLogo, setCompanyLogoState] = useState("");
   const [loading, setLoading] = useState(true);
 
   // Fetch all data on mount
