@@ -74,8 +74,9 @@ const AdminPage = () => {
             </button>
             <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
             <div>
-            <h1 className="text-2xl font-bold text-foreground">{t("adminTitle")}</h1>
-            <p className="text-sm text-muted-foreground">{t("adminSubtitle")}</p>
+              <h1 className="text-2xl font-bold text-foreground">{t("adminTitle")}</h1>
+              <p className="text-sm text-muted-foreground">{t("adminSubtitle")}</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
