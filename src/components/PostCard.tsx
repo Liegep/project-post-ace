@@ -88,12 +88,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
         <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
 
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span className={`flex items-center gap-1 ${isOverdue ? "text-destructive font-medium" : ""}`}>
-            <Calendar className="h-3 w-3" />
-            {format(post.deadline, "dd MMM yyyy", { locale: ptBR })}
-            {isOverdue && ` (${t("overdue")})`}
-          </span>
-          <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-1 hover:text-foreground">
+          <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="flex items-center gap-1 hover:text-foreground">
             <MessageCircle className="h-3 w-3" />
             {post.comments.length} {post.comments.length !== 1 ? t("comments") : t("comment")}
             {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
