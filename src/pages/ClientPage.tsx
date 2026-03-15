@@ -11,7 +11,7 @@ const ClientPage = () => {
       <header className="border-b bg-card px-6 py-4">
         <div className="mx-auto flex max-w-7xl items-center gap-4">
           {companyLogo && (
-            <img src={companyLogo} alt="Logo" className="h-12 w-12 rounded-lg object-contain" />
+            <img src={companyLogo} alt="Logo" className="rounded-lg object-contain" style={{ width: 600, height: 400 }} />
           )}
           <div>
             <h1 className="text-2xl font-bold text-foreground">{t("clientTitle")}</h1>
