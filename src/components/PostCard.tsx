@@ -73,6 +73,13 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
       </div>
 
       <div className="p-4 pt-3 space-y-2">
+        {!isAdmin && (
+          <div className="rounded-lg bg-primary/10 px-3 py-2 text-center">
+            <span className="text-sm font-semibold text-primary">
+              Previsão de Publicação {format(post.deadline, "dd/MM/yyyy")}
+            </span>
+          </div>
+        )}
         {isAdmin ? (
           <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
         ) : (
