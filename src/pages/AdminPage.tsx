@@ -19,7 +19,7 @@ const STATUS_KEYS: Record<PostStatus, "statusInDevelopment" | "statusWritingCapt
 };
 
 const AdminPage = () => {
-  const { posts, updatePostStatus, deletePost, postingPeriod, setPostingPeriod } = usePosts();
+  const { posts, updatePostStatus, deletePost, postingPeriod, setPostingPeriod, companyLogo, setCompanyLogo, uploadMedia } = usePosts();
   const { t } = useI18n();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [createOpen, setCreateOpen] = useState(false);
@@ -27,6 +27,18 @@ const AdminPage = () => {
   const [editingPeriod, setEditingPeriod] = useState(false);
   const [periodDraft, setPeriodDraft] = useState(postingPeriod);
   const periodInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const url = await uploadMedia(file);
+      setCompanyLogo(url);
+    } catch (err) {
+      console.error("Logo upload failed", err);
+    }
+  };
 
   useEffect(() => {
     if (editingPeriod && periodInputRef.current) {
