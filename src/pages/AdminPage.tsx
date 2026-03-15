@@ -59,7 +59,7 @@ const AdminPage = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => logoInputRef.current?.click()}
-              className="group relative flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-primary overflow-hidden transition-colors" style={{ width: 600, height: 400 }}
+              className="group relative flex h-10 w-10 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-primary overflow-hidden transition-colors"
             >
               {companyLogo ? (
                 <>
