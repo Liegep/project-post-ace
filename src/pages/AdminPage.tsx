@@ -296,14 +296,14 @@ const KanbanBoard = ({
 
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
-    posts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
+    posts, archivedPosts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn,
-    movePostToColumn, reorderPostsInColumn,
+    movePostToColumn, reorderPostsInColumn, unarchivePost,
   } = usePosts();
   const { t } = useI18n();
   const navigate = useNavigate();
   const [view, setView] = useState<"kanban" | "list">("kanban");
-  const [createOpen, setCreateOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [editingPeriod, setEditingPeriod] = useState(false);
   const [periodDraft, setPeriodDraft] = useState(postingPeriod);
