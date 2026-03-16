@@ -1,0 +1,1 @@
+ALTER TABLE public.posts ADD COLUMN client_unarchived_at timestamp with time zone;

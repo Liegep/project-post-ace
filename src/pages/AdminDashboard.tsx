@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { LABEL_CONFIG } from "@/types/post";
 
@@ -33,11 +33,21 @@ interface FeedbackNotification {
   updatedAt: string;
 }
 
+interface UnarchiveNotification {
+  postId: string;
+  postTitle: string;
+  clientName: string;
+  clientSlug: string;
+  clientLogo: string;
+  unarchivedAt: string;
+}
+
 const AdminDashboard = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
   const [feedbacks, setFeedbacks] = useState<FeedbackNotification[]>([]);
+  const [unarchiveNotifs, setUnarchiveNotifs] = useState<UnarchiveNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -54,6 +64,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchClients();
     fetchFeedbacks();
+    fetchUnarchiveNotifs();
   }, []);
 
   const fetchClients = async () => {
@@ -98,10 +109,49 @@ const AdminDashboard = () => {
     );
   };
 
+  const fetchUnarchiveNotifs = async () => {
+    const { data: posts } = await supabase
+      .from("posts")
+      .select("id, title, client_id, client_unarchived_at")
+      .not("client_unarchived_at", "is", null)
+      .order("client_unarchived_at", { ascending: false });
+
+    if (!posts || posts.length === 0) {
+      setUnarchiveNotifs([]);
+      return;
+    }
+
+    const clientIds = [...new Set(posts.map((p: any) => p.client_id).filter(Boolean))];
+    const { data: clientsData } = await supabase
+      .from("clients")
+      .select("id, name, slug, logo_url")
+      .in("id", clientIds);
+
+    const clientMap: Record<string, { name: string; slug: string; logo_url: string }> = {};
+    (clientsData || []).forEach((c: any) => { clientMap[c.id] = { name: c.name, slug: c.slug, logo_url: c.logo_url }; });
+
+    setUnarchiveNotifs(
+      posts.map((p: any) => ({
+        postId: p.id,
+        postTitle: p.title,
+        clientName: clientMap[p.client_id]?.name || "—",
+        clientSlug: clientMap[p.client_id]?.slug || "",
+        clientLogo: clientMap[p.client_id]?.logo_url || "",
+        unarchivedAt: p.client_unarchived_at,
+      }))
+    );
+  };
+
   const dismissFeedback = async (postId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     await supabase.from("posts").update({ client_label: "pendente" } as any).eq("id", postId);
     setFeedbacks((prev) => prev.filter((fb) => fb.postId !== postId));
+  };
+
+  const dismissUnarchiveNotif = async (postId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await supabase.from("posts").update({ client_unarchived_at: null } as any).eq("id", postId);
+    setUnarchiveNotifs((prev) => prev.filter((n) => n.postId !== postId));
   };
 
   const generateSlug = (name: string) => {
@@ -270,6 +320,55 @@ const AdminDashboard = () => {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Unarchive notifications */}
+        {unarchiveNotifs.length > 0 && (
+          <div className="rounded-xl border bg-card p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-info/20">
+                <RotateCcw className="h-4 w-4 text-info-foreground" />
+              </div>
+              <h2 className="font-semibold text-foreground">Posts Restaurados pelo Cliente</h2>
+              <span className="rounded-full bg-info/20 px-2 py-0.5 text-xs font-semibold text-info-foreground">
+                {unarchiveNotifs.length}
+              </span>
+            </div>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {unarchiveNotifs.map((n) => (
+                <div
+                  key={n.postId}
+                  onClick={() => navigate(`/admin/${n.clientSlug}`)}
+                  className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5 cursor-pointer hover:bg-muted transition-colors"
+                >
+                  {n.clientLogo ? (
+                    <img src={n.clientLogo} alt={n.clientName} className="h-7 w-7 rounded-full object-contain border shrink-0" />
+                  ) : (
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted border shrink-0">
+                      <span className="text-xs font-bold text-muted-foreground">{n.clientName.charAt(0).toUpperCase()}</span>
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{n.postTitle}</p>
+                    <p className="text-xs text-muted-foreground">{n.clientName}</p>
+                  </div>
+                  <span className="shrink-0 inline-flex rounded-full bg-info/20 px-2 py-0.5 text-[10px] font-semibold text-info-foreground">
+                    Restaurado
+                  </span>
+                  <span className="text-[10px] text-muted-foreground shrink-0">
+                    {new Date(n.unarchivedAt).toLocaleDateString("pt-BR")}
+                  </span>
+                  <button
+                    onClick={(e) => dismissUnarchiveNotif(n.postId, e)}
+                    className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                    title="Dispensar"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         )}
