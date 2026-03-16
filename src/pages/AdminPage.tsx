@@ -116,6 +116,40 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   // Posts without a column
   const unassignedPosts = posts.filter((p) => !p.columnId);
 
+  const handleTrelloSync = async () => {
+    if (!trelloBoardId.trim()) return;
+    setSyncing(true);
+    try {
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const res = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/trello-sync`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ boardId: trelloBoardId.trim(), clientId: clientData.id }),
+        }
+      );
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error);
+      toast({
+        title: "Sincronização concluída!",
+        description: `${result.summary.tags} etiquetas, ${result.summary.columns} colunas, ${result.summary.posts} posts importados.`,
+      });
+      setTrelloSyncOpen(false);
+      setTrelloBoardId("");
+      // Reload page to refresh data
+      window.location.reload();
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: "Erro na sincronização", description: err.message, variant: "destructive" });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card px-6 py-4">
