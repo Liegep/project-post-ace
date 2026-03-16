@@ -70,7 +70,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-64 space-y-3" align="start" onClick={(e) => e.stopPropagation()}>
-            <p className="text-sm font-medium text-foreground">{t("manageTags")}</p>
+            <p className="text-sm font-medium text-foreground">{t("tags")}</p>
             <div className="flex flex-wrap gap-1.5">
               {tags.map((tag) => {
                 const selected = selectedTagIds.includes(tag.id);
