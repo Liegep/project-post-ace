@@ -304,6 +304,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const navigate = useNavigate();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
+  const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [editingPeriod, setEditingPeriod] = useState(false);
   const [periodDraft, setPeriodDraft] = useState(postingPeriod);
