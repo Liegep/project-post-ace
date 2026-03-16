@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
-import { Post, PostStatus, ClientLabel, Comment, Tag, MediaType } from "@/types/post";
+import { Post, PostStatus, ClientLabel, Comment, Tag, MediaType, Column } from "@/types/post";
 import { supabase } from "@/integrations/supabase/client";
 
 interface PostsContextType {
   posts: Post[];
   tags: Tag[];
+  columns: Column[];
   postingPeriod: string;
   companyLogo: string;
   setPostingPeriod: (period: string) => void;
@@ -18,6 +19,11 @@ interface PostsContextType {
   addTag: (name: string, color: string) => Tag;
   deleteTag: (id: string) => void;
   uploadMedia: (file: File) => Promise<string>;
+  addColumn: (name: string) => Promise<Column>;
+  renameColumn: (id: string, name: string) => void;
+  deleteColumn: (id: string) => void;
+  reorderColumns: (columns: Column[]) => void;
+  movePostToColumn: (postId: string, columnId: string | null) => void;
   loading: boolean;
 }
 
@@ -40,6 +46,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     comments,
     tags: row.tags || [],
     createdAt: new Date(row.created_at),
+    columnId: row.column_id || null,
   };
 }
 
@@ -53,6 +60,7 @@ interface PostsProviderProps {
 export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLogo = "", clientPostingPeriod = "", children }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [columns, setColumns] = useState<Column[]>([]);
   const [postingPeriod, setPostingPeriodState] = useState(clientPostingPeriod);
   const [companyLogo, setCompanyLogoState] = useState(clientLogo);
   const [loading, setLoading] = useState(true);
@@ -66,10 +74,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (!clientId) return;
     const fetchAll = async () => {
       setLoading(true);
-      const [postsRes, commentsRes, tagsRes] = await Promise.all([
+      const [postsRes, commentsRes, tagsRes, columnsRes] = await Promise.all([
         supabase.from("posts").select("*").eq("client_id", clientId).order("created_at", { ascending: false }),
         supabase.from("comments").select("*").order("created_at", { ascending: true }),
         supabase.from("tags").select("*").eq("client_id", clientId),
+        supabase.from("columns").select("*").eq("client_id", clientId).order("position", { ascending: true }),
       ]);
 
       const commentsMap: Record<string, Comment[]> = {};
@@ -81,6 +90,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       setPosts((postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || [])));
       setTags((tagsRes.data || []).map((t: any) => ({ id: t.id, name: t.name, color: t.color })));
+      setColumns((columnsRes.data || []).map((c: any) => ({ id: c.id, clientId: c.client_id, name: c.name, position: c.position })));
       setLoading(false);
     };
     fetchAll();
@@ -101,6 +111,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       status: post.status,
       tags: post.tags || [],
       client_id: clientId,
+      column_id: post.columnId || null,
     };
     if (post.deadline) {
       insertData.deadline = post.deadline.toISOString();
@@ -150,9 +161,15 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
     if (updates.status !== undefined) dbUpdates.status = updates.status;
     if (updates.clientLabel !== undefined) dbUpdates.client_label = updates.clientLabel;
+    if (updates.columnId !== undefined) dbUpdates.column_id = updates.columnId;
     if (Object.keys(dbUpdates).length > 0) {
       await supabase.from("posts").update(dbUpdates).eq("id", id);
     }
+  }, []);
+
+  const movePostToColumn = useCallback(async (postId: string, columnId: string | null) => {
+    setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, columnId } : p)));
+    await supabase.from("posts").update({ column_id: columnId } as any).eq("id", postId);
   }, []);
 
   const uploadMedia = useCallback(async (file: File): Promise<string> => {
@@ -177,13 +194,51 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     supabase.from("tags").delete().eq("id", id);
   }, []);
 
+  const addColumn = useCallback(async (name: string): Promise<Column> => {
+    const position = columns.length;
+    const { data, error } = await supabase.from("columns").insert({
+      client_id: clientId,
+      name,
+      position,
+    } as any).select().single();
+    if (error) throw error;
+    const col: Column = { id: data.id, clientId: data.client_id, name: data.name, position: data.position };
+    setColumns((prev) => [...prev, col]);
+    return col;
+  }, [clientId, columns.length]);
+
+  const renameColumn = useCallback(async (id: string, name: string) => {
+    setColumns((prev) => prev.map((c) => (c.id === id ? { ...c, name } : c)));
+    await supabase.from("columns").update({ name } as any).eq("id", id);
+  }, []);
+
+  const deleteColumn = useCallback(async (id: string) => {
+    // Move posts from this column to unassigned
+    setPosts((prev) => prev.map((p) => (p.id && p.columnId === id ? { ...p, columnId: null } : p)));
+    await supabase.from("posts").update({ column_id: null } as any).eq("column_id", id);
+    setColumns((prev) => prev.filter((c) => c.id !== id));
+    await supabase.from("columns").delete().eq("id", id);
+  }, []);
+
+  const reorderColumns = useCallback(async (newColumns: Column[]) => {
+    setColumns(newColumns);
+    for (let i = 0; i < newColumns.length; i++) {
+      await supabase.from("columns").update({ position: i } as any).eq("id", newColumns[i].id);
+    }
+  }, []);
+
   const setCompanyLogo = useCallback(async (url: string) => {
     setCompanyLogoState(url);
     await supabase.from("clients").update({ logo_url: url } as any).eq("id", clientId);
   }, [clientId]);
 
   return (
-    <PostsContext.Provider value={{ posts, tags, postingPeriod, companyLogo, setPostingPeriod, setCompanyLogo, addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost, addTag, deleteTag, uploadMedia, loading }}>
+    <PostsContext.Provider value={{
+      posts, tags, columns, postingPeriod, companyLogo, setPostingPeriod, setCompanyLogo,
+      addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost,
+      addTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns,
+      movePostToColumn, loading,
+    }}>
       {children}
     </PostsContext.Provider>
   );
