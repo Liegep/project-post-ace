@@ -78,6 +78,7 @@ export type Database = {
           id: string
           name: string
           position: number
+          trello_list_id: string | null
         }
         Insert: {
           client_id: string
@@ -85,6 +86,7 @@ export type Database = {
           id?: string
           name: string
           position?: number
+          trello_list_id?: string | null
         }
         Update: {
           client_id?: string
@@ -92,6 +94,7 @@ export type Database = {
           id?: string
           name?: string
           position?: number
+          trello_list_id?: string | null
         }
         Relationships: [
           {
@@ -154,6 +157,7 @@ export type Database = {
           status: string
           tags: string[]
           title: string
+          trello_card_id: string | null
           updated_at: string
         }
         Insert: {
@@ -174,6 +178,7 @@ export type Database = {
           status?: string
           tags?: string[]
           title: string
+          trello_card_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -194,6 +199,7 @@ export type Database = {
           status?: string
           tags?: string[]
           title?: string
+          trello_card_id?: string | null
           updated_at?: string
         }
         Relationships: [

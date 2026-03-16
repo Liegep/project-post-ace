@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { Post, PostStatus, ClientLabel, Comment, Tag, MediaType, Column } from "@/types/post";
 import { supabase } from "@/integrations/supabase/client";
+import { pushToTrello } from "@/lib/trelloPush";
 
 interface PostsContextType {
   posts: Post[];
@@ -145,6 +146,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       archivedAt: isArchiving ? new Date() : p.archivedAt,
     } : p)));
     await supabase.from("posts").update(updates).eq("id", id);
+    pushToTrello(id, "update");
   }, []);
 
   const updateClientLabel = useCallback(async (id: string, label: ClientLabel) => {
@@ -184,12 +186,14 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.columnId !== undefined) dbUpdates.column_id = updates.columnId;
     if (Object.keys(dbUpdates).length > 0) {
       await supabase.from("posts").update(dbUpdates).eq("id", id);
+      pushToTrello(id, "update");
     }
   }, []);
 
   const movePostToColumn = useCallback(async (postId: string, columnId: string | null) => {
     setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, columnId } : p)));
     await supabase.from("posts").update({ column_id: columnId } as any).eq("id", postId);
+    pushToTrello(postId, "move_column");
   }, []);
 
   const uploadMedia = useCallback(async (file: File): Promise<string> => {
