@@ -79,11 +79,11 @@ const AdminDashboard = () => {
     const clientIds = [...new Set(posts.map((p: any) => p.client_id).filter(Boolean))];
     const { data: clientsData } = await supabase
       .from("clients")
-      .select("id, name, slug")
+      .select("id, name, slug, logo_url")
       .in("id", clientIds);
 
-    const clientMap: Record<string, { name: string; slug: string }> = {};
-    (clientsData || []).forEach((c: any) => { clientMap[c.id] = { name: c.name, slug: c.slug }; });
+    const clientMap: Record<string, { name: string; slug: string; logo_url: string }> = {};
+    (clientsData || []).forEach((c: any) => { clientMap[c.id] = { name: c.name, slug: c.slug, logo_url: c.logo_url }; });
 
     setFeedbacks(
       posts.map((p: any) => ({
@@ -91,6 +91,7 @@ const AdminDashboard = () => {
         postTitle: p.title,
         clientName: clientMap[p.client_id]?.name || "—",
         clientSlug: clientMap[p.client_id]?.slug || "",
+        clientLogo: clientMap[p.client_id]?.logo_url || "",
         label: p.client_label,
         updatedAt: p.updated_at,
       }))
