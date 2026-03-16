@@ -211,7 +211,47 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl p-6">
+      <main className="mx-auto max-w-5xl p-6 space-y-6">
+        {/* Feedback notifications */}
+        {feedbacks.length > 0 && (
+          <div className="rounded-xl border bg-card p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-warning/20">
+                <Bell className="h-4 w-4 text-warning-foreground" />
+              </div>
+              <h2 className="font-semibold text-foreground">Feedbacks dos Clientes</h2>
+              <span className="rounded-full bg-warning/20 px-2 py-0.5 text-xs font-semibold text-warning-foreground">
+                {feedbacks.length}
+              </span>
+            </div>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {feedbacks.map((fb) => {
+                const labelConfig = LABEL_CONFIG[fb.label as keyof typeof LABEL_CONFIG];
+                return (
+                  <div
+                    key={fb.postId}
+                    onClick={() => navigate(`/admin/${fb.clientSlug}`)}
+                    className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5 cursor-pointer hover:bg-muted transition-colors"
+                  >
+                    <MessageCircle className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{fb.postTitle}</p>
+                      <p className="text-xs text-muted-foreground">{fb.clientName}</p>
+                    </div>
+                    {labelConfig && (
+                      <span className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
+                        {labelConfig.label}
+                      </span>
+                    )}
+                    <span className="text-[10px] text-muted-foreground shrink-0">
+                      {new Date(fb.updatedAt).toLocaleDateString("pt-BR")}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
