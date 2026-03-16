@@ -194,7 +194,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                                       {columns.map((col) => (
                                         <button
                                           key={col.id}
-                                          onClick={() => unarchivePost(post.id, col.id)}
+                                          onClick={() => unarchivePost(post.id, col.id, true)}
                                           className="w-full rounded-md px-3 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
                                         >
                                           {col.name}
