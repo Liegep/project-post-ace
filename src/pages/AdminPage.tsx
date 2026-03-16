@@ -22,6 +22,7 @@ interface ClientData {
   logo_url: string;
   locale: string;
   posting_period: string;
+  trello_board_id: string;
 }
 
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
