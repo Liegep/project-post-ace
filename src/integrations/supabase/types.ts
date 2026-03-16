@@ -69,7 +69,7 @@ export type Database = {
           caption: string
           client_label: string
           created_at: string
-          deadline: string
+          deadline: string | null
           id: string
           image_url: string
           media_type: string
@@ -82,7 +82,7 @@ export type Database = {
           caption?: string
           client_label?: string
           created_at?: string
-          deadline: string
+          deadline?: string | null
           id?: string
           image_url: string
           media_type?: string
@@ -95,7 +95,7 @@ export type Database = {
           caption?: string
           client_label?: string
           created_at?: string
-          deadline?: string
+          deadline?: string | null
           id?: string
           image_url?: string
           media_type?: string
