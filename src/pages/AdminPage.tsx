@@ -709,6 +709,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 movePostToColumn={movePostToColumn}
                 reorderPostsInColumn={reorderPostsInColumn}
                 t={t}
+                selectionMode={selectionMode}
+                selectedPostIds={selectedPostIds}
+                onToggleSelect={toggleSelect}
               />
             ) : (
               <div className="space-y-3">
@@ -720,6 +723,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
                     onEdit={() => setEditPost(post)}
+                    selectionMode={selectionMode}
+                    isSelected={selectedPostIds.has(post.id)}
+                    onToggleSelect={toggleSelect}
                   />
                 ))}
               </div>
