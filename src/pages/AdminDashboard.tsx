@@ -9,8 +9,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2 } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { LABEL_CONFIG } from "@/types/post";
 
 interface Client {
   id: string;
@@ -20,6 +21,15 @@ interface Client {
   locale: string;
   posting_period: string;
   created_at: string;
+}
+
+interface FeedbackNotification {
+  postId: string;
+  postTitle: string;
+  clientName: string;
+  clientSlug: string;
+  label: string;
+  updatedAt: string;
 }
 
 const AdminDashboard = () => {
