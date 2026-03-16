@@ -400,7 +400,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
     posts, archivedPosts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn,
-    movePostToColumn, reorderPostsInColumn, unarchivePost,
+    movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts,
   } = usePosts();
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -422,6 +422,46 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [trelloSyncOpen, setTrelloSyncOpen] = useState(false);
   const [trelloBoardId, setTrelloBoardId] = useState(clientData.trello_board_id || "");
   const [syncing, setSyncing] = useState(false);
+
+  // Selection mode state
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
+
+  const toggleSelect = (id: string) => {
+    setSelectedPostIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const exitSelectionMode = () => {
+    setSelectionMode(false);
+    setSelectedPostIds(new Set());
+  };
+
+  const handleBulkStatusChange = async (status: PostStatus) => {
+    const ids = Array.from(selectedPostIds);
+    await bulkUpdateStatus(ids, status);
+    exitSelectionMode();
+    toast({ title: `${ids.length} posts atualizados` });
+  };
+
+  const handleBulkDelete = async () => {
+    const ids = Array.from(selectedPostIds);
+    if (!confirm(`Excluir ${ids.length} posts permanentemente?`)) return;
+    await bulkDeletePosts(ids);
+    exitSelectionMode();
+    toast({ title: `${ids.length} posts excluídos` });
+  };
+
+  const handleBulkUnarchive = async () => {
+    const ids = Array.from(selectedPostIds);
+    for (const id of ids) await unarchivePost(id);
+    exitSelectionMode();
+    toast({ title: `${ids.length} posts restaurados` });
+  };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
