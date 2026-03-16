@@ -134,7 +134,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete
           </div>
         )}
 
-        {!isAdmin && (
+        {!isAdmin && !hideFeedback && (
           <div className="rounded-lg bg-primary/10 px-3 py-2 text-center">
             <span className="text-sm font-semibold text-primary">
               {t("publishForecast")} {format(post.deadline, "dd/MM/yyyy")}
@@ -159,7 +159,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete
           </>
         )}
 
-        {!isCompact && (
+        {!isCompact && !hideFeedback && (
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="flex items-center gap-1 hover:text-foreground">
               <MessageCircle className="h-3 w-3" />
@@ -204,7 +204,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete
         )}
       </div>
 
-      {(expanded || !isAdmin) && !isCompact && (
+      {(expanded || !isAdmin) && !isCompact && !hideFeedback && (
         <div className="border-t bg-muted/30 p-4">
           <div className="space-y-3">
             {post.comments.length === 0 && (
