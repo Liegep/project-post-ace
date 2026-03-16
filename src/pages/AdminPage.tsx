@@ -6,6 +6,8 @@ import { Post, PostStatus } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { EditPostDialog } from "@/components/EditPostDialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
