@@ -160,7 +160,7 @@ const KanbanBoard = ({
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="flex gap-4 overflow-x-auto pb-4">
         {columns.map((col) => {
-          const columnPosts = posts.filter((p) => p.columnId === col.id);
+          const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
           return (
             <div key={col.id} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
               <div className="mb-4 flex items-center justify-between gap-2">
