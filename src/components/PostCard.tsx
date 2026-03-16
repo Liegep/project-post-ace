@@ -12,7 +12,7 @@ import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send } from "l
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-const CaptionText = ({ text }: { text: string }) => {
+const CaptionText = ({ text, t }: { text: string; t: (key: keyof typeof import("@/i18n/translations").translations.pt) => string }) => {
   const [expanded, setExpanded] = useState(false);
   const isLong = text.length > 150;
   return (
@@ -20,7 +20,7 @@ const CaptionText = ({ text }: { text: string }) => {
       <p className={`text-sm text-muted-foreground ${!expanded && isLong ? "line-clamp-3" : ""}`}>{text}</p>
       {isLong && (
         <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="text-xs font-medium text-primary hover:underline mt-1">
-          {expanded ? "Ver menos" : "Ver mais"}
+          {expanded ? t("readLess") : t("readMore")}
         </button>
       )}
     </div>
@@ -108,7 +108,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
         {!isAdmin && (
           <div className="rounded-lg bg-primary/10 px-3 py-2 text-center">
             <span className="text-sm font-semibold text-primary">
-              Previsão de Publicação {format(post.deadline, "dd/MM/yyyy")}
+              {t("publishForecast")} {format(post.deadline, "dd/MM/yyyy")}
             </span>
           </div>
         )}
@@ -124,7 +124,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
               isAdmin ? (
                 <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
               ) : (
-                <CaptionText text={post.caption} />
+                <CaptionText text={post.caption} t={t} />
               )
             )}
           </>

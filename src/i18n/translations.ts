@@ -79,6 +79,11 @@ type TranslationKeys = {
   // Posting period
   postingPeriod: string;
   editPeriodPlaceholder: string;
+  // Read more
+  readMore: string;
+  readLess: string;
+  // Publish forecast
+  publishForecast: string;
 };
 
 const pt: TranslationKeys = {
@@ -131,6 +136,9 @@ const pt: TranslationKeys = {
   clickToSelectMedia: "Clique para selecionar imagem ou vídeo",
   postingPeriod: "Período de Postagem",
   editPeriodPlaceholder: "Ex: Março 2026",
+  readMore: "Ver mais",
+  readLess: "Ver menos",
+  publishForecast: "Previsão de Publicação",
 };
 
 const en: TranslationKeys = {
@@ -183,6 +191,9 @@ const en: TranslationKeys = {
   clickToSelectMedia: "Click to select image or video",
   postingPeriod: "Posting Period",
   editPeriodPlaceholder: "E.g.: March 2026",
+  readMore: "Read more",
+  readLess: "Read less",
+  publishForecast: "Publish Forecast",
 };
 
 const it: TranslationKeys = {
@@ -235,6 +246,9 @@ const it: TranslationKeys = {
   clickToSelectMedia: "Clicca per selezionare immagine o video",
   postingPeriod: "Periodo di Pubblicazione",
   editPeriodPlaceholder: "Es: Marzo 2026",
+  readMore: "Leggi di più",
+  readLess: "Leggi meno",
+  publishForecast: "Previsione di Pubblicazione",
 };
 
 const es: TranslationKeys = {
@@ -287,6 +301,9 @@ const es: TranslationKeys = {
   clickToSelectMedia: "Haz clic para seleccionar imagen o video",
   postingPeriod: "Período de Publicación",
   editPeriodPlaceholder: "Ej: Marzo 2026",
+  readMore: "Leer más",
+  readLess: "Leer menos",
+  publishForecast: "Previsión de Publicación",
 };
 
 const sv: TranslationKeys = {
@@ -339,6 +356,9 @@ const sv: TranslationKeys = {
   clickToSelectMedia: "Klicka för att välja bild eller video",
   postingPeriod: "Publiceringsperiod",
   editPeriodPlaceholder: "T.ex.: Mars 2026",
+  readMore: "Läs mer",
+  readLess: "Läs mindre",
+  publishForecast: "Publiceringsförhandsvisning",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };
