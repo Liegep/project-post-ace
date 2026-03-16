@@ -77,7 +77,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
                 <div className="space-y-4 rounded-xl bg-muted/30 p-4">
                   {sortByDate(entradaPosts).map((post) => (
-                    <PostCard key={post.id} post={post} isAdmin={false} />
+                    <PostCard key={post.id} post={post} isAdmin={false} hideFeedback />
                   ))}
                 </div>
               </div>
