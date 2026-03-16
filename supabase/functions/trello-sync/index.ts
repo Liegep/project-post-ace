@@ -26,17 +26,32 @@ Deno.serve(async (req) => {
       throw new Error("Supabase credentials not configured");
     }
 
-    const { boardId, clientId } = await req.json();
-    if (!boardId || !clientId) {
+    const { boardId: rawBoardId, clientId } = await req.json();
+    if (!rawBoardId || !clientId) {
       throw new Error("boardId and clientId are required");
     }
+    // Sanitize board ID: remove trailing slashes, whitespace, and extract ID from full URLs
+    let boardId = rawBoardId.trim().replace(/\/+$/, '');
+    // Handle full Trello URLs like https://trello.com/b/BOARD_ID/board-name
+    const urlMatch = boardId.match(/trello\.com\/b\/([^\/]+)/);
+    if (urlMatch) boardId = urlMatch[1];
+
+    console.log("Using Trello API Key (first 4 chars):", TRELLO_API_KEY?.substring(0, 4));
+    console.log("Using Trello Token (first 4 chars):", TRELLO_TOKEN?.substring(0, 4));
+    console.log("Board ID:", boardId);
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const authParams = `key=${TRELLO_API_KEY}&token=${TRELLO_TOKEN}`;
 
     // 1. Fetch board labels
-    const labelsRes = await fetch(`${TRELLO_API}/boards/${boardId}/labels?${authParams}`);
-    if (!labelsRes.ok) throw new Error(`Failed to fetch labels: ${labelsRes.status}`);
+    const labelsUrl = `${TRELLO_API}/boards/${boardId}/labels?${authParams}`;
+    console.log("Fetching labels from:", labelsUrl.replace(TRELLO_TOKEN!, '***').replace(TRELLO_API_KEY!, '***'));
+    const labelsRes = await fetch(labelsUrl);
+    if (!labelsRes.ok) {
+      const body = await labelsRes.text();
+      console.error("Labels response:", labelsRes.status, body);
+      throw new Error(`Failed to fetch labels: ${labelsRes.status}`);
+    }
     const trelloLabels = await labelsRes.json();
 
     // 2. Fetch board lists (columns)
