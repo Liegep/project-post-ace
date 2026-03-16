@@ -193,6 +193,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   const movePostToColumn = useCallback(async (postId: string, columnId: string | null) => {
     setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, columnId } : p)));
     await supabase.from("posts").update({ column_id: columnId } as any).eq("id", postId);
+    pushToTrello(postId, "move_column");
   }, []);
 
   const uploadMedia = useCallback(async (file: File): Promise<string> => {
