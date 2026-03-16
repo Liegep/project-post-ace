@@ -91,7 +91,7 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (post.deadline) {
       insertData.deadline = post.deadline.toISOString();
     }
-    const { data, error } = await supabase.from("posts").insert(insertData).select().single();
+    const { data, error } = await supabase.from("posts").insert(insertData as any).select().single();
     if (data && !error) {
       setPosts((prev) => [dbPostToPost(data, []), ...prev]);
     }
