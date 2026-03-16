@@ -1,15 +1,16 @@
 import { useState, useRef, useEffect } from "react";
-import { usePosts } from "@/context/PostsContext";
+import { useParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { PostsProvider, usePosts } from "@/context/PostsContext";
 import { Post, PostStatus, STATUS_CONFIG } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { EditPostDialog } from "@/components/EditPostDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft } from "lucide-react";
 
 const COLUMNS: PostStatus[] = ["entrada", "pronto"];
 
@@ -20,9 +21,19 @@ const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "s
   pronto: "statusReady",
 };
 
-const AdminPage = () => {
+interface ClientData {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url: string;
+  locale: string;
+  posting_period: string;
+}
+
+const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const { posts, updatePostStatus, deletePost, postingPeriod, setPostingPeriod, companyLogo, setCompanyLogo, uploadMedia } = usePosts();
-  const { t, clientLocale } = useI18n();
+  const { t } = useI18n();
+  const navigate = useNavigate();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
@@ -60,6 +71,12 @@ const AdminPage = () => {
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center gap-4">
             <button
+              onClick={() => navigate("/admin")}
+              className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <button
               onClick={() => logoInputRef.current?.click()}
               className="group relative flex h-10 w-10 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-primary overflow-hidden transition-colors"
             >
@@ -76,21 +93,12 @@ const AdminPage = () => {
             </button>
             <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
             <div>
-              <h1 className="text-2xl font-bold text-foreground">{t("adminTitle")}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{clientData.name}</h1>
               <p className="text-sm text-muted-foreground">{t("adminSubtitle")}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="text-[10px] text-muted-foreground">Admin</span>
-                <LanguageSelector />
-              </div>
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="text-[10px] text-muted-foreground">Cliente</span>
-                <LanguageSelector forClient clientLocale={clientLocale} />
-              </div>
-            </div>
+            <LanguageSelector />
             <div className="flex rounded-lg border bg-muted p-1">
               <button
                 onClick={() => setView("kanban")}
@@ -129,7 +137,7 @@ const AdminPage = () => {
               onClick={() => { setPeriodDraft(postingPeriod); setEditingPeriod(true); }}
               className="group flex items-center gap-2 text-2xl font-bold text-foreground hover:text-accent transition-colors"
             >
-              {postingPeriod}
+              {postingPeriod || "Clique para definir o período"}
               <Pencil className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
             </button>
           )}
@@ -185,6 +193,41 @@ const AdminPage = () => {
       <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} />
       <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
     </div>
+  );
+};
+
+const AdminPage = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const [clientData, setClientData] = useState<ClientData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!slug) return;
+    const load = async () => {
+      const { data } = await supabase.from("clients").select("*").eq("slug", slug).maybeSingle();
+      if (!data) {
+        navigate("/admin");
+        return;
+      }
+      setClientData(data as ClientData);
+      setLoading(false);
+    };
+    load();
+  }, [slug, navigate]);
+
+  if (loading || !clientData) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
+  return (
+    <PostsProvider clientId={clientData.id} clientLogo={clientData.logo_url} clientPostingPeriod={clientData.posting_period}>
+      <AdminPageInner clientData={clientData} />
+    </PostsProvider>
   );
 };
 

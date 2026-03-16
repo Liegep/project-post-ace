@@ -32,6 +32,39 @@ export type Database = {
         }
         Relationships: []
       }
+      clients: {
+        Row: {
+          created_at: string
+          id: string
+          locale: string
+          logo_url: string
+          name: string
+          posting_period: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          locale?: string
+          logo_url?: string
+          name: string
+          posting_period?: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          locale?: string
+          logo_url?: string
+          name?: string
+          posting_period?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           author: string
@@ -67,6 +100,7 @@ export type Database = {
       posts: {
         Row: {
           caption: string
+          client_id: string | null
           client_label: string
           created_at: string
           deadline: string | null
@@ -80,6 +114,7 @@ export type Database = {
         }
         Insert: {
           caption?: string
+          client_id?: string | null
           client_label?: string
           created_at?: string
           deadline?: string | null
@@ -93,6 +128,7 @@ export type Database = {
         }
         Update: {
           caption?: string
+          client_id?: string | null
           client_label?: string
           created_at?: string
           deadline?: string | null
@@ -104,28 +140,47 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tags: {
         Row: {
+          client_id: string | null
           color: string
           created_at: string
           id: string
           name: string
         }
         Insert: {
+          client_id?: string | null
           color: string
           created_at?: string
           id: string
           name: string
         }
         Update: {
+          client_id?: string | null
           color?: string
           created_at?: string
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tags_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
