@@ -90,16 +90,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             </div>
           )}
 
-          {entradaPosts.length > 0 && (
-            <div>
-              <h3 className="mb-4 text-lg font-semibold text-muted-foreground">Entrada</h3>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 rounded-xl bg-muted/30 p-4">
-                {sortByDate(entradaPosts).map((post) => (
-                  <PostCard key={post.id} post={post} isAdmin={false} />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </main>
     </div>
