@@ -28,6 +28,7 @@ interface FeedbackNotification {
   postTitle: string;
   clientName: string;
   clientSlug: string;
+  clientLogo: string;
   label: string;
   updatedAt: string;
 }
