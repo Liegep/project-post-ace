@@ -484,6 +484,14 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     toast({ title: `${ids.length} posts restaurados` });
   };
 
+  const handleBulkMoveToColumn = async (columnId: string) => {
+    const ids = Array.from(selectedPostIds);
+    const targetColumnId = columnId === "__unassigned__" ? null : columnId;
+    await bulkMoveToColumn(ids, targetColumnId);
+    exitSelectionMode();
+    toast({ title: `${ids.length} posts movidos` });
+  };
+
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
