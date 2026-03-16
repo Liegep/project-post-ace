@@ -137,6 +137,7 @@ const en: TranslationKeys = {
   adminTitle: "Content Dashboard",
   adminSubtitle: "Manage your posts and approvals",
   newPost: "New Post",
+  statusEntry: "Entry",
   statusInDevelopment: "In Development",
   statusWritingCaption: "Writing Caption",
   statusReady: "Ready",
