@@ -108,7 +108,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
         {!isAdmin && (
           <div className="rounded-lg bg-primary/10 px-3 py-2 text-center">
             <span className="text-sm font-semibold text-primary">
-              Previsão de Publicação {format(post.deadline, "dd/MM/yyyy")}
+              {t("publishForecast")} {format(post.deadline, "dd/MM/yyyy")}
             </span>
           </div>
         )}
