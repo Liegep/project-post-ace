@@ -79,16 +79,19 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     await supabase.from("app_settings").update({ value: period }).eq("key", "posting_period");
   }, []);
 
-  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => {
-    const { data, error } = await supabase.from("posts").insert({
+  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel"> & { deadline?: Date }) => {
+    const insertData: Record<string, any> = {
       title: post.title,
-      image_url: post.imageUrl,
-      media_type: post.mediaType,
-      caption: post.caption,
-      deadline: post.deadline.toISOString(),
+      image_url: post.imageUrl || '',
+      media_type: post.mediaType || 'image',
+      caption: post.caption || '',
       status: post.status,
-      tags: post.tags,
-    }).select().single();
+      tags: post.tags || [],
+    };
+    if (post.deadline) {
+      insertData.deadline = post.deadline.toISOString();
+    }
+    const { data, error } = await supabase.from("posts").insert(insertData).select().single();
     if (data && !error) {
       setPosts((prev) => [dbPostToPost(data, []), ...prev]);
     }

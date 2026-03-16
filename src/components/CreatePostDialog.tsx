@@ -76,7 +76,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
         imageUrl: finalUrl,
         mediaType,
         caption,
-        deadline: new Date(deadline),
+        deadline: deadline ? new Date(deadline) : undefined,
         status,
         tags: selectedTags,
       });
