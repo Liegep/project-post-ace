@@ -31,7 +31,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             <img src={clientData.logo_url} alt="Logo" className="h-[250px] w-[250px] rounded-lg object-contain" />
           )}
           <div>
-            <h1 className="text-2xl font-bold text-foreground">{clientData.name}</h1>
+            <h1 className="text-4xl font-extrabold text-foreground">{clientData.name}</h1>
             <p className="text-sm text-muted-foreground">{t("clientSubtitle")}</p>
           </div>
         </div>
