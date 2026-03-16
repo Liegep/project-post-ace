@@ -23,8 +23,14 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
     [locale]
   );
 
-  // Only show posts with status "pronto"
+  // Posts with status "pronto" (shown without column grouping)
   const readyPosts = posts.filter((p) => p.status === "pronto");
+
+  // "Entrada" column: show posts that are "em_desenvolvimento"
+  const entradaColumn = columns.find((c) => c.name.toLowerCase() === "entrada");
+  const entradaPosts = entradaColumn
+    ? posts.filter((p) => p.columnId === entradaColumn.id && p.status === "em_desenvolvimento")
+    : [];
 
   const sortByDate = (list: typeof posts) =>
     [...list].sort((a, b) => {
@@ -32,6 +38,8 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
       const dateB = b.deadline ? new Date(b.deadline).getTime() : 0;
       return dateA - dateB;
     });
+
+  const hasContent = readyPosts.length > 0 || entradaPosts.length > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -57,17 +65,30 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         )}
         <h2 className="mb-6 text-center text-3xl font-bold text-foreground">{t("postsForApproval")}</h2>
 
-        {readyPosts.length === 0 && (
+        {!hasContent && (
           <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
         )}
 
-        {readyPosts.length > 0 && (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {sortByDate(readyPosts).map((post) => (
-              <PostCard key={post.id} post={post} isAdmin={false} />
-            ))}
-          </div>
-        )}
+        <div className="space-y-8">
+          {readyPosts.length > 0 && (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {sortByDate(readyPosts).map((post) => (
+                <PostCard key={post.id} post={post} isAdmin={false} />
+              ))}
+            </div>
+          )}
+
+          {entradaPosts.length > 0 && (
+            <div>
+              <h3 className="mb-4 text-lg font-semibold text-muted-foreground">Entrada</h3>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 rounded-xl bg-muted/30 p-4">
+                {sortByDate(entradaPosts).map((post) => (
+                  <PostCard key={post.id} post={post} isAdmin={false} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
