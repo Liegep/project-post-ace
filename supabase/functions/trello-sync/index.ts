@@ -33,7 +33,8 @@ Deno.serve(async (req) => {
     // Sanitize board ID: remove trailing slashes, whitespace, and extract ID from full URLs
     let boardId = rawBoardId.trim().replace(/\/+$/, '');
     // Handle full Trello URLs like https://trello.com/b/BOARD_ID/board-name
-    const urlMatch = boardId.match(/trello\.com\/b\/([^\/]+)/);
+    // Handle full Trello URLs: /b/ID, /invite/b/ID, etc.
+    const urlMatch = boardId.match(/trello\.com\/(?:invite\/)?b\/([^\/]+)/);
     if (urlMatch) boardId = urlMatch[1];
 
     console.log("Using Trello API Key (first 4 chars):", TRELLO_API_KEY?.substring(0, 4));
