@@ -7,7 +7,10 @@ import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Archive, LayoutGrid } from "lucide-react";
+import { Archive, LayoutGrid, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface ClientData {
   id: string;
@@ -20,7 +23,7 @@ interface ClientData {
 }
 
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
-  const { posts, archivedPosts, columns, postingPeriod } = usePosts();
+  const { posts, archivedPosts, columns, postingPeriod, unarchivePost } = usePosts();
   const locale = (clientData.locale || "pt") as Locale;
   const t = useCallback(
     (key: keyof typeof translations.pt) => translations[locale]?.[key] || translations.pt[key] || key,
@@ -161,9 +164,50 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                       <span className="text-xs text-muted-foreground">({groupedArchived[month].length})</span>
                     </div>
                     <div className="space-y-3">
-                      {groupedArchived[month].map((post) => (
-                        <PostCard key={post.id} post={post} isAdmin={false} hideFeedback />
-                      ))}
+                      {groupedArchived[month].map((post) => {
+                        const thumbUrl = post.mediaUrls[0] || post.imageUrl;
+                        const hasMedia = post.mediaUrls.length > 0 || post.imageUrl;
+                        return (
+                          <div key={post.id} className="rounded-lg border bg-card p-3">
+                            <div className="flex items-start gap-3">
+                              {hasMedia && thumbUrl && (
+                                <img src={thumbUrl} alt="" className="h-12 w-12 rounded-md object-cover shrink-0" />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">{post.title}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {post.archivedAt ? format(post.archivedAt, "dd/MM/yyyy") : format(post.createdAt, "dd/MM/yyyy")}
+                                </p>
+                              </div>
+                            </div>
+                            {columns.length > 0 && (
+                              <div className="mt-2">
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button variant="outline" size="sm" className="w-full text-xs">
+                                      <RotateCcw className="mr-1.5 h-3 w-3" /> Restaurar
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-48 p-2" align="start">
+                                    <p className="text-xs font-medium text-muted-foreground mb-2">Mover para coluna:</p>
+                                    <div className="space-y-1">
+                                      {columns.map((col) => (
+                                        <button
+                                          key={col.id}
+                                          onClick={() => unarchivePost(post.id, col.id)}
+                                          className="w-full rounded-md px-3 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                                        >
+                                          {col.name}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}

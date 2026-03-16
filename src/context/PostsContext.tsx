@@ -26,7 +26,7 @@ interface PostsContextType {
   reorderColumns: (columns: Column[]) => void;
   movePostToColumn: (postId: string, columnId: string | null) => void;
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
-  unarchivePost: (id: string) => void;
+  unarchivePost: (id: string, columnId?: string | null) => void;
   bulkUpdateStatus: (ids: string[], status: PostStatus) => void;
   bulkDeletePosts: (ids: string[]) => void;
   bulkMoveToColumn: (ids: string[], columnId: string | null) => void;
@@ -268,9 +268,13 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("clients").update({ logo_url: url } as any).eq("id", clientId);
   }, [clientId]);
 
-  const unarchivePost = useCallback(async (id: string) => {
-    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, archived: false, archivedAt: null, status: "pronto" as PostStatus } : p)));
-    await supabase.from("posts").update({ archived: false, archived_at: null, status: "pronto" } as any).eq("id", id);
+  const unarchivePost = useCallback(async (id: string, columnId?: string | null) => {
+    const updates: Partial<Post> = { archived: false, archivedAt: null, status: "pronto" as PostStatus };
+    if (columnId !== undefined) updates.columnId = columnId;
+    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+    const dbUpdates: Record<string, any> = { archived: false, archived_at: null, status: "pronto" };
+    if (columnId !== undefined) dbUpdates.column_id = columnId;
+    await supabase.from("posts").update(dbUpdates as any).eq("id", id);
   }, []);
 
   const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus) => {
