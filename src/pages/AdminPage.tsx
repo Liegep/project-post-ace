@@ -14,7 +14,48 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { DndContext, DragOverlay, closestCenter, PointerSensor, useSensor, useSensors, DragStartEvent, DragEndEvent, DragOverEvent, useDroppable } from "@dnd-kit/core";
+import { useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
+const UNASSIGNED_COLUMN_ID = "__unassigned__";
+
+const DroppableColumn = ({ id, children }: { id: string; children: React.ReactNode }) => {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div ref={setNodeRef} className={`space-y-3 min-h-[60px] rounded-lg transition-colors ${isOver ? "bg-accent/10 ring-2 ring-accent/30" : ""}`}>
+      {children}
+    </div>
+  );
+};
+
+const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit }: {
+  post: Post;
+  onStatusChange: (s: PostStatus) => void;
+  onDelete: () => void;
+  onEdit: () => void;
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: post.id,
+    data: { type: "post", post },
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <PostCard
+        post={post}
+        isAdmin
+        onStatusChange={onStatusChange}
+        onDelete={onDelete}
+        onEdit={onEdit}
+      />
+    </div>
+  );
+};
 interface ClientData {
   id: string;
   name: string;
