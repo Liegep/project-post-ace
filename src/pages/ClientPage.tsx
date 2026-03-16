@@ -53,7 +53,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           {posts.length === 0 && (
             <p className="col-span-full py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
           )}
-          {posts.map((post) => (
+          {[...posts].sort((a, b) => {
+            const dateA = a.deadline ? new Date(a.deadline).getTime() : 0;
+            const dateB = b.deadline ? new Date(b.deadline).getTime() : 0;
+            return dateA - dateB;
+          }).map((post) => (
             <PostCard key={post.id} post={post} isAdmin={false} />
           ))}
         </div>
