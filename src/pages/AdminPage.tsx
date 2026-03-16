@@ -694,6 +694,19 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               )}
             </button>
           </div>
+          {activeTab === "archived" && (
+            <div className="flex items-center gap-2 ml-3">
+              <Switch
+                id="show-archived-client"
+                checked={showArchivedToClient}
+                onCheckedChange={toggleShowArchivedToClient}
+              />
+              <label htmlFor="show-archived-client" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                {showArchivedToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                {showArchivedToClient ? "Visível para o cliente" : "Oculto do cliente"}
+              </label>
+            </div>
+          )}
         </div>
 
         {activeTab === "board" ? (
