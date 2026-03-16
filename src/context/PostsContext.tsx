@@ -77,7 +77,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     const fetchAll = async () => {
       setLoading(true);
       const [postsRes, commentsRes, tagsRes, columnsRes] = await Promise.all([
-        supabase.from("posts").select("*").eq("client_id", clientId).order("created_at", { ascending: false }),
+        supabase.from("posts").select("*").eq("client_id", clientId).order("position", { ascending: true }).order("created_at", { ascending: false }),
         supabase.from("comments").select("*").order("created_at", { ascending: true }),
         supabase.from("tags").select("*").eq("client_id", clientId),
         supabase.from("columns").select("*").eq("client_id", clientId).order("position", { ascending: true }),
