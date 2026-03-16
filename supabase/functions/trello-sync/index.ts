@@ -19,71 +19,46 @@ Deno.serve(async (req) => {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    if (!TRELLO_API_KEY || !TRELLO_TOKEN) {
-      throw new Error("Trello credentials not configured");
-    }
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error("Supabase credentials not configured");
-    }
+    if (!TRELLO_API_KEY || !TRELLO_TOKEN) throw new Error("Trello credentials not configured");
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Supabase credentials not configured");
 
     const { boardId: rawBoardId, clientId } = await req.json();
-    if (!rawBoardId || !clientId) {
-      throw new Error("boardId and clientId are required");
-    }
-    // Sanitize board ID: remove trailing slashes, whitespace, and extract ID from full URLs
-    let boardId = rawBoardId.trim().replace(/\/+$/, '');
-    // Handle full Trello URLs like https://trello.com/b/BOARD_ID/board-name
-    // Handle full Trello URLs: /b/ID, /invite/b/ID, etc.
+    if (!rawBoardId || !clientId) throw new Error("boardId and clientId are required");
+
+    let boardId = rawBoardId.trim().replace(/\/+$/, "");
     const urlMatch = boardId.match(/trello\.com\/(?:invite\/)?b\/([^\/]+)/);
     if (urlMatch) boardId = urlMatch[1];
 
-    console.log("Using Trello API Key (first 4 chars):", TRELLO_API_KEY?.substring(0, 4));
-    console.log("Using Trello Token (first 4 chars):", TRELLO_TOKEN?.substring(0, 4));
     console.log("Board ID:", boardId);
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const authParams = new URLSearchParams({
-      key: TRELLO_API_KEY,
-      token: TRELLO_TOKEN,
-    });
+    const authParams = new URLSearchParams({ key: TRELLO_API_KEY, token: TRELLO_TOKEN });
 
     const fetchTrelloJson = async (path: string, context: string) => {
       const url = `${TRELLO_API}${path}${path.includes("?") ? "&" : "?"}${authParams.toString()}`;
-      console.log(`Fetching ${context} from:`, url.replace(TRELLO_TOKEN, '***').replace(TRELLO_API_KEY, '***'));
-
       const response = await fetch(url);
       if (!response.ok) {
         const body = await response.text();
         console.error(`${context} response:`, response.status, body);
-
         if (response.status === 401) {
-          throw new Error(
-            `Trello access denied for board ${boardId}. The configured token does not have permission to read this board.`
-          );
+          throw new Error(`Trello access denied for board ${boardId}.`);
         }
-
         throw new Error(`Failed to fetch ${context}: ${response.status}`);
       }
-
       return response.json();
     };
 
     await fetchTrelloJson(`/boards/${boardId}?fields=id,name,closed`, "board");
 
-    // 1. Fetch board labels
     const trelloLabels = await fetchTrelloJson(`/boards/${boardId}/labels`, "labels");
-
-    // 2. Fetch board lists (columns)
     const trelloLists = await fetchTrelloJson(`/boards/${boardId}/lists`, "lists");
-
-    // 3. Fetch board cards
     const trelloCards = await fetchTrelloJson(
       `/boards/${boardId}/cards?fields=name,desc,due,idList,idLabels,pos&attachments=true`,
       "cards"
     );
 
-    // --- Sync Labels/Tags ---
-    const tagResults = [];
+    // --- Sync Labels/Tags (upsert by trello label id) ---
+    let tagsCount = 0;
     for (const label of trelloLabels) {
       if (!label.name) continue;
       const colorMap: Record<string, string> = {
@@ -93,82 +68,89 @@ Deno.serve(async (req) => {
         yellow_dark: "#ca8a04", orange_dark: "#ea580c", red_dark: "#dc2626",
         purple_dark: "#7c3aed", blue_dark: "#2563eb",
       };
-      const tagData = {
+      await supabase.from("tags").upsert({
         id: label.id,
         name: label.name,
         color: colorMap[label.color] || "#6b7280",
         client_id: clientId,
-      };
-      const { error } = await supabase.from("tags").upsert(tagData, { onConflict: "id" });
-      tagResults.push({ id: label.id, name: label.name, error: error?.message });
+      }, { onConflict: "id" });
+      tagsCount++;
     }
 
-    // --- Sync Lists/Columns ---
-    // First delete existing columns for this client, then insert fresh
-    await supabase.from("columns").delete().eq("client_id", clientId);
-
-    const columnIdMap: Record<string, string> = {};
+    // --- Sync Lists/Columns (non-destructive via trello_list_id) ---
+    const columnIdMap: Record<string, string> = {}; // trelloListId -> supabase column id
     for (let i = 0; i < trelloLists.length; i++) {
       const list = trelloLists[i];
-      const { data, error } = await supabase
+      // Check if column with this trello_list_id already exists
+      const { data: existing } = await supabase
         .from("columns")
-        .insert({ client_id: clientId, name: list.name, position: i })
         .select("id")
-        .single();
-      if (data) {
-        columnIdMap[list.id] = data.id;
+        .eq("trello_list_id", list.id)
+        .eq("client_id", clientId)
+        .maybeSingle();
+
+      if (existing) {
+        // Update name/position
+        await supabase.from("columns").update({ name: list.name, position: i }).eq("id", existing.id);
+        columnIdMap[list.id] = existing.id;
+      } else {
+        const { data } = await supabase
+          .from("columns")
+          .insert({ client_id: clientId, name: list.name, position: i, trello_list_id: list.id })
+          .select("id")
+          .single();
+        if (data) columnIdMap[list.id] = data.id;
       }
     }
 
-    // --- Sync Cards/Posts ---
-    // Delete existing posts for this client before importing
-    await supabase.from("posts").delete().eq("client_id", clientId);
-
+    // --- Sync Cards/Posts (non-destructive via trello_card_id) ---
     let postsCreated = 0;
+    let postsUpdated = 0;
     for (const card of trelloCards) {
-      // Get first image attachment as cover
-      const imageAttachment = card.attachments?.find(
-        (a: any) => a.mimeType?.startsWith("image/")
-      );
+      const imageAttachment = card.attachments?.find((a: any) => a.mimeType?.startsWith("image/"));
       const imageUrl = imageAttachment?.url || "";
-
-      // Collect all image attachments
       const mediaUrls = (card.attachments || [])
         .filter((a: any) => a.mimeType?.startsWith("image/") || a.mimeType?.startsWith("video/"))
         .map((a: any) => a.url);
-
       const mediaType = mediaUrls.some((u: string) =>
         card.attachments?.find((a: any) => a.url === u && a.mimeType?.startsWith("video/"))
-      )
-        ? "video"
-        : "image";
+      ) ? "video" : "image";
 
-      const postData = {
+      const postFields = {
         title: card.name,
         image_url: imageUrl,
         media_type: mediaType,
         media_urls: mediaUrls.length > 0 ? mediaUrls : imageUrl ? [imageUrl] : [],
         caption: card.desc || "",
         deadline: card.due || null,
-        status: "entrada",
-        client_label: "pendente",
         tags: card.idLabels || [],
         client_id: clientId,
         column_id: columnIdMap[card.idList] || null,
+        trello_card_id: card.id,
       };
 
-      const { error } = await supabase.from("posts").insert(postData);
-      if (!error) postsCreated++;
+      // Check if post with this trello_card_id already exists
+      const { data: existing } = await supabase
+        .from("posts")
+        .select("id")
+        .eq("trello_card_id", card.id)
+        .maybeSingle();
+
+      if (existing) {
+        // Update existing post (don't overwrite status/client_label set by user)
+        const { title, image_url, media_type, media_urls, caption, deadline, tags, column_id } = postFields;
+        await supabase.from("posts").update({ title, image_url, media_type, media_urls, caption, deadline, tags, column_id }).eq("id", existing.id);
+        postsUpdated++;
+      } else {
+        await supabase.from("posts").insert({ ...postFields, status: "entrada", client_label: "pendente" });
+        postsCreated++;
+      }
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        summary: {
-          tags: tagResults.length,
-          columns: Object.keys(columnIdMap).length,
-          posts: postsCreated,
-        },
+        summary: { tags: tagsCount, columns: Object.keys(columnIdMap).length, postsCreated, postsUpdated },
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
