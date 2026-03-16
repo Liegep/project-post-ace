@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { Post, PostStatus, ClientLabel, Comment, Tag, MediaType, Column } from "@/types/post";
 import { supabase } from "@/integrations/supabase/client";
+import { pushToTrello } from "@/lib/trelloPush";
 
 interface PostsContextType {
   posts: Post[];
