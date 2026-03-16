@@ -186,6 +186,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.columnId !== undefined) dbUpdates.column_id = updates.columnId;
     if (Object.keys(dbUpdates).length > 0) {
       await supabase.from("posts").update(dbUpdates).eq("id", id);
+      pushToTrello(id, "update");
     }
   }, []);
 
