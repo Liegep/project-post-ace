@@ -9,7 +9,7 @@ interface PostsContextType {
   companyLogo: string;
   setPostingPeriod: (period: string) => void;
   setCompanyLogo: (url: string) => void;
-  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => void;
+  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel"> & { deadline?: Date }) => void;
   updatePostStatus: (id: string, status: PostStatus) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
   addComment: (postId: string, author: string, text: string) => void;
@@ -30,7 +30,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     imageUrl: row.image_url,
     mediaType: (row.media_type || "image") as MediaType,
     caption: row.caption,
-    deadline: new Date(row.deadline),
+    deadline: row.deadline ? new Date(row.deadline) : new Date(),
     status: row.status as PostStatus,
     clientLabel: row.client_label as ClientLabel,
     comments,
@@ -79,16 +79,19 @@ export const PostsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     await supabase.from("app_settings").update({ value: period }).eq("key", "posting_period");
   }, []);
 
-  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel">) => {
-    const { data, error } = await supabase.from("posts").insert({
+  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel"> & { deadline?: Date }) => {
+    const insertData: Record<string, any> = {
       title: post.title,
-      image_url: post.imageUrl,
-      media_type: post.mediaType,
-      caption: post.caption,
-      deadline: post.deadline.toISOString(),
+      image_url: post.imageUrl || '',
+      media_type: post.mediaType || 'image',
+      caption: post.caption || '',
       status: post.status,
-      tags: post.tags,
-    }).select().single();
+      tags: post.tags || [],
+    };
+    if (post.deadline) {
+      insertData.deadline = post.deadline.toISOString();
+    }
+    const { data, error } = await supabase.from("posts").insert(insertData as any).select().single();
     if (data && !error) {
       setPosts((prev) => [dbPostToPost(data, []), ...prev]);
     }
