@@ -38,6 +38,7 @@ export interface Post {
   tags: string[]; // tag ids
   createdAt: Date;
   columnId: string | null;
+  position: number;
 }
 
 export const DEFAULT_TAGS: Tag[] = [
