@@ -96,6 +96,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       title: post.title,
       image_url: post.imageUrl || '',
       media_type: post.mediaType || 'image',
+      media_urls: post.mediaUrls || [],
       caption: post.caption || '',
       status: post.status,
       tags: post.tags || [],
