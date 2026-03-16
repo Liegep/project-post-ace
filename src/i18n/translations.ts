@@ -293,6 +293,7 @@ const sv: TranslationKeys = {
   adminTitle: "Innehållspanel",
   adminSubtitle: "Hantera dina inlägg och godkännanden",
   newPost: "Nytt Inlägg",
+  statusEntry: "Inkommande",
   statusInDevelopment: "Under Utveckling",
   statusWritingCaption: "Skriver Bildtext",
   statusReady: "Klart",
