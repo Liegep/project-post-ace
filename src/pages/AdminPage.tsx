@@ -102,6 +102,9 @@ interface KanbanBoardProps {
   movePostToColumn: (postId: string, columnId: string | null) => void;
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   t: (key: any) => string;
+  selectionMode?: boolean;
+  selectedPostIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
 }
 
 const KanbanBoard = ({
