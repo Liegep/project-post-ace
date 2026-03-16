@@ -45,25 +45,17 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-1.5">
-        {tags.map((tag) => {
-          const selected = selectedTagIds.includes(tag.id);
+        {tags.filter((tag) => selectedTagIds.includes(tag.id)).map((tag) => {
           const translationKey = TAG_TRANSLATION_KEYS[tag.id];
           const displayName = translationKey ? t(translationKey) : tag.name;
           return (
-            <button
+            <span
               key={tag.id}
-              type="button"
-              onClick={() => toggleTag(tag.id)}
-              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all border"
-              style={{
-                backgroundColor: selected ? tag.color : "transparent",
-                borderColor: tag.color,
-                color: selected ? "#fff" : tag.color,
-              }}
+              className="inline-flex rounded-full px-2.5 py-1 text-xs font-medium"
+              style={{ backgroundColor: tag.color, color: "#fff" }}
             >
-              {selected && <Check className="h-3 w-3" />}
               {displayName}
-            </button>
+            </span>
           );
         })}
 
@@ -71,32 +63,58 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
           <PopoverTrigger asChild>
             <button
               type="button"
+              onClick={(e) => e.stopPropagation()}
               className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/40 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-accent hover:text-accent"
             >
               <Plus className="h-3 w-3" /> {t("newTag")}
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-64 space-y-3" align="start">
-            <p className="text-sm font-medium text-foreground">{t("createTag")}</p>
-            <Input
-              placeholder={t("tagNamePlaceholder")}
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className="h-8 text-sm"
-            />
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-muted-foreground">{t("color")}:</label>
-              <input
-                type="color"
-                value={newColor}
-                onChange={(e) => setNewColor(e.target.value)}
-                className="h-8 w-8 cursor-pointer rounded border-0 bg-transparent p-0"
-              />
-              <span className="text-xs text-muted-foreground">{newColor}</span>
+          <PopoverContent className="w-64 space-y-3" align="start" onClick={(e) => e.stopPropagation()}>
+            <p className="text-sm font-medium text-foreground">{t("tags")}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {tags.map((tag) => {
+                const selected = selectedTagIds.includes(tag.id);
+                const translationKey = TAG_TRANSLATION_KEYS[tag.id];
+                const displayName = translationKey ? t(translationKey) : tag.name;
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => toggleTag(tag.id)}
+                    className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all border"
+                    style={{
+                      backgroundColor: selected ? tag.color : "transparent",
+                      borderColor: tag.color,
+                      color: selected ? "#fff" : tag.color,
+                    }}
+                  >
+                    {selected && <Check className="h-3 w-3" />}
+                    {displayName}
+                  </button>
+                );
+              })}
             </div>
-            <Button size="sm" onClick={handleCreate} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              {t("create")}
-            </Button>
+            <div className="border-t pt-3 space-y-2">
+              <Input
+                placeholder={t("tagNamePlaceholder")}
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="h-8 text-sm"
+              />
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-muted-foreground">{t("color")}:</label>
+                <input
+                  type="color"
+                  value={newColor}
+                  onChange={(e) => setNewColor(e.target.value)}
+                  className="h-8 w-8 cursor-pointer rounded border-0 bg-transparent p-0"
+                />
+                <span className="text-xs text-muted-foreground">{newColor}</span>
+              </div>
+              <Button size="sm" onClick={handleCreate} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                {t("create")}
+              </Button>
+            </div>
           </PopoverContent>
         </Popover>
       </div>
