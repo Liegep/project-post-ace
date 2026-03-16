@@ -241,7 +241,13 @@ const AdminDashboard = () => {
                     onClick={() => navigate(`/admin/${fb.clientSlug}`)}
                     className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5 cursor-pointer hover:bg-muted transition-colors"
                   >
-                    <MessageCircle className="h-4 w-4 text-muted-foreground shrink-0" />
+                    {fb.clientLogo ? (
+                      <img src={fb.clientLogo} alt={fb.clientName} className="h-7 w-7 rounded-full object-contain border shrink-0" />
+                    ) : (
+                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted border shrink-0">
+                        <span className="text-xs font-bold text-muted-foreground">{fb.clientName.charAt(0).toUpperCase()}</span>
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">{fb.postTitle}</p>
                       <p className="text-xs text-muted-foreground">{fb.clientName}</p>
