@@ -24,11 +24,15 @@ interface PostsContextType {
 const PostsContext = createContext<PostsContextType | undefined>(undefined);
 
 function dbPostToPost(row: any, comments: Comment[]): Post {
+  const mediaUrls: string[] = row.media_urls && row.media_urls.length > 0
+    ? row.media_urls
+    : row.image_url ? [row.image_url] : [];
   return {
     id: row.id,
     title: row.title,
     imageUrl: row.image_url,
     mediaType: (row.media_type || "image") as MediaType,
+    mediaUrls,
     caption: row.caption,
     deadline: row.deadline ? new Date(row.deadline) : new Date(),
     status: row.status as PostStatus,
