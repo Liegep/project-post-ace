@@ -260,6 +260,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     }
   }, []);
 
+  const setCompanyLogo = useCallback(async (url: string) => {
+    setCompanyLogoState(url);
+    await supabase.from("clients").update({ logo_url: url } as any).eq("id", clientId);
+  }, [clientId]);
+
   const unarchivePost = useCallback(async (id: string) => {
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, archived: false, archivedAt: null, status: "pronto" as PostStatus } : p)));
     await supabase.from("posts").update({ archived: false, archived_at: null, status: "pronto" } as any).eq("id", id);
