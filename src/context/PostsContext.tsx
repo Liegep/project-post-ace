@@ -29,6 +29,7 @@ interface PostsContextType {
   unarchivePost: (id: string) => void;
   bulkUpdateStatus: (ids: string[], status: PostStatus) => void;
   bulkDeletePosts: (ids: string[]) => void;
+  bulkMoveToColumn: (ids: string[], columnId: string | null) => void;
   loading: boolean;
 }
 
@@ -292,6 +293,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("posts").delete().in("id", ids);
   }, []);
 
+  const bulkMoveToColumn = useCallback(async (ids: string[], columnId: string | null) => {
+    setPosts((prev) => prev.map((p) => ids.includes(p.id) ? { ...p, columnId } : p));
+    await supabase.from("posts").update({ column_id: columnId } as any).in("id", ids);
+  }, []);
+
   const activePosts = posts.filter((p) => !p.archived);
   const archivedPosts = posts.filter((p) => p.archived);
 
@@ -300,7 +306,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       posts: activePosts, archivedPosts, tags, columns, postingPeriod, companyLogo, setPostingPeriod, setCompanyLogo,
       addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost,
       addTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns,
-      movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, loading,
+      movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, loading,
     }}>
       {children}
     </PostsContext.Provider>
