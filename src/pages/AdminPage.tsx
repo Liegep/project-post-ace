@@ -789,6 +789,19 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   ))}
                 </SelectContent>
               </Select>
+              {columns.length > 0 && (
+                <Select onValueChange={(v) => handleBulkMoveToColumn(v)}>
+                  <SelectTrigger className="h-8 w-auto min-w-[140px] text-xs">
+                    <SelectValue placeholder="Mover p/ coluna" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {columns.map((col) => (
+                      <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
+                    ))}
+                    <SelectItem value="__unassigned__">Sem coluna</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
               <Button size="sm" variant="outline" onClick={() => handleBulkStatusChange("finalizado")}>
                 <Archive className="mr-1.5 h-3.5 w-3.5" /> Arquivar
               </Button>
