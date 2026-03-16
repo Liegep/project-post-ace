@@ -753,9 +753,52 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             )}
           </>
         ) : (
-          <ArchivedView archivedPosts={archivedPosts} unarchivePost={unarchivePost} deletePost={deletePost} />
+          <ArchivedView
+            archivedPosts={archivedPosts}
+            unarchivePost={unarchivePost}
+            deletePost={deletePost}
+            selectionMode={selectionMode}
+            selectedPostIds={selectedPostIds}
+            onToggleSelect={toggleSelect}
+          />
         )}
       </main>
+
+      {/* Floating bulk action bar */}
+      {selectionMode && selectedPostIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl border bg-card px-5 py-3 shadow-xl">
+          <span className="text-sm font-semibold text-foreground">{selectedPostIds.size} selecionado(s)</span>
+          <div className="h-6 w-px bg-border" />
+          {activeTab === "board" ? (
+            <>
+              <Select onValueChange={(v) => handleBulkStatusChange(v as PostStatus)}>
+                <SelectTrigger className="h-8 w-auto min-w-[140px] text-xs">
+                  <SelectValue placeholder="Mudar status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
+                    <SelectItem key={key} value={key}>{STATUS_CONFIG[key].label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button size="sm" variant="outline" onClick={() => handleBulkStatusChange("finalizado")}>
+                <Archive className="mr-1.5 h-3.5 w-3.5" /> Arquivar
+              </Button>
+            </>
+          ) : (
+            <Button size="sm" variant="outline" onClick={handleBulkUnarchive}>
+              <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Restaurar
+            </Button>
+          )}
+          <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={handleBulkDelete}>
+            <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Excluir
+          </Button>
+          <div className="h-6 w-px bg-border" />
+          <Button size="sm" variant="ghost" onClick={exitSelectionMode}>
+            <X className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      )}
 
       <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} defaultColumnId={createInColumnId} />
       <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
