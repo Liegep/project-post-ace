@@ -151,6 +151,7 @@ const en: TranslationKeys = {
   statusInDevelopment: "In Development",
   statusWritingCaption: "Writing Caption",
   statusReady: "Ready",
+  statusFinalized: "Finalized",
   labelPending: "Pending",
   labelApproved: "Approved",
   labelChangeRequested: "Change Requested",
