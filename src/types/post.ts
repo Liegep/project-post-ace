@@ -46,6 +46,7 @@ export const TAG_TRANSLATION_KEYS: Record<string, "tagSEO" | "tagAltered" | "tag
 };
 
 export const STATUS_CONFIG: Record<PostStatus, { label: string; color: string }> = {
+  entrada: { label: "Entrada", color: "bg-muted text-muted-foreground" },
   em_desenvolvimento: { label: "Em Desenvolvimento", color: "bg-info text-info-foreground" },
   escrevendo_legenda: { label: "Escrevendo Legenda", color: "bg-warning text-warning-foreground" },
   pronto: { label: "Pronto", color: "bg-success text-success-foreground" },

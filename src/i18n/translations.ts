@@ -22,6 +22,7 @@ type TranslationKeys = {
   adminSubtitle: string;
   newPost: string;
   // Status labels
+  statusEntry: string;
   statusInDevelopment: string;
   statusWritingCaption: string;
   statusReady: string;
