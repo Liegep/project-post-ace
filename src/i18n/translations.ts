@@ -191,6 +191,9 @@ const en: TranslationKeys = {
   clickToSelectMedia: "Click to select image or video",
   postingPeriod: "Posting Period",
   editPeriodPlaceholder: "E.g.: March 2026",
+  readMore: "Read more",
+  readLess: "Read less",
+  publishForecast: "Publish Forecast",
 };
 
 const it: TranslationKeys = {
