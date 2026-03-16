@@ -69,7 +69,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
     setCommentText("");
   };
 
-  const hasMedia = post.imageUrl && post.imageUrl.length > 0;
+  const hasMedia = allMedia.length > 0;
   const isCompact = !hasMedia && isAdmin;
 
   return (
