@@ -356,7 +356,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     setEditingPeriod(false);
   };
 
-  const addingColumnRef = React.useRef(false);
+  const addingColumnRef = useRef(false);
   const handleAddColumn = async () => {
     if (!newColumnName.trim()) {
       setAddingColumn(false);
