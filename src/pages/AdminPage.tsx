@@ -66,7 +66,220 @@ interface ClientData {
   trello_board_id: string;
 }
 
-const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
+interface KanbanBoardProps {
+  posts: Post[];
+  columns: { id: string; name: string; position: number }[];
+  unassignedPosts: Post[];
+  editingColumnId: string | null;
+  editingColumnName: string;
+  setEditingColumnId: (id: string | null) => void;
+  setEditingColumnName: (name: string) => void;
+  editColumnInputRef: React.RefObject<HTMLInputElement>;
+  handleRenameColumn: (id: string) => void;
+  handleDeleteColumn: (id: string) => void;
+  updatePostStatus: (id: string, status: PostStatus) => void;
+  deletePost: (id: string) => void;
+  setEditPost: (post: Post) => void;
+  setCreateInColumnId: (id: string | null) => void;
+  setCreateOpen: (open: boolean) => void;
+  addingColumn: boolean;
+  setAddingColumn: (v: boolean) => void;
+  newColumnName: string;
+  setNewColumnName: (v: string) => void;
+  newColumnInputRef: React.RefObject<HTMLInputElement>;
+  handleAddColumn: () => void;
+  movePostToColumn: (postId: string, columnId: string | null) => void;
+  t: (key: any) => string;
+}
+
+const KanbanBoard = ({
+  posts, columns, unassignedPosts, editingColumnId, editingColumnName,
+  setEditingColumnId, setEditingColumnName, editColumnInputRef, handleRenameColumn,
+  handleDeleteColumn, updatePostStatus, deletePost, setEditPost, setCreateInColumnId,
+  setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
+  newColumnInputRef, handleAddColumn, movePostToColumn, t,
+}: KanbanBoardProps) => {
+  const [activePost, setActivePost] = useState<Post | null>(null);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const post = posts.find((p) => p.id === event.active.id);
+    if (post) setActivePost(post);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    setActivePost(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const postId = active.id as string;
+    const overId = over.id as string;
+
+    // Determine target column
+    let targetColumnId: string | null = null;
+    if (overId === UNASSIGNED_COLUMN_ID) {
+      targetColumnId = null;
+    } else if (columns.some((c) => c.id === overId)) {
+      targetColumnId = overId;
+    } else {
+      // Dropped on another post - find that post's column
+      const overPost = posts.find((p) => p.id === overId);
+      if (overPost) {
+        targetColumnId = overPost.columnId;
+      } else {
+        return;
+      }
+    }
+
+    const currentPost = posts.find((p) => p.id === postId);
+    if (currentPost && currentPost.columnId !== targetColumnId) {
+      movePostToColumn(postId, targetColumnId);
+    }
+  };
+
+  const allPostIds = posts.map((p) => p.id);
+
+  return (
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <div className="flex gap-4 overflow-x-auto pb-4">
+        {columns.map((col) => {
+          const columnPosts = posts.filter((p) => p.columnId === col.id);
+          return (
+            <div key={col.id} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
+              <div className="mb-4 flex items-center justify-between gap-2">
+                {editingColumnId === col.id ? (
+                  <Input
+                    ref={editColumnInputRef}
+                    value={editingColumnName}
+                    onChange={(e) => setEditingColumnName(e.target.value)}
+                    onBlur={() => handleRenameColumn(col.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleRenameColumn(col.id);
+                      if (e.key === "Escape") setEditingColumnId(null);
+                    }}
+                    className="h-7 text-sm font-semibold"
+                  />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-foreground">{col.name}</span>
+                    <span className="text-xs text-muted-foreground">({columnPosts.length})</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}
+                    className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteColumn(col.id)}
+                    className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+              <SortableContext items={columnPosts.map((p) => p.id)} strategy={verticalListSortingStrategy}>
+                <DroppableColumn id={col.id}>
+                  {columnPosts.map((post) => (
+                    <DraggablePostCard
+                      key={post.id}
+                      post={post}
+                      onStatusChange={(s) => updatePostStatus(post.id, s)}
+                      onDelete={() => deletePost(post.id)}
+                      onEdit={() => setEditPost(post)}
+                    />
+                  ))}
+                  {columnPosts.length === 0 && (
+                    <p className="py-8 text-center text-sm text-muted-foreground">{t("noPosts")}</p>
+                  )}
+                </DroppableColumn>
+              </SortableContext>
+              <button
+                onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
+                className="mt-3 flex w-full items-center justify-center gap-1 rounded-lg border-2 border-dashed border-muted-foreground/30 py-2 text-xs text-muted-foreground hover:border-accent hover:text-accent transition-colors"
+              >
+                <Plus className="h-3.5 w-3.5" /> Adicionar post
+              </button>
+            </div>
+          );
+        })}
+
+        {/* Unassigned posts column */}
+        {unassignedPosts.length > 0 && (
+          <div className="w-80 shrink-0 rounded-xl border bg-muted/30 p-4">
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-sm font-semibold text-muted-foreground">Sem coluna</span>
+              <span className="text-xs text-muted-foreground">({unassignedPosts.length})</span>
+            </div>
+            <SortableContext items={unassignedPosts.map((p) => p.id)} strategy={verticalListSortingStrategy}>
+              <DroppableColumn id={UNASSIGNED_COLUMN_ID}>
+                {unassignedPosts.map((post) => (
+                  <DraggablePostCard
+                    key={post.id}
+                    post={post}
+                    onStatusChange={(s) => updatePostStatus(post.id, s)}
+                    onDelete={() => deletePost(post.id)}
+                    onEdit={() => setEditPost(post)}
+                  />
+                ))}
+              </DroppableColumn>
+            </SortableContext>
+          </div>
+        )}
+
+        {/* Add column button */}
+        <div className="w-80 shrink-0">
+          {addingColumn ? (
+            <div className="rounded-xl border bg-card/50 p-4">
+              <Input
+                ref={newColumnInputRef}
+                value={newColumnName}
+                onChange={(e) => setNewColumnName(e.target.value)}
+                onBlur={handleAddColumn}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleAddColumn();
+                  if (e.key === "Escape") { setNewColumnName(""); setAddingColumn(false); }
+                }}
+                placeholder="Nome da coluna"
+                className="mb-2"
+              />
+              <div className="flex gap-2">
+                <Button size="sm" onClick={handleAddColumn} className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
+                  Criar
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => { setNewColumnName(""); setAddingColumn(false); }}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setAddingColumn(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-muted-foreground/30 py-12 text-sm text-muted-foreground hover:border-accent hover:text-accent transition-colors"
+            >
+              <Plus className="h-5 w-5" />
+              Nova coluna
+            </button>
+          )}
+        </div>
+      </div>
+
+      <DragOverlay>
+        {activePost && (
+          <div className="w-80 rotate-2 opacity-90">
+            <PostCard post={activePost} isAdmin />
+          </div>
+        )}
+      </DragOverlay>
+    </DndContext>
+  );
+};
+
+
   const {
     posts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn,
