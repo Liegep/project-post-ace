@@ -204,7 +204,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete
         )}
       </div>
 
-      {(expanded || !isAdmin) && !isCompact && (
+      {(expanded || !isAdmin) && !isCompact && !hideFeedback && (
         <div className="border-t bg-muted/30 p-4">
           <div className="space-y-3">
             {post.comments.length === 0 && (
