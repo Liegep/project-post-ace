@@ -23,6 +23,16 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
     [locale]
   );
 
+  const sortByDate = (list: typeof posts) =>
+    [...list].sort((a, b) => {
+      const dateA = a.deadline ? new Date(a.deadline).getTime() : 0;
+      const dateB = b.deadline ? new Date(b.deadline).getTime() : 0;
+      return dateA - dateB;
+    });
+
+  const entradaPosts = sortByDate(posts.filter((p) => p.status === "entrada"));
+  const otherPosts = sortByDate(posts.filter((p) => p.status !== "entrada"));
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card px-6 py-4">
@@ -49,18 +59,34 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         {postingPeriod && (
           <p className="mb-6 text-center text-lg font-medium text-muted-foreground">{postingPeriod}</p>
         )}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {posts.length === 0 && (
-            <p className="col-span-full py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
-          )}
-          {[...posts].sort((a, b) => {
-            const dateA = a.deadline ? new Date(a.deadline).getTime() : 0;
-            const dateB = b.deadline ? new Date(b.deadline).getTime() : 0;
-            return dateA - dateB;
-          }).map((post) => (
-            <PostCard key={post.id} post={post} isAdmin={false} />
-          ))}
-        </div>
+
+        {posts.length === 0 && (
+          <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
+        )}
+
+        {entradaPosts.length > 0 && (
+          <div className="mb-8">
+            <h3 className="mb-4 text-xl font-semibold text-muted-foreground">{t("statusEntry")}</h3>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {entradaPosts.map((post) => (
+                <PostCard key={post.id} post={post} isAdmin={false} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {otherPosts.length > 0 && (
+          <div>
+            {entradaPosts.length > 0 && (
+              <h3 className="mb-4 text-xl font-semibold text-muted-foreground">{t("postsForApproval")}</h3>
+            )}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {otherPosts.map((post) => (
+                <PostCard key={post.id} post={post} isAdmin={false} />
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
