@@ -6,11 +6,13 @@ import { Post, PostStatus } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { EditPostDialog } from "@/components/EditPostDialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface ClientData {
@@ -44,6 +46,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const newColumnInputRef = useRef<HTMLInputElement>(null);
   const editColumnInputRef = useRef<HTMLInputElement>(null);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
+  const [trelloSyncOpen, setTrelloSyncOpen] = useState(false);
+  const [trelloBoardId, setTrelloBoardId] = useState("");
+  const [syncing, setSyncing] = useState(false);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -111,6 +116,40 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   // Posts without a column
   const unassignedPosts = posts.filter((p) => !p.columnId);
 
+  const handleTrelloSync = async () => {
+    if (!trelloBoardId.trim()) return;
+    setSyncing(true);
+    try {
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const res = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/trello-sync`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({ boardId: trelloBoardId.trim(), clientId: clientData.id }),
+        }
+      );
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error);
+      toast({
+        title: "Sincronização concluída!",
+        description: `${result.summary.tags} etiquetas, ${result.summary.columns} colunas, ${result.summary.posts} posts importados.`,
+      });
+      setTrelloSyncOpen(false);
+      setTrelloBoardId("");
+      // Reload page to refresh data
+      window.location.reload();
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: "Erro na sincronização", description: err.message, variant: "destructive" });
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card px-6 py-4">
@@ -159,6 +198,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <List className="h-4 w-4" />
               </button>
             </div>
+            <Button variant="outline" onClick={() => setTrelloSyncOpen(true)}>
+              <RefreshCw className="mr-2 h-4 w-4" /> Trello Sync
+            </Button>
             <Button onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newPost")}
             </Button>
@@ -331,6 +373,43 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
 
       <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} defaultColumnId={createInColumnId} />
       <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
+
+      {/* Trello Sync Dialog */}
+      <Dialog open={trelloSyncOpen} onOpenChange={setTrelloSyncOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sincronizar com Trello</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Board ID do Trello</Label>
+              <Input
+                value={trelloBoardId}
+                onChange={(e) => setTrelloBoardId(e.target.value)}
+                placeholder="Ex: abc123def456"
+                onKeyDown={(e) => { if (e.key === "Enter") handleTrelloSync(); }}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Encontre o Board ID na URL do Trello: trello.com/b/<strong>BOARD_ID</strong>/nome-do-board
+              </p>
+            </div>
+            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              ⚠️ A sincronização substituirá todas as colunas e posts existentes deste cliente.
+            </div>
+            <Button
+              onClick={handleTrelloSync}
+              disabled={syncing || !trelloBoardId.trim()}
+              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              {syncing ? (
+                <><RefreshCw className="mr-2 h-4 w-4 animate-spin" /> Sincronizando...</>
+              ) : (
+                <><RefreshCw className="mr-2 h-4 w-4" /> Iniciar Sincronização</>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
