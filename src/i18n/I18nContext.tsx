@@ -9,8 +9,8 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
-export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [locale, setLocale] = useState<Locale>("pt");
+export const I18nProvider: React.FC<{ children: React.ReactNode; defaultLocale?: Locale }> = ({ children, defaultLocale = "pt" }) => {
+  const [locale, setLocale] = useState<Locale>(defaultLocale);
 
   const t = useCallback(
     (key: keyof typeof translations.pt) => translations[locale][key] || key,

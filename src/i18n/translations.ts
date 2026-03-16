@@ -356,6 +356,9 @@ const sv: TranslationKeys = {
   clickToSelectMedia: "Klicka för att välja bild eller video",
   postingPeriod: "Publiceringsperiod",
   editPeriodPlaceholder: "T.ex.: Mars 2026",
+  readMore: "Läs mer",
+  readLess: "Läs mindre",
+  publishForecast: "Publiceringsförhandsvisning",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };

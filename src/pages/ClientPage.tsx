@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PostsProvider, usePosts } from "@/context/PostsContext";
 import { PostCard } from "@/components/PostCard";
 import { Locale, translations } from "@/i18n/translations";
-import { useCallback } from "react";
+import { I18nProvider } from "@/i18n/I18nContext";
 
 interface ClientData {
   id: string;
@@ -92,10 +92,14 @@ const ClientPage = () => {
     );
   }
 
+  const clientLocale = (clientData.locale || "pt") as Locale;
+
   return (
-    <PostsProvider clientId={clientData.id} clientLogo={clientData.logo_url} clientPostingPeriod={clientData.posting_period}>
-      <ClientPageInner clientData={clientData} />
-    </PostsProvider>
+    <I18nProvider key={clientLocale} defaultLocale={clientLocale}>
+      <PostsProvider clientId={clientData.id} clientLogo={clientData.logo_url} clientPostingPeriod={clientData.posting_period}>
+        <ClientPageInner clientData={clientData} />
+      </PostsProvider>
+    </I18nProvider>
   );
 };
 
