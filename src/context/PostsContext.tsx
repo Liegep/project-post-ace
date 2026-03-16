@@ -29,6 +29,7 @@ interface PostsContextType {
   unarchivePost: (id: string) => void;
   bulkUpdateStatus: (ids: string[], status: PostStatus) => void;
   bulkDeletePosts: (ids: string[]) => void;
+  bulkMoveToColumn: (ids: string[], columnId: string | null) => void;
   loading: boolean;
 }
 
