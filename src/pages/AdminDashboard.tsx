@@ -36,6 +36,7 @@ const AdminDashboard = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
+  const [feedbacks, setFeedbacks] = useState<FeedbackNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -51,6 +52,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchClients();
+    fetchFeedbacks();
   }, []);
 
   const fetchClients = async () => {
@@ -58,6 +60,40 @@ const AdminDashboard = () => {
     const { data } = await supabase.from("clients").select("*").order("created_at", { ascending: false });
     setClients((data as Client[]) || []);
     setLoading(false);
+  };
+
+  const fetchFeedbacks = async () => {
+    // Fetch posts where client gave feedback (label != pendente)
+    const { data: posts } = await supabase
+      .from("posts")
+      .select("id, title, client_label, client_id, updated_at")
+      .neq("client_label", "pendente")
+      .order("updated_at", { ascending: false });
+
+    if (!posts || posts.length === 0) {
+      setFeedbacks([]);
+      return;
+    }
+
+    const clientIds = [...new Set(posts.map((p: any) => p.client_id).filter(Boolean))];
+    const { data: clientsData } = await supabase
+      .from("clients")
+      .select("id, name, slug")
+      .in("id", clientIds);
+
+    const clientMap: Record<string, { name: string; slug: string }> = {};
+    (clientsData || []).forEach((c: any) => { clientMap[c.id] = { name: c.name, slug: c.slug }; });
+
+    setFeedbacks(
+      posts.map((p: any) => ({
+        postId: p.id,
+        postTitle: p.title,
+        clientName: clientMap[p.client_id]?.name || "—",
+        clientSlug: clientMap[p.client_id]?.slug || "",
+        label: p.client_label,
+        updatedAt: p.updated_at,
+      }))
+    );
   };
 
   const generateSlug = (name: string) => {
