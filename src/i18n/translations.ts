@@ -136,6 +136,9 @@ const pt: TranslationKeys = {
   clickToSelectMedia: "Clique para selecionar imagem ou vídeo",
   postingPeriod: "Período de Postagem",
   editPeriodPlaceholder: "Ex: Março 2026",
+  readMore: "Ver mais",
+  readLess: "Ver menos",
+  publishForecast: "Previsão de Publicação",
 };
 
 const en: TranslationKeys = {
