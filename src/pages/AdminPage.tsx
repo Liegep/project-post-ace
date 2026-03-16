@@ -33,15 +33,19 @@ const DroppableColumn = ({ id, children }: { id: string; children: React.ReactNo
   );
 };
 
-const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit }: {
+const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: {
   post: Post;
   onStatusChange: (s: PostStatus) => void;
   onDelete: () => void;
   onEdit: () => void;
+  selectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: post.id,
     data: { type: "post", post },
+    disabled: selectionMode,
   });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -49,13 +53,16 @@ const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit }: {
     opacity: isDragging ? 0.4 : 1,
   };
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} {...attributes} {...(selectionMode ? {} : listeners)}>
       <PostCard
         post={post}
         isAdmin
         onStatusChange={onStatusChange}
         onDelete={onDelete}
         onEdit={onEdit}
+        selectionMode={selectionMode}
+        isSelected={isSelected}
+        onToggleSelect={onToggleSelect}
       />
     </div>
   );
