@@ -449,7 +449,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </button>
             <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
             <div>
-              <h1 className="text-2xl font-bold text-foreground">{clientData.name}</h1>
+              <h1 className="text-2xl font-bold text-foreground cursor-pointer hover:text-primary transition-colors" onClick={() => window.open(`/client/${clientData.slug}`, '_blank')}>{clientData.name}</h1>
               <p className="text-sm text-muted-foreground">{t("adminSubtitle")}</p>
             </div>
           </div>
