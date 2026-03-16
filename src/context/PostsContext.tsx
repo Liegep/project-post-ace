@@ -229,6 +229,22 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     }
   }, []);
 
+  const reorderPostsInColumn = useCallback(async (columnId: string | null, orderedPostIds: string[]) => {
+    setPosts((prev) => {
+      const updated = [...prev];
+      orderedPostIds.forEach((id, index) => {
+        const postIndex = updated.findIndex((p) => p.id === id);
+        if (postIndex !== -1) {
+          updated[postIndex] = { ...updated[postIndex], position: index, columnId };
+        }
+      });
+      return updated;
+    });
+    for (let i = 0; i < orderedPostIds.length; i++) {
+      await supabase.from("posts").update({ position: i, column_id: columnId } as any).eq("id", orderedPostIds[i]);
+    }
+  }, []);
+
   const setCompanyLogo = useCallback(async (url: string) => {
     setCompanyLogoState(url);
     await supabase.from("clients").update({ logo_url: url } as any).eq("id", clientId);
@@ -239,7 +255,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       posts, tags, columns, postingPeriod, companyLogo, setPostingPeriod, setCompanyLogo,
       addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost,
       addTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns,
-      movePostToColumn, loading,
+      movePostToColumn, reorderPostsInColumn, loading,
     }}>
       {children}
     </PostsContext.Provider>
