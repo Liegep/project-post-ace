@@ -207,6 +207,7 @@ const it: TranslationKeys = {
   statusInDevelopment: "In Sviluppo",
   statusWritingCaption: "Scrittura Didascalia",
   statusReady: "Pronto",
+  statusFinalized: "Finalizzato",
   labelPending: "In Attesa",
   labelApproved: "Approvato",
   labelChangeRequested: "Modifica Richiesta",
