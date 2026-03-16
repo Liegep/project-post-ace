@@ -33,6 +33,15 @@ interface FeedbackNotification {
   updatedAt: string;
 }
 
+interface UnarchiveNotification {
+  postId: string;
+  postTitle: string;
+  clientName: string;
+  clientSlug: string;
+  clientLogo: string;
+  unarchivedAt: string;
+}
+
 const AdminDashboard = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
