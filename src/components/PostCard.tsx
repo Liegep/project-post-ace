@@ -55,6 +55,9 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [mediaIndex, setMediaIndex] = useState(0);
+
+  const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
 
   const statusConfig = STATUS_CONFIG[post.status];
   const labelConfig = LABEL_CONFIG[post.clientLabel];
