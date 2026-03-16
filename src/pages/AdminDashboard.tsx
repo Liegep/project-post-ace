@@ -9,8 +9,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2 } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { LABEL_CONFIG } from "@/types/post";
 
 interface Client {
   id: string;
@@ -22,10 +23,20 @@ interface Client {
   created_at: string;
 }
 
+interface FeedbackNotification {
+  postId: string;
+  postTitle: string;
+  clientName: string;
+  clientSlug: string;
+  label: string;
+  updatedAt: string;
+}
+
 const AdminDashboard = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
+  const [feedbacks, setFeedbacks] = useState<FeedbackNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -41,6 +52,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchClients();
+    fetchFeedbacks();
   }, []);
 
   const fetchClients = async () => {
@@ -48,6 +60,40 @@ const AdminDashboard = () => {
     const { data } = await supabase.from("clients").select("*").order("created_at", { ascending: false });
     setClients((data as Client[]) || []);
     setLoading(false);
+  };
+
+  const fetchFeedbacks = async () => {
+    // Fetch posts where client gave feedback (label != pendente)
+    const { data: posts } = await supabase
+      .from("posts")
+      .select("id, title, client_label, client_id, updated_at")
+      .neq("client_label", "pendente")
+      .order("updated_at", { ascending: false });
+
+    if (!posts || posts.length === 0) {
+      setFeedbacks([]);
+      return;
+    }
+
+    const clientIds = [...new Set(posts.map((p: any) => p.client_id).filter(Boolean))];
+    const { data: clientsData } = await supabase
+      .from("clients")
+      .select("id, name, slug")
+      .in("id", clientIds);
+
+    const clientMap: Record<string, { name: string; slug: string }> = {};
+    (clientsData || []).forEach((c: any) => { clientMap[c.id] = { name: c.name, slug: c.slug }; });
+
+    setFeedbacks(
+      posts.map((p: any) => ({
+        postId: p.id,
+        postTitle: p.title,
+        clientName: clientMap[p.client_id]?.name || "—",
+        clientSlug: clientMap[p.client_id]?.slug || "",
+        label: p.client_label,
+        updatedAt: p.updated_at,
+      }))
+    );
   };
 
   const generateSlug = (name: string) => {
@@ -165,7 +211,47 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl p-6">
+      <main className="mx-auto max-w-5xl p-6 space-y-6">
+        {/* Feedback notifications */}
+        {feedbacks.length > 0 && (
+          <div className="rounded-xl border bg-card p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-warning/20">
+                <Bell className="h-4 w-4 text-warning-foreground" />
+              </div>
+              <h2 className="font-semibold text-foreground">Feedbacks dos Clientes</h2>
+              <span className="rounded-full bg-warning/20 px-2 py-0.5 text-xs font-semibold text-warning-foreground">
+                {feedbacks.length}
+              </span>
+            </div>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {feedbacks.map((fb) => {
+                const labelConfig = LABEL_CONFIG[fb.label as keyof typeof LABEL_CONFIG];
+                return (
+                  <div
+                    key={fb.postId}
+                    onClick={() => navigate(`/admin/${fb.clientSlug}`)}
+                    className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5 cursor-pointer hover:bg-muted transition-colors"
+                  >
+                    <MessageCircle className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{fb.postTitle}</p>
+                      <p className="text-xs text-muted-foreground">{fb.clientName}</p>
+                    </div>
+                    {labelConfig && (
+                      <span className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
+                        {labelConfig.label}
+                      </span>
+                    )}
+                    <span className="text-[10px] text-muted-foreground shrink-0">
+                      {new Date(fb.updatedAt).toLocaleDateString("pt-BR")}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
