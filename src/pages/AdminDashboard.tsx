@@ -64,6 +64,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchClients();
     fetchFeedbacks();
+    fetchUnarchiveNotifs();
   }, []);
 
   const fetchClients = async () => {
