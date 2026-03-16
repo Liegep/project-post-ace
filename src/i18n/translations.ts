@@ -319,6 +319,7 @@ const sv: TranslationKeys = {
   statusInDevelopment: "Under Utveckling",
   statusWritingCaption: "Skriver Bildtext",
   statusReady: "Klart",
+  statusFinalized: "Avslutat",
   labelPending: "Väntande",
   labelApproved: "Godkänt",
   labelChangeRequested: "Ändring Begärd",
