@@ -134,6 +134,7 @@ export type Database = {
           caption: string
           client_id: string | null
           client_label: string
+          column_id: string | null
           created_at: string
           deadline: string | null
           id: string
@@ -149,6 +150,7 @@ export type Database = {
           caption?: string
           client_id?: string | null
           client_label?: string
+          column_id?: string | null
           created_at?: string
           deadline?: string | null
           id?: string
@@ -164,6 +166,7 @@ export type Database = {
           caption?: string
           client_id?: string | null
           client_label?: string
+          column_id?: string | null
           created_at?: string
           deadline?: string | null
           id?: string
@@ -181,6 +184,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_column_id_fkey"
+            columns: ["column_id"]
+            isOneToOne: false
+            referencedRelation: "columns"
             referencedColumns: ["id"]
           },
         ]
