@@ -80,7 +80,8 @@ const AdminPage = () => {
               <p className="text-sm text-muted-foreground">{t("adminSubtitle")}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div className="flex flex-col items-center gap-0.5">
                 <span className="text-[10px] text-muted-foreground">Admin</span>
                 <LanguageSelector />
