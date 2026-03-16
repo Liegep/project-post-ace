@@ -8,9 +8,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, useSortable, horizontalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const CaptionText = ({ text, t }: { text: string; t: (key: keyof typeof import("@/i18n/translations").translations.pt) => string }) => {
   const [expanded, setExpanded] = useState(false);
@@ -51,14 +54,65 @@ interface PostCardProps {
   onEdit?: () => void;
 }
 
+const SortableThumb = ({ url, index, isActive }: { url: string; index: number; isActive: boolean }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: `thumb-${index}` });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  const isVideo = url.match(/\.(mp4|webm|mov|avi)/i);
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`relative h-10 w-10 shrink-0 rounded overflow-hidden cursor-grab active:cursor-grabbing border-2 transition-colors ${isActive ? "border-accent" : "border-transparent hover:border-muted-foreground/50"}`}
+    >
+      {isVideo ? (
+        <video src={url} className="h-full w-full object-cover" muted />
+      ) : (
+        <img src={url} alt="" className="h-full w-full object-cover" />
+      )}
+      {index === 0 && (
+        <div className="absolute inset-0 flex items-center justify-center bg-accent/30">
+          <span className="text-[7px] font-bold text-accent-foreground">CAPA</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete, onEdit }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags } = usePosts();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [mediaIndex, setMediaIndex] = useState(0);
+  const [localMediaOrder, setLocalMediaOrder] = useState<string[] | null>(null);
 
-  const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
+  const baseMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
+  const allMedia = localMediaOrder || baseMedia;
+
+  const thumbSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+
+  const handleThumbDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = parseInt((active.id as string).replace("thumb-", ""));
+    const newIndex = parseInt((over.id as string).replace("thumb-", ""));
+    const newOrder = arrayMove(allMedia, oldIndex, newIndex);
+    setLocalMediaOrder(newOrder);
+    setMediaIndex(0);
+    // Save: first item is always the cover
+    updatePost(post.id, {
+      mediaUrls: newOrder,
+      imageUrl: newOrder[0] || "",
+    });
+  };
 
   const statusConfig = STATUS_CONFIG[post.status];
   const labelConfig = LABEL_CONFIG[post.clientLabel];
@@ -80,46 +134,62 @@ export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete
       </div>
 
       {hasMedia && (
-        <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
-          {(() => {
-            const currentUrl = allMedia[mediaIndex] || allMedia[0];
-            const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
-            return isVideo ? (
-              <video src={currentUrl} className="h-full w-full object-cover" controls muted />
-            ) : (
-              <img src={currentUrl} alt={post.title} className="h-full w-full object-cover" />
-            );
-          })()}
-          {allMedia.length > 1 && (
-            <>
-              <button
-                onClick={(e) => { e.stopPropagation(); setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length); }}
-                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1 hover:bg-background"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); setMediaIndex((prev) => (prev + 1) % allMedia.length); }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1 hover:bg-background"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-1">
-                {allMedia.map((_, i) => (
-                  <span key={i} className={`h-1.5 w-1.5 rounded-full ${i === mediaIndex ? "bg-primary-foreground" : "bg-primary-foreground/40"}`} />
-                ))}
-              </div>
-            </>
-          )}
-          <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
-            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${statusConfig.color}`}>
-              {t(STATUS_KEYS[post.status])}
-            </span>
-            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}>
-              {t(LABEL_KEYS[post.clientLabel])}
-            </span>
+        <>
+          <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
+            {(() => {
+              const currentUrl = allMedia[mediaIndex] || allMedia[0];
+              const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
+              return isVideo ? (
+                <video src={currentUrl} className="h-full w-full object-cover" controls muted />
+              ) : (
+                <img src={currentUrl} alt={post.title} className="h-full w-full object-cover" />
+              );
+            })()}
+            {allMedia.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length); }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1 hover:bg-background"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setMediaIndex((prev) => (prev + 1) % allMedia.length); }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1 hover:bg-background"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-1">
+                  {allMedia.map((_, i) => (
+                    <span key={i} className={`h-1.5 w-1.5 rounded-full ${i === mediaIndex ? "bg-primary-foreground" : "bg-primary-foreground/40"}`} />
+                  ))}
+                </div>
+              </>
+            )}
+            <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+              <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${statusConfig.color}`}>
+                {t(STATUS_KEYS[post.status])}
+              </span>
+              <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}>
+                {t(LABEL_KEYS[post.clientLabel])}
+              </span>
+            </div>
           </div>
-        </div>
+          {/* Sortable thumbnail strip for admin with multiple media */}
+          {isAdmin && allMedia.length > 1 && (
+            <div className="px-2 py-1.5 bg-muted/30" onClick={(e) => e.stopPropagation()}>
+              <DndContext sensors={thumbSensors} collisionDetection={closestCenter} onDragEnd={handleThumbDragEnd}>
+                <SortableContext items={allMedia.map((_, i) => `thumb-${i}`)} strategy={horizontalListSortingStrategy}>
+                  <div className="flex gap-1.5 overflow-x-auto">
+                    {allMedia.map((url, i) => (
+                      <SortableThumb key={`${url}-${i}`} url={url} index={i} isActive={i === mediaIndex} />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
+            </div>
+          )}
+        </>
       )}
 
       <div className={`px-4 space-y-2 ${isCompact ? "pb-3 pt-1" : "p-4 pt-3"}`}>
