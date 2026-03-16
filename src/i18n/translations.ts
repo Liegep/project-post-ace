@@ -301,6 +301,9 @@ const es: TranslationKeys = {
   clickToSelectMedia: "Haz clic para seleccionar imagen o video",
   postingPeriod: "Período de Publicación",
   editPeriodPlaceholder: "Ej: Marzo 2026",
+  readMore: "Leer más",
+  readLess: "Leer menos",
+  publishForecast: "Previsión de Publicación",
 };
 
 const sv: TranslationKeys = {
