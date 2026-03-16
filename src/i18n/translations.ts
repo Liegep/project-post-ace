@@ -241,6 +241,7 @@ const es: TranslationKeys = {
   adminTitle: "Panel de Contenido",
   adminSubtitle: "Gestiona tus publicaciones y aprobaciones",
   newPost: "Nueva Publicación",
+  statusEntry: "Entrada",
   statusInDevelopment: "En Desarrollo",
   statusWritingCaption: "Escribiendo Leyenda",
   statusReady: "Listo",
