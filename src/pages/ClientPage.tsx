@@ -39,7 +39,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
       <main className="mx-auto max-w-7xl p-6">
         {postingPeriod && (
-          <h2 className="mb-2 text-center text-2xl font-bold text-foreground">{postingPeriod}</h2>
+          <div className="mb-4 flex justify-center">
+            <span className="rounded-full bg-primary px-6 py-2 text-lg font-bold text-primary-foreground shadow-md">
+              {postingPeriod}
+            </span>
+          </div>
         )}
         <p className="mb-6 text-center text-sm text-muted-foreground">{t("postsForApproval")}</p>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
