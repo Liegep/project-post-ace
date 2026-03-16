@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { LABEL_CONFIG } from "@/types/post";
 
@@ -94,6 +94,12 @@ const AdminDashboard = () => {
         updatedAt: p.updated_at,
       }))
     );
+  };
+
+  const dismissFeedback = async (postId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await supabase.from("posts").update({ client_label: "pendente" } as any).eq("id", postId);
+    setFeedbacks((prev) => prev.filter((fb) => fb.postId !== postId));
   };
 
   const generateSlug = (name: string) => {
@@ -246,6 +252,13 @@ const AdminDashboard = () => {
                     <span className="text-[10px] text-muted-foreground shrink-0">
                       {new Date(fb.updatedAt).toLocaleDateString("pt-BR")}
                     </span>
+                    <button
+                      onClick={(e) => dismissFeedback(fb.postId, e)}
+                      className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                      title="Dispensar"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 );
               })}
