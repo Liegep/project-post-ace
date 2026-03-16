@@ -62,7 +62,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || (!imagePreview && !imageUrl) || !caption || !deadline) return;
+    if (!title) return;
 
     setUploading(true);
     try {
