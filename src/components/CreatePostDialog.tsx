@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { STATUS_CONFIG } from "@/types/post";
-import { ImagePlus, X, Video } from "lucide-react";
+import { ImagePlus, X } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 
 const STATUS_KEYS = {
@@ -18,6 +18,12 @@ const STATUS_KEYS = {
   escrevendo_legenda: "statusWritingCaption",
   pronto: "statusReady",
 } as const;
+
+interface MediaPreview {
+  file: File;
+  dataUrl: string;
+  type: MediaType;
+}
 
 interface CreatePostDialogProps {
   open: boolean;
@@ -28,36 +34,33 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
   const { addPost, uploadMedia } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [imagePreview, setImagePreview] = useState("");
-  const [mediaType, setMediaType] = useState<MediaType>("image");
+  const [mediaPreviews, setMediaPreviews] = useState<MediaPreview[]>([]);
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState<PostStatus>("entrada");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const pendingFileRef = useRef<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const isVideo = file.type.startsWith("video/");
-    setMediaType(isVideo ? "video" : "image");
-    pendingFileRef.current = file;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const dataUrl = ev.target?.result as string;
-      setImagePreview(dataUrl);
-    };
-    reader.readAsDataURL(file);
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const isVideo = file.type.startsWith("video/");
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setMediaPreviews((prev) => [
+          ...prev,
+          { file, dataUrl: ev.target?.result as string, type: isVideo ? "video" : "image" },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const clearImage = () => {
-    setImageUrl("");
-    setImagePreview("");
-    pendingFileRef.current = null;
-    if (fileInputRef.current) fileInputRef.current.value = "";
+  const removeMedia = (index: number) => {
+    setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,15 +69,17 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
 
     setUploading(true);
     try {
-      let finalUrl = imageUrl;
-      if (pendingFileRef.current) {
-        finalUrl = await uploadMedia(pendingFileRef.current);
+      const uploadedUrls: string[] = [];
+      for (const mp of mediaPreviews) {
+        const url = await uploadMedia(mp.file);
+        uploadedUrls.push(url);
       }
 
       await addPost({
         title,
-        imageUrl: finalUrl,
-        mediaType,
+        imageUrl: uploadedUrls[0] || "",
+        mediaType: mediaPreviews[0]?.type || "image",
+        mediaUrls: uploadedUrls,
         caption,
         deadline: deadline ? new Date(deadline) : undefined,
         status,
@@ -82,7 +87,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
       });
 
       setTitle("");
-      clearImage();
+      setMediaPreviews([]);
       setCaption("");
       setDeadline("");
       setStatus("entrada");
@@ -110,22 +115,37 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
               ref={fileInputRef}
               type="file"
               accept="image/*,video/*"
+              multiple
               onChange={handleFileChange}
               className="hidden"
             />
-            {imagePreview ? (
-              <div className="relative mt-1 rounded-lg border overflow-hidden" style={{ aspectRatio: "4/5" }}>
-                {mediaType === "video" ? (
-                  <video src={imagePreview} className="h-full w-full object-cover" controls muted />
-                ) : (
-                  <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
-                )}
+            {mediaPreviews.length > 0 ? (
+              <div className="mt-1 space-y-2">
+                <div className="grid grid-cols-3 gap-2">
+                  {mediaPreviews.map((mp, i) => (
+                    <div key={i} className="relative rounded-lg border overflow-hidden aspect-square">
+                      {mp.type === "video" ? (
+                        <video src={mp.dataUrl} className="h-full w-full object-cover" muted />
+                      ) : (
+                        <img src={mp.dataUrl} alt="Preview" className="h-full w-full object-cover" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeMedia(i)}
+                        className="absolute top-1 right-1 rounded-full bg-background/80 p-0.5 hover:bg-background"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
                 <button
                   type="button"
-                  onClick={clearImage}
-                  className="absolute top-2 right-2 rounded-full bg-background/80 p-1 hover:bg-background"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/30 py-3 text-sm text-muted-foreground transition-colors hover:border-accent hover:text-accent"
                 >
-                  <X className="h-4 w-4" />
+                  <ImagePlus className="h-4 w-4" />
+                  Adicionar mais
                 </button>
               </div>
             ) : (
