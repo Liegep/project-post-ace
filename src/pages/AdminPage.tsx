@@ -89,6 +89,7 @@ interface KanbanBoardProps {
   newColumnInputRef: React.RefObject<HTMLInputElement>;
   handleAddColumn: () => void;
   movePostToColumn: (postId: string, columnId: string | null) => void;
+  reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   t: (key: any) => string;
 }
 
@@ -97,7 +98,7 @@ const KanbanBoard = ({
   setEditingColumnId, setEditingColumnName, editColumnInputRef, handleRenameColumn,
   handleDeleteColumn, updatePostStatus, deletePost, setEditPost, setCreateInColumnId,
   setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
-  newColumnInputRef, handleAddColumn, movePostToColumn, t,
+  newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
   const sensors = useSensors(
@@ -116,6 +117,7 @@ const KanbanBoard = ({
 
     const postId = active.id as string;
     const overId = over.id as string;
+    if (postId === overId) return;
 
     // Determine target column
     let targetColumnId: string | null = null;
@@ -124,7 +126,6 @@ const KanbanBoard = ({
     } else if (columns.some((c) => c.id === overId)) {
       targetColumnId = overId;
     } else {
-      // Dropped on another post - find that post's column
       const overPost = posts.find((p) => p.id === overId);
       if (overPost) {
         targetColumnId = overPost.columnId;
@@ -134,9 +135,23 @@ const KanbanBoard = ({
     }
 
     const currentPost = posts.find((p) => p.id === postId);
-    if (currentPost && currentPost.columnId !== targetColumnId) {
-      movePostToColumn(postId, targetColumnId);
+    if (!currentPost) return;
+
+    // Get posts in the target column (sorted by position)
+    const targetPosts = posts
+      .filter((p) => p.columnId === targetColumnId && p.id !== postId)
+      .sort((a, b) => a.position - b.position);
+
+    // Find insert index
+    const overIndex = targetPosts.findIndex((p) => p.id === overId);
+    const newOrder = [...targetPosts];
+    if (overIndex >= 0) {
+      newOrder.splice(overIndex, 0, currentPost);
+    } else {
+      newOrder.push(currentPost);
     }
+
+    reorderPostsInColumn(targetColumnId, newOrder.map((p) => p.id));
   };
 
   const allPostIds = posts.map((p) => p.id);
@@ -145,7 +160,7 @@ const KanbanBoard = ({
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="flex gap-4 overflow-x-auto pb-4">
         {columns.map((col) => {
-          const columnPosts = posts.filter((p) => p.columnId === col.id);
+          const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
           return (
             <div key={col.id} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
               <div className="mb-4 flex items-center justify-between gap-2">
@@ -283,7 +298,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
     posts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn,
-    movePostToColumn,
+    movePostToColumn, reorderPostsInColumn,
   } = usePosts();
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -369,7 +384,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   };
 
   // Posts without a column
-  const unassignedPosts = posts.filter((p) => !p.columnId);
+  const unassignedPosts = posts.filter((p) => !p.columnId).sort((a, b) => a.position - b.position);
 
   const handleTrelloSync = async () => {
     if (!trelloBoardId.trim()) return;
@@ -511,6 +526,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             newColumnInputRef={newColumnInputRef}
             handleAddColumn={handleAddColumn}
             movePostToColumn={movePostToColumn}
+            reorderPostsInColumn={reorderPostsInColumn}
             t={t}
           />
         ) : (

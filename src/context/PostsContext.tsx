@@ -10,7 +10,7 @@ interface PostsContextType {
   companyLogo: string;
   setPostingPeriod: (period: string) => void;
   setCompanyLogo: (url: string) => void;
-  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel"> & { deadline?: Date }) => void;
+  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position"> & { deadline?: Date }) => void;
   updatePostStatus: (id: string, status: PostStatus) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
   addComment: (postId: string, author: string, text: string) => void;
@@ -24,6 +24,7 @@ interface PostsContextType {
   deleteColumn: (id: string) => void;
   reorderColumns: (columns: Column[]) => void;
   movePostToColumn: (postId: string, columnId: string | null) => void;
+  reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   loading: boolean;
 }
 
@@ -47,6 +48,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     tags: row.tags || [],
     createdAt: new Date(row.created_at),
     columnId: row.column_id || null,
+    position: row.position ?? 0,
   };
 }
 
@@ -75,7 +77,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     const fetchAll = async () => {
       setLoading(true);
       const [postsRes, commentsRes, tagsRes, columnsRes] = await Promise.all([
-        supabase.from("posts").select("*").eq("client_id", clientId).order("created_at", { ascending: false }),
+        supabase.from("posts").select("*").eq("client_id", clientId).order("position", { ascending: true }).order("created_at", { ascending: false }),
         supabase.from("comments").select("*").order("created_at", { ascending: true }),
         supabase.from("tags").select("*").eq("client_id", clientId),
         supabase.from("columns").select("*").eq("client_id", clientId).order("position", { ascending: true }),
@@ -101,7 +103,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("clients").update({ posting_period: period } as any).eq("id", clientId);
   }, [clientId]);
 
-  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel"> & { deadline?: Date }) => {
+  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position"> & { deadline?: Date }) => {
     const insertData: Record<string, any> = {
       title: post.title,
       image_url: post.imageUrl || '',
@@ -227,6 +229,22 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     }
   }, []);
 
+  const reorderPostsInColumn = useCallback(async (columnId: string | null, orderedPostIds: string[]) => {
+    setPosts((prev) => {
+      const updated = [...prev];
+      orderedPostIds.forEach((id, index) => {
+        const postIndex = updated.findIndex((p) => p.id === id);
+        if (postIndex !== -1) {
+          updated[postIndex] = { ...updated[postIndex], position: index, columnId };
+        }
+      });
+      return updated;
+    });
+    for (let i = 0; i < orderedPostIds.length; i++) {
+      await supabase.from("posts").update({ position: i, column_id: columnId } as any).eq("id", orderedPostIds[i]);
+    }
+  }, []);
+
   const setCompanyLogo = useCallback(async (url: string) => {
     setCompanyLogoState(url);
     await supabase.from("clients").update({ logo_url: url } as any).eq("id", clientId);
@@ -237,7 +255,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       posts, tags, columns, postingPeriod, companyLogo, setPostingPeriod, setCompanyLogo,
       addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost,
       addTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns,
-      movePostToColumn, loading,
+      movePostToColumn, reorderPostsInColumn, loading,
     }}>
       {children}
     </PostsContext.Provider>
