@@ -70,7 +70,19 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         )}
 
         {hasContent && (
-          <div className="flex gap-6">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Coluna Entrada à esquerda (acima no mobile) */}
+            {entradaPosts.length > 0 && (
+              <div className="w-full lg:w-80 shrink-0">
+                <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
+                <div className="space-y-4 rounded-xl bg-muted/30 p-4">
+                  {sortByDate(entradaPosts).map((post) => (
+                    <PostCard key={post.id} post={post} isAdmin={false} />
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Posts prontos */}
             <div className="flex-1 min-w-0">
               {readyPosts.length > 0 && (
@@ -81,18 +93,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 </div>
               )}
             </div>
-
-            {/* Coluna Entrada ao lado */}
-            {entradaPosts.length > 0 && (
-              <div className="w-80 shrink-0">
-                <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
-                <div className="space-y-4 rounded-xl bg-muted/30 p-4">
-                  {sortByDate(entradaPosts).map((post) => (
-                    <PostCard key={post.id} post={post} isAdmin={false} />
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
       </main>
