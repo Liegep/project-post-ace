@@ -135,12 +135,13 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       );
       const result = await res.json();
       if (!result.success) throw new Error(result.error);
+      // Save board ID to client record
+      await supabase.from("clients").update({ trello_board_id: trelloBoardId.trim() } as any).eq("id", clientData.id);
       toast({
         title: "Sincronização concluída!",
         description: `${result.summary.tags} etiquetas, ${result.summary.columns} colunas, ${result.summary.posts} posts importados.`,
       });
       setTrelloSyncOpen(false);
-      setTrelloBoardId("");
       // Reload page to refresh data
       window.location.reload();
     } catch (err: any) {
