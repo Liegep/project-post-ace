@@ -30,11 +30,12 @@ const CaptionText = ({ text, t }: { text: string; t: (key: keyof typeof import("
   );
 };
 
-const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "statusWritingCaption" | "statusReady"> = {
+const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "statusWritingCaption" | "statusReady" | "statusFinalized"> = {
   entrada: "statusEntry",
   em_desenvolvimento: "statusInDevelopment",
   escrevendo_legenda: "statusWritingCaption",
   pronto: "statusReady",
+  finalizado: "statusFinalized",
 };
 
 const LABEL_KEYS: Record<ClientLabel, "labelPending" | "labelApproved" | "labelChangeRequested" | "labelReadComment" | "labelGiveFeedback"> = {
