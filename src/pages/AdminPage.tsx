@@ -315,8 +315,14 @@ const KanbanBoard = ({
   );
 };
 
-const ArchivedView = ({ archivedPosts, unarchivePost, deletePost }: { archivedPosts: Post[]; unarchivePost: (id: string) => void; deletePost: (id: string) => void }) => {
-  // Group archived posts by month (based on archivedAt or createdAt)
+const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode, selectedPostIds, onToggleSelect }: {
+  archivedPosts: Post[];
+  unarchivePost: (id: string) => void;
+  deletePost: (id: string) => void;
+  selectionMode?: boolean;
+  selectedPostIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+}) => {
   const grouped = archivedPosts.reduce<Record<string, Post[]>>((acc, post) => {
     const date = post.archivedAt || post.createdAt;
     const key = format(date, "MMMM yyyy", { locale: ptBR });
@@ -355,9 +361,22 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost }: { archivedPo
             {grouped[month].map((post) => {
               const hasMedia = post.mediaUrls.length > 0 || post.imageUrl;
               const thumbUrl = post.mediaUrls[0] || post.imageUrl;
+              const isSelected = selectedPostIds?.has(post.id);
               return (
-                <div key={post.id} className="rounded-lg border bg-card p-3">
+                <div
+                  key={post.id}
+                  className={`rounded-lg border bg-card p-3 ${selectionMode ? "cursor-pointer" : ""} ${selectionMode && isSelected ? "ring-2 ring-accent" : ""}`}
+                  onClick={selectionMode ? () => onToggleSelect?.(post.id) : undefined}
+                >
                   <div className="flex items-start gap-3">
+                    {selectionMode && (
+                      <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => onToggleSelect?.(post.id)}
+                        />
+                      </div>
+                    )}
                     {hasMedia && thumbUrl && (
                       <img src={thumbUrl} alt="" className="h-12 w-12 rounded-md object-cover shrink-0" />
                     )}
@@ -368,24 +387,26 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost }: { archivedPo
                       </p>
                     </div>
                   </div>
-                  <div className="mt-2 flex gap-1.5">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 text-xs"
-                      onClick={() => unarchivePost(post.id)}
-                    >
-                      <RotateCcw className="mr-1 h-3 w-3" /> Restaurar
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive hover:text-destructive text-xs"
-                      onClick={() => { if (confirm("Excluir permanentemente?")) deletePost(post.id); }}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
+                  {!selectionMode && (
+                    <div className="mt-2 flex gap-1.5">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 text-xs"
+                        onClick={() => unarchivePost(post.id)}
+                      >
+                        <RotateCcw className="mr-1 h-3 w-3" /> Restaurar
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive text-xs"
+                        onClick={() => { if (confirm("Excluir permanentemente?")) deletePost(post.id); }}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               );
             })}
