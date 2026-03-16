@@ -61,9 +61,9 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
         )}
 
-        <div className="flex gap-8">
+        <div className="flex flex-col gap-8 md:flex-row">
           {entradaPosts.length > 0 && (
-            <div className="w-1/4 shrink-0">
+            <div className="w-full md:w-1/4 md:shrink-0">
               <div className="rounded-xl bg-muted/50 p-4">
                 <h3 className="mb-4 text-lg font-semibold text-muted-foreground">Posts para fazer</h3>
                 <div className="space-y-4">
