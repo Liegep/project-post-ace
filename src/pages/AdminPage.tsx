@@ -617,6 +617,12 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <List className="h-4 w-4" />
               </button>
             </div>
+            <Button
+              variant={selectionMode ? "default" : "outline"}
+              onClick={() => selectionMode ? exitSelectionMode() : setSelectionMode(true)}
+            >
+              <CheckSquare className="mr-2 h-4 w-4" /> {selectionMode ? "Cancelar" : "Selecionar"}
+            </Button>
             <Button variant="outline" onClick={() => setTrelloSyncOpen(true)}>
               <RefreshCw className="mr-2 h-4 w-4" /> Trello Sync
             </Button>
