@@ -30,7 +30,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     imageUrl: row.image_url,
     mediaType: (row.media_type || "image") as MediaType,
     caption: row.caption,
-    deadline: new Date(row.deadline),
+    deadline: row.deadline ? new Date(row.deadline) : new Date(),
     status: row.status as PostStatus,
     clientLabel: row.client_label as ClientLabel,
     comments,
