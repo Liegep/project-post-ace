@@ -67,7 +67,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
       <header className="border-b bg-card px-6 py-4">
         <div className="mx-auto flex max-w-7xl items-center gap-4">
           {clientData.logo_url && (
-            <img src={clientData.logo_url} alt="Logo" className="h-[200px] w-[200px] rounded-lg object-contain" />
+            <img src={clientData.logo_url} alt="Logo" className="h-16 w-16 rounded-lg object-contain" />
           )}
           <div>
             <h1 className="text-4xl font-extrabold text-foreground">{clientData.name}</h1>
