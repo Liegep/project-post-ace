@@ -89,6 +89,7 @@ interface KanbanBoardProps {
   newColumnInputRef: React.RefObject<HTMLInputElement>;
   handleAddColumn: () => void;
   movePostToColumn: (postId: string, columnId: string | null) => void;
+  reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   t: (key: any) => string;
 }
 
@@ -97,7 +98,7 @@ const KanbanBoard = ({
   setEditingColumnId, setEditingColumnName, editColumnInputRef, handleRenameColumn,
   handleDeleteColumn, updatePostStatus, deletePost, setEditPost, setCreateInColumnId,
   setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
-  newColumnInputRef, handleAddColumn, movePostToColumn, t,
+  newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
   const sensors = useSensors(
