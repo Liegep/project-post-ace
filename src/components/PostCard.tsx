@@ -159,7 +159,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete
           </>
         )}
 
-        {!isCompact && (
+        {!isCompact && !hideFeedback && (
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="flex items-center gap-1 hover:text-foreground">
               <MessageCircle className="h-3 w-3" />
