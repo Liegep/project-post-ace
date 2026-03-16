@@ -80,8 +80,16 @@ const AdminPage = () => {
               <p className="text-sm text-muted-foreground">{t("adminSubtitle")}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <LanguageSelector />
+          <div className="flex items-center gap-2">
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-[10px] text-muted-foreground">Admin</span>
+                <LanguageSelector />
+              </div>
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-[10px] text-muted-foreground">Cliente</span>
+                <LanguageSelector forClient clientLocale={clientLocale} />
+              </div>
+            </div>
             <div className="flex rounded-lg border bg-muted p-1">
               <button
                 onClick={() => setView("kanban")}
