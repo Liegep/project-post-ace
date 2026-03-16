@@ -26,6 +26,7 @@ type TranslationKeys = {
   statusInDevelopment: string;
   statusWritingCaption: string;
   statusReady: string;
+  statusFinalized: string;
   // Client labels
   labelPending: string;
   labelApproved: string;
