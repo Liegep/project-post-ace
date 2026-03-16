@@ -27,7 +27,8 @@ const CaptionText = ({ text }: { text: string }) => {
   );
 };
 
-const STATUS_KEYS: Record<PostStatus, "statusInDevelopment" | "statusWritingCaption" | "statusReady"> = {
+const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "statusWritingCaption" | "statusReady"> = {
+  entrada: "statusEntry",
   em_desenvolvimento: "statusInDevelopment",
   escrevendo_legenda: "statusWritingCaption",
   pronto: "statusReady",

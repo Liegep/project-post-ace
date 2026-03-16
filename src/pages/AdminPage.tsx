@@ -10,9 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, LayoutGrid, List, Pencil, ImagePlus } from "lucide-react";
 
-const COLUMNS: PostStatus[] = ["em_desenvolvimento", "escrevendo_legenda", "pronto"];
+const COLUMNS: PostStatus[] = ["entrada"];
 
-const STATUS_KEYS: Record<PostStatus, "statusInDevelopment" | "statusWritingCaption" | "statusReady"> = {
+const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "statusWritingCaption" | "statusReady"> = {
+  entrada: "statusEntry",
   em_desenvolvimento: "statusInDevelopment",
   escrevendo_legenda: "statusWritingCaption",
   pronto: "statusReady",
@@ -124,7 +125,7 @@ const AdminPage = () => {
           )}
         </div>
         {view === "kanban" ? (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6">
             {COLUMNS.map((status) => {
               const config = STATUS_CONFIG[status];
               const columnPosts = posts.filter((p) => p.status === status);

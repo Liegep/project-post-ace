@@ -22,6 +22,7 @@ type TranslationKeys = {
   adminSubtitle: string;
   newPost: string;
   // Status labels
+  statusEntry: string;
   statusInDevelopment: string;
   statusWritingCaption: string;
   statusReady: string;
@@ -84,6 +85,7 @@ const pt: TranslationKeys = {
   adminTitle: "Painel de Conteúdo",
   adminSubtitle: "Gerencie seus posts e aprovações",
   newPost: "Novo Post",
+  statusEntry: "Entrada",
   statusInDevelopment: "Em Desenvolvimento",
   statusWritingCaption: "Escrevendo Legenda",
   statusReady: "Pronto",
@@ -135,6 +137,7 @@ const en: TranslationKeys = {
   adminTitle: "Content Dashboard",
   adminSubtitle: "Manage your posts and approvals",
   newPost: "New Post",
+  statusEntry: "Entry",
   statusInDevelopment: "In Development",
   statusWritingCaption: "Writing Caption",
   statusReady: "Ready",
@@ -186,6 +189,7 @@ const it: TranslationKeys = {
   adminTitle: "Pannello Contenuti",
   adminSubtitle: "Gestisci i tuoi post e le approvazioni",
   newPost: "Nuovo Post",
+  statusEntry: "Ingresso",
   statusInDevelopment: "In Sviluppo",
   statusWritingCaption: "Scrittura Didascalia",
   statusReady: "Pronto",
@@ -237,6 +241,7 @@ const es: TranslationKeys = {
   adminTitle: "Panel de Contenido",
   adminSubtitle: "Gestiona tus publicaciones y aprobaciones",
   newPost: "Nueva Publicación",
+  statusEntry: "Entrada",
   statusInDevelopment: "En Desarrollo",
   statusWritingCaption: "Escribiendo Leyenda",
   statusReady: "Listo",
@@ -288,6 +293,7 @@ const sv: TranslationKeys = {
   adminTitle: "Innehållspanel",
   adminSubtitle: "Hantera dina inlägg och godkännanden",
   newPost: "Nytt Inlägg",
+  statusEntry: "Inkommande",
   statusInDevelopment: "Under Utveckling",
   statusWritingCaption: "Skriver Bildtext",
   statusReady: "Klart",

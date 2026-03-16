@@ -13,6 +13,7 @@ import { ImagePlus, X, Video } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 
 const STATUS_KEYS = {
+  entrada: "statusEntry",
   em_desenvolvimento: "statusInDevelopment",
   escrevendo_legenda: "statusWritingCaption",
   pronto: "statusReady",
@@ -32,7 +33,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
   const [mediaType, setMediaType] = useState<MediaType>("image");
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
-  const [status, setStatus] = useState<PostStatus>("em_desenvolvimento");
+  const [status, setStatus] = useState<PostStatus>("entrada");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);

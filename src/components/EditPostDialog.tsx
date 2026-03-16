@@ -13,6 +13,7 @@ import { TagSelector } from "@/components/TagSelector";
 import { format } from "date-fns";
 
 const STATUS_KEYS = {
+  entrada: "statusEntry",
   em_desenvolvimento: "statusInDevelopment",
   escrevendo_legenda: "statusWritingCaption",
   pronto: "statusReady",
