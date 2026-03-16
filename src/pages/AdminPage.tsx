@@ -113,6 +113,7 @@ const KanbanBoard = ({
   handleDeleteColumn, updatePostStatus, deletePost, setEditPost, setCreateInColumnId,
   setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
   newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
+  selectionMode, selectedPostIds, onToggleSelect,
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
   const sensors = useSensors(
