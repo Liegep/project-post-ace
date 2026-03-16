@@ -23,8 +23,8 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
     [locale]
   );
 
-  // Only show posts that have the "pronto" tag
-  const readyPosts = posts.filter((p) => p.tags.some((tag) => tag.toLowerCase() === "pronto"));
+  // Only show posts with status "pronto"
+  const readyPosts = posts.filter((p) => p.status === "pronto");
 
   const sortByDate = (list: typeof posts) =>
     [...list].sort((a, b) => {
