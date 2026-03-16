@@ -49,6 +49,8 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     createdAt: new Date(row.created_at),
     columnId: row.column_id || null,
     position: row.position ?? 0,
+    archived: row.archived ?? false,
+    archivedAt: row.archived_at ? new Date(row.archived_at) : null,
   };
 }
 
