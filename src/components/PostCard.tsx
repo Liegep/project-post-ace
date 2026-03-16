@@ -54,6 +54,9 @@ interface PostCardProps {
   onStatusChange?: (status: PostStatus) => void;
   onDelete?: () => void;
   onEdit?: () => void;
+  selectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 const SortableThumb = ({ url, index, isActive }: { url: string; index: number; isActive: boolean }) => {
