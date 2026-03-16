@@ -275,129 +275,31 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
         </div>
 
         {view === "kanban" ? (
-          <div className="flex gap-4 overflow-x-auto pb-4">
-            {/* Dynamic columns */}
-            {columns.map((col) => {
-              const columnPosts = posts.filter((p) => p.columnId === col.id);
-              return (
-                <div key={col.id} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
-                  <div className="mb-4 flex items-center justify-between gap-2">
-                    {editingColumnId === col.id ? (
-                      <Input
-                        ref={editColumnInputRef}
-                        value={editingColumnName}
-                        onChange={(e) => setEditingColumnName(e.target.value)}
-                        onBlur={() => handleRenameColumn(col.id)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleRenameColumn(col.id);
-                          if (e.key === "Escape") setEditingColumnId(null);
-                        }}
-                        className="h-7 text-sm font-semibold"
-                      />
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-foreground">{col.name}</span>
-                        <span className="text-xs text-muted-foreground">({columnPosts.length})</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}
-                        className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                      >
-                        <Pencil className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteColumn(col.id)}
-                        className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    {columnPosts.map((post) => (
-                      <PostCard
-                        key={post.id}
-                        post={post}
-                        isAdmin
-                        onStatusChange={(s) => updatePostStatus(post.id, s)}
-                        onDelete={() => deletePost(post.id)}
-                        onEdit={() => setEditPost(post)}
-                      />
-                    ))}
-                    {columnPosts.length === 0 && (
-                      <p className="py-8 text-center text-sm text-muted-foreground">{t("noPosts")}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
-                    className="mt-3 flex w-full items-center justify-center gap-1 rounded-lg border-2 border-dashed border-muted-foreground/30 py-2 text-xs text-muted-foreground hover:border-accent hover:text-accent transition-colors"
-                  >
-                    <Plus className="h-3.5 w-3.5" /> Adicionar post
-                  </button>
-                </div>
-              );
-            })}
-
-            {/* Unassigned posts column (if any) */}
-            {unassignedPosts.length > 0 && (
-              <div className="w-80 shrink-0 rounded-xl border bg-muted/30 p-4">
-                <div className="mb-4 flex items-center gap-2">
-                  <span className="text-sm font-semibold text-muted-foreground">Sem coluna</span>
-                  <span className="text-xs text-muted-foreground">({unassignedPosts.length})</span>
-                </div>
-                <div className="space-y-3">
-                  {unassignedPosts.map((post) => (
-                    <PostCard
-                      key={post.id}
-                      post={post}
-                      isAdmin
-                      onStatusChange={(s) => updatePostStatus(post.id, s)}
-                      onDelete={() => deletePost(post.id)}
-                      onEdit={() => setEditPost(post)}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Add column button */}
-            <div className="w-80 shrink-0">
-              {addingColumn ? (
-                <div className="rounded-xl border bg-card/50 p-4">
-                  <Input
-                    ref={newColumnInputRef}
-                    value={newColumnName}
-                    onChange={(e) => setNewColumnName(e.target.value)}
-                    onBlur={handleAddColumn}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleAddColumn();
-                      if (e.key === "Escape") { setNewColumnName(""); setAddingColumn(false); }
-                    }}
-                    placeholder="Nome da coluna"
-                    className="mb-2"
-                  />
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={handleAddColumn} className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
-                      Criar
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => { setNewColumnName(""); setAddingColumn(false); }}>
-                      Cancelar
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setAddingColumn(true)}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-muted-foreground/30 py-12 text-sm text-muted-foreground hover:border-accent hover:text-accent transition-colors"
-                >
-                  <Plus className="h-5 w-5" />
-                  Nova coluna
-                </button>
-              )}
-            </div>
-          </div>
+          <KanbanBoard
+            posts={posts}
+            columns={columns}
+            unassignedPosts={unassignedPosts}
+            editingColumnId={editingColumnId}
+            editingColumnName={editingColumnName}
+            setEditingColumnId={setEditingColumnId}
+            setEditingColumnName={setEditingColumnName}
+            editColumnInputRef={editColumnInputRef}
+            handleRenameColumn={handleRenameColumn}
+            handleDeleteColumn={handleDeleteColumn}
+            updatePostStatus={updatePostStatus}
+            deletePost={deletePost}
+            setEditPost={setEditPost}
+            setCreateInColumnId={setCreateInColumnId}
+            setCreateOpen={setCreateOpen}
+            addingColumn={addingColumn}
+            setAddingColumn={setAddingColumn}
+            newColumnName={newColumnName}
+            setNewColumnName={setNewColumnName}
+            newColumnInputRef={newColumnInputRef}
+            handleAddColumn={handleAddColumn}
+            movePostToColumn={movePostToColumn}
+            t={t}
+          />
         ) : (
           <div className="space-y-3">
             {posts.map((post) => (
