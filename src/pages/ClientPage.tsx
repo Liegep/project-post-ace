@@ -16,7 +16,7 @@ interface ClientData {
 }
 
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
-  const { posts, postingPeriod } = usePosts();
+  const { posts, columns, postingPeriod } = usePosts();
   const locale = (clientData.locale || "pt") as Locale;
   const t = useCallback(
     (key: keyof typeof translations.pt) => translations[locale]?.[key] || translations.pt[key] || key,
@@ -29,9 +29,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
       const dateB = b.deadline ? new Date(b.deadline).getTime() : 0;
       return dateA - dateB;
     });
-
-  const entradaPosts = sortByDate(posts.filter((p) => p.status === "entrada"));
-  const otherPosts = sortByDate(posts.filter((p) => p.status !== "entrada"));
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,7 +44,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl p-6">
+      <main className="mx-auto max-w-full p-6">
         {postingPeriod && (
           <div className="mb-4 flex justify-center">
             <span className="rounded-full bg-primary px-6 py-2 text-lg font-bold text-primary-foreground shadow-md">
@@ -61,30 +58,46 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
         )}
 
-        <div className="flex flex-col gap-8 md:flex-row">
-          {entradaPosts.length > 0 && (
-            <div className="w-full md:w-1/4 md:shrink-0">
-              <div className="rounded-xl bg-muted/50 p-4">
-                <h3 className="mb-4 text-lg font-semibold text-muted-foreground">Posts para fazer</h3>
-                <div className="space-y-4">
-                  {entradaPosts.map((post) => (
-                    <PostCard key={post.id} post={post} isAdmin={false} hideFeedback />
-                  ))}
+        {columns.length > 0 ? (
+          <div className="flex gap-6 overflow-x-auto pb-4">
+            {columns.map((col) => {
+              const columnPosts = sortByDate(posts.filter((p) => p.columnId === col.id));
+              if (columnPosts.length === 0) return null;
+              return (
+                <div key={col.id} className="w-80 shrink-0">
+                  <h3 className="mb-4 text-lg font-semibold text-foreground">{col.name}</h3>
+                  <div className="space-y-4">
+                    {columnPosts.map((post) => (
+                      <PostCard key={post.id} post={post} isAdmin={false} />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
-
-          {otherPosts.length > 0 && (
-            <div className="flex-1">
-              <div className={`grid grid-cols-1 gap-6 ${entradaPosts.length > 0 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
-                {otherPosts.map((post) => (
-                  <PostCard key={post.id} post={post} isAdmin={false} />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+              );
+            })}
+            {/* Unassigned posts */}
+            {(() => {
+              const unassigned = sortByDate(posts.filter((p) => !p.columnId));
+              if (unassigned.length === 0) return null;
+              return (
+                <div className="w-80 shrink-0">
+                  <h3 className="mb-4 text-lg font-semibold text-muted-foreground">Outros</h3>
+                  <div className="space-y-4">
+                    {unassigned.map((post) => (
+                      <PostCard key={post.id} post={post} isAdmin={false} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        ) : (
+          /* Fallback: no columns defined, show all posts in grid */
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {sortByDate(posts).map((post) => (
+              <PostCard key={post.id} post={post} isAdmin={false} />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );
