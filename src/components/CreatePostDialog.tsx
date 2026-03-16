@@ -85,7 +85,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
       clearImage();
       setCaption("");
       setDeadline("");
-      setStatus("em_desenvolvimento");
+      setStatus("entrada");
       setSelectedTags([]);
       onOpenChange(false);
     } finally {
