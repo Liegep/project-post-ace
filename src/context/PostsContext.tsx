@@ -105,7 +105,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("clients").update({ posting_period: period } as any).eq("id", clientId);
   }, [clientId]);
 
-  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position"> & { deadline?: Date }) => {
+  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt"> & { deadline?: Date }) => {
     const insertData: Record<string, any> = {
       title: post.title,
       image_url: post.imageUrl || '',
