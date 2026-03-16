@@ -272,6 +272,26 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("posts").update({ archived: false, archived_at: null, status: "pronto" } as any).eq("id", id);
   }, []);
 
+  const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus) => {
+    const isArchiving = status === "finalizado";
+    const updates: Record<string, any> = { status };
+    if (isArchiving) {
+      updates.archived = true;
+      updates.archived_at = new Date().toISOString();
+    }
+    setPosts((prev) => prev.map((p) => ids.includes(p.id) ? {
+      ...p, status,
+      archived: isArchiving ? true : p.archived,
+      archivedAt: isArchiving ? new Date() : p.archivedAt,
+    } : p));
+    await supabase.from("posts").update(updates).in("id", ids);
+  }, []);
+
+  const bulkDeletePosts = useCallback(async (ids: string[]) => {
+    setPosts((prev) => prev.filter((p) => !ids.includes(p.id)));
+    await supabase.from("posts").delete().in("id", ids);
+  }, []);
+
   const activePosts = posts.filter((p) => !p.archived);
   const archivedPosts = posts.filter((p) => p.archived);
 
