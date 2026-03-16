@@ -8,14 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ImagePlus, X } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
-
-interface MediaPreview {
-  file: File;
-  dataUrl: string;
-  type: MediaType;
-}
+import { SortableMediaGrid, SortableMediaItem } from "@/components/SortableMediaGrid";
 
 interface CreatePostDialogProps {
   open: boolean;
@@ -23,11 +17,14 @@ interface CreatePostDialogProps {
   defaultColumnId?: string | null;
 }
 
+let mediaIdCounter = 0;
+
 export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: CreatePostDialogProps) => {
   const { addPost, uploadMedia, columns } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
-  const [mediaPreviews, setMediaPreviews] = useState<MediaPreview[]>([]);
+  const [mediaItems, setMediaItems] = useState<SortableMediaItem[]>([]);
+  const [coverIndex, setCoverIndex] = useState(0);
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState<PostStatus>("entrada");
@@ -36,11 +33,8 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: Create
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync defaultColumnId when dialog opens
   const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen) {
-      setColumnId(defaultColumnId ?? null);
-    }
+    if (isOpen) setColumnId(defaultColumnId ?? null);
     onOpenChange(isOpen);
   };
 
@@ -51,9 +45,9 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: Create
       const isVideo = file.type.startsWith("video/");
       const reader = new FileReader();
       reader.onload = (ev) => {
-        setMediaPreviews((prev) => [
+        setMediaItems((prev) => [
           ...prev,
-          { file, dataUrl: ev.target?.result as string, type: isVideo ? "video" : "image" },
+          { id: `new-${mediaIdCounter++}`, url: ev.target?.result as string, type: isVideo ? "video" : "image", file },
         ]);
       };
       reader.readAsDataURL(file);
@@ -62,7 +56,12 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: Create
   };
 
   const removeMedia = (index: number) => {
-    setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
+    setMediaItems((prev) => prev.filter((_, i) => i !== index));
+    setCoverIndex((prev) => {
+      if (index === prev) return 0;
+      if (index < prev) return prev - 1;
+      return prev;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,15 +71,17 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: Create
     setUploading(true);
     try {
       const uploadedUrls: string[] = [];
-      for (const mp of mediaPreviews) {
-        const url = await uploadMedia(mp.file);
-        uploadedUrls.push(url);
+      for (const mp of mediaItems) {
+        if (mp.file) {
+          const url = await uploadMedia(mp.file);
+          uploadedUrls.push(url);
+        }
       }
 
       await addPost({
         title,
-        imageUrl: uploadedUrls[0] || "",
-        mediaType: mediaPreviews[0]?.type || "image",
+        imageUrl: uploadedUrls[coverIndex] || uploadedUrls[0] || "",
+        mediaType: mediaItems[coverIndex]?.type || mediaItems[0]?.type || "image",
         mediaUrls: uploadedUrls,
         caption,
         deadline: deadline ? new Date(deadline) : undefined,
@@ -90,7 +91,8 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: Create
       });
 
       setTitle("");
-      setMediaPreviews([]);
+      setMediaItems([]);
+      setCoverIndex(0);
       setCaption("");
       setDeadline("");
       setStatus("entrada");
@@ -115,53 +117,16 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: Create
           </div>
           <div>
             <Label>{t("media")}</Label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*,video/*"
-              multiple
-              onChange={handleFileChange}
-              className="hidden"
+            <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={handleFileChange} className="hidden" />
+            <SortableMediaGrid
+              items={mediaItems}
+              coverIndex={coverIndex}
+              onReorder={setMediaItems}
+              onRemove={removeMedia}
+              onSetCover={setCoverIndex}
+              onAddMore={() => fileInputRef.current?.click()}
+              emptyLabel={t("clickToSelectMedia")}
             />
-            {mediaPreviews.length > 0 ? (
-              <div className="mt-1 space-y-2">
-                <div className="grid grid-cols-3 gap-2">
-                  {mediaPreviews.map((mp, i) => (
-                    <div key={i} className="relative rounded-lg border overflow-hidden aspect-square">
-                      {mp.type === "video" ? (
-                        <video src={mp.dataUrl} className="h-full w-full object-cover" muted />
-                      ) : (
-                        <img src={mp.dataUrl} alt="Preview" className="h-full w-full object-cover" />
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => removeMedia(i)}
-                        className="absolute top-1 right-1 rounded-full bg-background/80 p-0.5 hover:bg-background"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/30 py-3 text-sm text-muted-foreground transition-colors hover:border-accent hover:text-accent"
-                >
-                  <ImagePlus className="h-4 w-4" />
-                  Adicionar mais
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/30 py-8 text-sm text-muted-foreground transition-colors hover:border-accent hover:text-accent"
-              >
-                <ImagePlus className="h-5 w-5" />
-                {t("clickToSelectMedia")}
-              </button>
-            )}
           </div>
           <div>
             <Label htmlFor="caption">{t("caption")}</Label>
@@ -175,9 +140,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: Create
             <div>
               <Label>Coluna</Label>
               <Select value={columnId ?? "none"} onValueChange={(v) => setColumnId(v === "none" ? null : v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Sem coluna</SelectItem>
                   {columns.map((col) => (

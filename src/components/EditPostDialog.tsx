@@ -8,15 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ImagePlus, X, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
+import { SortableMediaGrid, SortableMediaItem } from "@/components/SortableMediaGrid";
 import { format } from "date-fns";
-
-interface MediaItem {
-  url: string;
-  type: MediaType;
-  file?: File;
-}
 
 interface EditPostDialogProps {
   post: Post | null;
@@ -24,11 +19,14 @@ interface EditPostDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+let mediaIdCounter = 0;
+
 export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps) => {
   const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [mediaItems, setMediaItems] = useState<SortableMediaItem[]>([]);
+  const [coverIndex, setCoverIndex] = useState(0);
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState<PostStatus>("em_desenvolvimento");
@@ -42,9 +40,13 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       setTitle(post.title);
       const urls = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
       setMediaItems(urls.map((url) => ({
+        id: `existing-${mediaIdCounter++}`,
         url,
         type: url.match(/\.(mp4|webm|mov|avi)/i) ? "video" as MediaType : "image" as MediaType,
       })));
+      // Find cover index: the imageUrl position in mediaUrls
+      const coverIdx = post.imageUrl ? urls.indexOf(post.imageUrl) : 0;
+      setCoverIndex(coverIdx >= 0 ? coverIdx : 0);
       setCaption(post.caption);
       setDeadline(format(post.deadline, "yyyy-MM-dd"));
       setStatus(post.status);
@@ -62,7 +64,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       reader.onload = (ev) => {
         setMediaItems((prev) => [
           ...prev,
-          { url: ev.target?.result as string, type: isVideo ? "video" : "image", file },
+          { id: `new-${mediaIdCounter++}`, url: ev.target?.result as string, type: isVideo ? "video" : "image", file },
         ]);
       };
       reader.readAsDataURL(file);
@@ -72,6 +74,11 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
   const removeMedia = (index: number) => {
     setMediaItems((prev) => prev.filter((_, i) => i !== index));
+    setCoverIndex((prev) => {
+      if (index === prev) return 0;
+      if (index < prev) return prev - 1;
+      return prev;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,8 +99,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
       await updatePost(post.id, {
         title,
-        imageUrl: finalUrls[0] || "",
-        mediaType: mediaItems[0]?.type || "image",
+        imageUrl: finalUrls[coverIndex] || finalUrls[0] || "",
+        mediaType: mediaItems[coverIndex]?.type || mediaItems[0]?.type || "image",
         mediaUrls: finalUrls,
         caption,
         deadline: new Date(deadline),
@@ -122,53 +129,16 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
           </div>
           <div>
             <Label>{t("media")}</Label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*,video/*"
-              multiple
-              onChange={handleFileChange}
-              className="hidden"
+            <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={handleFileChange} className="hidden" />
+            <SortableMediaGrid
+              items={mediaItems}
+              coverIndex={coverIndex}
+              onReorder={setMediaItems}
+              onRemove={removeMedia}
+              onSetCover={setCoverIndex}
+              onAddMore={() => fileInputRef.current?.click()}
+              emptyLabel={t("clickToSelectMedia")}
             />
-            {mediaItems.length > 0 ? (
-              <div className="mt-1 space-y-2">
-                <div className="grid grid-cols-3 gap-2">
-                  {mediaItems.map((item, i) => (
-                    <div key={i} className="relative rounded-lg border overflow-hidden aspect-square">
-                      {item.type === "video" ? (
-                        <video src={item.url} className="h-full w-full object-cover" muted />
-                      ) : (
-                        <img src={item.url} alt="Preview" className="h-full w-full object-cover" />
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => removeMedia(i)}
-                        className="absolute top-1 right-1 rounded-full bg-background/80 p-0.5 hover:bg-background"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/30 py-3 text-sm text-muted-foreground transition-colors hover:border-accent hover:text-accent"
-                >
-                  <ImagePlus className="h-4 w-4" />
-                  Adicionar mais
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/30 py-8 text-sm text-muted-foreground transition-colors hover:border-accent hover:text-accent"
-              >
-                <ImagePlus className="h-5 w-5" />
-                {t("clickToSelectMedia")}
-              </button>
-            )}
           </div>
           <div>
             <Label htmlFor="edit-caption">{t("caption")}</Label>
@@ -182,9 +152,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
             <div>
               <Label>Coluna</Label>
               <Select value={columnId ?? "none"} onValueChange={(v) => setColumnId(v === "none" ? null : v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Sem coluna</SelectItem>
                   {columns.map((col) => (
