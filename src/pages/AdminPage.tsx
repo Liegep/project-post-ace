@@ -356,11 +356,14 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     setEditingPeriod(false);
   };
 
+  const addingColumnRef = useRef(false);
   const handleAddColumn = async () => {
     if (!newColumnName.trim()) {
       setAddingColumn(false);
       return;
     }
+    if (addingColumnRef.current) return;
+    addingColumnRef.current = true;
     try {
       await addColumn(newColumnName.trim());
       setNewColumnName("");
@@ -368,6 +371,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     } catch (err) {
       console.error(err);
       toast({ title: "Erro ao criar coluna", variant: "destructive" });
+    } finally {
+      addingColumnRef.current = false;
     }
   };
 
