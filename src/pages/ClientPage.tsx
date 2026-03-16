@@ -59,14 +59,14 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         )}
 
         {columns.length > 0 ? (
-          <div className="flex gap-6 overflow-x-auto pb-4">
+          <div className="space-y-8">
             {columns.map((col) => {
               const columnPosts = sortByDate(posts.filter((p) => p.columnId === col.id));
               if (columnPosts.length === 0) return null;
               return (
-                <div key={col.id} className="w-80 shrink-0">
+                <div key={col.id}>
                   <h3 className="mb-4 text-lg font-semibold text-foreground">{col.name}</h3>
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {columnPosts.map((post) => (
                       <PostCard key={post.id} post={post} isAdmin={false} />
                     ))}
@@ -74,14 +74,13 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 </div>
               );
             })}
-            {/* Unassigned posts */}
             {(() => {
               const unassigned = sortByDate(posts.filter((p) => !p.columnId));
               if (unassigned.length === 0) return null;
               return (
-                <div className="w-80 shrink-0">
+                <div>
                   <h3 className="mb-4 text-lg font-semibold text-muted-foreground">Outros</h3>
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {unassigned.map((post) => (
                       <PostCard key={post.id} post={post} isAdmin={false} />
                     ))}
@@ -91,8 +90,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             })()}
           </div>
         ) : (
-          /* Fallback: no columns defined, show all posts in grid */
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {sortByDate(posts).map((post) => (
               <PostCard key={post.id} post={post} isAdmin={false} />
             ))}
