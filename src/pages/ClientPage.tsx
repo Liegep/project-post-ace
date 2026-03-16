@@ -55,38 +55,41 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             </span>
           </div>
         )}
-        <h2 className="mb-2 text-center text-3xl font-bold text-foreground">{t("postsForApproval")}</h2>
-        {postingPeriod && (
-          <p className="mb-6 text-center text-lg font-medium text-muted-foreground">{postingPeriod}</p>
-        )}
+        <div className="mb-6 flex items-center justify-center gap-3">
+          <h2 className="text-3xl font-bold text-foreground">{t("postsForApproval")}</h2>
+          {postingPeriod && (
+            <span className="rounded-full bg-muted px-4 py-1 text-sm font-medium text-muted-foreground">{postingPeriod}</span>
+          )}
+        </div>
 
         {posts.length === 0 && (
           <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
         )}
 
-        {entradaPosts.length > 0 && (
-          <div className="mb-8 rounded-xl bg-muted/50 p-6">
-            <h3 className="mb-4 text-xl font-semibold text-muted-foreground">Posts para fazer</h3>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              {entradaPosts.map((post) => (
-                <PostCard key={post.id} post={post} isAdmin={false} hideFeedback />
-              ))}
+        <div className="flex gap-8">
+          {entradaPosts.length > 0 && (
+            <div className="w-1/4 shrink-0">
+              <div className="rounded-xl bg-muted/50 p-4">
+                <h3 className="mb-4 text-lg font-semibold text-muted-foreground">Posts para fazer</h3>
+                <div className="space-y-4">
+                  {entradaPosts.map((post) => (
+                    <PostCard key={post.id} post={post} isAdmin={false} hideFeedback />
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {otherPosts.length > 0 && (
-          <div>
-            {entradaPosts.length > 0 && (
-              <h3 className="mb-4 text-xl font-semibold text-muted-foreground">{t("postsForApproval")}</h3>
-            )}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              {otherPosts.map((post) => (
-                <PostCard key={post.id} post={post} isAdmin={false} />
-              ))}
+          {otherPosts.length > 0 && (
+            <div className="flex-1">
+              <div className={`grid grid-cols-1 gap-6 ${entradaPosts.length > 0 ? "md:grid-cols-2" : "md:grid-cols-3"}`}>
+                {otherPosts.map((post) => (
+                  <PostCard key={post.id} post={post} isAdmin={false} />
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </main>
     </div>
   );
