@@ -44,14 +44,26 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center gap-4">
-          {clientData.logo_url && (
-            <img src={clientData.logo_url} alt="Logo" className="h-[250px] w-[250px] rounded-lg object-contain" />
-          )}
-          <div>
-            <h1 className="text-4xl font-extrabold text-foreground">{clientData.name}</h1>
-            <p className="text-sm text-muted-foreground">{t("clientSubtitle")}</p>
+        <div className="mx-auto flex max-w-7xl items-start gap-6">
+          <div className="flex items-center gap-4">
+            {clientData.logo_url && (
+              <img src={clientData.logo_url} alt="Logo" className="h-[250px] w-[250px] rounded-lg object-contain" />
+            )}
+            <div>
+              <h1 className="text-4xl font-extrabold text-foreground">{clientData.name}</h1>
+              <p className="text-sm text-muted-foreground">{t("clientSubtitle")}</p>
+            </div>
           </div>
+          {entradaPosts.length > 0 && (
+            <div className="flex-1 min-w-0">
+              <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 rounded-xl bg-muted/30 p-4">
+                {sortByDate(entradaPosts).map((post) => (
+                  <PostCard key={post.id} post={post} isAdmin={false} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
