@@ -23,7 +23,7 @@ interface ClientData {
 }
 
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
-  const { posts, archivedPosts, columns, postingPeriod } = usePosts();
+  const { posts, archivedPosts, columns, postingPeriod, unarchivePost } = usePosts();
   const locale = (clientData.locale || "pt") as Locale;
   const t = useCallback(
     (key: keyof typeof translations.pt) => translations[locale]?.[key] || translations.pt[key] || key,
