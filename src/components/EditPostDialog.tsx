@@ -132,10 +132,18 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
             <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={handleFileChange} className="hidden" />
             <SortableMediaGrid
               items={mediaItems}
-              coverIndex={coverIndex}
-              onReorder={setMediaItems}
+              coverIndex={0}
+              onReorder={(newItems) => { setMediaItems(newItems); setCoverIndex(0); }}
               onRemove={removeMedia}
-              onSetCover={setCoverIndex}
+              onSetCover={(idx) => {
+                // Move the selected item to first position (making it the cover)
+                if (idx === 0) return;
+                const newItems = [...mediaItems];
+                const [moved] = newItems.splice(idx, 1);
+                newItems.unshift(moved);
+                setMediaItems(newItems);
+                setCoverIndex(0);
+              }}
               onAddMore={() => fileInputRef.current?.click()}
               emptyLabel={t("clickToSelectMedia")}
             />
