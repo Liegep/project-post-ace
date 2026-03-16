@@ -45,7 +45,10 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             </span>
           </div>
         )}
-        <p className="mb-6 text-center text-sm text-muted-foreground">{t("postsForApproval")}</p>
+        <h2 className="mb-2 text-center text-3xl font-bold text-foreground">{t("postsForApproval")}</h2>
+        {postingPeriod && (
+          <p className="mb-6 text-center text-lg font-medium text-muted-foreground">{postingPeriod}</p>
+        )}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {posts.length === 0 && (
             <p className="col-span-full py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
