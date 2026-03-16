@@ -142,6 +142,7 @@ export type Database = {
           caption: string
           client_id: string | null
           client_label: string
+          client_unarchived_at: string | null
           column_id: string | null
           created_at: string
           deadline: string | null
@@ -161,6 +162,7 @@ export type Database = {
           caption?: string
           client_id?: string | null
           client_label?: string
+          client_unarchived_at?: string | null
           column_id?: string | null
           created_at?: string
           deadline?: string | null
@@ -180,6 +182,7 @@ export type Database = {
           caption?: string
           client_id?: string | null
           client_label?: string
+          client_unarchived_at?: string | null
           column_id?: string | null
           created_at?: string
           deadline?: string | null
