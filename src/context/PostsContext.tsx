@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface PostsContextType {
   posts: Post[];
+  archivedPosts: Post[];
   tags: Tag[];
   columns: Column[];
   postingPeriod: string;
@@ -25,6 +26,7 @@ interface PostsContextType {
   reorderColumns: (columns: Column[]) => void;
   movePostToColumn: (postId: string, columnId: string | null) => void;
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
+  unarchivePost: (id: string) => void;
   loading: boolean;
 }
 
