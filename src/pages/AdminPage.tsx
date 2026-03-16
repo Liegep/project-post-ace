@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, LayoutGrid, List, Pencil, ImagePlus } from "lucide-react";
 
-const COLUMNS: PostStatus[] = ["entrada"];
+const COLUMNS: PostStatus[] = ["entrada", "pronto"];
 
 const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "statusWritingCaption" | "statusReady"> = {
   entrada: "statusEntry",
