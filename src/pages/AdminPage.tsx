@@ -296,6 +296,87 @@ const KanbanBoard = ({
   );
 };
 
+const ArchivedView = ({ archivedPosts, unarchivePost, deletePost }: { archivedPosts: Post[]; unarchivePost: (id: string) => void; deletePost: (id: string) => void }) => {
+  // Group archived posts by month (based on archivedAt or createdAt)
+  const grouped = archivedPosts.reduce<Record<string, Post[]>>((acc, post) => {
+    const date = post.archivedAt || post.createdAt;
+    const key = format(date, "MMMM yyyy", { locale: ptBR });
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(post);
+    return acc;
+  }, {});
+
+  const months = Object.keys(grouped).sort((a, b) => {
+    const dateA = grouped[a][0].archivedAt || grouped[a][0].createdAt;
+    const dateB = grouped[b][0].archivedAt || grouped[b][0].createdAt;
+    return dateB.getTime() - dateA.getTime();
+  });
+
+  if (archivedPosts.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="mb-4 rounded-full bg-muted p-6">
+          <Archive className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <h2 className="text-xl font-semibold text-foreground">Nenhum post arquivado</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Posts com status "Finalizado" aparecerão aqui</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex gap-4 overflow-x-auto pb-4">
+      {months.map((month) => (
+        <div key={month} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-sm font-semibold text-foreground capitalize">{month}</span>
+            <span className="text-xs text-muted-foreground">({grouped[month].length})</span>
+          </div>
+          <div className="space-y-3">
+            {grouped[month].map((post) => {
+              const hasMedia = post.mediaUrls.length > 0 || post.imageUrl;
+              const thumbUrl = post.mediaUrls[0] || post.imageUrl;
+              return (
+                <div key={post.id} className="rounded-lg border bg-card p-3">
+                  <div className="flex items-start gap-3">
+                    {hasMedia && thumbUrl && (
+                      <img src={thumbUrl} alt="" className="h-12 w-12 rounded-md object-cover shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{post.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {post.archivedAt ? format(post.archivedAt, "dd/MM/yyyy") : format(post.createdAt, "dd/MM/yyyy")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 text-xs"
+                      onClick={() => unarchivePost(post.id)}
+                    >
+                      <RotateCcw className="mr-1 h-3 w-3" /> Restaurar
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive text-xs"
+                      onClick={() => { if (confirm("Excluir permanentemente?")) deletePost(post.id); }}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
     posts, archivedPosts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
