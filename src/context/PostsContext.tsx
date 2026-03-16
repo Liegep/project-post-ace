@@ -146,6 +146,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       archivedAt: isArchiving ? new Date() : p.archivedAt,
     } : p)));
     await supabase.from("posts").update(updates).eq("id", id);
+    pushToTrello(id, "update");
   }, []);
 
   const updateClientLabel = useCallback(async (id: string, label: ClientLabel) => {
