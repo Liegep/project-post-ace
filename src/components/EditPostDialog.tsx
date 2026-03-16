@@ -99,8 +99,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
       await updatePost(post.id, {
         title,
-        imageUrl: finalUrls[coverIndex] || finalUrls[0] || "",
-        mediaType: mediaItems[coverIndex]?.type || mediaItems[0]?.type || "image",
+        imageUrl: finalUrls[0] || "",
+        mediaType: mediaItems[0]?.type || "image",
         mediaUrls: finalUrls,
         caption,
         deadline: new Date(deadline),
