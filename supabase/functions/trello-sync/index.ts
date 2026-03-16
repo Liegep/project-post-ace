@@ -41,30 +41,45 @@ Deno.serve(async (req) => {
     console.log("Board ID:", boardId);
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const authParams = `key=${TRELLO_API_KEY}&token=${TRELLO_TOKEN}`;
+    const authParams = new URLSearchParams({
+      key: TRELLO_API_KEY,
+      token: TRELLO_TOKEN,
+    });
+
+    const fetchTrelloJson = async (path: string, context: string) => {
+      const url = `${TRELLO_API}${path}${path.includes("?") ? "&" : "?"}${authParams.toString()}`;
+      console.log(`Fetching ${context} from:`, url.replace(TRELLO_TOKEN, '***').replace(TRELLO_API_KEY, '***'));
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        const body = await response.text();
+        console.error(`${context} response:`, response.status, body);
+
+        if (response.status === 401) {
+          throw new Error(
+            `Trello access denied for board ${boardId}. The configured token does not have permission to read this board.`
+          );
+        }
+
+        throw new Error(`Failed to fetch ${context}: ${response.status}`);
+      }
+
+      return response.json();
+    };
+
+    await fetchTrelloJson(`/boards/${boardId}?fields=id,name,closed`, "board");
 
     // 1. Fetch board labels
-    const labelsUrl = `${TRELLO_API}/boards/${boardId}/labels?${authParams}`;
-    console.log("Fetching labels from:", labelsUrl.replace(TRELLO_TOKEN!, '***').replace(TRELLO_API_KEY!, '***'));
-    const labelsRes = await fetch(labelsUrl);
-    if (!labelsRes.ok) {
-      const body = await labelsRes.text();
-      console.error("Labels response:", labelsRes.status, body);
-      throw new Error(`Failed to fetch labels: ${labelsRes.status}`);
-    }
-    const trelloLabels = await labelsRes.json();
+    const trelloLabels = await fetchTrelloJson(`/boards/${boardId}/labels`, "labels");
 
     // 2. Fetch board lists (columns)
-    const listsRes = await fetch(`${TRELLO_API}/boards/${boardId}/lists?${authParams}`);
-    if (!listsRes.ok) throw new Error(`Failed to fetch lists: ${listsRes.status}`);
-    const trelloLists = await listsRes.json();
+    const trelloLists = await fetchTrelloJson(`/boards/${boardId}/lists`, "lists");
 
     // 3. Fetch board cards
-    const cardsRes = await fetch(
-      `${TRELLO_API}/boards/${boardId}/cards?fields=name,desc,due,idList,idLabels,pos&attachments=true&${authParams}`
+    const trelloCards = await fetchTrelloJson(
+      `/boards/${boardId}/cards?fields=name,desc,due,idList,idLabels,pos&attachments=true`,
+      "cards"
     );
-    if (!cardsRes.ok) throw new Error(`Failed to fetch cards: ${cardsRes.status}`);
-    const trelloCards = await cardsRes.json();
 
     // --- Sync Labels/Tags ---
     const tagResults = [];
