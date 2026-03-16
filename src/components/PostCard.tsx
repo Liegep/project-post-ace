@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send } from "lucide-react";
+import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -55,6 +55,9 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
   const [commentText, setCommentText] = useState("");
+  const [mediaIndex, setMediaIndex] = useState(0);
+
+  const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
 
   const statusConfig = STATUS_CONFIG[post.status];
   const labelConfig = LABEL_CONFIG[post.clientLabel];
@@ -66,7 +69,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
     setCommentText("");
   };
 
-  const hasMedia = post.imageUrl && post.imageUrl.length > 0;
+  const hasMedia = allMedia.length > 0;
   const isCompact = !hasMedia && isAdmin;
 
   return (
@@ -77,10 +80,35 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
 
       {hasMedia && (
         <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
-          {post.mediaType === "video" ? (
-            <video src={post.imageUrl} className="h-full w-full object-cover" controls muted />
-          ) : (
-            <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover" />
+          {(() => {
+            const currentUrl = allMedia[mediaIndex] || allMedia[0];
+            const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
+            return isVideo ? (
+              <video src={currentUrl} className="h-full w-full object-cover" controls muted />
+            ) : (
+              <img src={currentUrl} alt={post.title} className="h-full w-full object-cover" />
+            );
+          })()}
+          {allMedia.length > 1 && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length); }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1 hover:bg-background"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setMediaIndex((prev) => (prev + 1) % allMedia.length); }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1 hover:bg-background"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-1">
+                {allMedia.map((_, i) => (
+                  <span key={i} className={`h-1.5 w-1.5 rounded-full ${i === mediaIndex ? "bg-primary-foreground" : "bg-primary-foreground/40"}`} />
+                ))}
+              </div>
+            </>
           )}
           <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
             <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${statusConfig.color}`}>

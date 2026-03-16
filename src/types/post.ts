@@ -22,6 +22,7 @@ export interface Post {
   title: string;
   imageUrl: string;
   mediaType: MediaType;
+  mediaUrls: string[];
   caption: string;
   deadline: Date;
   status: PostStatus;

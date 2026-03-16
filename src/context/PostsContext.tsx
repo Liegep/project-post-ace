@@ -24,11 +24,15 @@ interface PostsContextType {
 const PostsContext = createContext<PostsContextType | undefined>(undefined);
 
 function dbPostToPost(row: any, comments: Comment[]): Post {
+  const mediaUrls: string[] = row.media_urls && row.media_urls.length > 0
+    ? row.media_urls
+    : row.image_url ? [row.image_url] : [];
   return {
     id: row.id,
     title: row.title,
     imageUrl: row.image_url,
     mediaType: (row.media_type || "image") as MediaType,
+    mediaUrls,
     caption: row.caption,
     deadline: row.deadline ? new Date(row.deadline) : new Date(),
     status: row.status as PostStatus,
@@ -92,6 +96,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       title: post.title,
       image_url: post.imageUrl || '',
       media_type: post.mediaType || 'image',
+      media_urls: post.mediaUrls || [],
       caption: post.caption || '',
       status: post.status,
       tags: post.tags || [],
@@ -139,6 +144,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.title !== undefined) dbUpdates.title = updates.title;
     if (updates.imageUrl !== undefined) dbUpdates.image_url = updates.imageUrl;
     if (updates.mediaType !== undefined) dbUpdates.media_type = updates.mediaType;
+    if (updates.mediaUrls !== undefined) dbUpdates.media_urls = updates.mediaUrls;
     if (updates.caption !== undefined) dbUpdates.caption = updates.caption;
     if (updates.deadline !== undefined) dbUpdates.deadline = updates.deadline instanceof Date ? updates.deadline.toISOString() : updates.deadline;
     if (updates.tags !== undefined) dbUpdates.tags = updates.tags;

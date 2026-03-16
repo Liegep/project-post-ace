@@ -19,6 +19,12 @@ const STATUS_KEYS = {
   pronto: "statusReady",
 } as const;
 
+interface MediaItem {
+  url: string;
+  type: MediaType;
+  file?: File;
+}
+
 interface EditPostDialogProps {
   post: Post | null;
   open: boolean;
@@ -29,67 +35,71 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const { updatePost, updatePostStatus, uploadMedia } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [imagePreview, setImagePreview] = useState("");
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
-  const [mediaType, setMediaType] = useState<MediaType>("image");
   const [status, setStatus] = useState<PostStatus>("em_desenvolvimento");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const pendingFileRef = useRef<File | null>(null);
 
   useEffect(() => {
     if (post) {
       setTitle(post.title);
-      setImageUrl(post.imageUrl);
-      setImagePreview(post.imageUrl);
-      setMediaType(post.mediaType || "image");
+      const urls = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
+      setMediaItems(urls.map((url) => ({
+        url,
+        type: url.match(/\.(mp4|webm|mov|avi)/i) ? "video" as MediaType : "image" as MediaType,
+      })));
       setCaption(post.caption);
       setDeadline(format(post.deadline, "yyyy-MM-dd"));
       setStatus(post.status);
       setSelectedTags(post.tags);
-      pendingFileRef.current = null;
     }
   }, [post]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const isVideo = file.type.startsWith("video/");
-    setMediaType(isVideo ? "video" : "image");
-    pendingFileRef.current = file;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const dataUrl = ev.target?.result as string;
-      setImagePreview(dataUrl);
-    };
-    reader.readAsDataURL(file);
+    const files = e.target.files;
+    if (!files) return;
+    Array.from(files).forEach((file) => {
+      const isVideo = file.type.startsWith("video/");
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setMediaItems((prev) => [
+          ...prev,
+          { url: ev.target?.result as string, type: isVideo ? "video" : "image", file },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const clearImage = () => {
-    setImageUrl("");
-    setImagePreview("");
-    pendingFileRef.current = null;
-    if (fileInputRef.current) fileInputRef.current.value = "";
+  const removeMedia = (index: number) => {
+    setMediaItems((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!post || !title || (!imagePreview && !imageUrl) || !caption || !deadline) return;
+    if (!post || !title) return;
 
     setUploading(true);
     try {
-      let finalUrl = imageUrl;
-      if (pendingFileRef.current) {
-        finalUrl = await uploadMedia(pendingFileRef.current);
+      const finalUrls: string[] = [];
+      for (const item of mediaItems) {
+        if (item.file) {
+          const url = await uploadMedia(item.file);
+          finalUrls.push(url);
+        } else {
+          finalUrls.push(item.url);
+        }
       }
 
       await updatePost(post.id, {
         title,
-        imageUrl: finalUrl,
-        mediaType,
+        imageUrl: finalUrls[0] || "",
+        mediaType: mediaItems[0]?.type || "image",
+        mediaUrls: finalUrls,
         caption,
         deadline: new Date(deadline),
         tags: selectedTags,
@@ -118,32 +128,38 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               ref={fileInputRef}
               type="file"
               accept="image/*,video/*"
+              multiple
               onChange={handleFileChange}
               className="hidden"
             />
-            {imagePreview ? (
-              <div className="relative mt-1 rounded-lg border overflow-hidden" style={{ aspectRatio: "4/5" }}>
-                {mediaType === "video" ? (
-                  <video src={imagePreview} className="h-full w-full object-cover" controls muted />
-                ) : (
-                  <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
-                )}
-                <div className="absolute top-2 right-2 flex gap-1">
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="rounded-full bg-background/80 p-1.5 hover:bg-background"
-                  >
-                    <ImagePlus className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={clearImage}
-                    className="rounded-full bg-background/80 p-1.5 hover:bg-background"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+            {mediaItems.length > 0 ? (
+              <div className="mt-1 space-y-2">
+                <div className="grid grid-cols-3 gap-2">
+                  {mediaItems.map((item, i) => (
+                    <div key={i} className="relative rounded-lg border overflow-hidden aspect-square">
+                      {item.type === "video" ? (
+                        <video src={item.url} className="h-full w-full object-cover" muted />
+                      ) : (
+                        <img src={item.url} alt="Preview" className="h-full w-full object-cover" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeMedia(i)}
+                        className="absolute top-1 right-1 rounded-full bg-background/80 p-0.5 hover:bg-background"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/30 py-3 text-sm text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+                >
+                  <ImagePlus className="h-4 w-4" />
+                  Adicionar mais
+                </button>
               </div>
             ) : (
               <button
