@@ -66,29 +66,45 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
     setCommentText("");
   };
 
+  const hasMedia = post.imageUrl && post.imageUrl.length > 0;
+  const isCompact = !hasMedia && isAdmin;
+
   return (
     <Card className={`overflow-hidden transition-shadow hover:shadow-md ${isAdmin ? "cursor-pointer" : ""}`} onClick={isAdmin ? onEdit : undefined}>
-      <div className="p-4 pb-2">
-        <h3 className="text-lg font-bold leading-snug text-foreground">{post.title}</h3>
+      <div className={`p-4 ${isCompact ? "pb-2" : "pb-2"}`}>
+        <h3 className={`font-bold leading-snug text-foreground ${isCompact ? "text-sm" : "text-lg"}`}>{post.title}</h3>
       </div>
 
-      <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
-        {post.mediaType === "video" ? (
-          <video src={post.imageUrl} className="h-full w-full object-cover" controls muted />
-        ) : (
-          <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover" />
-        )}
-        <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
-          <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${statusConfig.color}`}>
-            {t(STATUS_KEYS[post.status])}
-          </span>
-          <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}>
-            {t(LABEL_KEYS[post.clientLabel])}
-          </span>
+      {hasMedia && (
+        <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
+          {post.mediaType === "video" ? (
+            <video src={post.imageUrl} className="h-full w-full object-cover" controls muted />
+          ) : (
+            <img src={post.imageUrl} alt={post.title} className="h-full w-full object-cover" />
+          )}
+          <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${statusConfig.color}`}>
+              {t(STATUS_KEYS[post.status])}
+            </span>
+            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}>
+              {t(LABEL_KEYS[post.clientLabel])}
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="p-4 pt-3 space-y-2">
+      <div className={`px-4 space-y-2 ${isCompact ? "pb-3 pt-1" : "p-4 pt-3"}`}>
+        {!hasMedia && (
+          <div className="flex items-center gap-1.5">
+            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusConfig.color}`}>
+              {t(STATUS_KEYS[post.status])}
+            </span>
+            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
+              {t(LABEL_KEYS[post.clientLabel])}
+            </span>
+          </div>
+        )}
+
         {!isAdmin && (
           <div className="rounded-lg bg-primary/10 px-3 py-2 text-center">
             <span className="text-sm font-semibold text-primary">
@@ -96,29 +112,38 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
             </span>
           </div>
         )}
-        {isAdmin ? (
-          <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
-        ) : (
-          <TagDisplay tagIds={post.tags} tags={tags} />
-        )}
-        {isAdmin ? (
-          <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
-        ) : (
-          <CaptionText text={post.caption} />
+
+        {!isCompact && (
+          <>
+            {isAdmin ? (
+              <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
+            ) : (
+              <TagDisplay tagIds={post.tags} tags={tags} />
+            )}
+            {post.caption && (
+              isAdmin ? (
+                <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
+              ) : (
+                <CaptionText text={post.caption} />
+              )
+            )}
+          </>
         )}
 
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="flex items-center gap-1 hover:text-foreground">
-            <MessageCircle className="h-3 w-3" />
-            {post.comments.length} {post.comments.length !== 1 ? t("comments") : t("comment")}
-            {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-          </button>
-        </div>
+        {!isCompact && (
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="flex items-center gap-1 hover:text-foreground">
+              <MessageCircle className="h-3 w-3" />
+              {post.comments.length} {post.comments.length !== 1 ? t("comments") : t("comment")}
+              {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+            </button>
+          </div>
+        )}
 
         {isAdmin && (
           <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
             <Select value={post.status} onValueChange={(v) => onStatusChange?.(v as PostStatus)}>
-              <SelectTrigger className="h-8 flex-1 text-xs">
+              <SelectTrigger className={`flex-1 text-xs ${isCompact ? "h-7" : "h-8"}`}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -127,7 +152,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className="h-8 w-8 text-destructive hover:text-destructive">
+            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
@@ -150,7 +175,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
         )}
       </div>
 
-      {(expanded || !isAdmin) && (
+      {(expanded || !isAdmin) && !isCompact && (
         <div className="border-t bg-muted/30 p-4">
           <div className="space-y-3">
             {post.comments.length === 0 && (
