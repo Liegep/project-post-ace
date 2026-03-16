@@ -134,6 +134,8 @@ export type Database = {
       }
       posts: {
         Row: {
+          archived: boolean
+          archived_at: string | null
           caption: string
           client_id: string | null
           client_label: string
@@ -151,6 +153,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          archived?: boolean
+          archived_at?: string | null
           caption?: string
           client_id?: string | null
           client_label?: string
@@ -168,6 +172,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          archived?: boolean
+          archived_at?: string | null
           caption?: string
           client_id?: string | null
           client_label?: string

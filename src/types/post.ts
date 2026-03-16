@@ -1,4 +1,4 @@
-export type PostStatus = "entrada" | "em_desenvolvimento" | "escrevendo_legenda" | "pronto";
+export type PostStatus = "entrada" | "em_desenvolvimento" | "escrevendo_legenda" | "pronto" | "finalizado";
 export type ClientLabel = "aprovado" | "alteracao_solicitada" | "leia_comentario" | "pendente" | "de_seu_feedback";
 
 export interface Tag {
@@ -39,6 +39,8 @@ export interface Post {
   createdAt: Date;
   columnId: string | null;
   position: number;
+  archived: boolean;
+  archivedAt: Date | null;
 }
 
 export const DEFAULT_TAGS: Tag[] = [
@@ -60,6 +62,7 @@ export const STATUS_CONFIG: Record<PostStatus, { label: string; color: string }>
   em_desenvolvimento: { label: "Em Desenvolvimento", color: "bg-info text-info-foreground" },
   escrevendo_legenda: { label: "Escrevendo Legenda", color: "bg-warning text-warning-foreground" },
   pronto: { label: "Pronto", color: "bg-success text-success-foreground" },
+  finalizado: { label: "Finalizado", color: "bg-primary text-primary-foreground" },
 };
 
 export const LABEL_CONFIG: Record<ClientLabel, { label: string; color: string }> = {

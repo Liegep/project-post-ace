@@ -2,7 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PostsProvider, usePosts } from "@/context/PostsContext";
-import { Post, PostStatus } from "@/types/post";
+import { Post, PostStatus, STATUS_CONFIG } from "@/types/post";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { PostCard } from "@/components/PostCard";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { EditPostDialog } from "@/components/EditPostDialog";
@@ -12,7 +14,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, RefreshCw } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, RefreshCw, Archive, RotateCcw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { DndContext, DragOverlay, closestCenter, PointerSensor, useSensor, useSensors, DragStartEvent, DragEndEvent, DragOverEvent, useDroppable } from "@dnd-kit/core";
 import { useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -294,15 +296,97 @@ const KanbanBoard = ({
   );
 };
 
+const ArchivedView = ({ archivedPosts, unarchivePost, deletePost }: { archivedPosts: Post[]; unarchivePost: (id: string) => void; deletePost: (id: string) => void }) => {
+  // Group archived posts by month (based on archivedAt or createdAt)
+  const grouped = archivedPosts.reduce<Record<string, Post[]>>((acc, post) => {
+    const date = post.archivedAt || post.createdAt;
+    const key = format(date, "MMMM yyyy", { locale: ptBR });
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(post);
+    return acc;
+  }, {});
+
+  const months = Object.keys(grouped).sort((a, b) => {
+    const dateA = grouped[a][0].archivedAt || grouped[a][0].createdAt;
+    const dateB = grouped[b][0].archivedAt || grouped[b][0].createdAt;
+    return dateB.getTime() - dateA.getTime();
+  });
+
+  if (archivedPosts.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="mb-4 rounded-full bg-muted p-6">
+          <Archive className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <h2 className="text-xl font-semibold text-foreground">Nenhum post arquivado</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Posts com status "Finalizado" aparecerão aqui</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex gap-4 overflow-x-auto pb-4">
+      {months.map((month) => (
+        <div key={month} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-sm font-semibold text-foreground capitalize">{month}</span>
+            <span className="text-xs text-muted-foreground">({grouped[month].length})</span>
+          </div>
+          <div className="space-y-3">
+            {grouped[month].map((post) => {
+              const hasMedia = post.mediaUrls.length > 0 || post.imageUrl;
+              const thumbUrl = post.mediaUrls[0] || post.imageUrl;
+              return (
+                <div key={post.id} className="rounded-lg border bg-card p-3">
+                  <div className="flex items-start gap-3">
+                    {hasMedia && thumbUrl && (
+                      <img src={thumbUrl} alt="" className="h-12 w-12 rounded-md object-cover shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{post.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {post.archivedAt ? format(post.archivedAt, "dd/MM/yyyy") : format(post.createdAt, "dd/MM/yyyy")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 text-xs"
+                      onClick={() => unarchivePost(post.id)}
+                    >
+                      <RotateCcw className="mr-1 h-3 w-3" /> Restaurar
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive hover:text-destructive text-xs"
+                      onClick={() => { if (confirm("Excluir permanentemente?")) deletePost(post.id); }}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
-    posts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
+    posts, archivedPosts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn,
-    movePostToColumn, reorderPostsInColumn,
+    movePostToColumn, reorderPostsInColumn, unarchivePost,
   } = usePosts();
   const { t } = useI18n();
   const navigate = useNavigate();
   const [view, setView] = useState<"kanban" | "list">("kanban");
+  const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
   const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [editingPeriod, setEditingPeriod] = useState(false);
@@ -485,68 +569,99 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       </header>
 
       <main className="mx-auto max-w-full p-6">
-        <div className="mb-8 flex items-center justify-center gap-2">
-          {editingPeriod ? (
-            <Input
-              ref={periodInputRef}
-              value={periodDraft}
-              onChange={(e) => setPeriodDraft(e.target.value)}
-              onBlur={savePeriod}
-              onKeyDown={(e) => { if (e.key === "Enter") savePeriod(); if (e.key === "Escape") { setPeriodDraft(postingPeriod); setEditingPeriod(false); } }}
-              placeholder={t("editPeriodPlaceholder")}
-              className="max-w-xs text-center text-2xl font-bold border-accent"
-            />
-          ) : (
+        {/* Tab switcher */}
+        <div className="mb-6 flex items-center justify-center gap-2">
+          <div className="flex rounded-lg border bg-muted p-1">
             <button
-              onClick={() => { setPeriodDraft(postingPeriod); setEditingPeriod(true); }}
-              className="group flex items-center gap-2 text-2xl font-bold text-foreground hover:text-accent transition-colors"
+              onClick={() => setActiveTab("board")}
+              className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "board" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
-              {postingPeriod || "Clique para definir o período"}
-              <Pencil className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
+              <LayoutGrid className="mr-1.5 inline h-4 w-4" />
+              Quadro
             </button>
-          )}
+            <button
+              onClick={() => setActiveTab("archived")}
+              className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "archived" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+            >
+              <Archive className="mr-1.5 inline h-4 w-4" />
+              Arquivados
+              {archivedPosts.length > 0 && (
+                <span className="ml-1.5 rounded-full bg-muted-foreground/20 px-1.5 py-0.5 text-[10px] font-semibold">
+                  {archivedPosts.length}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
 
-        {view === "kanban" ? (
-          <KanbanBoard
-            posts={posts}
-            columns={columns}
-            unassignedPosts={unassignedPosts}
-            editingColumnId={editingColumnId}
-            editingColumnName={editingColumnName}
-            setEditingColumnId={setEditingColumnId}
-            setEditingColumnName={setEditingColumnName}
-            editColumnInputRef={editColumnInputRef}
-            handleRenameColumn={handleRenameColumn}
-            handleDeleteColumn={handleDeleteColumn}
-            updatePostStatus={updatePostStatus}
-            deletePost={deletePost}
-            setEditPost={setEditPost}
-            setCreateInColumnId={setCreateInColumnId}
-            setCreateOpen={setCreateOpen}
-            addingColumn={addingColumn}
-            setAddingColumn={setAddingColumn}
-            newColumnName={newColumnName}
-            setNewColumnName={setNewColumnName}
-            newColumnInputRef={newColumnInputRef}
-            handleAddColumn={handleAddColumn}
-            movePostToColumn={movePostToColumn}
-            reorderPostsInColumn={reorderPostsInColumn}
-            t={t}
-          />
-        ) : (
-          <div className="space-y-3">
-            {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                isAdmin
-                onStatusChange={(s) => updatePostStatus(post.id, s)}
-                onDelete={() => deletePost(post.id)}
-                onEdit={() => setEditPost(post)}
+        {activeTab === "board" ? (
+          <>
+            <div className="mb-8 flex items-center justify-center gap-2">
+              {editingPeriod ? (
+                <Input
+                  ref={periodInputRef}
+                  value={periodDraft}
+                  onChange={(e) => setPeriodDraft(e.target.value)}
+                  onBlur={savePeriod}
+                  onKeyDown={(e) => { if (e.key === "Enter") savePeriod(); if (e.key === "Escape") { setPeriodDraft(postingPeriod); setEditingPeriod(false); } }}
+                  placeholder={t("editPeriodPlaceholder")}
+                  className="max-w-xs text-center text-2xl font-bold border-accent"
+                />
+              ) : (
+                <button
+                  onClick={() => { setPeriodDraft(postingPeriod); setEditingPeriod(true); }}
+                  className="group flex items-center gap-2 text-2xl font-bold text-foreground hover:text-accent transition-colors"
+                >
+                  {postingPeriod || "Clique para definir o período"}
+                  <Pencil className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
+                </button>
+              )}
+            </div>
+
+            {view === "kanban" ? (
+              <KanbanBoard
+                posts={posts}
+                columns={columns}
+                unassignedPosts={unassignedPosts}
+                editingColumnId={editingColumnId}
+                editingColumnName={editingColumnName}
+                setEditingColumnId={setEditingColumnId}
+                setEditingColumnName={setEditingColumnName}
+                editColumnInputRef={editColumnInputRef}
+                handleRenameColumn={handleRenameColumn}
+                handleDeleteColumn={handleDeleteColumn}
+                updatePostStatus={updatePostStatus}
+                deletePost={deletePost}
+                setEditPost={setEditPost}
+                setCreateInColumnId={setCreateInColumnId}
+                setCreateOpen={setCreateOpen}
+                addingColumn={addingColumn}
+                setAddingColumn={setAddingColumn}
+                newColumnName={newColumnName}
+                setNewColumnName={setNewColumnName}
+                newColumnInputRef={newColumnInputRef}
+                handleAddColumn={handleAddColumn}
+                movePostToColumn={movePostToColumn}
+                reorderPostsInColumn={reorderPostsInColumn}
+                t={t}
               />
-            ))}
-          </div>
+            ) : (
+              <div className="space-y-3">
+                {posts.map((post) => (
+                  <PostCard
+                    key={post.id}
+                    post={post}
+                    isAdmin
+                    onStatusChange={(s) => updatePostStatus(post.id, s)}
+                    onDelete={() => deletePost(post.id)}
+                    onEdit={() => setEditPost(post)}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <ArchivedView archivedPosts={archivedPosts} unarchivePost={unarchivePost} deletePost={deletePost} />
         )}
       </main>
 

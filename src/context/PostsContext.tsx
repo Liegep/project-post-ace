@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface PostsContextType {
   posts: Post[];
+  archivedPosts: Post[];
   tags: Tag[];
   columns: Column[];
   postingPeriod: string;
   companyLogo: string;
   setPostingPeriod: (period: string) => void;
   setCompanyLogo: (url: string) => void;
-  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position"> & { deadline?: Date }) => void;
+  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt"> & { deadline?: Date }) => void;
   updatePostStatus: (id: string, status: PostStatus) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
   addComment: (postId: string, author: string, text: string) => void;
@@ -25,6 +26,7 @@ interface PostsContextType {
   reorderColumns: (columns: Column[]) => void;
   movePostToColumn: (postId: string, columnId: string | null) => void;
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
+  unarchivePost: (id: string) => void;
   loading: boolean;
 }
 
@@ -49,6 +51,8 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     createdAt: new Date(row.created_at),
     columnId: row.column_id || null,
     position: row.position ?? 0,
+    archived: row.archived ?? false,
+    archivedAt: row.archived_at ? new Date(row.archived_at) : null,
   };
 }
 
@@ -103,7 +107,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("clients").update({ posting_period: period } as any).eq("id", clientId);
   }, [clientId]);
 
-  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position"> & { deadline?: Date }) => {
+  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt"> & { deadline?: Date }) => {
     const insertData: Record<string, any> = {
       title: post.title,
       image_url: post.imageUrl || '',
@@ -125,8 +129,19 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, [clientId]);
 
   const updatePostStatus = useCallback(async (id: string, status: PostStatus) => {
-    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
-    await supabase.from("posts").update({ status }).eq("id", id);
+    const isArchiving = status === "finalizado";
+    const updates: Record<string, any> = { status };
+    if (isArchiving) {
+      updates.archived = true;
+      updates.archived_at = new Date().toISOString();
+    }
+    setPosts((prev) => prev.map((p) => (p.id === id ? { 
+      ...p, 
+      status, 
+      archived: isArchiving ? true : p.archived,
+      archivedAt: isArchiving ? new Date() : p.archivedAt,
+    } : p)));
+    await supabase.from("posts").update(updates).eq("id", id);
   }, []);
 
   const updateClientLabel = useCallback(async (id: string, label: ClientLabel) => {
@@ -250,12 +265,20 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("clients").update({ logo_url: url } as any).eq("id", clientId);
   }, [clientId]);
 
+  const unarchivePost = useCallback(async (id: string) => {
+    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, archived: false, archivedAt: null, status: "pronto" as PostStatus } : p)));
+    await supabase.from("posts").update({ archived: false, archived_at: null, status: "pronto" } as any).eq("id", id);
+  }, []);
+
+  const activePosts = posts.filter((p) => !p.archived);
+  const archivedPosts = posts.filter((p) => p.archived);
+
   return (
     <PostsContext.Provider value={{
-      posts, tags, columns, postingPeriod, companyLogo, setPostingPeriod, setCompanyLogo,
+      posts: activePosts, archivedPosts, tags, columns, postingPeriod, companyLogo, setPostingPeriod, setCompanyLogo,
       addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost,
       addTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns,
-      movePostToColumn, reorderPostsInColumn, loading,
+      movePostToColumn, reorderPostsInColumn, unarchivePost, loading,
     }}>
       {children}
     </PostsContext.Provider>
