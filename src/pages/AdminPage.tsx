@@ -526,6 +526,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             newColumnInputRef={newColumnInputRef}
             handleAddColumn={handleAddColumn}
             movePostToColumn={movePostToColumn}
+            reorderPostsInColumn={reorderPostsInColumn}
             t={t}
           />
         ) : (
