@@ -125,7 +125,7 @@ const AdminPage = () => {
           )}
         </div>
         {view === "kanban" ? (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6">
             {COLUMNS.map((status) => {
               const config = STATUS_CONFIG[status];
               const columnPosts = posts.filter((p) => p.status === status);
