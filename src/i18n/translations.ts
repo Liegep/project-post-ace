@@ -79,6 +79,11 @@ type TranslationKeys = {
   // Posting period
   postingPeriod: string;
   editPeriodPlaceholder: string;
+  // Read more
+  readMore: string;
+  readLess: string;
+  // Publish forecast
+  publishForecast: string;
 };
 
 const pt: TranslationKeys = {

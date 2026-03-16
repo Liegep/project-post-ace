@@ -124,7 +124,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
               isAdmin ? (
                 <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
               ) : (
-                <CaptionText text={post.caption} />
+                <CaptionText text={post.caption} t={t} />
               )
             )}
           </>
