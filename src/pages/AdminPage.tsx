@@ -373,6 +373,43 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
 
       <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} defaultColumnId={createInColumnId} />
       <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
+
+      {/* Trello Sync Dialog */}
+      <Dialog open={trelloSyncOpen} onOpenChange={setTrelloSyncOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sincronizar com Trello</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Board ID do Trello</Label>
+              <Input
+                value={trelloBoardId}
+                onChange={(e) => setTrelloBoardId(e.target.value)}
+                placeholder="Ex: abc123def456"
+                onKeyDown={(e) => { if (e.key === "Enter") handleTrelloSync(); }}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Encontre o Board ID na URL do Trello: trello.com/b/<strong>BOARD_ID</strong>/nome-do-board
+              </p>
+            </div>
+            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              ⚠️ A sincronização substituirá todas as colunas e posts existentes deste cliente.
+            </div>
+            <Button
+              onClick={handleTrelloSync}
+              disabled={syncing || !trelloBoardId.trim()}
+              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              {syncing ? (
+                <><RefreshCw className="mr-2 h-4 w-4 animate-spin" /> Sincronizando...</>
+              ) : (
+                <><RefreshCw className="mr-2 h-4 w-4" /> Iniciar Sincronização</>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
