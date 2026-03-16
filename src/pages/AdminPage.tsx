@@ -44,6 +44,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const newColumnInputRef = useRef<HTMLInputElement>(null);
   const editColumnInputRef = useRef<HTMLInputElement>(null);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
+  const [trelloSyncOpen, setTrelloSyncOpen] = useState(false);
+  const [trelloBoardId, setTrelloBoardId] = useState("");
+  const [syncing, setSyncing] = useState(false);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
