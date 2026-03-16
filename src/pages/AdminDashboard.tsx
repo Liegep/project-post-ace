@@ -47,6 +47,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
   const [feedbacks, setFeedbacks] = useState<FeedbackNotification[]>([]);
+  const [unarchiveNotifs, setUnarchiveNotifs] = useState<UnarchiveNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
