@@ -45,12 +45,13 @@ const LABEL_KEYS: Record<ClientLabel, "labelPending" | "labelApproved" | "labelC
 interface PostCardProps {
   post: Post;
   isAdmin: boolean;
+  hideFeedback?: boolean;
   onStatusChange?: (status: PostStatus) => void;
   onDelete?: () => void;
   onEdit?: () => void;
 }
 
-export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: PostCardProps) => {
+export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete, onEdit }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags } = usePosts();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
