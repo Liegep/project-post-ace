@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN show_archived_to_client boolean NOT NULL DEFAULT false;

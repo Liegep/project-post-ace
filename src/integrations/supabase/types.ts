@@ -40,6 +40,7 @@ export type Database = {
           logo_url: string
           name: string
           posting_period: string
+          show_archived_to_client: boolean
           slug: string
           trello_board_id: string
           updated_at: string
@@ -51,6 +52,7 @@ export type Database = {
           logo_url?: string
           name: string
           posting_period?: string
+          show_archived_to_client?: boolean
           slug: string
           trello_board_id?: string
           updated_at?: string
@@ -62,6 +64,7 @@ export type Database = {
           logo_url?: string
           name?: string
           posting_period?: string
+          show_archived_to_client?: boolean
           slug?: string
           trello_board_id?: string
           updated_at?: string
