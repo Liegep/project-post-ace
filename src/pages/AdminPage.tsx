@@ -577,7 +577,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       await supabase.from("clients").update({ trello_board_id: trelloBoardId.trim() } as any).eq("id", clientData.id);
       toast({
         title: "Sincronização concluída!",
-        description: `${result.summary.tags} etiquetas, ${result.summary.columns} colunas, ${result.summary.posts} posts importados.`,
+        description: `${result.summary.tags} etiquetas, ${result.summary.columns} colunas, ${result.summary.postsCreated ?? result.summary.posts ?? 0} posts criados, ${result.summary.postsUpdated ?? 0} posts atualizados.`,
       });
       setTrelloSyncOpen(false);
       // Reload page to refresh data
