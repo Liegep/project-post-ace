@@ -66,7 +66,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
         {entradaPosts.length > 0 && (
           <div className="mb-8">
-            <h3 className="mb-4 text-xl font-semibold text-muted-foreground">{t("statusEntry")}</h3>
+            <h3 className="mb-4 text-xl font-semibold text-muted-foreground">Posts para fazer</h3>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {entradaPosts.map((post) => (
                 <PostCard key={post.id} post={post} isAdmin={false} hideFeedback />
