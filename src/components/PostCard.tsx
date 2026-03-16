@@ -187,7 +187,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete
           </div>
         )}
 
-        {!isAdmin && (
+        {!isAdmin && !hideFeedback && (
           <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
             <SelectTrigger className="h-9 w-full text-sm font-semibold bg-info text-info-foreground border-info hover:bg-info/90 rounded-lg">
               <SelectValue />
