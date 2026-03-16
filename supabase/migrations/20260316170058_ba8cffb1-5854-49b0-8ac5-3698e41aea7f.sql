@@ -1,0 +1,1 @@
+ALTER TABLE public.posts ADD COLUMN position integer NOT NULL DEFAULT 0;

@@ -144,6 +144,7 @@ export type Database = {
           image_url: string
           media_type: string
           media_urls: string[]
+          position: number
           status: string
           tags: string[]
           title: string
@@ -160,6 +161,7 @@ export type Database = {
           image_url: string
           media_type?: string
           media_urls?: string[]
+          position?: number
           status?: string
           tags?: string[]
           title: string
@@ -176,6 +178,7 @@ export type Database = {
           image_url?: string
           media_type?: string
           media_urls?: string[]
+          position?: number
           status?: string
           tags?: string[]
           title?: string
