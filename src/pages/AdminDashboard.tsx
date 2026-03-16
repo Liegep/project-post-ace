@@ -96,6 +96,12 @@ const AdminDashboard = () => {
     );
   };
 
+  const dismissFeedback = async (postId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await supabase.from("posts").update({ client_label: "pendente" } as any).eq("id", postId);
+    setFeedbacks((prev) => prev.filter((fb) => fb.postId !== postId));
+  };
+
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
