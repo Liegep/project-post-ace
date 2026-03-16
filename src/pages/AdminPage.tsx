@@ -22,7 +22,7 @@ const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "s
 
 const AdminPage = () => {
   const { posts, updatePostStatus, deletePost, postingPeriod, setPostingPeriod, companyLogo, setCompanyLogo, uploadMedia } = usePosts();
-  const { t } = useI18n();
+  const { t, clientLocale } = useI18n();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
