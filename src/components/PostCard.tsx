@@ -7,6 +7,7 @@ import { TagSelector } from "@/components/TagSelector";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
 import { format } from "date-fns";
@@ -53,6 +54,9 @@ interface PostCardProps {
   onStatusChange?: (status: PostStatus) => void;
   onDelete?: () => void;
   onEdit?: () => void;
+  selectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 const SortableThumb = ({ url, index, isActive }: { url: string; index: number; isActive: boolean }) => {
@@ -85,7 +89,7 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
   );
 };
 
-export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete, onEdit }: PostCardProps) => {
+export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags } = usePosts();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
@@ -108,7 +112,6 @@ export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete
     const newOrder = arrayMove(allMedia, oldIndex, newIndex);
     setLocalMediaOrder(newOrder);
     setMediaIndex(0);
-    // Save: first item is always the cover
     updatePost(post.id, {
       mediaUrls: newOrder,
       imageUrl: newOrder[0] || "",
@@ -128,10 +131,31 @@ export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete
   const hasMedia = allMedia.length > 0;
   const isCompact = !hasMedia && isAdmin;
 
+  const handleCardClick = () => {
+    if (selectionMode && onToggleSelect) {
+      onToggleSelect(post.id);
+    } else if (isAdmin) {
+      onEdit?.();
+    }
+  };
+
   return (
-    <Card className={`overflow-hidden transition-shadow hover:shadow-md ${isAdmin ? "cursor-pointer" : ""}`} onClick={isAdmin ? onEdit : undefined}>
+    <Card
+      className={`overflow-hidden transition-shadow hover:shadow-md ${isAdmin ? "cursor-pointer" : ""} ${selectionMode && isSelected ? "ring-2 ring-accent shadow-lg" : ""}`}
+      onClick={handleCardClick}
+    >
       <div className={`p-4 ${isCompact ? "pb-2" : "pb-2"}`}>
-        <h3 className={`font-bold leading-snug text-foreground ${isCompact ? "text-sm" : "text-lg"}`}>{post.title}</h3>
+        <div className="flex items-start gap-2">
+          {selectionMode && (
+            <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={() => onToggleSelect?.(post.id)}
+              />
+            </div>
+          )}
+          <h3 className={`font-bold leading-snug text-foreground ${isCompact ? "text-sm" : "text-lg"} flex-1`}>{post.title}</h3>
+        </div>
       </div>
 
       {hasMedia && (

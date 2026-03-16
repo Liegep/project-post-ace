@@ -14,7 +14,9 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, RefreshCw, Archive, RotateCcw } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, RefreshCw, Archive, RotateCcw, CheckSquare, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 import { DndContext, DragOverlay, closestCenter, PointerSensor, useSensor, useSensors, DragStartEvent, DragEndEvent, DragOverEvent, useDroppable } from "@dnd-kit/core";
 import { useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -31,15 +33,19 @@ const DroppableColumn = ({ id, children }: { id: string; children: React.ReactNo
   );
 };
 
-const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit }: {
+const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: {
   post: Post;
   onStatusChange: (s: PostStatus) => void;
   onDelete: () => void;
   onEdit: () => void;
+  selectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: post.id,
     data: { type: "post", post },
+    disabled: selectionMode,
   });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -47,13 +53,16 @@ const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit }: {
     opacity: isDragging ? 0.4 : 1,
   };
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} {...attributes} {...(selectionMode ? {} : listeners)}>
       <PostCard
         post={post}
         isAdmin
         onStatusChange={onStatusChange}
         onDelete={onDelete}
         onEdit={onEdit}
+        selectionMode={selectionMode}
+        isSelected={isSelected}
+        onToggleSelect={onToggleSelect}
       />
     </div>
   );
@@ -93,6 +102,9 @@ interface KanbanBoardProps {
   movePostToColumn: (postId: string, columnId: string | null) => void;
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   t: (key: any) => string;
+  selectionMode?: boolean;
+  selectedPostIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
 }
 
 const KanbanBoard = ({
@@ -101,6 +113,7 @@ const KanbanBoard = ({
   handleDeleteColumn, updatePostStatus, deletePost, setEditPost, setCreateInColumnId,
   setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
   newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
+  selectionMode, selectedPostIds, onToggleSelect,
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
   const sensors = useSensors(
@@ -208,6 +221,9 @@ const KanbanBoard = ({
                       onStatusChange={(s) => updatePostStatus(post.id, s)}
                       onDelete={() => deletePost(post.id)}
                       onEdit={() => setEditPost(post)}
+                      selectionMode={selectionMode}
+                      isSelected={selectedPostIds?.has(post.id)}
+                      onToggleSelect={onToggleSelect}
                     />
                   ))}
                   {columnPosts.length === 0 && (
@@ -241,6 +257,9 @@ const KanbanBoard = ({
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
                     onEdit={() => setEditPost(post)}
+                    selectionMode={selectionMode}
+                    isSelected={selectedPostIds?.has(post.id)}
+                    onToggleSelect={onToggleSelect}
                   />
                 ))}
               </DroppableColumn>
@@ -296,8 +315,14 @@ const KanbanBoard = ({
   );
 };
 
-const ArchivedView = ({ archivedPosts, unarchivePost, deletePost }: { archivedPosts: Post[]; unarchivePost: (id: string) => void; deletePost: (id: string) => void }) => {
-  // Group archived posts by month (based on archivedAt or createdAt)
+const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode, selectedPostIds, onToggleSelect }: {
+  archivedPosts: Post[];
+  unarchivePost: (id: string) => void;
+  deletePost: (id: string) => void;
+  selectionMode?: boolean;
+  selectedPostIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+}) => {
   const grouped = archivedPosts.reduce<Record<string, Post[]>>((acc, post) => {
     const date = post.archivedAt || post.createdAt;
     const key = format(date, "MMMM yyyy", { locale: ptBR });
@@ -336,9 +361,22 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost }: { archivedPo
             {grouped[month].map((post) => {
               const hasMedia = post.mediaUrls.length > 0 || post.imageUrl;
               const thumbUrl = post.mediaUrls[0] || post.imageUrl;
+              const isSelected = selectedPostIds?.has(post.id);
               return (
-                <div key={post.id} className="rounded-lg border bg-card p-3">
+                <div
+                  key={post.id}
+                  className={`rounded-lg border bg-card p-3 ${selectionMode ? "cursor-pointer" : ""} ${selectionMode && isSelected ? "ring-2 ring-accent" : ""}`}
+                  onClick={selectionMode ? () => onToggleSelect?.(post.id) : undefined}
+                >
                   <div className="flex items-start gap-3">
+                    {selectionMode && (
+                      <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => onToggleSelect?.(post.id)}
+                        />
+                      </div>
+                    )}
                     {hasMedia && thumbUrl && (
                       <img src={thumbUrl} alt="" className="h-12 w-12 rounded-md object-cover shrink-0" />
                     )}
@@ -349,24 +387,26 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost }: { archivedPo
                       </p>
                     </div>
                   </div>
-                  <div className="mt-2 flex gap-1.5">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 text-xs"
-                      onClick={() => unarchivePost(post.id)}
-                    >
-                      <RotateCcw className="mr-1 h-3 w-3" /> Restaurar
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-destructive hover:text-destructive text-xs"
-                      onClick={() => { if (confirm("Excluir permanentemente?")) deletePost(post.id); }}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
+                  {!selectionMode && (
+                    <div className="mt-2 flex gap-1.5">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 text-xs"
+                        onClick={() => unarchivePost(post.id)}
+                      >
+                        <RotateCcw className="mr-1 h-3 w-3" /> Restaurar
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive text-xs"
+                        onClick={() => { if (confirm("Excluir permanentemente?")) deletePost(post.id); }}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -381,7 +421,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
     posts, archivedPosts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn,
-    movePostToColumn, reorderPostsInColumn, unarchivePost,
+    movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts,
   } = usePosts();
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -403,6 +443,46 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [trelloSyncOpen, setTrelloSyncOpen] = useState(false);
   const [trelloBoardId, setTrelloBoardId] = useState(clientData.trello_board_id || "");
   const [syncing, setSyncing] = useState(false);
+
+  // Selection mode state
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
+
+  const toggleSelect = (id: string) => {
+    setSelectedPostIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const exitSelectionMode = () => {
+    setSelectionMode(false);
+    setSelectedPostIds(new Set());
+  };
+
+  const handleBulkStatusChange = async (status: PostStatus) => {
+    const ids = Array.from(selectedPostIds);
+    await bulkUpdateStatus(ids, status);
+    exitSelectionMode();
+    toast({ title: `${ids.length} posts atualizados` });
+  };
+
+  const handleBulkDelete = async () => {
+    const ids = Array.from(selectedPostIds);
+    if (!confirm(`Excluir ${ids.length} posts permanentemente?`)) return;
+    await bulkDeletePosts(ids);
+    exitSelectionMode();
+    toast({ title: `${ids.length} posts excluídos` });
+  };
+
+  const handleBulkUnarchive = async () => {
+    const ids = Array.from(selectedPostIds);
+    for (const id of ids) await unarchivePost(id);
+    exitSelectionMode();
+    toast({ title: `${ids.length} posts restaurados` });
+  };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -558,6 +638,12 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <List className="h-4 w-4" />
               </button>
             </div>
+            <Button
+              variant={selectionMode ? "default" : "outline"}
+              onClick={() => selectionMode ? exitSelectionMode() : setSelectionMode(true)}
+            >
+              <CheckSquare className="mr-2 h-4 w-4" /> {selectionMode ? "Cancelar" : "Selecionar"}
+            </Button>
             <Button variant="outline" onClick={() => setTrelloSyncOpen(true)}>
               <RefreshCw className="mr-2 h-4 w-4" /> Trello Sync
             </Button>
@@ -644,6 +730,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 movePostToColumn={movePostToColumn}
                 reorderPostsInColumn={reorderPostsInColumn}
                 t={t}
+                selectionMode={selectionMode}
+                selectedPostIds={selectedPostIds}
+                onToggleSelect={toggleSelect}
               />
             ) : (
               <div className="space-y-3">
@@ -655,15 +744,61 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
                     onEdit={() => setEditPost(post)}
+                    selectionMode={selectionMode}
+                    isSelected={selectedPostIds.has(post.id)}
+                    onToggleSelect={toggleSelect}
                   />
                 ))}
               </div>
             )}
           </>
         ) : (
-          <ArchivedView archivedPosts={archivedPosts} unarchivePost={unarchivePost} deletePost={deletePost} />
+          <ArchivedView
+            archivedPosts={archivedPosts}
+            unarchivePost={unarchivePost}
+            deletePost={deletePost}
+            selectionMode={selectionMode}
+            selectedPostIds={selectedPostIds}
+            onToggleSelect={toggleSelect}
+          />
         )}
       </main>
+
+      {/* Floating bulk action bar */}
+      {selectionMode && selectedPostIds.size > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl border bg-card px-5 py-3 shadow-xl">
+          <span className="text-sm font-semibold text-foreground">{selectedPostIds.size} selecionado(s)</span>
+          <div className="h-6 w-px bg-border" />
+          {activeTab === "board" ? (
+            <>
+              <Select onValueChange={(v) => handleBulkStatusChange(v as PostStatus)}>
+                <SelectTrigger className="h-8 w-auto min-w-[140px] text-xs">
+                  <SelectValue placeholder="Mudar status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
+                    <SelectItem key={key} value={key}>{STATUS_CONFIG[key].label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button size="sm" variant="outline" onClick={() => handleBulkStatusChange("finalizado")}>
+                <Archive className="mr-1.5 h-3.5 w-3.5" /> Arquivar
+              </Button>
+            </>
+          ) : (
+            <Button size="sm" variant="outline" onClick={handleBulkUnarchive}>
+              <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Restaurar
+            </Button>
+          )}
+          <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={handleBulkDelete}>
+            <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Excluir
+          </Button>
+          <div className="h-6 w-px bg-border" />
+          <Button size="sm" variant="ghost" onClick={exitSelectionMode}>
+            <X className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      )}
 
       <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} defaultColumnId={createInColumnId} />
       <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
