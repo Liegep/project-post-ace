@@ -45,12 +45,13 @@ const LABEL_KEYS: Record<ClientLabel, "labelPending" | "labelApproved" | "labelC
 interface PostCardProps {
   post: Post;
   isAdmin: boolean;
+  hideFeedback?: boolean;
   onStatusChange?: (status: PostStatus) => void;
   onDelete?: () => void;
   onEdit?: () => void;
 }
 
-export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: PostCardProps) => {
+export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete, onEdit }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags } = usePosts();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
@@ -186,7 +187,7 @@ export const PostCard = ({ post, isAdmin, onStatusChange, onDelete, onEdit }: Po
           </div>
         )}
 
-        {!isAdmin && (
+        {!isAdmin && !hideFeedback && (
           <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
             <SelectTrigger className="h-9 w-full text-sm font-semibold bg-info text-info-foreground border-info hover:bg-info/90 rounded-lg">
               <SelectValue />
