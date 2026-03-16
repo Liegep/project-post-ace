@@ -12,13 +12,6 @@ import { ImagePlus, X, Save } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 import { format } from "date-fns";
 
-const STATUS_KEYS = {
-  entrada: "statusEntry",
-  em_desenvolvimento: "statusInDevelopment",
-  escrevendo_legenda: "statusWritingCaption",
-  pronto: "statusReady",
-} as const;
-
 interface MediaItem {
   url: string;
   type: MediaType;
@@ -32,13 +25,14 @@ interface EditPostDialogProps {
 }
 
 export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps) => {
-  const { updatePost, updatePostStatus, uploadMedia } = usePosts();
+  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState<PostStatus>("em_desenvolvimento");
+  const [columnId, setColumnId] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -54,6 +48,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       setCaption(post.caption);
       setDeadline(format(post.deadline, "yyyy-MM-dd"));
       setStatus(post.status);
+      setColumnId(post.columnId);
       setSelectedTags(post.tags);
     }
   }, [post]);
@@ -105,6 +100,9 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         tags: selectedTags,
       });
       await updatePostStatus(post.id, status);
+      if (columnId !== post.columnId) {
+        await movePostToColumn(post.id, columnId);
+      }
       onOpenChange(false);
     } finally {
       setUploading(false);
@@ -182,14 +180,15 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               <Input id="edit-deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
             </div>
             <div>
-              <Label>{t("status")}</Label>
-              <Select value={status} onValueChange={(v) => setStatus(v as PostStatus)}>
+              <Label>Coluna</Label>
+              <Select value={columnId ?? "none"} onValueChange={(v) => setColumnId(v === "none" ? null : v)}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Selecione..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(STATUS_KEYS) as PostStatus[]).map((key) => (
-                    <SelectItem key={key} value={key}>{t(STATUS_KEYS[key])}</SelectItem>
+                  <SelectItem value="none">Sem coluna</SelectItem>
+                  {columns.map((col) => (
+                    <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

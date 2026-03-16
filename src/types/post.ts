@@ -7,6 +7,13 @@ export interface Tag {
   color: string; // hex color
 }
 
+export interface Column {
+  id: string;
+  clientId: string;
+  name: string;
+  position: number;
+}
+
 export interface Comment {
   id: string;
   postId: string;
@@ -30,6 +37,7 @@ export interface Post {
   comments: Comment[];
   tags: string[]; // tag ids
   createdAt: Date;
+  columnId: string | null;
 }
 
 export const DEFAULT_TAGS: Tag[] = [

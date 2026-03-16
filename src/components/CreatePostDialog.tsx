@@ -8,16 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { STATUS_CONFIG } from "@/types/post";
 import { ImagePlus, X } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
-
-const STATUS_KEYS = {
-  entrada: "statusEntry",
-  em_desenvolvimento: "statusInDevelopment",
-  escrevendo_legenda: "statusWritingCaption",
-  pronto: "statusReady",
-} as const;
 
 interface MediaPreview {
   file: File;
@@ -28,19 +20,29 @@ interface MediaPreview {
 interface CreatePostDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultColumnId?: string | null;
 }
 
-export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) => {
-  const { addPost, uploadMedia } = usePosts();
+export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: CreatePostDialogProps) => {
+  const { addPost, uploadMedia, columns } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [mediaPreviews, setMediaPreviews] = useState<MediaPreview[]>([]);
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
   const [status, setStatus] = useState<PostStatus>("entrada");
+  const [columnId, setColumnId] = useState<string | null>(defaultColumnId ?? null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync defaultColumnId when dialog opens
+  const handleOpenChange = (isOpen: boolean) => {
+    if (isOpen) {
+      setColumnId(defaultColumnId ?? null);
+    }
+    onOpenChange(isOpen);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -84,6 +86,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
         deadline: deadline ? new Date(deadline) : undefined,
         status,
         tags: selectedTags,
+        columnId,
       });
 
       setTitle("");
@@ -91,15 +94,16 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
       setCaption("");
       setDeadline("");
       setStatus("entrada");
+      setColumnId(null);
       setSelectedTags([]);
-      onOpenChange(false);
+      handleOpenChange(false);
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{t("createNewPost")}</DialogTitle>
@@ -169,14 +173,15 @@ export const CreatePostDialog = ({ open, onOpenChange }: CreatePostDialogProps) 
               <Input id="deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
             </div>
             <div>
-              <Label>{t("status")}</Label>
-              <Select value={status} onValueChange={(v) => setStatus(v as PostStatus)}>
+              <Label>Coluna</Label>
+              <Select value={columnId ?? "none"} onValueChange={(v) => setColumnId(v === "none" ? null : v)}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Selecione..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(STATUS_KEYS) as PostStatus[]).map((key) => (
-                    <SelectItem key={key} value={key}>{t(STATUS_KEYS[key])}</SelectItem>
+                  <SelectItem value="none">Sem coluna</SelectItem>
+                  {columns.map((col) => (
+                    <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

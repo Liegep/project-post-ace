@@ -65,6 +65,38 @@ export type Database = {
         }
         Relationships: []
       }
+      columns: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          name: string
+          position: number
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "columns_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           author: string
@@ -102,6 +134,7 @@ export type Database = {
           caption: string
           client_id: string | null
           client_label: string
+          column_id: string | null
           created_at: string
           deadline: string | null
           id: string
@@ -117,6 +150,7 @@ export type Database = {
           caption?: string
           client_id?: string | null
           client_label?: string
+          column_id?: string | null
           created_at?: string
           deadline?: string | null
           id?: string
@@ -132,6 +166,7 @@ export type Database = {
           caption?: string
           client_id?: string | null
           client_label?: string
+          column_id?: string | null
           created_at?: string
           deadline?: string | null
           id?: string
@@ -149,6 +184,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_column_id_fkey"
+            columns: ["column_id"]
+            isOneToOne: false
+            referencedRelation: "columns"
             referencedColumns: ["id"]
           },
         ]
