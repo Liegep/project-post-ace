@@ -361,36 +361,20 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
           </div>
           <div className="space-y-3">
             {grouped[month].map((post) => {
-              const hasMedia = post.mediaUrls.length > 0 || post.imageUrl;
-              const thumbUrl = post.mediaUrls[0] || post.imageUrl;
               const isSelected = selectedPostIds?.has(post.id);
               return (
-                <div
-                  key={post.id}
-                  className={`rounded-lg border bg-card p-3 ${selectionMode ? "cursor-pointer" : ""} ${selectionMode && isSelected ? "ring-2 ring-accent" : ""}`}
-                  onClick={selectionMode ? () => onToggleSelect?.(post.id) : undefined}
-                >
-                  <div className="flex items-start gap-3">
-                    {selectionMode && (
-                      <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => onToggleSelect?.(post.id)}
-                        />
-                      </div>
-                    )}
-                    {hasMedia && thumbUrl && (
-                      <img src={thumbUrl} alt="" className="h-12 w-12 rounded-md object-cover shrink-0" />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{post.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {post.archivedAt ? format(post.archivedAt, "dd/MM/yyyy") : format(post.createdAt, "dd/MM/yyyy")}
-                      </p>
-                    </div>
-                  </div>
+                <div key={post.id} className="relative">
+                  <PostCard
+                    post={post}
+                    isAdmin
+                    hideFeedback
+                    selectionMode={selectionMode}
+                    isSelected={isSelected}
+                    onToggleSelect={onToggleSelect}
+                    onEdit={() => {}}
+                  />
                   {!selectionMode && (
-                    <div className="mt-2 flex gap-1.5">
+                    <div className="mt-1.5 flex gap-1.5">
                       <Button
                         variant="outline"
                         size="sm"
