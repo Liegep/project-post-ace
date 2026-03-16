@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN trello_board_id text NOT NULL DEFAULT '';
