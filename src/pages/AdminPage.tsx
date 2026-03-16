@@ -280,7 +280,7 @@ const KanbanBoard = ({
 };
 
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
-
+  const {
     posts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn,
     movePostToColumn,
