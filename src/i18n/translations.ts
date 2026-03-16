@@ -85,6 +85,7 @@ const pt: TranslationKeys = {
   adminTitle: "Painel de Conteúdo",
   adminSubtitle: "Gerencie seus posts e aprovações",
   newPost: "Novo Post",
+  statusEntry: "Entrada",
   statusInDevelopment: "Em Desenvolvimento",
   statusWritingCaption: "Escrevendo Legenda",
   statusReady: "Pronto",
