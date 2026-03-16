@@ -109,10 +109,49 @@ const AdminDashboard = () => {
     );
   };
 
+  const fetchUnarchiveNotifs = async () => {
+    const { data: posts } = await supabase
+      .from("posts")
+      .select("id, title, client_id, client_unarchived_at")
+      .not("client_unarchived_at", "is", null)
+      .order("client_unarchived_at", { ascending: false });
+
+    if (!posts || posts.length === 0) {
+      setUnarchiveNotifs([]);
+      return;
+    }
+
+    const clientIds = [...new Set(posts.map((p: any) => p.client_id).filter(Boolean))];
+    const { data: clientsData } = await supabase
+      .from("clients")
+      .select("id, name, slug, logo_url")
+      .in("id", clientIds);
+
+    const clientMap: Record<string, { name: string; slug: string; logo_url: string }> = {};
+    (clientsData || []).forEach((c: any) => { clientMap[c.id] = { name: c.name, slug: c.slug, logo_url: c.logo_url }; });
+
+    setUnarchiveNotifs(
+      posts.map((p: any) => ({
+        postId: p.id,
+        postTitle: p.title,
+        clientName: clientMap[p.client_id]?.name || "—",
+        clientSlug: clientMap[p.client_id]?.slug || "",
+        clientLogo: clientMap[p.client_id]?.logo_url || "",
+        unarchivedAt: p.client_unarchived_at,
+      }))
+    );
+  };
+
   const dismissFeedback = async (postId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     await supabase.from("posts").update({ client_label: "pendente" } as any).eq("id", postId);
     setFeedbacks((prev) => prev.filter((fb) => fb.postId !== postId));
+  };
+
+  const dismissUnarchiveNotif = async (postId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await supabase.from("posts").update({ client_unarchived_at: null } as any).eq("id", postId);
+    setUnarchiveNotifs((prev) => prev.filter((n) => n.postId !== postId));
   };
 
   const generateSlug = (name: string) => {
