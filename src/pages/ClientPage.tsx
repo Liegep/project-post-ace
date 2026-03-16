@@ -5,6 +5,9 @@ import { PostsProvider, usePosts } from "@/context/PostsContext";
 import { PostCard } from "@/components/PostCard";
 import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Archive, LayoutGrid } from "lucide-react";
 
 interface ClientData {
   id: string;
@@ -13,20 +16,21 @@ interface ClientData {
   logo_url: string;
   locale: string;
   posting_period: string;
+  show_archived_to_client: boolean;
 }
 
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
-  const { posts, columns, postingPeriod } = usePosts();
+  const { posts, archivedPosts, columns, postingPeriod } = usePosts();
   const locale = (clientData.locale || "pt") as Locale;
   const t = useCallback(
     (key: keyof typeof translations.pt) => translations[locale]?.[key] || translations.pt[key] || key,
     [locale]
   );
 
-  // Posts with status "pronto" (shown without column grouping)
+  const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
+
   const readyPosts = posts.filter((p) => p.status === "pronto");
 
-  // "Entrada" column: show posts that are "em_desenvolvimento"
   const entradaColumn = columns.find((c) => c.name.toLowerCase() === "entrada");
   const entradaPosts = entradaColumn
     ? posts.filter((p) => p.columnId === entradaColumn.id && p.status === "em_desenvolvimento")
@@ -40,6 +44,20 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
     });
 
   const hasContent = readyPosts.length > 0 || entradaPosts.length > 0;
+
+  const groupedArchived = archivedPosts.reduce<Record<string, typeof archivedPosts>>((acc, post) => {
+    const date = post.archivedAt || post.createdAt;
+    const key = format(date, "MMMM yyyy", { locale: ptBR });
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(post);
+    return acc;
+  }, {});
+
+  const archivedMonths = Object.keys(groupedArchived).sort((a, b) => {
+    const dateA = groupedArchived[a][0].archivedAt || groupedArchived[a][0].createdAt;
+    const dateB = groupedArchived[b][0].archivedAt || groupedArchived[b][0].createdAt;
+    return dateB.getTime() - dateA.getTime();
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -63,36 +81,94 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             </span>
           </div>
         )}
-        <h2 className="mb-6 text-center text-3xl font-bold text-foreground">{t("postsForApproval")}</h2>
 
-        {!hasContent && (
-          <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
+        {clientData.show_archived_to_client && (
+          <div className="mb-6 flex items-center justify-center">
+            <div className="flex rounded-lg border bg-muted p-1">
+              <button
+                onClick={() => setActiveTab("board")}
+                className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "board" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+              >
+                <LayoutGrid className="mr-1.5 inline h-4 w-4" />
+                {t("postsForApproval")}
+              </button>
+              <button
+                onClick={() => setActiveTab("archived")}
+                className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "archived" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+              >
+                <Archive className="mr-1.5 inline h-4 w-4" />
+                Arquivados
+                {archivedPosts.length > 0 && (
+                  <span className="ml-1.5 rounded-full bg-muted-foreground/20 px-1.5 py-0.5 text-[10px] font-semibold">
+                    {archivedPosts.length}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
         )}
 
-        {hasContent && (
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Coluna Entrada à esquerda (acima no mobile) */}
-            {entradaPosts.length > 0 && (
-              <div className="w-full lg:w-80 shrink-0">
-                <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
-                <div className="space-y-4 rounded-xl bg-muted/30 p-4">
-                  {sortByDate(entradaPosts).map((post) => (
-                    <PostCard key={post.id} post={post} isAdmin={false} hideFeedback />
-                  ))}
+        {activeTab === "board" || !clientData.show_archived_to_client ? (
+          <>
+            {!clientData.show_archived_to_client && (
+              <h2 className="mb-6 text-center text-3xl font-bold text-foreground">{t("postsForApproval")}</h2>
+            )}
+
+            {!hasContent && (
+              <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
+            )}
+
+            {hasContent && (
+              <div className="flex flex-col lg:flex-row gap-6">
+                {entradaPosts.length > 0 && (
+                  <div className="w-full lg:w-80 shrink-0">
+                    <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
+                    <div className="space-y-4 rounded-xl bg-muted/30 p-4">
+                      {sortByDate(entradaPosts).map((post) => (
+                        <PostCard key={post.id} post={post} isAdmin={false} hideFeedback />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex-1 min-w-0">
+                  {readyPosts.length > 0 && (
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                      {sortByDate(readyPosts).map((post) => (
+                        <PostCard key={post.id} post={post} isAdmin={false} />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
-
-            {/* Posts prontos */}
-            <div className="flex-1 min-w-0">
-              {readyPosts.length > 0 && (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {sortByDate(readyPosts).map((post) => (
-                    <PostCard key={post.id} post={post} isAdmin={false} />
-                  ))}
+          </>
+        ) : (
+          <div>
+            {archivedPosts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="mb-4 rounded-full bg-muted p-6">
+                  <Archive className="h-8 w-8 text-muted-foreground" />
                 </div>
-              )}
-            </div>
+                <h2 className="text-xl font-semibold text-foreground">Nenhum post arquivado</h2>
+              </div>
+            ) : (
+              <div className="flex gap-4 overflow-x-auto pb-4">
+                {archivedMonths.map((month) => (
+                  <div key={month} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
+                    <div className="mb-4 flex items-center gap-2">
+                      <span className="text-sm font-semibold text-foreground capitalize">{month}</span>
+                      <span className="text-xs text-muted-foreground">({groupedArchived[month].length})</span>
+                    </div>
+                    <div className="space-y-3">
+                      {groupedArchived[month].map((post) => (
+                        <PostCard key={post.id} post={post} isAdmin={false} hideFeedback />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </main>

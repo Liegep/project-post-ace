@@ -14,9 +14,10 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, RefreshCw, Archive, RotateCcw, CheckSquare, X } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, RefreshCw, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import { DndContext, DragOverlay, closestCenter, PointerSensor, useSensor, useSensors, DragStartEvent, DragEndEvent, DragOverEvent, useDroppable } from "@dnd-kit/core";
 import { useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -75,6 +76,7 @@ interface ClientData {
   locale: string;
   posting_period: string;
   trello_board_id: string;
+  show_archived_to_client: boolean;
 }
 
 interface KanbanBoardProps {
@@ -447,6 +449,12 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   // Selection mode state
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
+  const [showArchivedToClient, setShowArchivedToClient] = useState(clientData.show_archived_to_client);
+
+  const toggleShowArchivedToClient = async (checked: boolean) => {
+    setShowArchivedToClient(checked);
+    await supabase.from("clients").update({ show_archived_to_client: checked } as any).eq("id", clientData.id);
+  };
 
   const toggleSelect = (id: string) => {
     setSelectedPostIds((prev) => {
@@ -686,6 +694,19 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               )}
             </button>
           </div>
+          {activeTab === "archived" && (
+            <div className="flex items-center gap-2 ml-3">
+              <Switch
+                id="show-archived-client"
+                checked={showArchivedToClient}
+                onCheckedChange={toggleShowArchivedToClient}
+              />
+              <label htmlFor="show-archived-client" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                {showArchivedToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                {showArchivedToClient ? "Visível para o cliente" : "Oculto do cliente"}
+              </label>
+            </div>
+          )}
         </div>
 
         {activeTab === "board" ? (
