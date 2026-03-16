@@ -298,7 +298,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
     posts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn,
-    movePostToColumn,
+    movePostToColumn, reorderPostsInColumn,
   } = usePosts();
   const { t } = useI18n();
   const navigate = useNavigate();
