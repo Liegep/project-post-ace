@@ -6,6 +6,7 @@ import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { EditPostDialog } from "@/components/EditPostDialog";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, LayoutGrid, List, Pencil, ImagePlus } from "lucide-react";
@@ -21,7 +22,7 @@ const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "s
 
 const AdminPage = () => {
   const { posts, updatePostStatus, deletePost, postingPeriod, setPostingPeriod, companyLogo, setCompanyLogo, uploadMedia } = usePosts();
-  const { t } = useI18n();
+  const { t, clientLocale } = useI18n();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
@@ -80,7 +81,16 @@ const AdminPage = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <LanguageSelector />
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-[10px] text-muted-foreground">Admin</span>
+                <LanguageSelector />
+              </div>
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-[10px] text-muted-foreground">Cliente</span>
+                <LanguageSelector forClient clientLocale={clientLocale} />
+              </div>
+            </div>
             <div className="flex rounded-lg border bg-muted p-1">
               <button
                 onClick={() => setView("kanban")}
