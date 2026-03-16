@@ -13,6 +13,7 @@ import { ImagePlus, X, Video } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 
 const STATUS_KEYS = {
+  entrada: "statusEntry",
   em_desenvolvimento: "statusInDevelopment",
   escrevendo_legenda: "statusWritingCaption",
   pronto: "statusReady",
