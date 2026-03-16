@@ -54,6 +54,36 @@ interface PostCardProps {
   onEdit?: () => void;
 }
 
+const SortableThumb = ({ url, index, isActive }: { url: string; index: number; isActive: boolean }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: `thumb-${index}` });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  const isVideo = url.match(/\.(mp4|webm|mov|avi)/i);
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`relative h-10 w-10 shrink-0 rounded overflow-hidden cursor-grab active:cursor-grabbing border-2 transition-colors ${isActive ? "border-accent" : "border-transparent hover:border-muted-foreground/50"}`}
+    >
+      {isVideo ? (
+        <video src={url} className="h-full w-full object-cover" muted />
+      ) : (
+        <img src={url} alt="" className="h-full w-full object-cover" />
+      )}
+      {index === 0 && (
+        <div className="absolute inset-0 flex items-center justify-center bg-accent/30">
+          <span className="text-[7px] font-bold text-accent-foreground">CAPA</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete, onEdit }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags } = usePosts();
   const { t } = useI18n();
