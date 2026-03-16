@@ -39,6 +39,8 @@ export interface Post {
   createdAt: Date;
   columnId: string | null;
   position: number;
+  archived: boolean;
+  archivedAt: Date | null;
 }
 
 export const DEFAULT_TAGS: Tag[] = [
