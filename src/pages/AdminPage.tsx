@@ -384,7 +384,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   };
 
   // Posts without a column
-  const unassignedPosts = posts.filter((p) => !p.columnId);
+  const unassignedPosts = posts.filter((p) => !p.columnId).sort((a, b) => a.position - b.position);
 
   const handleTrelloSync = async () => {
     if (!trelloBoardId.trim()) return;
