@@ -12,7 +12,7 @@ import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send } from "l
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-const CaptionText = ({ text }: { text: string }) => {
+const CaptionText = ({ text, t }: { text: string; t: (key: keyof typeof import("@/i18n/translations").translations.pt) => string }) => {
   const [expanded, setExpanded] = useState(false);
   const isLong = text.length > 150;
   return (
@@ -20,7 +20,7 @@ const CaptionText = ({ text }: { text: string }) => {
       <p className={`text-sm text-muted-foreground ${!expanded && isLong ? "line-clamp-3" : ""}`}>{text}</p>
       {isLong && (
         <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="text-xs font-medium text-primary hover:underline mt-1">
-          {expanded ? "Ver menos" : "Ver mais"}
+          {expanded ? t("readLess") : t("readMore")}
         </button>
       )}
     </div>
