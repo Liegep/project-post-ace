@@ -48,6 +48,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     tags: row.tags || [],
     createdAt: new Date(row.created_at),
     columnId: row.column_id || null,
+    position: row.position ?? 0,
   };
 }
 
