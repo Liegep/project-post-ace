@@ -10,7 +10,7 @@ interface PostsContextType {
   companyLogo: string;
   setPostingPeriod: (period: string) => void;
   setCompanyLogo: (url: string) => void;
-  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel"> & { deadline?: Date }) => void;
+  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position"> & { deadline?: Date }) => void;
   updatePostStatus: (id: string, status: PostStatus) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
   addComment: (postId: string, author: string, text: string) => void;
@@ -24,6 +24,7 @@ interface PostsContextType {
   deleteColumn: (id: string) => void;
   reorderColumns: (columns: Column[]) => void;
   movePostToColumn: (postId: string, columnId: string | null) => void;
+  reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   loading: boolean;
 }
 
