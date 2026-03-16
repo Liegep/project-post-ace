@@ -41,6 +41,7 @@ export type Database = {
           name: string
           posting_period: string
           slug: string
+          trello_board_id: string
           updated_at: string
         }
         Insert: {
@@ -51,6 +52,7 @@ export type Database = {
           name: string
           posting_period?: string
           slug: string
+          trello_board_id?: string
           updated_at?: string
         }
         Update: {
@@ -61,6 +63,7 @@ export type Database = {
           name?: string
           posting_period?: string
           slug?: string
+          trello_board_id?: string
           updated_at?: string
         }
         Relationships: []

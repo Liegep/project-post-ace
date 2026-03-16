@@ -22,6 +22,7 @@ interface ClientData {
   logo_url: string;
   locale: string;
   posting_period: string;
+  trello_board_id: string;
 }
 
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
@@ -47,7 +48,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const editColumnInputRef = useRef<HTMLInputElement>(null);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
   const [trelloSyncOpen, setTrelloSyncOpen] = useState(false);
-  const [trelloBoardId, setTrelloBoardId] = useState("");
+  const [trelloBoardId, setTrelloBoardId] = useState(clientData.trello_board_id || "");
   const [syncing, setSyncing] = useState(false);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,12 +135,13 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       );
       const result = await res.json();
       if (!result.success) throw new Error(result.error);
+      // Save board ID to client record
+      await supabase.from("clients").update({ trello_board_id: trelloBoardId.trim() } as any).eq("id", clientData.id);
       toast({
         title: "Sincronização concluída!",
         description: `${result.summary.tags} etiquetas, ${result.summary.columns} colunas, ${result.summary.posts} posts importados.`,
       });
       setTrelloSyncOpen(false);
-      setTrelloBoardId("");
       // Reload page to refresh data
       window.location.reload();
     } catch (err: any) {
