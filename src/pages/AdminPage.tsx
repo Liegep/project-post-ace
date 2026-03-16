@@ -162,6 +162,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <List className="h-4 w-4" />
               </button>
             </div>
+            <Button variant="outline" onClick={() => setTrelloSyncOpen(true)}>
+              <RefreshCw className="mr-2 h-4 w-4" /> Trello Sync
+            </Button>
             <Button onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newPost")}
             </Button>
