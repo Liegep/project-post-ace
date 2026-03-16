@@ -1,10 +1,10 @@
 import { usePosts } from "@/context/PostsContext";
-import { useI18n } from "@/i18n/I18nContext";
+import { useClientI18n } from "@/i18n/I18nContext";
 import { PostCard } from "@/components/PostCard";
 
 const ClientPage = () => {
   const { posts, postingPeriod, companyLogo } = usePosts();
-  const { t } = useI18n();
+  const { t } = useClientI18n();
 
   return (
     <div className="min-h-screen bg-background">
