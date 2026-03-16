@@ -252,6 +252,13 @@ const AdminDashboard = () => {
                     <span className="text-[10px] text-muted-foreground shrink-0">
                       {new Date(fb.updatedAt).toLocaleDateString("pt-BR")}
                     </span>
+                    <button
+                      onClick={(e) => dismissFeedback(fb.postId, e)}
+                      className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                      title="Dispensar"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 );
               })}
