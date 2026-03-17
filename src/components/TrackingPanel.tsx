@@ -211,7 +211,7 @@ export const TrackingPanel = ({ clientId, posts, columns = [], tags = [], isAdmi
         )}
       </div>
 
-      <div className="space-y-1 max-h-[calc(100vh-250px)] overflow-y-auto pr-1">
+      <div className="space-y-2.5 max-h-[calc(100vh-250px)] overflow-y-auto pr-1">
         {orderedPosts.length > 0 ? (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={allIds} strategy={verticalListSortingStrategy}>
