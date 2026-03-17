@@ -700,6 +700,19 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               </label>
             </div>
           )}
+          {activeTab === "board" && (
+            <div className="flex items-center gap-2 ml-3">
+              <Switch
+                id="allow-client-edit-caption"
+                checked={allowClientEditCaption}
+                onCheckedChange={toggleAllowClientEditCaption}
+              />
+              <label htmlFor="allow-client-edit-caption" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                <Pencil className="h-3.5 w-3.5" />
+                {allowClientEditCaption ? "Cliente pode editar legenda" : "Cliente não edita legenda"}
+              </label>
+            </div>
+          )}
         </div>
 
         {activeTab === "board" ? (
