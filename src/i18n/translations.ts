@@ -897,6 +897,7 @@ const sv: TranslationKeys = {
   signOut: "Logga ut",
   confirmDeleteClient: "Är du säker på att du vill ta bort denna klient?",
   noColumn: "Ingen kolumn",
+  columnLabel: "Kolumn",
   columnName: "Kolumnnamn",
   cancel: "Avbryt",
   newColumn: "Ny kolumn",
