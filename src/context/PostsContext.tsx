@@ -225,6 +225,17 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, []);
 
   const updatePost = useCallback(async (id: string, updates: Partial<Post>) => {
+    // Auto-archive when "publicado" tag is added
+    if (updates.tags !== undefined) {
+      const currentPost = posts.find((p) => p.id === id);
+      const hadPublicado = currentPost?.tags.includes("publicado") ?? false;
+      const hasPublicado = updates.tags.includes("publicado");
+      if (!hadPublicado && hasPublicado) {
+        updates.archived = true;
+        updates.archivedAt = new Date();
+      }
+    }
+
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
     const dbUpdates: Record<string, any> = {};
     if (updates.title !== undefined) dbUpdates.title = updates.title;
@@ -237,11 +248,13 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.status !== undefined) dbUpdates.status = updates.status;
     if (updates.clientLabel !== undefined) dbUpdates.client_label = updates.clientLabel;
     if (updates.columnId !== undefined) dbUpdates.column_id = updates.columnId;
+    if (updates.archived !== undefined) dbUpdates.archived = updates.archived;
+    if (updates.archivedAt !== undefined) dbUpdates.archived_at = updates.archivedAt instanceof Date ? updates.archivedAt.toISOString() : updates.archivedAt;
     if (Object.keys(dbUpdates).length > 0) {
       await supabase.from("posts").update(dbUpdates).eq("id", id);
       pushToTrello(id, "update");
     }
-  }, []);
+  }, [posts]);
 
   const movePostToColumn = useCallback(async (postId: string, columnId: string | null) => {
     setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, columnId } : p)));
