@@ -21,7 +21,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import { DndContext, DragOverlay, closestCenter, PointerSensor, useSensor, useSensors, DragStartEvent, DragEndEvent, DragOverEvent, useDroppable } from "@dnd-kit/core";
-import { useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { useSortable, SortableContext, verticalListSortingStrategy, horizontalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 const UNASSIGNED_COLUMN_ID = "__unassigned__";
@@ -111,7 +111,28 @@ interface KanbanBoardProps {
   selectionMode?: boolean;
   selectedPostIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
+  reorderColumns: (columns: { id: string; name: string; position: number; visibleToClient: boolean }[]) => void;
 }
+
+const SortableColumn = ({ col, children }: { col: { id: string }; children: React.ReactNode }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: `col-${col.id}`,
+    data: { type: "column", columnId: col.id },
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing mb-1 flex justify-center">
+        <GripVertical className="h-4 w-4 text-muted-foreground/50 rotate-90" />
+      </div>
+      {children}
+    </div>
+  );
+};
 
 const KanbanBoard = ({
   posts, columns, unassignedPosts, editingColumnId, editingColumnName,
@@ -121,25 +142,50 @@ const KanbanBoard = ({
   newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
   toggleColumnVisibility,
   selectionMode, selectedPostIds, onToggleSelect,
+  reorderColumns,
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
   );
 
   const handleDragStart = (event: DragStartEvent) => {
-    const post = posts.find((p) => p.id === event.active.id);
-    if (post) setActivePost(post);
+    const data = event.active.data.current;
+    if (data?.type === "column") {
+      setActiveColumnId(data.columnId);
+    } else {
+      const post = posts.find((p) => p.id === event.active.id);
+      if (post) setActivePost(post);
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
+    const wasColumnDrag = activeColumnId !== null;
     setActivePost(null);
+    setActiveColumnId(null);
     const { active, over } = event;
     if (!over) return;
 
-    const postId = active.id as string;
+    const activeId = active.id as string;
     const overId = over.id as string;
-    if (postId === overId) return;
+    if (activeId === overId) return;
+
+    // Handle column reorder
+    if (wasColumnDrag) {
+      const activeColId = activeId.replace("col-", "");
+      const overColId = overId.replace("col-", "");
+      const oldIndex = columns.findIndex((c) => c.id === activeColId);
+      const newIndex = columns.findIndex((c) => c.id === overColId);
+      if (oldIndex >= 0 && newIndex >= 0) {
+        const newCols = arrayMove([...columns], oldIndex, newIndex).map((c, i) => ({ ...c, position: i }));
+        reorderColumns(newCols);
+      }
+      return;
+    }
+
+    // Handle post reorder
+    const postId = activeId;
 
     // Determine target column
     let targetColumnId: string | null = null;
@@ -177,86 +223,87 @@ const KanbanBoard = ({
   };
 
   const allPostIds = posts.map((p) => p.id);
+  const columnSortIds = columns.map((c) => `col-${c.id}`);
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="flex gap-4 overflow-x-auto pb-4">
-        {columns.map((col) => {
-          const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
-          return (
-            <div key={col.id} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
-              <div className="mb-4 flex items-center justify-between gap-2">
-                {editingColumnId === col.id ? (
-                  <Input
-                    ref={editColumnInputRef}
-                    value={editingColumnName}
-                    onChange={(e) => setEditingColumnName(e.target.value)}
-                    onBlur={() => handleRenameColumn(col.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleRenameColumn(col.id);
-                      if (e.key === "Escape") setEditingColumnId(null);
-                    }}
-                    className="h-7 text-sm font-semibold"
-                  />
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-foreground">{col.name}</span>
-                    <span className="text-xs text-muted-foreground">({columnPosts.length})</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => toggleColumnVisibility(col.id, !col.visibleToClient)}
-                    className={`rounded p-1 transition-colors ${col.visibleToClient ? "text-primary hover:bg-primary/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
-                    title={col.visibleToClient ? "Visível para o cliente" : "Oculto para o cliente"}
-                  >
-                    {col.visibleToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
-                  </button>
-                  <button
-                    onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
-                    className="rounded p-1 text-muted-foreground hover:bg-accent/10 hover:text-accent"
-                    title="Adicionar post"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}
-                    className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteColumn(col.id)}
-                    className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-              <SortableContext items={columnPosts.map((p) => p.id)} strategy={verticalListSortingStrategy}>
-                <DroppableColumn id={col.id}>
-                  {columnPosts.map((post) => (
-                    <DraggablePostCard
-                      key={post.id}
-                      post={post}
-                      onStatusChange={(s) => updatePostStatus(post.id, s)}
-                      onDelete={() => deletePost(post.id)}
-                      onEdit={() => setEditPost(post)}
-                      selectionMode={selectionMode}
-                      isSelected={selectedPostIds?.has(post.id)}
-                      onToggleSelect={onToggleSelect}
+        <SortableContext items={columnSortIds} strategy={horizontalListSortingStrategy}>
+          {columns.map((col) => {
+            const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
+            return (
+              <SortableColumn key={col.id} col={col}>
+                <div className="mb-4 flex items-center justify-between gap-2">
+                  {editingColumnId === col.id ? (
+                    <Input
+                      ref={editColumnInputRef}
+                      value={editingColumnName}
+                      onChange={(e) => setEditingColumnName(e.target.value)}
+                      onBlur={() => handleRenameColumn(col.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleRenameColumn(col.id);
+                        if (e.key === "Escape") setEditingColumnId(null);
+                      }}
+                      className="h-7 text-sm font-semibold"
                     />
-                  ))}
-                  {columnPosts.length === 0 && (
-                    <p className="py-8 text-center text-sm text-muted-foreground">{t("noPosts")}</p>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-foreground">{col.name}</span>
+                      <span className="text-xs text-muted-foreground">({columnPosts.length})</span>
+                    </div>
                   )}
-                </DroppableColumn>
-              </SortableContext>
-
-
-            </div>
-          );
-        })}
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => toggleColumnVisibility(col.id, !col.visibleToClient)}
+                      className={`rounded p-1 transition-colors ${col.visibleToClient ? "text-primary hover:bg-primary/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                      title={col.visibleToClient ? "Visível para o cliente" : "Oculto para o cliente"}
+                    >
+                      {col.visibleToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                    </button>
+                    <button
+                      onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
+                      className="rounded p-1 text-muted-foreground hover:bg-accent/10 hover:text-accent"
+                      title="Adicionar post"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}
+                      className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteColumn(col.id)}
+                      className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+                <SortableContext items={columnPosts.map((p) => p.id)} strategy={verticalListSortingStrategy}>
+                  <DroppableColumn id={col.id}>
+                    {columnPosts.map((post) => (
+                      <DraggablePostCard
+                        key={post.id}
+                        post={post}
+                        onStatusChange={(s) => updatePostStatus(post.id, s)}
+                        onDelete={() => deletePost(post.id)}
+                        onEdit={() => setEditPost(post)}
+                        selectionMode={selectionMode}
+                        isSelected={selectedPostIds?.has(post.id)}
+                        onToggleSelect={onToggleSelect}
+                      />
+                    ))}
+                    {columnPosts.length === 0 && (
+                      <p className="py-8 text-center text-sm text-muted-foreground">{t("noPosts")}</p>
+                    )}
+                  </DroppableColumn>
+                </SortableContext>
+              </SortableColumn>
+            );
+          })}
+        </SortableContext>
 
         {/* Unassigned posts column */}
         {unassignedPosts.length > 0 && (
@@ -325,6 +372,13 @@ const KanbanBoard = ({
         {activePost && (
           <div className="w-80 rotate-2 opacity-90">
             <PostCard post={activePost} isAdmin />
+          </div>
+        )}
+        {activeColumnId && (
+          <div className="w-80 rotate-1 opacity-80 rounded-xl border bg-card/50 p-4 shadow-lg">
+            <span className="text-sm font-semibold text-foreground">
+              {columns.find((c) => c.id === activeColumnId)?.name}
+            </span>
           </div>
         )}
       </DragOverlay>
@@ -422,7 +476,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
     posts, archivedPosts, columns, tags, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn, toggleColumnVisibility,
-    movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn,
+    movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, reorderColumns,
   } = usePosts();
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -850,6 +904,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     selectionMode={selectionMode}
                     selectedPostIds={selectedPostIds}
                     onToggleSelect={toggleSelect}
+                    reorderColumns={reorderColumns}
                   />
                 </div>
                 {trackingEnabled && (
