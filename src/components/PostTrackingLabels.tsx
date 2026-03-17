@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 interface TrackingStep {
@@ -16,7 +17,6 @@ interface PostTrackingLabelsProps {
   isAdmin?: boolean;
 }
 
-// Simple cache for steps per client to avoid refetching
 const stepsCache: Record<string, TrackingStep[]> = {};
 
 export const PostTrackingLabels = ({ postId, clientId, isAdmin = false }: PostTrackingLabelsProps) => {
@@ -26,14 +26,12 @@ export const PostTrackingLabels = ({ postId, clientId, isAdmin = false }: PostTr
 
   useEffect(() => {
     const load = async () => {
-      // Fetch steps if not cached
       if (!stepsCache[clientId]) {
         const { data } = await supabase.from("tracking_steps").select("*").eq("client_id", clientId).order("position");
         stepsCache[clientId] = (data || []).map((s: any) => ({ id: s.id, name: s.name, color: s.color, position: s.position }));
       }
       setSteps(stepsCache[clientId]);
 
-      // Fetch tracking for this post
       const { data: trackingData } = await supabase.from("post_tracking").select("step_id, completed").eq("post_id", postId);
       const completed = new Set<string>();
       (trackingData || []).forEach((t: any) => { if (t.completed) completed.add(t.step_id); });
@@ -54,7 +52,6 @@ export const PostTrackingLabels = ({ postId, clientId, isAdmin = false }: PostTr
       return next;
     });
 
-    // Check if record exists
     const { data: existing } = await supabase.from("post_tracking").select("id").eq("post_id", postId).eq("step_id", stepId).maybeSingle();
 
     if (existing) {
@@ -78,46 +75,58 @@ export const PostTrackingLabels = ({ postId, clientId, isAdmin = false }: PostTr
   const progress = Math.round((completedCount / steps.length) * 100);
 
   return (
-    <div className="space-y-1.5" onClick={(e) => e.stopPropagation()}>
-      {/* Mini progress bar */}
-      <div className="flex items-center gap-2">
-        <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
-          <div
-            className="h-full rounded-full transition-all duration-300"
-            style={{
-              width: `${progress}%`,
-              backgroundColor: progress === 100 ? "hsl(var(--success))" : "hsl(var(--primary))",
-            }}
-          />
-        </div>
-        <span className="text-[9px] font-bold text-muted-foreground shrink-0">{progress}%</span>
-      </div>
-
-      {/* Step labels */}
-      <div className="flex flex-wrap gap-1">
-        {steps.map((step) => {
-          const done = completedSteps.has(step.id);
-          return (
-            <button
-              key={step.id}
-              onClick={() => toggleStep(step.id)}
-              disabled={!isAdmin}
-              className={cn(
-                "inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[9px] font-semibold transition-all border",
-                isAdmin && "cursor-pointer hover:scale-105",
-                !isAdmin && "cursor-default",
-                done
-                  ? "text-white border-transparent"
-                  : "bg-transparent border-muted-foreground/20 text-muted-foreground"
-              )}
-              style={done ? { backgroundColor: step.color, borderColor: step.color } : {}}
-            >
-              {done && <Check className="h-2.5 w-2.5" />}
-              {step.name}
-            </button>
-          );
-        })}
-      </div>
+    <div className="space-y-1" onClick={(e) => e.stopPropagation()}>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button className="w-full flex items-center gap-2 rounded-md border border-muted-foreground/20 px-2 py-1 hover:bg-muted/50 transition-colors">
+            {/* Mini progress bar */}
+            <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-300"
+                style={{
+                  width: `${progress}%`,
+                  backgroundColor: progress === 100 ? "hsl(142, 71%, 45%)" : "hsl(var(--primary))",
+                }}
+              />
+            </div>
+            <span className="text-[9px] font-bold text-muted-foreground shrink-0">{completedCount}/{steps.length}</span>
+            <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-56 p-2" align="start">
+          <p className="text-xs font-semibold text-muted-foreground mb-2 px-1">Acompanhamento</p>
+          <div className="space-y-0.5">
+            {steps.map((step) => {
+              const done = completedSteps.has(step.id);
+              return (
+                <button
+                  key={step.id}
+                  onClick={() => toggleStep(step.id)}
+                  disabled={!isAdmin}
+                  className={cn(
+                    "w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors",
+                    isAdmin && "hover:bg-muted cursor-pointer",
+                    !isAdmin && "cursor-default"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors",
+                      done ? "border-transparent" : "border-muted-foreground/30"
+                    )}
+                    style={done ? { backgroundColor: step.color } : {}}
+                  >
+                    {done && <Check className="h-2.5 w-2.5 text-white" />}
+                  </div>
+                  <span className={cn("text-left flex-1", done ? "line-through text-muted-foreground" : "text-foreground")}>
+                    {step.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };

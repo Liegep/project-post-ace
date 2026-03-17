@@ -230,17 +230,14 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
 
       <div className={`px-4 space-y-2 ${isCompact ? "pb-3 pt-1" : "p-4 pt-3"}`}>
         {!hasMedia && (
-          <>
-            <div className="flex items-center gap-1.5">
-              <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusConfig.color}`}>
-                {t(STATUS_KEYS[post.status])}
-              </span>
-              <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
-                {t(LABEL_KEYS[post.clientLabel])}
-              </span>
-            </div>
-            <PostTrackingLabels postId={post.id} clientId={clientId} isAdmin={isAdmin} />
-          </>
+          <div className="flex items-center gap-1.5">
+            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusConfig.color}`}>
+              {t(STATUS_KEYS[post.status])}
+            </span>
+            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
+              {t(LABEL_KEYS[post.clientLabel])}
+            </span>
+          </div>
         )}
 
         {!isAdmin && !hideFeedback && (
