@@ -349,10 +349,10 @@ const KanbanBoard = ({
               />
               <div className="flex gap-2">
                 <Button size="sm" onClick={handleAddColumn} className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
-                  Criar
+                  {t("create")}
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => { setNewColumnName(""); setAddingColumn(false); }}>
-                  Cancelar
+                  {t("cancel")}
                 </Button>
               </div>
             </div>
