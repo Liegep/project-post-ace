@@ -988,7 +988,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </>
           ) : (
             <Button size="sm" variant="outline" onClick={handleBulkUnarchive}>
-              <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Restaurar
+              <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> {t("restore")}
             </Button>
           )}
           <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={handleBulkDelete}>
