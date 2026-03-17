@@ -456,7 +456,7 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
                         variant="ghost"
                         size="sm"
                         className="text-destructive hover:text-destructive text-xs"
-                        onClick={() => { if (confirm("Excluir permanentemente?")) deletePost(post.id); }}
+                        onClick={() => { if (confirm(t("deletePermanently"))) deletePost(post.id); }}
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
