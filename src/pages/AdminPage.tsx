@@ -14,7 +14,8 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, RefreshCw, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, RefreshCw, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList } from "lucide-react";
+import { TrackingPanel } from "@/components/TrackingPanel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
@@ -77,6 +78,7 @@ interface ClientData {
   posting_period: string;
   trello_board_id: string;
   show_archived_to_client: boolean;
+  tracking_enabled: boolean;
 }
 
 interface KanbanBoardProps {
@@ -438,6 +440,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
   const [showArchivedToClient, setShowArchivedToClient] = useState(clientData.show_archived_to_client);
   const [allowClientEditCaption, setAllowClientEditCaption] = useState((clientData as any).allow_client_edit_caption ?? false);
+  const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
 
   const toggleShowArchivedToClient = async (checked: boolean) => {
     setShowArchivedToClient(checked);
@@ -447,6 +450,34 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const toggleAllowClientEditCaption = async (checked: boolean) => {
     setAllowClientEditCaption(checked);
     await supabase.from("clients").update({ allow_client_edit_caption: checked } as any).eq("id", clientData.id);
+  };
+
+  const enableTracking = async () => {
+    // Create default steps
+    const defaultSteps = [
+      { name: "Roteiro", color: "#6366f1" },
+      { name: "Design / Arte", color: "#f59e0b" },
+      { name: "Legenda", color: "#3b82f6" },
+      { name: "Revisão", color: "#8b5cf6" },
+      { name: "Agendado", color: "#06b6d4" },
+      { name: "Publicado", color: "#22c55e" },
+    ];
+    for (let i = 0; i < defaultSteps.length; i++) {
+      await supabase.from("tracking_steps").insert({
+        client_id: clientData.id,
+        name: defaultSteps[i].name,
+        color: defaultSteps[i].color,
+        position: i,
+      } as any);
+    }
+    await supabase.from("clients").update({ tracking_enabled: true } as any).eq("id", clientData.id);
+    setTrackingEnabled(true);
+    toast({ title: "Acompanhamento criado!", description: "A coluna de acompanhamento foi adicionada ao quadro." });
+  };
+
+  const disableTracking = async () => {
+    await supabase.from("clients").update({ tracking_enabled: false } as any).eq("id", clientData.id);
+    setTrackingEnabled(false);
   };
 
   const toggleSelect = (id: string) => {
@@ -653,6 +684,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             >
               <CheckSquare className="mr-2 h-4 w-4" /> {selectionMode ? "Cancelar" : "Selecionar"}
             </Button>
+            {!trackingEnabled && (
+              <Button variant="outline" onClick={enableTracking}>
+                <ClipboardList className="mr-2 h-4 w-4" /> Criar Acompanhamento
+              </Button>
+            )}
             <Button variant="outline" onClick={() => setTrelloSyncOpen(true)}>
               <RefreshCw className="mr-2 h-4 w-4" /> Trello Sync
             </Button>
@@ -701,16 +737,31 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </div>
           )}
           {activeTab === "board" && (
-            <div className="flex items-center gap-2 ml-3">
-              <Switch
-                id="allow-client-edit-caption"
-                checked={allowClientEditCaption}
-                onCheckedChange={toggleAllowClientEditCaption}
-              />
-              <label htmlFor="allow-client-edit-caption" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
-                <Pencil className="h-3.5 w-3.5" />
-                {allowClientEditCaption ? "Cliente pode editar legenda" : "Cliente não edita legenda"}
-              </label>
+            <div className="flex items-center gap-4 ml-3">
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="allow-client-edit-caption"
+                  checked={allowClientEditCaption}
+                  onCheckedChange={toggleAllowClientEditCaption}
+                />
+                <label htmlFor="allow-client-edit-caption" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                  <Pencil className="h-3.5 w-3.5" />
+                  {allowClientEditCaption ? "Cliente pode editar legenda" : "Cliente não edita legenda"}
+                </label>
+              </div>
+              {trackingEnabled && (
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="tracking-toggle"
+                    checked={trackingEnabled}
+                    onCheckedChange={(checked) => { if (!checked) disableTracking(); }}
+                  />
+                  <label htmlFor="tracking-toggle" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                    <ClipboardList className="h-3.5 w-3.5" />
+                    Acompanhamento ativo
+                  </label>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -740,35 +791,42 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </div>
 
             {view === "kanban" ? (
-              <KanbanBoard
-                posts={posts}
-                columns={columns}
-                unassignedPosts={unassignedPosts}
-                editingColumnId={editingColumnId}
-                editingColumnName={editingColumnName}
-                setEditingColumnId={setEditingColumnId}
-                setEditingColumnName={setEditingColumnName}
-                editColumnInputRef={editColumnInputRef}
-                handleRenameColumn={handleRenameColumn}
-                handleDeleteColumn={handleDeleteColumn}
-                updatePostStatus={updatePostStatus}
-                deletePost={deletePost}
-                setEditPost={setEditPost}
-                setCreateInColumnId={setCreateInColumnId}
-                setCreateOpen={setCreateOpen}
-                addingColumn={addingColumn}
-                setAddingColumn={setAddingColumn}
-                newColumnName={newColumnName}
-                setNewColumnName={setNewColumnName}
-                newColumnInputRef={newColumnInputRef}
-                handleAddColumn={handleAddColumn}
-                movePostToColumn={movePostToColumn}
-                reorderPostsInColumn={reorderPostsInColumn}
-                t={t}
-                selectionMode={selectionMode}
-                selectedPostIds={selectedPostIds}
-                onToggleSelect={toggleSelect}
-              />
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0 overflow-x-auto">
+                  <KanbanBoard
+                    posts={posts}
+                    columns={columns}
+                    unassignedPosts={unassignedPosts}
+                    editingColumnId={editingColumnId}
+                    editingColumnName={editingColumnName}
+                    setEditingColumnId={setEditingColumnId}
+                    setEditingColumnName={setEditingColumnName}
+                    editColumnInputRef={editColumnInputRef}
+                    handleRenameColumn={handleRenameColumn}
+                    handleDeleteColumn={handleDeleteColumn}
+                    updatePostStatus={updatePostStatus}
+                    deletePost={deletePost}
+                    setEditPost={setEditPost}
+                    setCreateInColumnId={setCreateInColumnId}
+                    setCreateOpen={setCreateOpen}
+                    addingColumn={addingColumn}
+                    setAddingColumn={setAddingColumn}
+                    newColumnName={newColumnName}
+                    setNewColumnName={setNewColumnName}
+                    newColumnInputRef={newColumnInputRef}
+                    handleAddColumn={handleAddColumn}
+                    movePostToColumn={movePostToColumn}
+                    reorderPostsInColumn={reorderPostsInColumn}
+                    t={t}
+                    selectionMode={selectionMode}
+                    selectedPostIds={selectedPostIds}
+                    onToggleSelect={toggleSelect}
+                  />
+                </div>
+                {trackingEnabled && (
+                  <TrackingPanel clientId={clientData.id} posts={posts} isAdmin />
+                )}
+              </div>
             ) : (
               <div className="space-y-3">
                 {posts.map((post) => (

@@ -8,6 +8,7 @@ import { I18nProvider } from "@/i18n/I18nContext";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Archive, LayoutGrid, RotateCcw } from "lucide-react";
+import { TrackingPanel } from "@/components/TrackingPanel";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -21,6 +22,7 @@ interface ClientData {
   posting_period: string;
   show_archived_to_client: boolean;
   allow_client_edit_caption: boolean;
+  tracking_enabled: boolean;
 }
 
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
@@ -144,6 +146,10 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                     </div>
                   )}
                 </div>
+
+                {clientData.tracking_enabled && (
+                  <TrackingPanel clientId={clientData.id} posts={[...readyPosts, ...entradaPosts]} />
+                )}
               </div>
             )}
           </>
