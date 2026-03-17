@@ -444,6 +444,7 @@ const en: TranslationKeys = {
   signOut: "Sign out",
   confirmDeleteClient: "Are you sure you want to delete this client?",
   noColumn: "No column",
+  columnLabel: "Column",
   columnName: "Column name",
   cancel: "Cancel",
   newColumn: "New column",
