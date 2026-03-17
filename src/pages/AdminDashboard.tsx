@@ -569,13 +569,13 @@ const AdminDashboard = () => {
 
         {/* Client created post notifications */}
         {clientCreatedNotifs.length > 0 && (
-          <div className="rounded-xl border bg-card p-4">
+          <div className="rounded-xl border border-violet-400/30 bg-violet-500/5 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20">
-                <FilePlus className="h-4 w-4 text-accent-foreground" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/20">
+                <FilePlus className="h-4 w-4 text-violet-500" />
               </div>
               <h2 className="font-semibold text-foreground">Posts Criados pelo Cliente</h2>
-              <span className="rounded-full bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent-foreground">
+              <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-xs font-semibold text-violet-500">
                 {clientCreatedNotifs.length}
               </span>
             </div>
