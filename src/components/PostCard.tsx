@@ -239,6 +239,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, tracki
               {t(LABEL_KEYS[post.clientLabel])}
             </span>
           </div>
+          <PostTrackingLabels postId={post.id} clientId={clientId} isAdmin={isAdmin} />
         )}
 
         {!isAdmin && !hideFeedback && (
