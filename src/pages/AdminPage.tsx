@@ -233,12 +233,8 @@ const KanbanBoard = ({
                   )}
                 </DroppableColumn>
               </SortableContext>
-              <button
-                onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
-                className="mt-3 flex w-full items-center justify-center gap-1 rounded-lg border-2 border-dashed border-muted-foreground/30 py-2 text-xs text-muted-foreground hover:border-accent hover:text-accent transition-colors"
-              >
-                <Plus className="h-3.5 w-3.5" /> Adicionar post
-              </button>
+
+
             </div>
           );
         })}
