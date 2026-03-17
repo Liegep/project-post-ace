@@ -31,6 +31,8 @@ const App = () => (
             <Route path="/" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
             <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
             <Route path="/admin/:slug" element={<AuthGuard><AdminPage /></AuthGuard>} />
+            <Route path="/social" element={<AuthGuard><SocialDashboard /></AuthGuard>} />
+            <Route path="/social/callback" element={<SocialCallbackPage />} />
             <Route path="/client/:slug" element={<ClientPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
