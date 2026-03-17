@@ -103,16 +103,19 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       setPosts((postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || [])));
       
-      // Seed default tags if none exist for this client
+      // Ensure all default tags exist for this client, even for older clients seeded before new tags were added
       const dbTags = tagsRes.data || [];
-      if (dbTags.length === 0) {
-        const { DEFAULT_TAGS } = await import("@/types/post");
-        const seededTags = DEFAULT_TAGS.map((t) => ({ ...t, client_id: clientId }));
-        await supabase.from("tags").insert(seededTags as any);
-        setTags(DEFAULT_TAGS);
-      } else {
-        setTags(dbTags.map((t: any) => ({ id: t.id, name: t.name, color: t.color })));
+      const { DEFAULT_TAGS } = await import("@/types/post");
+      const existingTagIds = new Set(dbTags.map((tag: any) => tag.id));
+      const missingDefaultTags = DEFAULT_TAGS.filter((tag) => !existingTagIds.has(tag.id));
+
+      if (missingDefaultTags.length > 0) {
+        const tagsToInsert = missingDefaultTags.map((tag) => ({ ...tag, client_id: clientId }));
+        await supabase.from("tags").insert(tagsToInsert as any);
       }
+
+      const mergedTags = [...dbTags.map((t: any) => ({ id: t.id, name: t.name, color: t.color })), ...missingDefaultTags];
+      setTags(mergedTags);
       
       setColumns((columnsRes.data || []).map((c: any) => ({ id: c.id, clientId: c.client_id, name: c.name, position: c.position, visibleToClient: c.visible_to_client ?? false })));
       setLoading(false);
