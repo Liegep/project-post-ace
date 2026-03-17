@@ -1024,7 +1024,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               </p>
             </div>
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              ⚠️ A sincronização substituirá todas as colunas e posts existentes deste cliente.
+              {t("trelloSyncWarning")}
             </div>
             <Button
               onClick={handleTrelloSync}
