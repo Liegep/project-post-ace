@@ -192,6 +192,7 @@ const en: TranslationKeys = {
   tagAltered: "Altered",
   tagScheduled: "Scheduled",
   tagPublished: "Published",
+  tagChangeRequested: "Change Requested",
   media: "Media",
   clickToSelectMedia: "Click to select image or video",
   postingPeriod: "Posting Period",
