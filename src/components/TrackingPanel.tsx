@@ -65,12 +65,12 @@ function SortableItem({ post, isEntrada, tags }: { post: Post; isEntrada: boolea
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex flex-col gap-1 rounded-lg border-2 px-2 py-2",
-        isDone && "border-success/20 bg-success/5",
-        isDev && "border-warning/20 bg-warning/5",
-        isChangeRequested && "border-destructive/20 bg-destructive/5",
+        "flex flex-col gap-1.5 rounded-xl border-2 px-3 py-2.5 shadow-sm",
+        isDone && "border-success/30 bg-success/5",
+        isDev && "border-warning/30 bg-warning/5",
+        isChangeRequested && "border-destructive/30 bg-destructive/5",
         isEntrada && !isDone && !isDev && !isChangeRequested && "border-red-400 bg-red-50 dark:bg-red-950/30 dark:border-red-600",
-        !isDone && !isDev && !isEntrada && !isChangeRequested && "border-transparent bg-card"
+        !isDone && !isDev && !isEntrada && !isChangeRequested && "border-border bg-card"
       )}
     >
       <div className="flex items-center gap-1">
