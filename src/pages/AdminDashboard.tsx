@@ -77,6 +77,7 @@ const AdminDashboard = () => {
     fetchClients();
     fetchFeedbacks();
     fetchUnarchiveNotifs();
+    fetchClientCreatedNotifs();
   }, []);
 
   const fetchClients = async () => {
