@@ -746,6 +746,7 @@ const es: TranslationKeys = {
   signOut: "Salir",
   confirmDeleteClient: "¿Estás seguro de que quieres eliminar este cliente?",
   noColumn: "Sin columna",
+  columnLabel: "Columna",
   columnName: "Nombre de columna",
   cancel: "Cancelar",
   newColumn: "Nueva columna",
