@@ -45,17 +45,26 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-1.5">
-        {tags.filter((tag) => selectedTagIds.includes(tag.id)).map((tag) => {
+      {tags.map((tag) => {
+          const selected = selectedTagIds.includes(tag.id);
           const translationKey = TAG_TRANSLATION_KEYS[tag.id];
           const displayName = translationKey ? t(translationKey) : tag.name;
           return (
-            <span
+            <button
               key={tag.id}
-              className="inline-flex rounded-full px-2.5 py-1 text-xs font-medium"
-              style={{ backgroundColor: tag.color, color: "#fff" }}
+              type="button"
+              onClick={(e) => { e.stopPropagation(); toggleTag(tag.id); }}
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all cursor-pointer"
+              style={{
+                backgroundColor: selected ? tag.color : "transparent",
+                border: `1.5px solid ${tag.color}`,
+                color: selected ? "#fff" : tag.color,
+                opacity: selected ? 1 : 0.6,
+              }}
             >
+              {selected && <Check className="h-3 w-3" />}
               {displayName}
-            </span>
+            </button>
           );
         })}
 
