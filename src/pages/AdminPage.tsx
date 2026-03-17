@@ -453,6 +453,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     await supabase.from("clients").update({ allow_client_edit_caption: checked } as any).eq("id", clientData.id);
   };
 
+  const toggleAllowClientCreatePost = async (checked: boolean) => {
+    setAllowClientCreatePost(checked);
+    await supabase.from("clients").update({ allow_client_create_post: checked } as any).eq("id", clientData.id);
+  };
+
   const enableTracking = async () => {
     // Create default steps
     const defaultSteps = [
