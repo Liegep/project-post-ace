@@ -737,16 +737,31 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </div>
           )}
           {activeTab === "board" && (
-            <div className="flex items-center gap-2 ml-3">
-              <Switch
-                id="allow-client-edit-caption"
-                checked={allowClientEditCaption}
-                onCheckedChange={toggleAllowClientEditCaption}
-              />
-              <label htmlFor="allow-client-edit-caption" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
-                <Pencil className="h-3.5 w-3.5" />
-                {allowClientEditCaption ? "Cliente pode editar legenda" : "Cliente não edita legenda"}
-              </label>
+            <div className="flex items-center gap-4 ml-3">
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="allow-client-edit-caption"
+                  checked={allowClientEditCaption}
+                  onCheckedChange={toggleAllowClientEditCaption}
+                />
+                <label htmlFor="allow-client-edit-caption" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                  <Pencil className="h-3.5 w-3.5" />
+                  {allowClientEditCaption ? "Cliente pode editar legenda" : "Cliente não edita legenda"}
+                </label>
+              </div>
+              {trackingEnabled && (
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="tracking-toggle"
+                    checked={trackingEnabled}
+                    onCheckedChange={(checked) => { if (!checked) disableTracking(); }}
+                  />
+                  <label htmlFor="tracking-toggle" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                    <ClipboardList className="h-3.5 w-3.5" />
+                    Acompanhamento ativo
+                  </label>
+                </div>
+              )}
             </div>
           )}
         </div>
