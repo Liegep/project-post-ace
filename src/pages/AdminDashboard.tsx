@@ -72,6 +72,39 @@ const AdminDashboard = () => {
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSaving, setPasswordSaving] = useState(false);
+
+  const handleChangePassword = async () => {
+    setPasswordError("");
+    if (newPassword.length < 6) {
+      setPasswordError("A senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError("As senhas não coincidem");
+      return;
+    }
+    setPasswordSaving(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        setPasswordError("Erro ao atualizar senha");
+        return;
+      }
+      toast({ title: "Senha atualizada com sucesso!" });
+      setChangePasswordOpen(false);
+      setNewPassword("");
+      setConfirmNewPassword("");
+    } catch {
+      setPasswordError("Erro ao atualizar senha");
+    } finally {
+      setPasswordSaving(false);
+    }
+  };
 
   useEffect(() => {
     fetchClients();
