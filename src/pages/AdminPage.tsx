@@ -992,7 +992,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </Button>
           )}
           <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={handleBulkDelete}>
-            <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Excluir
+            <Trash2 className="mr-1.5 h-3.5 w-3.5" /> {t("deleteAction")}
           </Button>
           <div className="h-6 w-px bg-border" />
           <Button size="sm" variant="ghost" onClick={exitSelectionMode}>
