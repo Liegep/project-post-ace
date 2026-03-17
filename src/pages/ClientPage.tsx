@@ -46,6 +46,13 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
     ? posts.filter((p) => p.columnId === entradaColumn.id && p.status === "em_desenvolvimento")
     : [];
 
+  // Columns explicitly visible to client (excluding entrada which has its own section)
+  const visibleColumns = columns.filter((c) => c.visibleToClient && c.id !== entradaColumn?.id);
+  const visibleColumnPosts = visibleColumns.map((col) => ({
+    column: col,
+    posts: posts.filter((p) => p.columnId === col.id),
+  })).filter((g) => g.posts.length > 0);
+
   const sortByDate = (list: typeof posts) =>
     [...list].sort((a, b) => {
       const dateA = a.deadline ? new Date(a.deadline).getTime() : 0;
@@ -53,7 +60,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
       return dateA - dateB;
     });
 
-  const hasContent = readyPosts.length > 0 || entradaPosts.length > 0;
+  const hasContent = readyPosts.length > 0 || entradaPosts.length > 0 || visibleColumnPosts.length > 0;
 
   const groupedArchived = archivedPosts.reduce<Record<string, typeof archivedPosts>>((acc, post) => {
     const date = post.archivedAt || post.createdAt;
