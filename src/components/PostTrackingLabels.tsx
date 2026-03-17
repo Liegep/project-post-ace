@@ -27,8 +27,15 @@ export const PostTrackingLabels = ({ postId, clientId, isAdmin = false }: PostTr
   useEffect(() => {
     const load = async () => {
       if (!stepsCache[clientId]) {
-        const { data } = await supabase.from("tracking_steps").select("*").eq("client_id", clientId).order("position");
-        stepsCache[clientId] = (data || []).map((s: any) => ({ id: s.id, name: s.name, color: s.color, position: s.position }));
+        if (!stepsFetching[clientId]) {
+          stepsFetching[clientId] = supabase.from("tracking_steps").select("*").eq("client_id", clientId).order("position")
+            .then(({ data }) => {
+              const steps = (data || []).map((s: any) => ({ id: s.id, name: s.name, color: s.color, position: s.position }));
+              stepsCache[clientId] = steps;
+              return steps;
+            });
+        }
+        await stepsFetching[clientId];
       }
       setSteps(stepsCache[clientId]);
 
