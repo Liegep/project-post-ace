@@ -1,4 +1,4 @@
-import { Post } from "@/types/post";
+import { Post, Tag, TAG_TRANSLATION_KEYS } from "@/types/post";
 import { Badge } from "@/components/ui/badge";
 import { Check, Circle, Eye, EyeOff, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
