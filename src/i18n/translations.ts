@@ -214,6 +214,7 @@ const it: TranslationKeys = {
   statusWritingCaption: "Scrittura Didascalia",
   statusReady: "Pronto",
   statusFinalized: "Finalizzato",
+  statusChangeRequested: "Modifica Richiesta",
   labelPending: "In Attesa",
   labelApproved: "Approvato",
   labelChangeRequested: "Modifica Richiesta",
