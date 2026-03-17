@@ -398,7 +398,7 @@ const AdminDashboard = () => {
           <div className="flex items-center gap-3">
             <LanguageSelector />
             <Button variant="outline" size="sm" onClick={() => navigate("/social")}>
-              <CalendarClock className="mr-1 h-4 w-4" /> Social
+              <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
             </Button>
             <Button variant="outline" size="sm" onClick={() => setChangePasswordOpen(true)}>
               <KeyRound className="mr-1 h-4 w-4" /> Senha
