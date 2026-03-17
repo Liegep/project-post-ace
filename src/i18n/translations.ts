@@ -135,6 +135,7 @@ type TranslationKeys = {
   confirmDeleteClient: string;
   // Admin Page (Kanban)
   noColumn: string;
+  columnLabel: string;
   columnName: string;
   cancel: string;
   newColumn: string;
