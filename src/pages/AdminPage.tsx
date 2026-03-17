@@ -659,7 +659,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   };
 
   const handleDeleteColumn = (id: string) => {
-    if (!confirm("Excluir esta coluna? Os posts serão movidos para 'Sem coluna'.")) return;
+    if (!confirm(t("deleteColumnConfirm"))) return;
     deleteColumn(id);
   };
 
