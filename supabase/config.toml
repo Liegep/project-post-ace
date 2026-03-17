@@ -5,3 +5,12 @@ verify_jwt = false
 
 [functions.bootstrap-admin]
 verify_jwt = false
+
+[functions.meta-auth]
+verify_jwt = false
+
+[functions.social-publish]
+verify_jwt = false
+
+[functions.social-scheduler]
+verify_jwt = false
