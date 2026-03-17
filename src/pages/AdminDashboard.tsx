@@ -781,7 +781,7 @@ const AdminDashboard = () => {
       <Dialog open={changePasswordOpen} onOpenChange={(open) => { setChangePasswordOpen(open); if (!open) { setNewPassword(""); setConfirmNewPassword(""); setPasswordError(""); } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Alterar Senha</DialogTitle>
+            <DialogTitle>{t("changePassword")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
