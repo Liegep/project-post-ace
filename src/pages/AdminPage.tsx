@@ -948,6 +948,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             selectionMode={selectionMode}
             selectedPostIds={selectedPostIds}
             onToggleSelect={toggleSelect}
+            t={t}
           />
         )}
       </main>
