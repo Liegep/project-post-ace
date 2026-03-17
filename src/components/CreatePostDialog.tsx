@@ -130,7 +130,10 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: Create
             />
           </div>
           <div>
-            <Label htmlFor="caption">{t("caption")}</Label>
+            <div className="flex items-center justify-between mb-1">
+              <Label htmlFor="caption">{t("caption")}</Label>
+              <HashtagManager clientId={clientId} onInsert={(h) => setCaption((prev) => prev ? `${prev}\n\n${h}` : h)} />
+            </div>
             <Textarea id="caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("captionPlaceholder")} className="min-h-[100px]" />
           </div>
           <div className="grid grid-cols-2 gap-4">
