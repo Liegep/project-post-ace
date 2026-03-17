@@ -26,6 +26,7 @@ interface TrackingPanelProps {
   clientId: string;
   posts: Post[];
   columns?: { id: string; name: string }[];
+  tags?: Tag[];
   isAdmin?: boolean;
   visibleToClient?: boolean;
   onToggleVisibility?: (visible: boolean) => void;
