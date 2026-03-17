@@ -167,7 +167,9 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                             </div>
                             <div className="space-y-4">
                               {sortByDate(colPosts).map((post) => (
-                                <PostCard key={post.id} post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                                <div key={post.id} className="cursor-pointer" onClick={() => setDetailPost(post)}>
+                                  <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                                </div>
                               ))}
                             </div>
                           </div>
