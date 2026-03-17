@@ -2,3 +2,6 @@ project_id = "cidoydrpqzpiqewultok"
 
 [functions.accept-admin-invite]
 verify_jwt = false
+
+[functions.bootstrap-admin]
+verify_jwt = false
