@@ -543,7 +543,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     }
     await supabase.from("clients").update({ tracking_enabled: true } as any).eq("id", clientData.id);
     setTrackingEnabled(true);
-    toast({ title: "Acompanhamento criado!", description: "A coluna de acompanhamento foi adicionada ao quadro." });
+    toast({ title: t("trackingCreated"), description: t("trackingCreatedDesc") });
   };
 
   const disableTracking = async () => {
