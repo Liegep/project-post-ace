@@ -90,13 +90,15 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
   );
 };
 
-export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
+export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags } = usePosts();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [mediaIndex, setMediaIndex] = useState(0);
   const [localMediaOrder, setLocalMediaOrder] = useState<string[] | null>(null);
+  const [editingCaption, setEditingCaption] = useState(false);
+  const [captionDraft, setCaptionDraft] = useState(post.caption);
 
   const baseMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
   const allMedia = localMediaOrder || baseMedia;
