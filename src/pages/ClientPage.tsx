@@ -146,6 +146,10 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
 
             <div className="flex flex-col lg:flex-row gap-6">
+              {clientData.tracking_enabled && clientData.tracking_visible_to_client && (
+                <TrackingPanel clientId={clientData.id} posts={posts} columns={columns} />
+              )}
+
               <div className="flex-1 min-w-0 space-y-8">
                 {hasContent ? (
                   <>
@@ -195,10 +199,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                   <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
                 )}
               </div>
-
-              {clientData.tracking_enabled && clientData.tracking_visible_to_client && (
-                <TrackingPanel clientId={clientData.id} posts={posts} columns={columns} />
-              )}
             </div>
           </>
         ) : (
