@@ -757,7 +757,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </Button>
             {!trackingEnabled && (
               <Button variant="outline" onClick={enableTracking}>
-                <ClipboardList className="mr-2 h-4 w-4" /> Criar Acompanhamento
+                <ClipboardList className="mr-2 h-4 w-4" /> {t("createTracking")}
               </Button>
             )}
             <Button variant="outline" onClick={() => setTrelloSyncOpen(true)}>
