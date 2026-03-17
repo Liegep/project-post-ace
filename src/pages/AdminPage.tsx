@@ -344,7 +344,7 @@ const KanbanBoard = ({
                   if (e.key === "Enter") handleAddColumn();
                   if (e.key === "Escape") { setNewColumnName(""); setAddingColumn(false); }
                 }}
-                placeholder="Nome da coluna"
+                placeholder={t("columnName")}
                 className="mb-2"
               />
               <div className="flex gap-2">
