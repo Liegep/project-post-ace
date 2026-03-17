@@ -162,11 +162,11 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               <Input id="edit-deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
             </div>
             <div>
-              <Label>Coluna</Label>
+              <Label>{t("caption") === "Legenda" ? "Coluna" : "Column"}</Label>
               <Select value={columnId ?? "none"} onValueChange={(v) => setColumnId(v === "none" ? null : v)}>
-                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">Sem coluna</SelectItem>
+                  <SelectItem value="none">{t("noPosts") === "Nenhum post" ? "Sem coluna" : "No column"}</SelectItem>
                   {columns.map((col) => (
                     <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
                   ))}
