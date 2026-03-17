@@ -16,11 +16,12 @@ interface CreatePostDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   defaultColumnId?: string | null;
+  clientCreated?: boolean;
 }
 
 let mediaIdCounter = 0;
 
-export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: CreatePostDialogProps) => {
+export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCreated }: CreatePostDialogProps) => {
   const { addPost, uploadMedia, columns, clientId } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
@@ -93,6 +94,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: Create
         status,
         tags: selectedTags,
         columnId,
+        clientCreated: clientCreated || false,
       });
 
       setTitle("");

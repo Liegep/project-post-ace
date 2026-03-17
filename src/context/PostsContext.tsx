@@ -13,7 +13,7 @@ interface PostsContextType {
   companyLogo: string;
   setPostingPeriod: (period: string) => void;
   setCompanyLogo: (url: string) => void;
-  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date }) => void;
+  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date; clientCreated?: boolean }) => void;
   updatePostStatus: (id: string, status: PostStatus) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
   addComment: (postId: string, author: string, text: string) => void;
@@ -113,7 +113,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("clients").update({ posting_period: period } as any).eq("id", clientId);
   }, [clientId]);
 
-  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date }) => {
+  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date; clientCreated?: boolean }) => {
     const insertData: Record<string, any> = {
       title: post.title,
       image_url: post.imageUrl || '',
@@ -127,6 +127,9 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     };
     if (post.deadline) {
       insertData.deadline = post.deadline.toISOString();
+    }
+    if (post.clientCreated) {
+      insertData.client_created_at = new Date().toISOString();
     }
     const { data, error } = await supabase.from("posts").insert(insertData as any).select().single();
     if (data && !error) {

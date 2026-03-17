@@ -234,6 +234,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           open={createOpen}
           onOpenChange={setCreateOpen}
           defaultColumnId={createInColumnId}
+          clientCreated
         />
       )}
     </div>
