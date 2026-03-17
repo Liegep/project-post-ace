@@ -264,8 +264,22 @@ const AdminDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
+            <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}>
+              <UserPlus className="mr-1 h-4 w-4" /> Convidar
+            </Button>
             <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> Novo Cliente
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                navigate("/login");
+              }}
+              title="Sair"
+            >
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
