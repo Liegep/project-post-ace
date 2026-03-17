@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/AdminDashboard.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
 import ClientPage from "./pages/ClientPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
+import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import AcceptInvitePage from "./pages/AcceptInvitePage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
