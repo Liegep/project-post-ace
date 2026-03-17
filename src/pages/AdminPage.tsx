@@ -452,6 +452,34 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     await supabase.from("clients").update({ allow_client_edit_caption: checked } as any).eq("id", clientData.id);
   };
 
+  const enableTracking = async () => {
+    // Create default steps
+    const defaultSteps = [
+      { name: "Roteiro", color: "#6366f1" },
+      { name: "Design / Arte", color: "#f59e0b" },
+      { name: "Legenda", color: "#3b82f6" },
+      { name: "Revisão", color: "#8b5cf6" },
+      { name: "Agendado", color: "#06b6d4" },
+      { name: "Publicado", color: "#22c55e" },
+    ];
+    for (let i = 0; i < defaultSteps.length; i++) {
+      await supabase.from("tracking_steps").insert({
+        client_id: clientData.id,
+        name: defaultSteps[i].name,
+        color: defaultSteps[i].color,
+        position: i,
+      } as any);
+    }
+    await supabase.from("clients").update({ tracking_enabled: true } as any).eq("id", clientData.id);
+    setTrackingEnabled(true);
+    toast({ title: "Acompanhamento criado!", description: "A coluna de acompanhamento foi adicionada ao quadro." });
+  };
+
+  const disableTracking = async () => {
+    await supabase.from("clients").update({ tracking_enabled: false } as any).eq("id", clientData.id);
+    setTrackingEnabled(false);
+  };
+
   const toggleSelect = (id: string) => {
     setSelectedPostIds((prev) => {
       const next = new Set(prev);
