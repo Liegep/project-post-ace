@@ -393,7 +393,7 @@ const AdminDashboard = () => {
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">ContentFlow</h1>
-            <p className="text-sm text-muted-foreground">Selecione ou crie um cliente</p>
+            <p className="text-sm text-muted-foreground">{t("selectOrCreateClient")}</p>
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
