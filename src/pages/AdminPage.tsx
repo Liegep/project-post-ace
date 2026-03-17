@@ -828,7 +828,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 />
                 <label htmlFor="allow-client-create-post" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
                   <Plus className="h-3.5 w-3.5" />
-                  {allowClientCreatePost ? "Cliente pode criar posts" : "Cliente não cria posts"}
+                  {allowClientCreatePost ? t("clientCanCreatePosts") : t("clientCannotCreatePosts")}
                 </label>
               </div>
               {trackingEnabled && (
