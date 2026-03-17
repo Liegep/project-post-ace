@@ -1008,7 +1008,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       <Dialog open={trelloSyncOpen} onOpenChange={setTrelloSyncOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Sincronizar com Trello</DialogTitle>
+            <DialogTitle>{t("syncWithTrello")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
