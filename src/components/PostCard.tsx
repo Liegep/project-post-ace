@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
+import { PostTrackingLabels } from "@/components/PostTrackingLabels";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
@@ -91,7 +92,7 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
 };
 
 export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
-  const { addComment, updateClientLabel, updatePost, tags } = usePosts();
+  const { addComment, updateClientLabel, updatePost, tags, clientId } = usePosts();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -229,14 +230,17 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
 
       <div className={`px-4 space-y-2 ${isCompact ? "pb-3 pt-1" : "p-4 pt-3"}`}>
         {!hasMedia && (
-          <div className="flex items-center gap-1.5">
-            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusConfig.color}`}>
-              {t(STATUS_KEYS[post.status])}
-            </span>
-            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
-              {t(LABEL_KEYS[post.clientLabel])}
-            </span>
-          </div>
+          <>
+            <div className="flex items-center gap-1.5">
+              <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusConfig.color}`}>
+                {t(STATUS_KEYS[post.status])}
+              </span>
+              <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
+                {t(LABEL_KEYS[post.clientLabel])}
+              </span>
+            </div>
+            <PostTrackingLabels postId={post.id} clientId={clientId} isAdmin={isAdmin} />
+          </>
         )}
 
         {!isAdmin && !hideFeedback && (
@@ -254,6 +258,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
             ) : (
               <TagDisplay tagIds={post.tags} tags={tags} />
             )}
+            <PostTrackingLabels postId={post.id} clientId={clientId} isAdmin={isAdmin} />
             {post.caption && (
               isAdmin ? (
                 <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
