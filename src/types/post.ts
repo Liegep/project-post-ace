@@ -50,13 +50,15 @@ export const DEFAULT_TAGS: Tag[] = [
   { id: "alterado", name: "Alterado", color: "#f59e0b" },
   { id: "agendado", name: "Agendado", color: "#8b5cf6" },
   { id: "publicado", name: "Publicado", color: "#22c55e" },
+  { id: "alteracao_solicitada", name: "Alteração Solicitada", color: "#ef4444" },
 ];
 
-export const TAG_TRANSLATION_KEYS: Record<string, "tagSEO" | "tagAltered" | "tagScheduled" | "tagPublished"> = {
+export const TAG_TRANSLATION_KEYS: Record<string, "tagSEO" | "tagAltered" | "tagScheduled" | "tagPublished" | "tagChangeRequested"> = {
   seo: "tagSEO",
   alterado: "tagAltered",
   agendado: "tagScheduled",
   publicado: "tagPublished",
+  alteracao_solicitada: "tagChangeRequested",
 };
 
 export const STATUS_CONFIG: Record<PostStatus, { label: string; color: string }> = {

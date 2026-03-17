@@ -74,6 +74,7 @@ type TranslationKeys = {
   tagAltered: string;
   tagScheduled: string;
   tagPublished: string;
+  tagChangeRequested: string;
   // Media
   media: string;
   clickToSelectMedia: string;
@@ -134,6 +135,7 @@ const pt: TranslationKeys = {
   tagAltered: "Alterado",
   tagScheduled: "Agendado",
   tagPublished: "Publicado",
+  tagChangeRequested: "Alteração Solicitada",
   media: "Mídia",
   clickToSelectMedia: "Clique para selecionar imagem ou vídeo",
   postingPeriod: "Período de Postagem",
@@ -190,6 +192,7 @@ const en: TranslationKeys = {
   tagAltered: "Altered",
   tagScheduled: "Scheduled",
   tagPublished: "Published",
+  tagChangeRequested: "Change Requested",
   media: "Media",
   clickToSelectMedia: "Click to select image or video",
   postingPeriod: "Posting Period",
@@ -246,6 +249,7 @@ const it: TranslationKeys = {
   tagAltered: "Modificato",
   tagScheduled: "Programmato",
   tagPublished: "Pubblicato",
+  tagChangeRequested: "Modifica Richiesta",
   media: "Media",
   clickToSelectMedia: "Clicca per selezionare immagine o video",
   postingPeriod: "Periodo di Pubblicazione",
@@ -302,6 +306,7 @@ const es: TranslationKeys = {
   tagAltered: "Alterado",
   tagScheduled: "Programado",
   tagPublished: "Publicado",
+  tagChangeRequested: "Alteración Solicitada",
   media: "Medios",
   clickToSelectMedia: "Haz clic para seleccionar imagen o video",
   postingPeriod: "Período de Publicación",
@@ -358,6 +363,7 @@ const sv: TranslationKeys = {
   tagAltered: "Ändrad",
   tagScheduled: "Schemalagd",
   tagPublished: "Publicerad",
+  tagChangeRequested: "Ändring Begärd",
   media: "Media",
   clickToSelectMedia: "Klicka för att välja bild eller video",
   postingPeriod: "Publiceringsperiod",
