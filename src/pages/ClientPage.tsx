@@ -195,7 +195,9 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                         {readyPosts.length > 0 && (
                           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             {sortByDate(readyPosts).map((post) => (
-                              <PostCard key={post.id} post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                              <div key={post.id} className="cursor-pointer" onClick={() => setDetailPost(post)}>
+                                <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                              </div>
                             ))}
                           </div>
                         )}
