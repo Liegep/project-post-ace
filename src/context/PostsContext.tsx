@@ -87,10 +87,13 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (!clientId) return;
     const fetchAll = async () => {
       setLoading(true);
+      const { DEFAULT_TAGS } = await import("@/types/post");
+      const defaultTagIds = DEFAULT_TAGS.map((tag) => tag.id);
+
       const [postsRes, commentsRes, tagsRes, columnsRes] = await Promise.all([
         supabase.from("posts").select("*").eq("client_id", clientId).order("position", { ascending: true }).order("created_at", { ascending: false }),
         supabase.from("comments").select("*").order("created_at", { ascending: true }),
-        supabase.from("tags").select("*").eq("client_id", clientId),
+        supabase.from("tags").select("*").or(`client_id.eq.${clientId},id.in.(${defaultTagIds.join(",")})`),
         supabase.from("columns").select("*").eq("client_id", clientId).order("position", { ascending: true }),
       ]);
 
@@ -103,19 +106,16 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       setPosts((postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || [])));
       
-      // Ensure all default tags exist for this client, even for older clients seeded before new tags were added
       const dbTags = tagsRes.data || [];
-      const { DEFAULT_TAGS } = await import("@/types/post");
-      const existingTagIds = new Set(dbTags.map((tag: any) => tag.id));
-      const missingDefaultTags = DEFAULT_TAGS.filter((tag) => !existingTagIds.has(tag.id));
+      const dbTagIds = new Set(dbTags.map((tag: any) => tag.id));
+      const missingDefaultTags = DEFAULT_TAGS.filter((tag) => !dbTagIds.has(tag.id));
 
       if (missingDefaultTags.length > 0) {
-        const tagsToInsert = missingDefaultTags.map((tag) => ({ ...tag, client_id: clientId }));
+        const tagsToInsert = missingDefaultTags.map((tag) => ({ ...tag, client_id: null }));
         await supabase.from("tags").insert(tagsToInsert as any);
       }
 
-      const mergedTags = [...dbTags.map((t: any) => ({ id: t.id, name: t.name, color: t.color })), ...missingDefaultTags];
-      setTags(mergedTags);
+      setTags([...dbTags.map((t: any) => ({ id: t.id, name: t.name, color: t.color })), ...missingDefaultTags]);
       
       setColumns((columnsRes.data || []).map((c: any) => ({ id: c.id, clientId: c.client_id, name: c.name, position: c.position, visibleToClient: c.visible_to_client ?? false })));
       setLoading(false);
