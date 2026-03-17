@@ -98,6 +98,7 @@ const pt: TranslationKeys = {
   statusWritingCaption: "Escrevendo Legenda",
   statusReady: "Pronto",
   statusFinalized: "Finalizado",
+  statusChangeRequested: "Alteração Solicitada",
   labelPending: "Pendente",
   labelApproved: "Aprovado",
   labelChangeRequested: "Alteração Solicitada",
