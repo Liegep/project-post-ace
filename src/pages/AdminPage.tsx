@@ -803,7 +803,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               />
               <label htmlFor="show-archived-client" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
                 {showArchivedToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
-                {showArchivedToClient ? "Visível para o cliente" : "Oculto do cliente"}
+                {showArchivedToClient ? t("visibleToClient") : t("hiddenFromClient")}
               </label>
             </div>
           )}
