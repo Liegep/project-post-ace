@@ -770,7 +770,7 @@ const AdminDashboard = () => {
               disabled={saving || !name || !slug}
               className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
             >
-              {saving ? "..." : editingClient ? "Salvar" : "Criar Cliente"}
+              {saving ? "..." : editingClient ? t("save") : t("createClient")}
             </Button>
           </div>
         </DialogContent>
