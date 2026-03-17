@@ -455,7 +455,7 @@ const AdminDashboard = () => {
                     <p className="text-sm font-medium text-foreground truncate">{p.postTitle}</p>
                     <p className="text-xs text-muted-foreground">{p.clientName}</p>
                   </div>
-                  <span className="shrink-0 inline-flex rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                  <span className="shrink-0 inline-flex rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-semibold text-blue-500">
                     {new Date(p.deadline).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </div>
