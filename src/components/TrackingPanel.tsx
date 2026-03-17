@@ -216,7 +216,7 @@ export const TrackingPanel = ({ clientId, posts, columns = [], tags = [], isAdmi
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={allIds} strategy={verticalListSortingStrategy}>
               {orderedPosts.map((post) => (
-                <SortableItem key={post.id} post={post} isEntrada={isEntrada(post)} />
+                <SortableItem key={post.id} post={post} isEntrada={isEntrada(post)} tags={tags} />
               ))}
             </SortableContext>
           </DndContext>
