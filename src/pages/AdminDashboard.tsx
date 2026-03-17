@@ -789,8 +789,8 @@ const AdminDashboard = () => {
               <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t("minChars")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmNewPassword">Confirmar nova senha</Label>
-              <Input id="confirmNewPassword" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} placeholder="Repita a senha" />
+              <Label htmlFor="confirmNewPassword">{t("confirmNewPassword")}</Label>
+              <Input id="confirmNewPassword" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} placeholder={t("repeatPassword")} />
             </div>
             {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
             <Button onClick={handleChangePassword} disabled={passwordSaving} className="w-full">
