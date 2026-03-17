@@ -1,0 +1,1 @@
+ALTER TABLE public.columns ADD COLUMN visible_to_client boolean NOT NULL DEFAULT false;
