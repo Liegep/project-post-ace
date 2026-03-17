@@ -95,7 +95,7 @@ const AdminDashboard = () => {
       return;
     }
     if (newPassword !== confirmNewPassword) {
-      setPasswordError("As senhas não coincidem");
+      setPasswordError(t("passwordMismatch"));
       return;
     }
     setPasswordSaving(true);
