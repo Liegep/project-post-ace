@@ -2,6 +2,7 @@ import { Post } from "@/types/post";
 import { Badge } from "@/components/ui/badge";
 import { Check, Circle, Eye, EyeOff, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 import {
   DndContext,
   closestCenter,
@@ -19,7 +20,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface TrackingPanelProps {
   clientId: string;
@@ -28,7 +29,6 @@ interface TrackingPanelProps {
   isAdmin?: boolean;
   visibleToClient?: boolean;
   onToggleVisibility?: (visible: boolean) => void;
-  onReorderPosts?: (orderedIds: string[]) => void;
 }
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
@@ -88,23 +88,53 @@ function SortableItem({ post, isEntrada }: { post: Post; isEntrada: boolean }) {
   );
 }
 
-export const TrackingPanel = ({ clientId, posts, columns = [], isAdmin = false, visibleToClient, onToggleVisibility, onReorderPosts }: TrackingPanelProps) => {
-  const [orderedPosts, setOrderedPosts] = useState<Post[]>(posts);
+export const TrackingPanel = ({ clientId, posts, columns = [], isAdmin = false, visibleToClient, onToggleVisibility }: TrackingPanelProps) => {
+  const [orderedPosts, setOrderedPosts] = useState<Post[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const savedOrderRef = useRef<string[]>([]);
 
-  // Find "entrada" column ID
   const entradaColumnId = columns.find((c) => c.name.toLowerCase() === "entrada")?.id;
 
+  // Load saved order from DB
   useEffect(() => {
-    setOrderedPosts((prev) => {
-      const prevIds = new Set(prev.map((p) => p.id));
-      const newIds = new Set(posts.map((p) => p.id));
-      const kept = prev
-        .filter((p) => newIds.has(p.id))
-        .map((p) => posts.find((np) => np.id === p.id)!);
-      const added = posts.filter((p) => !prevIds.has(p.id));
-      return [...kept, ...added];
-    });
-  }, [posts]);
+    const loadOrder = async () => {
+      const { data } = await supabase
+        .from("tracking_order" as any)
+        .select("post_ids")
+        .eq("client_id", clientId)
+        .maybeSingle();
+      if (data) {
+        savedOrderRef.current = (data as any).post_ids || [];
+      }
+      setLoaded(true);
+    };
+    loadOrder();
+  }, [clientId]);
+
+  // Apply saved order to posts
+  useEffect(() => {
+    if (!loaded) return;
+    const savedIds = savedOrderRef.current;
+    if (savedIds.length > 0) {
+      const postMap = new Map(posts.map((p) => [p.id, p]));
+      // First: posts in saved order
+      const ordered: Post[] = [];
+      for (const id of savedIds) {
+        const post = postMap.get(id);
+        if (post) {
+          ordered.push(post);
+          postMap.delete(id);
+        }
+      }
+      // Then: any new posts not in saved order
+      for (const post of postMap.values()) {
+        ordered.push(post);
+      }
+      setOrderedPosts(ordered);
+    } else {
+      setOrderedPosts(posts);
+    }
+  }, [posts, loaded]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -116,6 +146,13 @@ export const TrackingPanel = ({ clientId, posts, columns = [], isAdmin = false, 
   const isEntrada = (post: Post) =>
     post.status === "entrada" || (entradaColumnId != null && post.columnId === entradaColumnId);
 
+  const saveOrder = useCallback(async (ids: string[]) => {
+    savedOrderRef.current = ids;
+    await supabase
+      .from("tracking_order" as any)
+      .upsert({ client_id: clientId, post_ids: ids, updated_at: new Date().toISOString() } as any, { onConflict: "client_id" });
+  }, [clientId]);
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -124,7 +161,7 @@ export const TrackingPanel = ({ clientId, posts, columns = [], isAdmin = false, 
       const oldIndex = prev.findIndex((p) => p.id === active.id);
       const newIndex = prev.findIndex((p) => p.id === over.id);
       const newOrder = arrayMove(prev, oldIndex, newIndex);
-      onReorderPosts?.(newOrder.map((p) => p.id));
+      saveOrder(newOrder.map((p) => p.id));
       return newOrder;
     });
   };
