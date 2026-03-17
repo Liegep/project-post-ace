@@ -687,15 +687,14 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       // Save board ID to client record
       await supabase.from("clients").update({ trello_board_id: trelloBoardId.trim() } as any).eq("id", clientData.id);
       toast({
-        title: "Sincronização concluída!",
-        description: `${result.summary.tags} etiquetas, ${result.summary.columns} colunas, ${result.summary.postsCreated ?? result.summary.posts ?? 0} posts criados, ${result.summary.postsUpdated ?? 0} posts atualizados.`,
+        title: t("syncComplete"),
+        description: `${result.summary.tags} ${t("tags")}, ${result.summary.columns} cols, ${result.summary.postsCreated ?? result.summary.posts ?? 0} posts`,
       });
       setTrelloSyncOpen(false);
-      // Reload page to refresh data
       window.location.reload();
     } catch (err: any) {
       console.error(err);
-      toast({ title: "Erro na sincronização", description: err.message, variant: "destructive" });
+      toast({ title: t("syncError"), description: err.message, variant: "destructive" });
     } finally {
       setSyncing(false);
     }
