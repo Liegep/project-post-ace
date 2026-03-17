@@ -201,6 +201,13 @@ const KanbanBoard = ({
                 )}
                 <div className="flex items-center gap-1">
                   <button
+                    onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
+                    className="rounded p-1 text-muted-foreground hover:bg-accent/10 hover:text-accent"
+                    title="Adicionar post"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </button>
+                  <button
                     onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}
                     className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                   >
