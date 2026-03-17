@@ -102,10 +102,10 @@ const AdminDashboard = () => {
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) {
-        setPasswordError("Erro ao atualizar senha");
+        setPasswordError(t("passwordUpdateError"));
         return;
       }
-      toast({ title: "Senha atualizada com sucesso!" });
+      toast({ title: t("passwordUpdated") });
       setChangePasswordOpen(false);
       setNewPassword("");
       setConfirmNewPassword("");
