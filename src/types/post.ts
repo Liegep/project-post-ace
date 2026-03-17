@@ -67,6 +67,7 @@ export const STATUS_CONFIG: Record<PostStatus, { label: string; color: string }>
   escrevendo_legenda: { label: "Escrevendo Legenda", color: "bg-warning text-warning-foreground" },
   pronto: { label: "Pronto", color: "bg-success text-success-foreground" },
   finalizado: { label: "Finalizado", color: "bg-primary text-primary-foreground" },
+  alteracao_solicitada: { label: "Alteração Solicitada", color: "bg-destructive text-destructive-foreground" },
 };
 
 export const LABEL_CONFIG: Record<ClientLabel, { label: string; color: string }> = {
