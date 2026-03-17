@@ -157,7 +157,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
               <Input id="deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
             </div>
             <div>
-              <Label>{t("noColumn").split(" ")[0] === "Sem" ? "Coluna" : t("noColumn").includes("column") ? "Column" : t("noColumn").includes("colonna") ? "Colonna" : t("noColumn").includes("columna") ? "Columna" : "Kolumn"}</Label>
+              <Label>{t("columnLabel")}</Label>
               <Select value={columnId ?? "none"} onValueChange={(v) => setColumnId(v === "none" ? null : v)}>
                 <SelectTrigger><SelectValue placeholder="..." /></SelectTrigger>
                 <SelectContent>
