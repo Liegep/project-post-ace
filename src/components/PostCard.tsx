@@ -91,7 +91,7 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
   );
 };
 
-export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, trackingEnabled, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
+export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags, clientId } = usePosts();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
