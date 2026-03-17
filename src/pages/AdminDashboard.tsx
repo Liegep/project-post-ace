@@ -110,7 +110,7 @@ const AdminDashboard = () => {
       setNewPassword("");
       setConfirmNewPassword("");
     } catch {
-      setPasswordError("Erro ao atualizar senha");
+      setPasswordError(t("passwordUpdateError"));
     } finally {
       setPasswordSaving(false);
     }
