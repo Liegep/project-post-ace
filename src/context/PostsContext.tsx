@@ -314,6 +314,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     }
   }, []);
 
+  const toggleColumnVisibility = useCallback(async (id: string, visible: boolean) => {
+    setColumns((prev) => prev.map((c) => (c.id === id ? { ...c, visibleToClient: visible } : c)));
+    await supabase.from("columns").update({ visible_to_client: visible } as any).eq("id", id);
+  }, []);
+
   const reorderPostsInColumn = useCallback(async (columnId: string | null, orderedPostIds: string[]) => {
     setPosts((prev) => {
       const updated = [...prev];
