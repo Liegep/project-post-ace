@@ -228,6 +228,14 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           </div>
         )}
       </main>
+
+      {clientData.allow_client_create_post && (
+        <CreatePostDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          defaultColumnId={createInColumnId}
+        />
+      )}
     </div>
   );
 };
