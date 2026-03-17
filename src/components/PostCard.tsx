@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Post, PostStatus, ClientLabel, STATUS_CONFIG, LABEL_CONFIG } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
 import { useI18n } from "@/i18n/I18nContext";
