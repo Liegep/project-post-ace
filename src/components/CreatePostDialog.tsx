@@ -85,7 +85,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
         }
       }
 
-      await addPost({
+      const success = await addPost({
         title,
         imageUrl: uploadedUrls[coverIndex] || uploadedUrls[0] || "",
         mediaType: mediaItems[coverIndex]?.type || mediaItems[0]?.type || "image",
@@ -97,6 +97,14 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
         columnId,
         clientCreated: clientCreated || false,
       });
+
+      if (clientCreated && success) {
+        toast({
+          title: "✅ Post enviado com sucesso!",
+          description: "Seu post foi recebido e está aguardando revisão da equipe.",
+          duration: 5000,
+        });
+      }
 
       setTitle("");
       setMediaItems([]);
