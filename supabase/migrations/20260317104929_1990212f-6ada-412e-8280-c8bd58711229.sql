@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN allow_client_edit_caption boolean NOT NULL DEFAULT false;

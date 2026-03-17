@@ -64,6 +64,7 @@ export type Database = {
       }
       clients: {
         Row: {
+          allow_client_edit_caption: boolean
           created_at: string
           id: string
           locale: string
@@ -76,6 +77,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          allow_client_edit_caption?: boolean
           created_at?: string
           id?: string
           locale?: string
@@ -88,6 +90,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          allow_client_edit_caption?: boolean
           created_at?: string
           id?: string
           locale?: string
