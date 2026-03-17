@@ -182,9 +182,39 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, []);
 
   const updateClientLabel = useCallback(async (id: string, label: ClientLabel) => {
-    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, clientLabel: label } : p)));
-    await supabase.from("posts").update({ client_label: label }).eq("id", id);
-  }, []);
+    let newColumnId: string | undefined;
+
+    // When client approves, move post to "Aprovados" column
+    if (label === "aprovado" && clientId) {
+      const { data: existingCols } = await supabase
+        .from("columns")
+        .select("id, name")
+        .eq("client_id", clientId);
+
+      const aprovadosCol = (existingCols || []).find((c: any) => c.name.toLowerCase() === "aprovados");
+      if (aprovadosCol) {
+        newColumnId = aprovadosCol.id;
+      } else {
+        // Create "Aprovados" column at the end
+        const maxPos = (existingCols || []).length;
+        const { data: newCol } = await supabase
+          .from("columns")
+          .insert({ client_id: clientId, name: "Aprovados", position: maxPos } as any)
+          .select()
+          .single();
+        if (newCol) {
+          newColumnId = (newCol as any).id;
+          setColumns((prev) => [...prev, { id: (newCol as any).id, clientId, name: "Aprovados", position: maxPos }]);
+        }
+      }
+    }
+
+    const dbUpdates: Record<string, any> = { client_label: label };
+    if (newColumnId) dbUpdates.column_id = newColumnId;
+
+    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, clientLabel: label, ...(newColumnId ? { columnId: newColumnId } : {}) } : p)));
+    await supabase.from("posts").update(dbUpdates).eq("id", id);
+  }, [clientId]);
 
   const addComment = useCallback(async (postId: string, author: string, text: string) => {
     const { data, error } = await supabase.from("comments").insert({
