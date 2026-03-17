@@ -1016,7 +1016,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               <Input
                 value={trelloBoardId}
                 onChange={(e) => setTrelloBoardId(e.target.value)}
-                placeholder="Ex: abc123def456"
+                placeholder={t("trelloBoardIdPlaceholder")}
                 onKeyDown={(e) => { if (e.key === "Enter") handleTrelloSync(); }}
               />
               <p className="mt-1 text-xs text-muted-foreground">
