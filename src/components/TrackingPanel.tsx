@@ -38,6 +38,7 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   escrevendo_legenda: { label: "Escrevendo Legenda", className: "bg-info/20 text-info border-info/30" },
   pronto: { label: "Pronto", className: "bg-primary/20 text-primary border-primary/30" },
   finalizado: { label: "Finalizado", className: "bg-success/20 text-success border-success/30" },
+  alteracao_solicitada: { label: "Alteração Solicitada", className: "bg-destructive/20 text-destructive border-destructive/30" },
 };
 
 function SortableItem({ post, isEntrada }: { post: Post; isEntrada: boolean }) {
