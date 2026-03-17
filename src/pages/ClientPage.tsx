@@ -124,7 +124,22 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               <h2 className="mb-6 text-center text-3xl font-bold text-foreground">{t("postsForApproval")}</h2>
             )}
 
-            {!hasContent && (
+            {clientData.allow_client_create_post && (
+              <div className="mb-4 flex justify-center">
+                <Button
+                  onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }}
+                  className="bg-accent text-accent-foreground hover:bg-accent/90"
+                >
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  Criar post
+                </Button>
+              </div>
+            )}
+
+            {!hasContent && !clientData.allow_client_create_post && (
+              <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
+            )}
+            {!hasContent && clientData.allow_client_create_post && (
               <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
             )}
 
