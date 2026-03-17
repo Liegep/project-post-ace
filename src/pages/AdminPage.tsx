@@ -569,7 +569,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     const ids = Array.from(selectedPostIds);
     await bulkUpdateStatus(ids, status);
     exitSelectionMode();
-    toast({ title: `${ids.length} posts atualizados` });
+    toast({ title: `${ids.length} ${t("postsUpdated")}` });
   };
 
   const handleBulkDelete = async () => {
