@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { usePosts } from "@/context/PostsContext";
 import { useI18n } from "@/i18n/I18nContext";
+import { HashtagManager } from "@/components/HashtagManager";
 import { Post, PostStatus, MediaType } from "@/types/post";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ interface EditPostDialogProps {
 let mediaIdCounter = 0;
 
 export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps) => {
-  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn } = usePosts();
+  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn, clientId } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [mediaItems, setMediaItems] = useState<SortableMediaItem[]>([]);
@@ -149,7 +150,10 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
             />
           </div>
           <div>
-            <Label htmlFor="edit-caption">{t("caption")}</Label>
+            <div className="flex items-center justify-between mb-1">
+              <Label htmlFor="edit-caption">{t("caption")}</Label>
+              <HashtagManager clientId={clientId} onInsert={(h) => setCaption((prev) => prev ? `${prev}\n\n${h}` : h)} />
+            </div>
             <Textarea id="edit-caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("captionPlaceholder")} className="min-h-[100px]" />
           </div>
           <div className="grid grid-cols-2 gap-4">

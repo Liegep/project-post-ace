@@ -168,6 +168,38 @@ export type Database = {
           },
         ]
       }
+      hashtag_groups: {
+        Row: {
+          client_id: string
+          created_at: string
+          hashtags: string[]
+          id: string
+          name: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          hashtags?: string[]
+          id?: string
+          name: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          hashtags?: string[]
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hashtag_groups_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           archived: boolean
