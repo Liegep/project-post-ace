@@ -248,13 +248,14 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
           </div>
         )}
 
+        {isAdmin ? (
+          <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
+        ) : (
+          <TagDisplay tagIds={post.tags} tags={tags} />
+        )}
+
         {!isCompact && (
           <>
-            {isAdmin ? (
-              <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
-            ) : (
-              <TagDisplay tagIds={post.tags} tags={tags} />
-            )}
             <PostTrackingLabels postId={post.id} clientId={clientId} isAdmin={isAdmin} />
             {post.caption && (
               isAdmin ? (
