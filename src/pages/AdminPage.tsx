@@ -904,6 +904,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     selectionMode={selectionMode}
                     selectedPostIds={selectedPostIds}
                     onToggleSelect={toggleSelect}
+                    reorderColumns={reorderColumns}
                   />
                 </div>
                 {trackingEnabled && (
