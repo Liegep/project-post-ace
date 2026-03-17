@@ -955,7 +955,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       {/* Floating bulk action bar */}
       {selectionMode && selectedPostIds.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl border bg-card px-5 py-3 shadow-xl">
-          <span className="text-sm font-semibold text-foreground">{selectedPostIds.size} selecionado(s)</span>
+          <span className="text-sm font-semibold text-foreground">{selectedPostIds.size} {t("selected")}</span>
           <div className="h-6 w-px bg-border" />
           {activeTab === "board" ? (
             <>
