@@ -9,9 +9,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, LogOut } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { LABEL_CONFIG } from "@/types/post";
+import InviteAdminDialog from "@/components/InviteAdminDialog";
 
 interface Client {
   id: string;
@@ -60,6 +61,7 @@ const AdminDashboard = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   useEffect(() => {
     fetchClients();
@@ -262,8 +264,22 @@ const AdminDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
+            <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}>
+              <UserPlus className="mr-1 h-4 w-4" /> Convidar
+            </Button>
             <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> Novo Cliente
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                navigate("/login");
+              }}
+              title="Sair"
+            >
+              <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -532,6 +548,8 @@ const AdminDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <InviteAdminDialog open={inviteOpen} onOpenChange={setInviteOpen} />
     </div>
   );
 };
