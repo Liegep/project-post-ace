@@ -275,6 +275,14 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           clientCreated
         />
       )}
+
+      <PostDetailDialog
+        post={detailPost}
+        open={!!detailPost}
+        onOpenChange={(v) => { if (!v) setDetailPost(null); }}
+        tags={tags}
+        t={t}
+      />
     </div>
   );
 };
