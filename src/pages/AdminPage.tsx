@@ -451,6 +451,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [allowClientEditCaption, setAllowClientEditCaption] = useState((clientData as any).allow_client_edit_caption ?? false);
   const [allowClientCreatePost, setAllowClientCreatePost] = useState((clientData as any).allow_client_create_post ?? false);
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
+  const [trackingVisibleToClient, setTrackingVisibleToClient] = useState((clientData as any).tracking_visible_to_client ?? false);
 
   const toggleShowArchivedToClient = async (checked: boolean) => {
     setShowArchivedToClient(checked);
@@ -851,7 +852,16 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   />
                 </div>
                 {trackingEnabled && (
-                  <TrackingPanel clientId={clientData.id} posts={posts} isAdmin />
+                  <TrackingPanel
+                    clientId={clientData.id}
+                    posts={posts}
+                    isAdmin
+                    visibleToClient={trackingVisibleToClient}
+                    onToggleVisibility={async (visible) => {
+                      setTrackingVisibleToClient(visible);
+                      await supabase.from("clients").update({ tracking_visible_to_client: visible } as any).eq("id", clientData.id);
+                    }}
+                  />
                 )}
               </div>
             ) : (
