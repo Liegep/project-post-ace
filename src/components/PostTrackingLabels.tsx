@@ -18,7 +18,7 @@ interface PostTrackingLabelsProps {
 }
 
 const stepsCache: Record<string, TrackingStep[]> = {};
-
+const stepsFetching: Record<string, Promise<TrackingStep[]>> = {};
 export const PostTrackingLabels = ({ postId, clientId, isAdmin = false }: PostTrackingLabelsProps) => {
   const [steps, setSteps] = useState<TrackingStep[]>(stepsCache[clientId] || []);
   const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
