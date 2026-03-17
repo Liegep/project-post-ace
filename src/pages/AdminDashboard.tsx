@@ -715,7 +715,7 @@ const AdminDashboard = () => {
             </div>
 
             <div>
-              <Label>Slug (URL)</Label>
+              <Label>{t("slugUrl")}</Label>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">/client/</span>
                 <Input
