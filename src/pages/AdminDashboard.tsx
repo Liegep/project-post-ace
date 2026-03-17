@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, LogOut, FilePlus } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, LogOut, FilePlus, KeyRound } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { LABEL_CONFIG } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
@@ -72,6 +72,39 @@ const AdminDashboard = () => {
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSaving, setPasswordSaving] = useState(false);
+
+  const handleChangePassword = async () => {
+    setPasswordError("");
+    if (newPassword.length < 6) {
+      setPasswordError("A senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError("As senhas não coincidem");
+      return;
+    }
+    setPasswordSaving(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        setPasswordError("Erro ao atualizar senha");
+        return;
+      }
+      toast({ title: "Senha atualizada com sucesso!" });
+      setChangePasswordOpen(false);
+      setNewPassword("");
+      setConfirmNewPassword("");
+    } catch {
+      setPasswordError("Erro ao atualizar senha");
+    } finally {
+      setPasswordSaving(false);
+    }
+  };
 
   useEffect(() => {
     fetchClients();
@@ -314,6 +347,9 @@ const AdminDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
+            <Button variant="outline" size="sm" onClick={() => setChangePasswordOpen(true)}>
+              <KeyRound className="mr-1 h-4 w-4" /> Senha
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}>
               <UserPlus className="mr-1 h-4 w-4" /> Convidar
             </Button>
@@ -649,6 +685,29 @@ const AdminDashboard = () => {
       </Dialog>
 
       <InviteAdminDialog open={inviteOpen} onOpenChange={setInviteOpen} />
+
+      <Dialog open={changePasswordOpen} onOpenChange={(open) => { setChangePasswordOpen(open); if (!open) { setNewPassword(""); setConfirmNewPassword(""); setPasswordError(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Alterar Senha</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">Nova senha</Label>
+              <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmNewPassword">Confirmar nova senha</Label>
+              <Input id="confirmNewPassword" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} placeholder="Repita a senha" />
+            </div>
+            {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
+            <Button onClick={handleChangePassword} disabled={passwordSaving} className="w-full">
+              <KeyRound className="mr-2 h-4 w-4" />
+              {passwordSaving ? "Salvando..." : "Salvar nova senha"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
