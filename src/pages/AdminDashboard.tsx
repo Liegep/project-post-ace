@@ -624,10 +624,10 @@ const AdminDashboard = () => {
             <div className="mb-4 rounded-full bg-muted p-6">
               <Plus className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h2 className="text-xl font-semibold text-foreground">Nenhum cliente ainda</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Crie seu primeiro cliente para começar</p>
+            <h2 className="text-xl font-semibold text-foreground">{t("noClientsYet")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("createFirstClient")}</p>
             <Button onClick={openCreate} className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
-              <Plus className="mr-2 h-4 w-4" /> Criar Cliente
+              <Plus className="mr-2 h-4 w-4" /> {t("createClient")}
             </Button>
           </div>
         ) : (
