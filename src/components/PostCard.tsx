@@ -53,6 +53,7 @@ interface PostCardProps {
   isAdmin: boolean;
   hideFeedback?: boolean;
   allowEditCaption?: boolean;
+  trackingEnabled?: boolean;
   onStatusChange?: (status: PostStatus) => void;
   onDelete?: () => void;
   onEdit?: () => void;
