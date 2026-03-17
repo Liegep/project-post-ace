@@ -363,6 +363,7 @@ const sv: TranslationKeys = {
   tagAltered: "Ändrad",
   tagScheduled: "Schemalagd",
   tagPublished: "Publicerad",
+  tagChangeRequested: "Ändring Begärd",
   media: "Media",
   clickToSelectMedia: "Klicka för att välja bild eller video",
   postingPeriod: "Publiceringsperiod",
