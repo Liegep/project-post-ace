@@ -407,7 +407,7 @@ const AdminDashboard = () => {
               <UserPlus className="mr-1 h-4 w-4" /> {t("invite")}
             </Button>
             <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Plus className="mr-2 h-4 w-4" /> Novo Cliente
+              <Plus className="mr-2 h-4 w-4" /> {t("newClient")}
             </Button>
             <Button
               variant="ghost"
