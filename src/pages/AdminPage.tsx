@@ -972,7 +972,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               {columns.length > 0 && (
                 <Select onValueChange={(v) => handleBulkMoveToColumn(v)}>
                   <SelectTrigger className="h-8 w-auto min-w-[140px] text-xs">
-                    <SelectValue placeholder="Mover p/ coluna" />
+                    <SelectValue placeholder={t("moveToColumn")} />
                   </SelectTrigger>
                   <SelectContent>
                     {columns.map((col) => (
