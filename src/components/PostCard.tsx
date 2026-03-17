@@ -337,7 +337,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
       </div>
 
       {(expanded || !isAdmin) && !isCompact && !hideFeedback && (
-        <div className="border-t bg-muted/30 p-4">
+        <div className="border-t bg-muted/30 p-4" onClick={(e) => e.stopPropagation()}>
           <div className="space-y-3">
             {post.comments.length === 0 && (
               <p className="text-sm text-muted-foreground">{t("noComments")}</p>
