@@ -144,12 +144,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               </div>
             )}
 
-            {!hasContent && !clientData.allow_client_create_post && (
-              <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
-            )}
-            {!hasContent && clientData.allow_client_create_post && (
-              <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
-            )}
 
             <div className="flex flex-col lg:flex-row gap-6">
               <div className="flex-1 min-w-0 space-y-8">
