@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { pushToTrello } from "@/lib/trelloPush";
 
 interface PostsContextType {
+  clientId: string;
   posts: Post[];
   archivedPosts: Post[];
   tags: Tag[];
