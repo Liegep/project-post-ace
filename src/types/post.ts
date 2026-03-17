@@ -32,7 +32,7 @@ export interface Post {
   mediaType: MediaType;
   mediaUrls: string[];
   caption: string;
-  deadline: Date;
+  deadline: Date | null;
   status: PostStatus;
   clientLabel: ClientLabel;
   comments: Comment[];

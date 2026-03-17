@@ -125,7 +125,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
 
   const statusConfig = STATUS_CONFIG[post.status];
   const labelConfig = LABEL_CONFIG[post.clientLabel];
-  const isOverdue = new Date() > post.deadline && post.status !== "pronto";
+  const isOverdue = post.deadline ? new Date() > post.deadline && post.status !== "pronto" : false;
 
   const handleAddComment = () => {
     if (!commentText.trim()) return;
@@ -241,7 +241,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
           </div>
         )}
 
-        {!isAdmin && !hideFeedback && (
+        {!isAdmin && !hideFeedback && post.deadline && (
           <div className="rounded-lg bg-primary/10 px-3 py-2 text-center">
             <span className="text-sm font-semibold text-primary">
               {t("publishForecast")} {format(post.deadline, "dd/MM/yyyy")}
