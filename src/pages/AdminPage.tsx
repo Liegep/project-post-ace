@@ -755,6 +755,17 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   {allowClientEditCaption ? "Cliente pode editar legenda" : "Cliente não edita legenda"}
                 </label>
               </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="allow-client-create-post"
+                  checked={allowClientCreatePost}
+                  onCheckedChange={toggleAllowClientCreatePost}
+                />
+                <label htmlFor="allow-client-create-post" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                  <Plus className="h-3.5 w-3.5" />
+                  {allowClientCreatePost ? "Cliente pode criar posts" : "Cliente não cria posts"}
+                </label>
+              </div>
               {trackingEnabled && (
                 <div className="flex items-center gap-2">
                   <Switch
