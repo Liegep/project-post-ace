@@ -382,7 +382,7 @@ const AdminDashboard = () => {
   const copyClientUrl = (slug: string) => {
     const url = `${window.location.origin}/client/${slug}`;
     navigator.clipboard.writeText(url);
-    toast({ title: "Link copiado!", description: url });
+    toast({ title: t("linkCopied"), description: url });
   };
 
   const baseUrl = window.location.origin;
