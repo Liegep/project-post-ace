@@ -776,35 +776,42 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </div>
 
             {view === "kanban" ? (
-              <KanbanBoard
-                posts={posts}
-                columns={columns}
-                unassignedPosts={unassignedPosts}
-                editingColumnId={editingColumnId}
-                editingColumnName={editingColumnName}
-                setEditingColumnId={setEditingColumnId}
-                setEditingColumnName={setEditingColumnName}
-                editColumnInputRef={editColumnInputRef}
-                handleRenameColumn={handleRenameColumn}
-                handleDeleteColumn={handleDeleteColumn}
-                updatePostStatus={updatePostStatus}
-                deletePost={deletePost}
-                setEditPost={setEditPost}
-                setCreateInColumnId={setCreateInColumnId}
-                setCreateOpen={setCreateOpen}
-                addingColumn={addingColumn}
-                setAddingColumn={setAddingColumn}
-                newColumnName={newColumnName}
-                setNewColumnName={setNewColumnName}
-                newColumnInputRef={newColumnInputRef}
-                handleAddColumn={handleAddColumn}
-                movePostToColumn={movePostToColumn}
-                reorderPostsInColumn={reorderPostsInColumn}
-                t={t}
-                selectionMode={selectionMode}
-                selectedPostIds={selectedPostIds}
-                onToggleSelect={toggleSelect}
-              />
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0 overflow-x-auto">
+                  <KanbanBoard
+                    posts={posts}
+                    columns={columns}
+                    unassignedPosts={unassignedPosts}
+                    editingColumnId={editingColumnId}
+                    editingColumnName={editingColumnName}
+                    setEditingColumnId={setEditingColumnId}
+                    setEditingColumnName={setEditingColumnName}
+                    editColumnInputRef={editColumnInputRef}
+                    handleRenameColumn={handleRenameColumn}
+                    handleDeleteColumn={handleDeleteColumn}
+                    updatePostStatus={updatePostStatus}
+                    deletePost={deletePost}
+                    setEditPost={setEditPost}
+                    setCreateInColumnId={setCreateInColumnId}
+                    setCreateOpen={setCreateOpen}
+                    addingColumn={addingColumn}
+                    setAddingColumn={setAddingColumn}
+                    newColumnName={newColumnName}
+                    setNewColumnName={setNewColumnName}
+                    newColumnInputRef={newColumnInputRef}
+                    handleAddColumn={handleAddColumn}
+                    movePostToColumn={movePostToColumn}
+                    reorderPostsInColumn={reorderPostsInColumn}
+                    t={t}
+                    selectionMode={selectionMode}
+                    selectedPostIds={selectedPostIds}
+                    onToggleSelect={toggleSelect}
+                  />
+                </div>
+                {trackingEnabled && (
+                  <TrackingPanel clientId={clientData.id} posts={posts} isAdmin />
+                )}
+              </div>
             ) : (
               <div className="space-y-3">
                 {posts.map((post) => (
