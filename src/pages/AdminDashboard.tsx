@@ -206,6 +206,7 @@ const AdminDashboard = () => {
     setClientCreatedNotifs((prev) => prev.filter((n) => n.postId !== postId));
   };
 
+  const generateSlug = (name: string) => {
     return name
       .toLowerCase()
       .normalize("NFD")
