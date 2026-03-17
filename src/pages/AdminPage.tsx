@@ -440,6 +440,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
   const [showArchivedToClient, setShowArchivedToClient] = useState(clientData.show_archived_to_client);
   const [allowClientEditCaption, setAllowClientEditCaption] = useState((clientData as any).allow_client_edit_caption ?? false);
+  const [allowClientCreatePost, setAllowClientCreatePost] = useState((clientData as any).allow_client_create_post ?? false);
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
 
   const toggleShowArchivedToClient = async (checked: boolean) => {
