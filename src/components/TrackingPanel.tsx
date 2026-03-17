@@ -111,7 +111,7 @@ function SortableItem({ post, isEntrada, tags }: { post: Post; isEntrada: boolea
   );
 }
 
-export const TrackingPanel = ({ clientId, posts, columns = [], isAdmin = false, visibleToClient, onToggleVisibility }: TrackingPanelProps) => {
+export const TrackingPanel = ({ clientId, posts, columns = [], tags = [], isAdmin = false, visibleToClient, onToggleVisibility }: TrackingPanelProps) => {
   const [orderedPosts, setOrderedPosts] = useState<Post[]>([]);
   const [loaded, setLoaded] = useState(false);
   const savedOrderRef = useRef<string[]>([]);
