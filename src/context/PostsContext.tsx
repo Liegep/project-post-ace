@@ -166,18 +166,8 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, [clientId]);
 
   const updatePostStatus = useCallback(async (id: string, status: PostStatus) => {
-    const isArchiving = status === "finalizado";
     const updates: Record<string, any> = { status };
-    if (isArchiving) {
-      updates.archived = true;
-      updates.archived_at = new Date().toISOString();
-    }
-    setPosts((prev) => prev.map((p) => (p.id === id ? { 
-      ...p, 
-      status, 
-      archived: isArchiving ? true : p.archived,
-      archivedAt: isArchiving ? new Date() : p.archivedAt,
-    } : p)));
+    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
     await supabase.from("posts").update(updates).eq("id", id);
     pushToTrello(id, "update");
   }, []);
@@ -351,17 +341,8 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, []);
 
   const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus) => {
-    const isArchiving = status === "finalizado";
     const updates: Record<string, any> = { status };
-    if (isArchiving) {
-      updates.archived = true;
-      updates.archived_at = new Date().toISOString();
-    }
-    setPosts((prev) => prev.map((p) => ids.includes(p.id) ? {
-      ...p, status,
-      archived: isArchiving ? true : p.archived,
-      archivedAt: isArchiving ? new Date() : p.archivedAt,
-    } : p));
+    setPosts((prev) => prev.map((p) => ids.includes(p.id) ? { ...p, status } : p));
     await supabase.from("posts").update(updates).in("id", ids);
   }, []);
 
