@@ -427,13 +427,13 @@ const AdminDashboard = () => {
       <main className="mx-auto max-w-5xl p-6 space-y-6">
         {/* Today's posts reminder */}
         {todayPosts.length > 0 && (
-          <div className="rounded-xl border bg-card p-4">
+          <div className="rounded-xl border border-blue-400/30 bg-blue-500/5 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
-                <CalendarClock className="h-4 w-4 text-primary" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20">
+                <CalendarClock className="h-4 w-4 text-blue-500" />
               </div>
               <h2 className="font-semibold text-foreground">Posts para Hoje</h2>
-              <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs font-semibold text-primary">
+              <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-xs font-semibold text-blue-500">
                 {todayPosts.length}
               </span>
             </div>
@@ -455,7 +455,7 @@ const AdminDashboard = () => {
                     <p className="text-sm font-medium text-foreground truncate">{p.postTitle}</p>
                     <p className="text-xs text-muted-foreground">{p.clientName}</p>
                   </div>
-                  <span className="shrink-0 inline-flex rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                  <span className="shrink-0 inline-flex rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-semibold text-blue-500">
                     {new Date(p.deadline).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                   </span>
                 </div>
@@ -466,13 +466,13 @@ const AdminDashboard = () => {
 
         {/* Feedback notifications */}
         {feedbacks.length > 0 && (
-          <div className="rounded-xl border bg-card p-4">
+          <div className="rounded-xl border border-amber-400/30 bg-amber-500/5 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-warning/20">
-                <Bell className="h-4 w-4 text-warning-foreground" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/20">
+                <Bell className="h-4 w-4 text-amber-500" />
               </div>
               <h2 className="font-semibold text-foreground">Feedbacks dos Clientes</h2>
-              <span className="rounded-full bg-warning/20 px-2 py-0.5 text-xs font-semibold text-warning-foreground">
+              <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-500">
                 {feedbacks.length}
               </span>
             </div>
@@ -520,13 +520,13 @@ const AdminDashboard = () => {
 
         {/* Unarchive notifications */}
         {unarchiveNotifs.length > 0 && (
-          <div className="rounded-xl border bg-card p-4">
+          <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/5 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-info/20">
-                <RotateCcw className="h-4 w-4 text-info-foreground" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
+                <RotateCcw className="h-4 w-4 text-emerald-500" />
               </div>
               <h2 className="font-semibold text-foreground">Posts Restaurados pelo Cliente</h2>
-              <span className="rounded-full bg-info/20 px-2 py-0.5 text-xs font-semibold text-info-foreground">
+              <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-500">
                 {unarchiveNotifs.length}
               </span>
             </div>
@@ -548,7 +548,7 @@ const AdminDashboard = () => {
                     <p className="text-sm font-medium text-foreground truncate">{n.postTitle}</p>
                     <p className="text-xs text-muted-foreground">{n.clientName}</p>
                   </div>
-                  <span className="shrink-0 inline-flex rounded-full bg-info/20 px-2 py-0.5 text-[10px] font-semibold text-info-foreground">
+                  <span className="shrink-0 inline-flex rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-500">
                     Restaurado
                   </span>
                   <span className="text-[10px] text-muted-foreground shrink-0">
@@ -569,13 +569,13 @@ const AdminDashboard = () => {
 
         {/* Client created post notifications */}
         {clientCreatedNotifs.length > 0 && (
-          <div className="rounded-xl border bg-card p-4">
+          <div className="rounded-xl border border-violet-400/30 bg-violet-500/5 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20">
-                <FilePlus className="h-4 w-4 text-accent-foreground" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/20">
+                <FilePlus className="h-4 w-4 text-violet-500" />
               </div>
               <h2 className="font-semibold text-foreground">Posts Criados pelo Cliente</h2>
-              <span className="rounded-full bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent-foreground">
+              <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-xs font-semibold text-violet-500">
                 {clientCreatedNotifs.length}
               </span>
             </div>
@@ -597,7 +597,7 @@ const AdminDashboard = () => {
                     <p className="text-sm font-medium text-foreground truncate">{n.postTitle}</p>
                     <p className="text-xs text-muted-foreground">{n.clientName}</p>
                   </div>
-                  <span className="shrink-0 inline-flex rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-semibold text-accent-foreground">
+                  <span className="shrink-0 inline-flex rounded-full bg-violet-500/20 px-2 py-0.5 text-[10px] font-semibold text-violet-500">
                     Novo post
                   </span>
                   <span className="text-[10px] text-muted-foreground shrink-0">
