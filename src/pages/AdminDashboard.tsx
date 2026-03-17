@@ -785,8 +785,8 @@ const AdminDashboard = () => {
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
-              <Label htmlFor="newPassword">Nova senha</Label>
-              <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
+              <Label htmlFor="newPassword">{t("newPassword")}</Label>
+              <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t("minChars")} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmNewPassword">Confirmar nova senha</Label>
