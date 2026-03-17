@@ -574,7 +574,7 @@ const AdminDashboard = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/20">
                 <FilePlus className="h-4 w-4 text-violet-500" />
               </div>
-              <h2 className="font-semibold text-foreground">Posts Criados pelo Cliente</h2>
+              <h2 className="font-semibold text-foreground">{t("postsCreatedByClient")}</h2>
               <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-xs font-semibold text-violet-500">
                 {clientCreatedNotifs.length}
               </span>
