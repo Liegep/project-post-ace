@@ -256,6 +256,7 @@ export type Database = {
           archived: boolean
           archived_at: string | null
           caption: string
+          client_created_at: string | null
           client_id: string | null
           client_label: string
           client_unarchived_at: string | null
@@ -277,6 +278,7 @@ export type Database = {
           archived?: boolean
           archived_at?: string | null
           caption?: string
+          client_created_at?: string | null
           client_id?: string | null
           client_label?: string
           client_unarchived_at?: string | null
@@ -298,6 +300,7 @@ export type Database = {
           archived?: boolean
           archived_at?: string | null
           caption?: string
+          client_created_at?: string | null
           client_id?: string | null
           client_label?: string
           client_unarchived_at?: string | null

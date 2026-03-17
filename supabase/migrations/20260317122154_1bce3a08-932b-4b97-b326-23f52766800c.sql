@@ -1,0 +1,1 @@
+ALTER TABLE public.posts ADD COLUMN client_created_at timestamp with time zone DEFAULT NULL;
