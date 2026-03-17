@@ -450,7 +450,7 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
                         className="flex-1 text-xs"
                         onClick={() => unarchivePost(post.id)}
                       >
-                        <RotateCcw className="mr-1 h-3 w-3" /> Restaurar
+                        <RotateCcw className="mr-1 h-3 w-3" /> {t("restore")}
                       </Button>
                       <Button
                         variant="ghost"
