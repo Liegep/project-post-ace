@@ -21,7 +21,7 @@ interface CreatePostDialogProps {
 let mediaIdCounter = 0;
 
 export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: CreatePostDialogProps) => {
-  const { addPost, uploadMedia, columns } = usePosts();
+  const { addPost, uploadMedia, columns, clientId } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [mediaItems, setMediaItems] = useState<SortableMediaItem[]>([]);
