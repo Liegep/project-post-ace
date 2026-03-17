@@ -256,7 +256,7 @@ const KanbanBoard = ({
                     <button
                       onClick={() => toggleColumnVisibility(col.id, !col.visibleToClient)}
                       className={`rounded p-1 transition-colors ${col.visibleToClient ? "text-primary hover:bg-primary/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
-                      title={col.visibleToClient ? "Visível para o cliente" : "Oculto para o cliente"}
+                      title={col.visibleToClient ? t("visibleToClient") : t("hiddenFromClient")}
                     >
                       {col.visibleToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                     </button>
