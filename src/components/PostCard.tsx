@@ -258,7 +258,32 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
               isAdmin ? (
                 <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
               ) : (
-                <CaptionText text={post.caption} t={t} />
+                allowEditCaption ? (
+                  editingCaption ? (
+                    <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+                      <Textarea
+                        value={captionDraft}
+                        onChange={(e) => setCaptionDraft(e.target.value)}
+                        className="min-h-[80px] text-sm resize-none"
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <Button variant="ghost" size="sm" onClick={() => { setEditingCaption(false); setCaptionDraft(post.caption); }}>
+                          Cancelar
+                        </Button>
+                        <Button size="sm" onClick={() => { updatePost(post.id, { caption: captionDraft }); setEditingCaption(false); }}>
+                          Salvar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="group/caption cursor-pointer" onClick={(e) => { e.stopPropagation(); setEditingCaption(true); }}>
+                      <CaptionText text={post.caption} t={t} />
+                      <span className="text-[10px] text-muted-foreground opacity-0 group-hover/caption:opacity-100 transition-opacity">Clique para editar</span>
+                    </div>
+                  )
+                ) : (
+                  <CaptionText text={post.caption} t={t} />
+                )
               )
             )}
           </>
