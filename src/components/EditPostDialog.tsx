@@ -49,7 +49,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       const coverIdx = post.imageUrl ? urls.indexOf(post.imageUrl) : 0;
       setCoverIndex(coverIdx >= 0 ? coverIdx : 0);
       setCaption(post.caption);
-      setDeadline(format(post.deadline, "yyyy-MM-dd"));
+      setDeadline(post.deadline ? format(post.deadline, "yyyy-MM-dd") : "");
       setStatus(post.status);
       setColumnId(post.columnId);
       setSelectedTags(post.tags);
