@@ -471,7 +471,7 @@ const AdminDashboard = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/20">
                 <Bell className="h-4 w-4 text-amber-500" />
               </div>
-              <h2 className="font-semibold text-foreground">Feedbacks dos Clientes</h2>
+              <h2 className="font-semibold text-foreground">{t("clientFeedbacks")}</h2>
               <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-500">
                 {feedbacks.length}
               </span>
