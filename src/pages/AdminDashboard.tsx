@@ -728,7 +728,7 @@ const AdminDashboard = () => {
             </div>
 
             <div>
-              <Label>Idioma do Cliente</Label>
+              <Label>{t("clientLanguage")}</Label>
               <Select value={locale} onValueChange={(v) => setLocale(v as Locale)}>
                 <SelectTrigger>
                   <SelectValue />
