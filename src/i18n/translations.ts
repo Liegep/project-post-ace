@@ -87,6 +87,105 @@ type TranslationKeys = {
   readLess: string;
   // Publish forecast
   publishForecast: string;
+  // Admin Dashboard
+  selectOrCreateClient: string;
+  postsForToday: string;
+  clientFeedbacks: string;
+  restoredByClient: string;
+  restored: string;
+  postsCreatedByClient: string;
+  createdByClient: string;
+  noClientsYet: string;
+  createFirstClient: string;
+  createClient: string;
+  manage: string;
+  editClient: string;
+  newClient: string;
+  clientName: string;
+  clientNamePlaceholder: string;
+  slugUrl: string;
+  clientLanguage: string;
+  logo: string;
+  selectLogo: string;
+  change: string;
+  save: string;
+  password: string;
+  changePassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+  minChars: string;
+  repeatPassword: string;
+  saving: string;
+  saveNewPassword: string;
+  passwordUpdated: string;
+  passwordMinError: string;
+  passwordMismatch: string;
+  passwordUpdateError: string;
+  invite: string;
+  inviteAdmin: string;
+  invitations: string;
+  accepted: string;
+  expired: string;
+  pending: string;
+  linkCopied: string;
+  inviteCreated: string;
+  inviteError: string;
+  social: string;
+  signOut: string;
+  confirmDeleteClient: string;
+  // Admin Page (Kanban)
+  noColumn: string;
+  columnName: string;
+  cancel: string;
+  newColumn: string;
+  addPost: string;
+  visibleToClient: string;
+  hiddenFromClient: string;
+  board: string;
+  archived: string;
+  noArchivedPosts: string;
+  archivedPostsAppearHere: string;
+  restore: string;
+  deletePermanently: string;
+  select: string;
+  createTracking: string;
+  trelloSync: string;
+  clickToSetPeriod: string;
+  selected: string;
+  changeStatus: string;
+  moveToColumn: string;
+  archive: string;
+  deleteAction: string;
+  // Bulk actions
+  postsUpdated: string;
+  postsDeleted: string;
+  postsRestored: string;
+  postsMoved: string;
+  confirmBulkDelete: string;
+  // Column actions
+  deleteColumnConfirm: string;
+  columnCreateError: string;
+  // Client edit permissions
+  clientCanEditCaption: string;
+  clientCannotEditCaption: string;
+  clientCanCreatePosts: string;
+  clientCannotCreatePosts: string;
+  trackingActive: string;
+  trackingCreated: string;
+  trackingCreatedDesc: string;
+  // Trello
+  syncWithTrello: string;
+  trelloBoardId: string;
+  trelloBoardIdPlaceholder: string;
+  trelloBoardIdHelp: string;
+  trelloSyncWarning: string;
+  syncing: string;
+  startSync: string;
+  syncComplete: string;
+  syncError: string;
+  // Post sent by client
+  postSentSuccess: string;
+  postSentDesc: string;
 };
 
 const pt: TranslationKeys = {
@@ -145,6 +244,100 @@ const pt: TranslationKeys = {
   readMore: "Ver mais",
   readLess: "Ver menos",
   publishForecast: "Previsão de Publicação",
+  // Admin Dashboard
+  selectOrCreateClient: "Selecione ou crie um cliente",
+  postsForToday: "Posts para Hoje",
+  clientFeedbacks: "Feedbacks dos Clientes",
+  restoredByClient: "Posts Restaurados pelo Cliente",
+  restored: "Restaurado",
+  postsCreatedByClient: "Posts Criados pelo Cliente",
+  createdByClient: "Criado pelo cliente",
+  noClientsYet: "Nenhum cliente ainda",
+  createFirstClient: "Crie seu primeiro cliente para começar",
+  createClient: "Criar Cliente",
+  manage: "Gerenciar",
+  editClient: "Editar Cliente",
+  newClient: "Novo Cliente",
+  clientName: "Nome do Cliente",
+  clientNamePlaceholder: "Ex: Empresa XYZ",
+  slugUrl: "Slug (URL)",
+  clientLanguage: "Idioma do Cliente",
+  logo: "Logo",
+  selectLogo: "Selecionar logo",
+  change: "Alterar",
+  save: "Salvar",
+  password: "Senha",
+  changePassword: "Alterar Senha",
+  newPassword: "Nova senha",
+  confirmNewPassword: "Confirmar nova senha",
+  minChars: "Mínimo 6 caracteres",
+  repeatPassword: "Repita a senha",
+  saving: "Salvando...",
+  saveNewPassword: "Salvar nova senha",
+  passwordUpdated: "Senha atualizada com sucesso!",
+  passwordMinError: "A senha deve ter pelo menos 6 caracteres",
+  passwordMismatch: "As senhas não coincidem",
+  passwordUpdateError: "Erro ao atualizar senha",
+  invite: "Convidar",
+  inviteAdmin: "Convidar Administrador",
+  invitations: "Convites",
+  accepted: "Aceito",
+  expired: "Expirado",
+  pending: "Pendente",
+  linkCopied: "Link copiado!",
+  inviteCreated: "Convite criado!",
+  inviteError: "Erro ao enviar convite",
+  social: "Social",
+  signOut: "Sair",
+  confirmDeleteClient: "Tem certeza que deseja excluir este cliente?",
+  // Admin Page
+  noColumn: "Sem coluna",
+  columnName: "Nome da coluna",
+  cancel: "Cancelar",
+  newColumn: "Nova coluna",
+  addPost: "Adicionar post",
+  visibleToClient: "Visível para o cliente",
+  hiddenFromClient: "Oculto para o cliente",
+  board: "Quadro",
+  archived: "Arquivados",
+  noArchivedPosts: "Nenhum post arquivado",
+  archivedPostsAppearHere: "Posts com status \"Finalizado\" aparecerão aqui",
+  restore: "Restaurar",
+  deletePermanently: "Excluir permanentemente?",
+  select: "Selecionar",
+  createTracking: "Criar Acompanhamento",
+  trelloSync: "Trello Sync",
+  clickToSetPeriod: "Clique para definir o período",
+  selected: "selecionado(s)",
+  changeStatus: "Mudar status",
+  moveToColumn: "Mover p/ coluna",
+  archive: "Arquivar",
+  deleteAction: "Excluir",
+  postsUpdated: "posts atualizados",
+  postsDeleted: "posts excluídos",
+  postsRestored: "posts restaurados",
+  postsMoved: "posts movidos",
+  confirmBulkDelete: "Excluir {count} posts permanentemente?",
+  deleteColumnConfirm: "Excluir esta coluna? Os posts serão movidos para 'Sem coluna'.",
+  columnCreateError: "Erro ao criar coluna",
+  clientCanEditCaption: "Cliente pode editar legenda",
+  clientCannotEditCaption: "Cliente não edita legenda",
+  clientCanCreatePosts: "Cliente pode criar posts",
+  clientCannotCreatePosts: "Cliente não cria posts",
+  trackingActive: "Acompanhamento ativo",
+  trackingCreated: "Acompanhamento criado!",
+  trackingCreatedDesc: "A coluna de acompanhamento foi adicionada ao quadro.",
+  syncWithTrello: "Sincronizar com Trello",
+  trelloBoardId: "Board ID do Trello",
+  trelloBoardIdPlaceholder: "Ex: abc123def456",
+  trelloBoardIdHelp: "Encontre o Board ID na URL do Trello: trello.com/b/BOARD_ID/nome-do-board",
+  trelloSyncWarning: "⚠️ A sincronização substituirá todas as colunas e posts existentes deste cliente.",
+  syncing: "Sincronizando...",
+  startSync: "Iniciar Sincronização",
+  syncComplete: "Sincronização concluída!",
+  syncError: "Erro na sincronização",
+  postSentSuccess: "✅ Post enviado com sucesso!",
+  postSentDesc: "Seu post foi recebido e está aguardando revisão da equipe.",
 };
 
 const en: TranslationKeys = {
@@ -203,6 +396,98 @@ const en: TranslationKeys = {
   readMore: "Read more",
   readLess: "Read less",
   publishForecast: "Publish Forecast",
+  selectOrCreateClient: "Select or create a client",
+  postsForToday: "Posts for Today",
+  clientFeedbacks: "Client Feedbacks",
+  restoredByClient: "Posts Restored by Client",
+  restored: "Restored",
+  postsCreatedByClient: "Posts Created by Client",
+  createdByClient: "Created by client",
+  noClientsYet: "No clients yet",
+  createFirstClient: "Create your first client to get started",
+  createClient: "Create Client",
+  manage: "Manage",
+  editClient: "Edit Client",
+  newClient: "New Client",
+  clientName: "Client Name",
+  clientNamePlaceholder: "E.g.: Company XYZ",
+  slugUrl: "Slug (URL)",
+  clientLanguage: "Client Language",
+  logo: "Logo",
+  selectLogo: "Select logo",
+  change: "Change",
+  save: "Save",
+  password: "Password",
+  changePassword: "Change Password",
+  newPassword: "New password",
+  confirmNewPassword: "Confirm new password",
+  minChars: "Minimum 6 characters",
+  repeatPassword: "Repeat password",
+  saving: "Saving...",
+  saveNewPassword: "Save new password",
+  passwordUpdated: "Password updated successfully!",
+  passwordMinError: "Password must be at least 6 characters",
+  passwordMismatch: "Passwords do not match",
+  passwordUpdateError: "Error updating password",
+  invite: "Invite",
+  inviteAdmin: "Invite Administrator",
+  invitations: "Invitations",
+  accepted: "Accepted",
+  expired: "Expired",
+  pending: "Pending",
+  linkCopied: "Link copied!",
+  inviteCreated: "Invite created!",
+  inviteError: "Error sending invite",
+  social: "Social",
+  signOut: "Sign out",
+  confirmDeleteClient: "Are you sure you want to delete this client?",
+  noColumn: "No column",
+  columnName: "Column name",
+  cancel: "Cancel",
+  newColumn: "New column",
+  addPost: "Add post",
+  visibleToClient: "Visible to client",
+  hiddenFromClient: "Hidden from client",
+  board: "Board",
+  archived: "Archived",
+  noArchivedPosts: "No archived posts",
+  archivedPostsAppearHere: "Posts with \"Finalized\" status will appear here",
+  restore: "Restore",
+  deletePermanently: "Delete permanently?",
+  select: "Select",
+  createTracking: "Create Tracking",
+  trelloSync: "Trello Sync",
+  clickToSetPeriod: "Click to set the period",
+  selected: "selected",
+  changeStatus: "Change status",
+  moveToColumn: "Move to column",
+  archive: "Archive",
+  deleteAction: "Delete",
+  postsUpdated: "posts updated",
+  postsDeleted: "posts deleted",
+  postsRestored: "posts restored",
+  postsMoved: "posts moved",
+  confirmBulkDelete: "Delete {count} posts permanently?",
+  deleteColumnConfirm: "Delete this column? Posts will be moved to 'No column'.",
+  columnCreateError: "Error creating column",
+  clientCanEditCaption: "Client can edit caption",
+  clientCannotEditCaption: "Client cannot edit caption",
+  clientCanCreatePosts: "Client can create posts",
+  clientCannotCreatePosts: "Client cannot create posts",
+  trackingActive: "Tracking active",
+  trackingCreated: "Tracking created!",
+  trackingCreatedDesc: "The tracking column was added to the board.",
+  syncWithTrello: "Sync with Trello",
+  trelloBoardId: "Trello Board ID",
+  trelloBoardIdPlaceholder: "E.g.: abc123def456",
+  trelloBoardIdHelp: "Find the Board ID in the Trello URL: trello.com/b/BOARD_ID/board-name",
+  trelloSyncWarning: "⚠️ Syncing will replace all existing columns and posts for this client.",
+  syncing: "Syncing...",
+  startSync: "Start Sync",
+  syncComplete: "Sync complete!",
+  syncError: "Sync error",
+  postSentSuccess: "✅ Post sent successfully!",
+  postSentDesc: "Your post was received and is awaiting team review.",
 };
 
 const it: TranslationKeys = {
@@ -261,6 +546,98 @@ const it: TranslationKeys = {
   readMore: "Leggi di più",
   readLess: "Leggi meno",
   publishForecast: "Previsione di Pubblicazione",
+  selectOrCreateClient: "Seleziona o crea un cliente",
+  postsForToday: "Post per Oggi",
+  clientFeedbacks: "Feedback dei Clienti",
+  restoredByClient: "Post Ripristinati dal Cliente",
+  restored: "Ripristinato",
+  postsCreatedByClient: "Post Creati dal Cliente",
+  createdByClient: "Creato dal cliente",
+  noClientsYet: "Nessun cliente ancora",
+  createFirstClient: "Crea il tuo primo cliente per iniziare",
+  createClient: "Crea Cliente",
+  manage: "Gestisci",
+  editClient: "Modifica Cliente",
+  newClient: "Nuovo Cliente",
+  clientName: "Nome del Cliente",
+  clientNamePlaceholder: "Es: Azienda XYZ",
+  slugUrl: "Slug (URL)",
+  clientLanguage: "Lingua del Cliente",
+  logo: "Logo",
+  selectLogo: "Seleziona logo",
+  change: "Modifica",
+  save: "Salva",
+  password: "Password",
+  changePassword: "Cambia Password",
+  newPassword: "Nuova password",
+  confirmNewPassword: "Conferma nuova password",
+  minChars: "Minimo 6 caratteri",
+  repeatPassword: "Ripeti la password",
+  saving: "Salvando...",
+  saveNewPassword: "Salva nuova password",
+  passwordUpdated: "Password aggiornata con successo!",
+  passwordMinError: "La password deve avere almeno 6 caratteri",
+  passwordMismatch: "Le password non corrispondono",
+  passwordUpdateError: "Errore nell'aggiornamento della password",
+  invite: "Invita",
+  inviteAdmin: "Invita Amministratore",
+  invitations: "Inviti",
+  accepted: "Accettato",
+  expired: "Scaduto",
+  pending: "In attesa",
+  linkCopied: "Link copiato!",
+  inviteCreated: "Invito creato!",
+  inviteError: "Errore nell'invio dell'invito",
+  social: "Social",
+  signOut: "Esci",
+  confirmDeleteClient: "Sei sicuro di voler eliminare questo cliente?",
+  noColumn: "Senza colonna",
+  columnName: "Nome colonna",
+  cancel: "Annulla",
+  newColumn: "Nuova colonna",
+  addPost: "Aggiungi post",
+  visibleToClient: "Visibile al cliente",
+  hiddenFromClient: "Nascosto al cliente",
+  board: "Bacheca",
+  archived: "Archiviati",
+  noArchivedPosts: "Nessun post archiviato",
+  archivedPostsAppearHere: "I post con stato \"Finalizzato\" appariranno qui",
+  restore: "Ripristina",
+  deletePermanently: "Eliminare definitivamente?",
+  select: "Seleziona",
+  createTracking: "Crea Monitoraggio",
+  trelloSync: "Trello Sync",
+  clickToSetPeriod: "Clicca per impostare il periodo",
+  selected: "selezionati",
+  changeStatus: "Cambia stato",
+  moveToColumn: "Sposta in colonna",
+  archive: "Archivia",
+  deleteAction: "Elimina",
+  postsUpdated: "post aggiornati",
+  postsDeleted: "post eliminati",
+  postsRestored: "post ripristinati",
+  postsMoved: "post spostati",
+  confirmBulkDelete: "Eliminare {count} post definitivamente?",
+  deleteColumnConfirm: "Eliminare questa colonna? I post saranno spostati in 'Senza colonna'.",
+  columnCreateError: "Errore nella creazione della colonna",
+  clientCanEditCaption: "Il cliente può modificare la didascalia",
+  clientCannotEditCaption: "Il cliente non può modificare la didascalia",
+  clientCanCreatePosts: "Il cliente può creare post",
+  clientCannotCreatePosts: "Il cliente non può creare post",
+  trackingActive: "Monitoraggio attivo",
+  trackingCreated: "Monitoraggio creato!",
+  trackingCreatedDesc: "La colonna di monitoraggio è stata aggiunta alla bacheca.",
+  syncWithTrello: "Sincronizza con Trello",
+  trelloBoardId: "Board ID di Trello",
+  trelloBoardIdPlaceholder: "Es: abc123def456",
+  trelloBoardIdHelp: "Trova il Board ID nell'URL di Trello: trello.com/b/BOARD_ID/nome-board",
+  trelloSyncWarning: "⚠️ La sincronizzazione sostituirà tutte le colonne e i post esistenti di questo cliente.",
+  syncing: "Sincronizzando...",
+  startSync: "Avvia Sincronizzazione",
+  syncComplete: "Sincronizzazione completata!",
+  syncError: "Errore di sincronizzazione",
+  postSentSuccess: "✅ Post inviato con successo!",
+  postSentDesc: "Il tuo post è stato ricevuto ed è in attesa di revisione.",
 };
 
 const es: TranslationKeys = {
@@ -319,6 +696,98 @@ const es: TranslationKeys = {
   readMore: "Leer más",
   readLess: "Leer menos",
   publishForecast: "Previsión de Publicación",
+  selectOrCreateClient: "Selecciona o crea un cliente",
+  postsForToday: "Posts para Hoy",
+  clientFeedbacks: "Feedbacks de Clientes",
+  restoredByClient: "Posts Restaurados por el Cliente",
+  restored: "Restaurado",
+  postsCreatedByClient: "Posts Creados por el Cliente",
+  createdByClient: "Creado por el cliente",
+  noClientsYet: "Sin clientes aún",
+  createFirstClient: "Crea tu primer cliente para comenzar",
+  createClient: "Crear Cliente",
+  manage: "Gestionar",
+  editClient: "Editar Cliente",
+  newClient: "Nuevo Cliente",
+  clientName: "Nombre del Cliente",
+  clientNamePlaceholder: "Ej: Empresa XYZ",
+  slugUrl: "Slug (URL)",
+  clientLanguage: "Idioma del Cliente",
+  logo: "Logo",
+  selectLogo: "Seleccionar logo",
+  change: "Cambiar",
+  save: "Guardar",
+  password: "Contraseña",
+  changePassword: "Cambiar Contraseña",
+  newPassword: "Nueva contraseña",
+  confirmNewPassword: "Confirmar nueva contraseña",
+  minChars: "Mínimo 6 caracteres",
+  repeatPassword: "Repite la contraseña",
+  saving: "Guardando...",
+  saveNewPassword: "Guardar nueva contraseña",
+  passwordUpdated: "¡Contraseña actualizada con éxito!",
+  passwordMinError: "La contraseña debe tener al menos 6 caracteres",
+  passwordMismatch: "Las contraseñas no coinciden",
+  passwordUpdateError: "Error al actualizar la contraseña",
+  invite: "Invitar",
+  inviteAdmin: "Invitar Administrador",
+  invitations: "Invitaciones",
+  accepted: "Aceptado",
+  expired: "Expirado",
+  pending: "Pendiente",
+  linkCopied: "¡Enlace copiado!",
+  inviteCreated: "¡Invitación creada!",
+  inviteError: "Error al enviar invitación",
+  social: "Social",
+  signOut: "Salir",
+  confirmDeleteClient: "¿Estás seguro de que quieres eliminar este cliente?",
+  noColumn: "Sin columna",
+  columnName: "Nombre de columna",
+  cancel: "Cancelar",
+  newColumn: "Nueva columna",
+  addPost: "Agregar publicación",
+  visibleToClient: "Visible para el cliente",
+  hiddenFromClient: "Oculto al cliente",
+  board: "Tablero",
+  archived: "Archivados",
+  noArchivedPosts: "Sin publicaciones archivadas",
+  archivedPostsAppearHere: "Las publicaciones con estado \"Finalizado\" aparecerán aquí",
+  restore: "Restaurar",
+  deletePermanently: "¿Eliminar permanentemente?",
+  select: "Seleccionar",
+  createTracking: "Crear Seguimiento",
+  trelloSync: "Trello Sync",
+  clickToSetPeriod: "Haz clic para definir el período",
+  selected: "seleccionados",
+  changeStatus: "Cambiar estado",
+  moveToColumn: "Mover a columna",
+  archive: "Archivar",
+  deleteAction: "Eliminar",
+  postsUpdated: "publicaciones actualizadas",
+  postsDeleted: "publicaciones eliminadas",
+  postsRestored: "publicaciones restauradas",
+  postsMoved: "publicaciones movidas",
+  confirmBulkDelete: "¿Eliminar {count} publicaciones permanentemente?",
+  deleteColumnConfirm: "¿Eliminar esta columna? Las publicaciones se moverán a 'Sin columna'.",
+  columnCreateError: "Error al crear columna",
+  clientCanEditCaption: "El cliente puede editar leyenda",
+  clientCannotEditCaption: "El cliente no puede editar leyenda",
+  clientCanCreatePosts: "El cliente puede crear publicaciones",
+  clientCannotCreatePosts: "El cliente no puede crear publicaciones",
+  trackingActive: "Seguimiento activo",
+  trackingCreated: "¡Seguimiento creado!",
+  trackingCreatedDesc: "La columna de seguimiento fue añadida al tablero.",
+  syncWithTrello: "Sincronizar con Trello",
+  trelloBoardId: "Board ID de Trello",
+  trelloBoardIdPlaceholder: "Ej: abc123def456",
+  trelloBoardIdHelp: "Encuentra el Board ID en la URL de Trello: trello.com/b/BOARD_ID/nombre-del-board",
+  trelloSyncWarning: "⚠️ La sincronización reemplazará todas las columnas y publicaciones existentes de este cliente.",
+  syncing: "Sincronizando...",
+  startSync: "Iniciar Sincronización",
+  syncComplete: "¡Sincronización completada!",
+  syncError: "Error de sincronización",
+  postSentSuccess: "✅ ¡Publicación enviada con éxito!",
+  postSentDesc: "Tu publicación fue recibida y está en espera de revisión.",
 };
 
 const sv: TranslationKeys = {
@@ -377,6 +846,98 @@ const sv: TranslationKeys = {
   readMore: "Läs mer",
   readLess: "Läs mindre",
   publishForecast: "Publiceringsförhandsvisning",
+  selectOrCreateClient: "Välj eller skapa en klient",
+  postsForToday: "Inlägg för Idag",
+  clientFeedbacks: "Kundfeedback",
+  restoredByClient: "Inlägg Återställda av Klient",
+  restored: "Återställd",
+  postsCreatedByClient: "Inlägg Skapade av Klient",
+  createdByClient: "Skapad av klient",
+  noClientsYet: "Inga klienter ännu",
+  createFirstClient: "Skapa din första klient för att komma igång",
+  createClient: "Skapa Klient",
+  manage: "Hantera",
+  editClient: "Redigera Klient",
+  newClient: "Ny Klient",
+  clientName: "Klientnamn",
+  clientNamePlaceholder: "T.ex.: Företag XYZ",
+  slugUrl: "Slug (URL)",
+  clientLanguage: "Klientens Språk",
+  logo: "Logo",
+  selectLogo: "Välj logo",
+  change: "Ändra",
+  save: "Spara",
+  password: "Lösenord",
+  changePassword: "Ändra Lösenord",
+  newPassword: "Nytt lösenord",
+  confirmNewPassword: "Bekräfta nytt lösenord",
+  minChars: "Minst 6 tecken",
+  repeatPassword: "Upprepa lösenordet",
+  saving: "Sparar...",
+  saveNewPassword: "Spara nytt lösenord",
+  passwordUpdated: "Lösenord uppdaterat!",
+  passwordMinError: "Lösenordet måste vara minst 6 tecken",
+  passwordMismatch: "Lösenorden matchar inte",
+  passwordUpdateError: "Fel vid uppdatering av lösenord",
+  invite: "Bjud in",
+  inviteAdmin: "Bjud in Administratör",
+  invitations: "Inbjudningar",
+  accepted: "Accepterad",
+  expired: "Utgången",
+  pending: "Väntande",
+  linkCopied: "Länk kopierad!",
+  inviteCreated: "Inbjudan skapad!",
+  inviteError: "Fel vid skickande av inbjudan",
+  social: "Social",
+  signOut: "Logga ut",
+  confirmDeleteClient: "Är du säker på att du vill ta bort denna klient?",
+  noColumn: "Ingen kolumn",
+  columnName: "Kolumnnamn",
+  cancel: "Avbryt",
+  newColumn: "Ny kolumn",
+  addPost: "Lägg till inlägg",
+  visibleToClient: "Synlig för klient",
+  hiddenFromClient: "Dold för klient",
+  board: "Tavla",
+  archived: "Arkiverade",
+  noArchivedPosts: "Inga arkiverade inlägg",
+  archivedPostsAppearHere: "Inlägg med status \"Avslutat\" visas här",
+  restore: "Återställ",
+  deletePermanently: "Ta bort permanent?",
+  select: "Välj",
+  createTracking: "Skapa Spårning",
+  trelloSync: "Trello Sync",
+  clickToSetPeriod: "Klicka för att ställa in perioden",
+  selected: "valda",
+  changeStatus: "Ändra status",
+  moveToColumn: "Flytta till kolumn",
+  archive: "Arkivera",
+  deleteAction: "Ta bort",
+  postsUpdated: "inlägg uppdaterade",
+  postsDeleted: "inlägg borttagna",
+  postsRestored: "inlägg återställda",
+  postsMoved: "inlägg flyttade",
+  confirmBulkDelete: "Ta bort {count} inlägg permanent?",
+  deleteColumnConfirm: "Ta bort denna kolumn? Inlägg flyttas till 'Ingen kolumn'.",
+  columnCreateError: "Fel vid skapande av kolumn",
+  clientCanEditCaption: "Klient kan redigera bildtext",
+  clientCannotEditCaption: "Klient kan inte redigera bildtext",
+  clientCanCreatePosts: "Klient kan skapa inlägg",
+  clientCannotCreatePosts: "Klient kan inte skapa inlägg",
+  trackingActive: "Spårning aktiv",
+  trackingCreated: "Spårning skapad!",
+  trackingCreatedDesc: "Spårningskolumnen lades till på tavlan.",
+  syncWithTrello: "Synkronisera med Trello",
+  trelloBoardId: "Trello Board ID",
+  trelloBoardIdPlaceholder: "T.ex.: abc123def456",
+  trelloBoardIdHelp: "Hitta Board ID i Trello-URL:en: trello.com/b/BOARD_ID/board-namn",
+  trelloSyncWarning: "⚠️ Synkronisering ersätter alla befintliga kolumner och inlägg för denna klient.",
+  syncing: "Synkroniserar...",
+  startSync: "Starta Synkronisering",
+  syncComplete: "Synkronisering klar!",
+  syncError: "Synkroniseringsfel",
+  postSentSuccess: "✅ Inlägg skickat!",
+  postSentDesc: "Ditt inlägg har mottagits och väntar på granskning.",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };
