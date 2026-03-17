@@ -750,7 +750,7 @@ const AdminDashboard = () => {
                 <div className="mt-1 flex items-center gap-3">
                   <img src={logoPreview} alt="Logo" className="h-14 w-14 rounded-lg object-contain border" />
                   <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-                    Alterar
+                    {t("change")}
                   </Button>
                 </div>
               ) : (
