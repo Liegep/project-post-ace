@@ -205,7 +205,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
           .single();
         if (newCol) {
           newColumnId = (newCol as any).id;
-          setColumns((prev) => [...prev, { id: (newCol as any).id, clientId, name: "Aprovados", position: maxPos }]);
+          setColumns((prev) => [...prev, { id: (newCol as any).id, clientId, name: "Aprovados", position: maxPos, visibleToClient: false }]);
         }
       }
     }
