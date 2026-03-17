@@ -167,7 +167,45 @@ const AdminDashboard = () => {
     setUnarchiveNotifs((prev) => prev.filter((n) => n.postId !== postId));
   };
 
-  const generateSlug = (name: string) => {
+  const fetchClientCreatedNotifs = async () => {
+    const { data: posts } = await supabase
+      .from("posts")
+      .select("id, title, client_id, client_created_at")
+      .not("client_created_at", "is", null)
+      .order("client_created_at", { ascending: false });
+
+    if (!posts || posts.length === 0) {
+      setClientCreatedNotifs([]);
+      return;
+    }
+
+    const clientIds = [...new Set(posts.map((p: any) => p.client_id).filter(Boolean))];
+    const { data: clientsData } = await supabase
+      .from("clients")
+      .select("id, name, slug, logo_url")
+      .in("id", clientIds);
+
+    const clientMap: Record<string, { name: string; slug: string; logo_url: string }> = {};
+    (clientsData || []).forEach((c: any) => { clientMap[c.id] = { name: c.name, slug: c.slug, logo_url: c.logo_url }; });
+
+    setClientCreatedNotifs(
+      posts.map((p: any) => ({
+        postId: p.id,
+        postTitle: p.title,
+        clientName: clientMap[p.client_id]?.name || "—",
+        clientSlug: clientMap[p.client_id]?.slug || "",
+        clientLogo: clientMap[p.client_id]?.logo_url || "",
+        createdAt: p.client_created_at,
+      }))
+    );
+  };
+
+  const dismissClientCreatedNotif = async (postId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await supabase.from("posts").update({ client_created_at: null } as any).eq("id", postId);
+    setClientCreatedNotifs((prev) => prev.filter((n) => n.postId !== postId));
+  };
+
     return name
       .toLowerCase()
       .normalize("NFD")
