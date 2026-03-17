@@ -548,6 +548,8 @@ const AdminDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <InviteAdminDialog open={inviteOpen} onOpenChange={setInviteOpen} />
     </div>
   );
 };
