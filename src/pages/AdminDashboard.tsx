@@ -795,7 +795,7 @@ const AdminDashboard = () => {
             {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
             <Button onClick={handleChangePassword} disabled={passwordSaving} className="w-full">
               <KeyRound className="mr-2 h-4 w-4" />
-              {passwordSaving ? "Salvando..." : "Salvar nova senha"}
+              {passwordSaving ? t("saving") : t("saveNewPassword")}
             </Button>
           </div>
         </DialogContent>
