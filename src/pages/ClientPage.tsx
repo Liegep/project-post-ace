@@ -23,6 +23,7 @@ interface ClientData {
   posting_period: string;
   show_archived_to_client: boolean;
   allow_client_edit_caption: boolean;
+  allow_client_create_post: boolean;
   tracking_enabled: boolean;
 }
 
