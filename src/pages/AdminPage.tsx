@@ -840,7 +840,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   />
                   <label htmlFor="tracking-toggle" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
                     <ClipboardList className="h-3.5 w-3.5" />
-                    Acompanhamento ativo
+                    {t("trackingActive")}
                   </label>
                 </div>
               )}
