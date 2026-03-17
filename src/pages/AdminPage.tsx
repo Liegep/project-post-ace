@@ -817,7 +817,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 />
                 <label htmlFor="allow-client-edit-caption" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
                   <Pencil className="h-3.5 w-3.5" />
-                  {allowClientEditCaption ? "Cliente pode editar legenda" : "Cliente não edita legenda"}
+                  {allowClientEditCaption ? t("clientCanEditCaption") : t("clientCannotEditCaption")}
                 </label>
               </div>
               <div className="flex items-center gap-2">
