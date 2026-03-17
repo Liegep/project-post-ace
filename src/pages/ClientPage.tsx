@@ -20,6 +20,7 @@ interface ClientData {
   locale: string;
   posting_period: string;
   show_archived_to_client: boolean;
+  allow_client_edit_caption: boolean;
 }
 
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
