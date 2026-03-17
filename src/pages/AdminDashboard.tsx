@@ -759,7 +759,7 @@ const AdminDashboard = () => {
                   onClick={() => fileInputRef.current?.click()}
                   className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/30 py-6 text-sm text-muted-foreground transition-colors hover:border-accent hover:text-accent"
                 >
-                  <ImagePlus className="h-5 w-5" />
+                  <ImagePlus className="h-5 w-5" /> {t("selectLogo")}
                   Selecionar logo
                 </button>
               )}
