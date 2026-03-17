@@ -1,4 +1,4 @@
-import { Post } from "@/types/post";
+import { Post, Tag, TAG_TRANSLATION_KEYS } from "@/types/post";
 import { Badge } from "@/components/ui/badge";
 import { Check, Circle, Eye, EyeOff, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,7 @@ interface TrackingPanelProps {
   clientId: string;
   posts: Post[];
   columns?: { id: string; name: string }[];
+  tags?: Tag[];
   isAdmin?: boolean;
   visibleToClient?: boolean;
   onToggleVisibility?: (visible: boolean) => void;
@@ -37,9 +38,10 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   escrevendo_legenda: { label: "Escrevendo Legenda", className: "bg-info/20 text-info border-info/30" },
   pronto: { label: "Pronto", className: "bg-primary/20 text-primary border-primary/30" },
   finalizado: { label: "Finalizado", className: "bg-success/20 text-success border-success/30" },
+  alteracao_solicitada: { label: "Alteração Solicitada", className: "bg-destructive/20 text-destructive border-destructive/30" },
 };
 
-function SortableItem({ post, isEntrada }: { post: Post; isEntrada: boolean }) {
+function SortableItem({ post, isEntrada, tags }: { post: Post; isEntrada: boolean; tags: Tag[] }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: post.id });
 
   const style = {
@@ -51,44 +53,65 @@ function SortableItem({ post, isEntrada }: { post: Post; isEntrada: boolean }) {
 
   const isDone = post.status === "finalizado";
   const isDev = post.status === "em_desenvolvimento";
+  const isChangeRequested = post.status === "alteracao_solicitada";
   const statusInfo = STATUS_LABELS[post.status] || STATUS_LABELS.entrada;
+
+  const postTags = post.tags
+    .map((tagId) => tags.find((t) => t.id === tagId))
+    .filter(Boolean) as Tag[];
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center gap-1 rounded-lg border-2 px-2 py-2",
+        "flex flex-col gap-1 rounded-lg border-2 px-2 py-2",
         isDone && "border-success/20 bg-success/5",
         isDev && "border-warning/20 bg-warning/5",
-        isEntrada && !isDone && !isDev && "border-red-400 bg-red-50 dark:bg-red-950/30 dark:border-red-600",
-        !isDone && !isDev && !isEntrada && "border-transparent bg-card"
+        isChangeRequested && "border-destructive/20 bg-destructive/5",
+        isEntrada && !isDone && !isDev && !isChangeRequested && "border-red-400 bg-red-50 dark:bg-red-950/30 dark:border-red-600",
+        !isDone && !isDev && !isEntrada && !isChangeRequested && "border-transparent bg-card"
       )}
     >
-      <button {...attributes} {...listeners} className="cursor-grab touch-none text-muted-foreground hover:text-foreground shrink-0">
-        <GripVertical className="h-3.5 w-3.5" />
-      </button>
-      {isDone ? (
-        <>
-          <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-md bg-success">
-            <Check className="h-2.5 w-2.5 text-success-foreground" />
-          </div>
-          <span className="text-sm font-medium text-muted-foreground line-through truncate">{post.title}</span>
-        </>
-      ) : (
-        <>
-          <Circle className={cn("h-3 w-3 shrink-0", isDev ? "text-warning-foreground" : isEntrada ? "text-red-500" : "text-muted-foreground")} />
-          <span className={cn("text-sm font-medium truncate flex-1", isEntrada ? "text-red-700 dark:text-red-400" : "text-foreground")}>{post.title}</span>
-          <Badge variant="outline" className={cn("text-[10px] shrink-0 font-semibold", isEntrada && !isDev ? "bg-red-500 text-white border-red-500 dark:bg-red-600 dark:border-red-600" : statusInfo.className)}>
-            {isEntrada ? "Entrada" : statusInfo.label}
-          </Badge>
-        </>
+      <div className="flex items-center gap-1">
+        <button {...attributes} {...listeners} className="cursor-grab touch-none text-muted-foreground hover:text-foreground shrink-0">
+          <GripVertical className="h-3.5 w-3.5" />
+        </button>
+        {isDone ? (
+          <>
+            <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-md bg-success">
+              <Check className="h-2.5 w-2.5 text-success-foreground" />
+            </div>
+            <span className="text-sm font-medium text-muted-foreground line-through truncate">{post.title}</span>
+          </>
+        ) : (
+          <>
+            <Circle className={cn("h-3 w-3 shrink-0", isDev ? "text-warning-foreground" : isChangeRequested ? "text-destructive" : isEntrada ? "text-red-500" : "text-muted-foreground")} />
+            <span className={cn("text-sm font-medium truncate flex-1", isEntrada ? "text-red-700 dark:text-red-400" : isChangeRequested ? "text-destructive" : "text-foreground")}>{post.title}</span>
+            <Badge variant="outline" className={cn("text-[10px] shrink-0 font-semibold", isEntrada && !isDev ? "bg-red-500 text-white border-red-500 dark:bg-red-600 dark:border-red-600" : statusInfo.className)}>
+              {isEntrada ? "Entrada" : statusInfo.label}
+            </Badge>
+          </>
+        )}
+      </div>
+      {postTags.length > 0 && (
+        <div className="flex flex-wrap gap-1 pl-6">
+          {postTags.map((tag) => (
+            <span
+              key={tag.id}
+              className="inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold"
+              style={{ backgroundColor: tag.color, color: "#fff" }}
+            >
+              {TAG_TRANSLATION_KEYS[tag.id] ? tag.name : tag.name}
+            </span>
+          ))}
+        </div>
       )}
     </div>
   );
 }
 
-export const TrackingPanel = ({ clientId, posts, columns = [], isAdmin = false, visibleToClient, onToggleVisibility }: TrackingPanelProps) => {
+export const TrackingPanel = ({ clientId, posts, columns = [], tags = [], isAdmin = false, visibleToClient, onToggleVisibility }: TrackingPanelProps) => {
   const [orderedPosts, setOrderedPosts] = useState<Post[]>([]);
   const [loaded, setLoaded] = useState(false);
   const savedOrderRef = useRef<string[]>([]);
@@ -193,7 +216,7 @@ export const TrackingPanel = ({ clientId, posts, columns = [], isAdmin = false, 
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={allIds} strategy={verticalListSortingStrategy}>
               {orderedPosts.map((post) => (
-                <SortableItem key={post.id} post={post} isEntrada={isEntrada(post)} />
+                <SortableItem key={post.id} post={post} isEntrada={isEntrada(post)} tags={tags} />
               ))}
             </SortableContext>
           </DndContext>

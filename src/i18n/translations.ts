@@ -27,6 +27,7 @@ type TranslationKeys = {
   statusWritingCaption: string;
   statusReady: string;
   statusFinalized: string;
+  statusChangeRequested: string;
   // Client labels
   labelPending: string;
   labelApproved: string;
@@ -97,6 +98,7 @@ const pt: TranslationKeys = {
   statusWritingCaption: "Escrevendo Legenda",
   statusReady: "Pronto",
   statusFinalized: "Finalizado",
+  statusChangeRequested: "Alteração Solicitada",
   labelPending: "Pendente",
   labelApproved: "Aprovado",
   labelChangeRequested: "Alteração Solicitada",
@@ -154,6 +156,7 @@ const en: TranslationKeys = {
   statusWritingCaption: "Writing Caption",
   statusReady: "Ready",
   statusFinalized: "Finalized",
+  statusChangeRequested: "Change Requested",
   labelPending: "Pending",
   labelApproved: "Approved",
   labelChangeRequested: "Change Requested",
@@ -211,6 +214,7 @@ const it: TranslationKeys = {
   statusWritingCaption: "Scrittura Didascalia",
   statusReady: "Pronto",
   statusFinalized: "Finalizzato",
+  statusChangeRequested: "Modifica Richiesta",
   labelPending: "In Attesa",
   labelApproved: "Approvato",
   labelChangeRequested: "Modifica Richiesta",
@@ -268,6 +272,7 @@ const es: TranslationKeys = {
   statusWritingCaption: "Escribiendo Leyenda",
   statusReady: "Listo",
   statusFinalized: "Finalizado",
+  statusChangeRequested: "Cambio Solicitado",
   labelPending: "Pendiente",
   labelApproved: "Aprobado",
   labelChangeRequested: "Cambio Solicitado",
@@ -325,6 +330,7 @@ const sv: TranslationKeys = {
   statusWritingCaption: "Skriver Bildtext",
   statusReady: "Klart",
   statusFinalized: "Avslutat",
+  statusChangeRequested: "Ändring Begärd",
   labelPending: "Väntande",
   labelApproved: "Godkänt",
   labelChangeRequested: "Ändring Begärd",

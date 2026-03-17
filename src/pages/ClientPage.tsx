@@ -29,7 +29,7 @@ interface ClientData {
 }
 
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
-  const { posts, archivedPosts, columns, postingPeriod, unarchivePost } = usePosts();
+  const { posts, archivedPosts, columns, tags, postingPeriod, unarchivePost } = usePosts();
   const locale = (clientData.locale || "pt") as Locale;
   const t = useCallback(
     (key: keyof typeof translations.pt) => translations[locale]?.[key] || translations.pt[key] || key,
@@ -147,7 +147,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
             <div className="flex flex-col lg:flex-row gap-6">
               {clientData.tracking_enabled && clientData.tracking_visible_to_client && (
-                <TrackingPanel clientId={clientData.id} posts={posts} columns={columns} />
+                <TrackingPanel clientId={clientData.id} posts={posts} columns={columns} tags={tags} />
               )}
 
               <div className="flex-1 min-w-0 space-y-8">

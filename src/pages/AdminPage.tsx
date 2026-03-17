@@ -420,7 +420,7 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
 
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
-    posts, archivedPosts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
+    posts, archivedPosts, columns, tags, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn, toggleColumnVisibility,
     movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn,
   } = usePosts();
@@ -857,6 +857,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     clientId={clientData.id}
                     posts={posts}
                     columns={columns}
+                    tags={tags}
                     isAdmin
                     visibleToClient={trackingVisibleToClient}
                     onToggleVisibility={async (visible) => {

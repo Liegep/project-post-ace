@@ -32,12 +32,13 @@ const CaptionText = ({ text, t }: { text: string; t: (key: keyof typeof import("
   );
 };
 
-const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "statusWritingCaption" | "statusReady" | "statusFinalized"> = {
+const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "statusWritingCaption" | "statusReady" | "statusFinalized" | "statusChangeRequested"> = {
   entrada: "statusEntry",
   em_desenvolvimento: "statusInDevelopment",
   escrevendo_legenda: "statusWritingCaption",
   pronto: "statusReady",
   finalizado: "statusFinalized",
+  alteracao_solicitada: "statusChangeRequested",
 };
 
 const LABEL_KEYS: Record<ClientLabel, "labelPending" | "labelApproved" | "labelChangeRequested" | "labelReadComment" | "labelGiveFeedback"> = {
@@ -305,33 +306,20 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
         )}
 
         {isAdmin && (
-          <div className="space-y-2 pt-1" onClick={(e) => e.stopPropagation()}>
-            <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
-              <SelectTrigger className={`w-full text-xs ${isCompact ? "h-7" : "h-8"}`}>
-                <SelectValue placeholder="Acompanhamento" />
+          <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
+            <Select value={post.status} onValueChange={(v) => onStatusChange?.(v as PostStatus)}>
+              <SelectTrigger className={`flex-1 text-xs ${isCompact ? "h-7" : "h-8"}`}>
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(Object.keys(LABEL_KEYS) as ClientLabel[]).map((key) => (
-                  <SelectItem key={key} value={key}>{t(LABEL_KEYS[key])}</SelectItem>
+                {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
+                  <SelectItem key={key} value={key}>{t(STATUS_KEYS[key])}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-
-            <div className="flex items-center gap-2">
-              <Select value={post.status} onValueChange={(v) => onStatusChange?.(v as PostStatus)}>
-                <SelectTrigger className={`flex-1 text-xs ${isCompact ? "h-7" : "h-8"}`}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
-                    <SelectItem key={key} value={key}>{t(STATUS_KEYS[key])}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
+            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
         )}
 
