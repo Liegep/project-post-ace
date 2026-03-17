@@ -592,7 +592,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     const targetColumnId = columnId === "__unassigned__" ? null : columnId;
     await bulkMoveToColumn(ids, targetColumnId);
     exitSelectionMode();
-    toast({ title: `${ids.length} posts movidos` });
+    toast({ title: `${ids.length} ${t("postsMoved")}` });
   };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
