@@ -25,6 +25,7 @@ interface ClientData {
   allow_client_edit_caption: boolean;
   allow_client_create_post: boolean;
   tracking_enabled: boolean;
+  tracking_visible_to_client: boolean;
 }
 
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
