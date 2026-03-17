@@ -135,6 +135,7 @@ const pt: TranslationKeys = {
   tagAltered: "Alterado",
   tagScheduled: "Agendado",
   tagPublished: "Publicado",
+  tagChangeRequested: "Alteração Solicitada",
   media: "Mídia",
   clickToSelectMedia: "Clique para selecionar imagem ou vídeo",
   postingPeriod: "Período de Postagem",
