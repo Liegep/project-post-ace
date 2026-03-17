@@ -520,13 +520,13 @@ const AdminDashboard = () => {
 
         {/* Unarchive notifications */}
         {unarchiveNotifs.length > 0 && (
-          <div className="rounded-xl border bg-card p-4">
+          <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/5 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-info/20">
-                <RotateCcw className="h-4 w-4 text-info-foreground" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
+                <RotateCcw className="h-4 w-4 text-emerald-500" />
               </div>
               <h2 className="font-semibold text-foreground">Posts Restaurados pelo Cliente</h2>
-              <span className="rounded-full bg-info/20 px-2 py-0.5 text-xs font-semibold text-info-foreground">
+              <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-500">
                 {unarchiveNotifs.length}
               </span>
             </div>
