@@ -11,6 +11,8 @@ import ClientPage from "./pages/ClientPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import AcceptInvitePage from "./pages/AcceptInvitePage.tsx";
+import SocialDashboard from "./pages/SocialDashboard.tsx";
+import SocialCallbackPage from "./pages/SocialCallbackPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
