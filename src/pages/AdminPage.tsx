@@ -414,8 +414,8 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
         <div className="mb-4 rounded-full bg-muted p-6">
           <Archive className="h-8 w-8 text-muted-foreground" />
         </div>
-        <h2 className="text-xl font-semibold text-foreground">Nenhum post arquivado</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Posts com status "Finalizado" aparecerão aqui</p>
+        <h2 className="text-xl font-semibold text-foreground">{t("noArchivedPosts")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("archivedPostsAppearHere")}</p>
       </div>
     );
   }
