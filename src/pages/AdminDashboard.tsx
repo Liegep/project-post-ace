@@ -43,6 +43,15 @@ interface UnarchiveNotification {
   unarchivedAt: string;
 }
 
+interface ClientCreatedNotification {
+  postId: string;
+  postTitle: string;
+  clientName: string;
+  clientSlug: string;
+  clientLogo: string;
+  createdAt: string;
+}
+
 const AdminDashboard = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
