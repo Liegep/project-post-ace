@@ -83,7 +83,7 @@ interface ClientData {
 
 interface KanbanBoardProps {
   posts: Post[];
-  columns: { id: string; name: string; position: number }[];
+  columns: { id: string; name: string; position: number; visibleToClient: boolean }[];
   unassignedPosts: Post[];
   editingColumnId: string | null;
   editingColumnName: string;
@@ -106,6 +106,7 @@ interface KanbanBoardProps {
   movePostToColumn: (postId: string, columnId: string | null) => void;
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   t: (key: any) => string;
+  toggleColumnVisibility: (id: string, visible: boolean) => void;
   selectionMode?: boolean;
   selectedPostIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
@@ -117,6 +118,7 @@ const KanbanBoard = ({
   handleDeleteColumn, updatePostStatus, deletePost, setEditPost, setCreateInColumnId,
   setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
   newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
+  toggleColumnVisibility,
   selectionMode, selectedPostIds, onToggleSelect,
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
@@ -202,6 +204,13 @@ const KanbanBoard = ({
                   </div>
                 )}
                 <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => toggleColumnVisibility(col.id, !col.visibleToClient)}
+                    className={`rounded p-1 transition-colors ${col.visibleToClient ? "text-primary hover:bg-primary/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                    title={col.visibleToClient ? "Visível para o cliente" : "Oculto para o cliente"}
+                  >
+                    {col.visibleToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                  </button>
                   <button
                     onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
                     className="rounded p-1 text-muted-foreground hover:bg-accent/10 hover:text-accent"
@@ -411,7 +420,7 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
     posts, archivedPosts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
-    companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn,
+    companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn, toggleColumnVisibility,
     movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn,
   } = usePosts();
   const { t } = useI18n();
@@ -835,6 +844,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     movePostToColumn={movePostToColumn}
                     reorderPostsInColumn={reorderPostsInColumn}
                     t={t}
+                    toggleColumnVisibility={toggleColumnVisibility}
                     selectionMode={selectionMode}
                     selectedPostIds={selectedPostIds}
                     onToggleSelect={toggleSelect}

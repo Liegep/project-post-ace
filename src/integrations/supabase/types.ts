@@ -118,6 +118,7 @@ export type Database = {
           name: string
           position: number
           trello_list_id: string | null
+          visible_to_client: boolean
         }
         Insert: {
           client_id: string
@@ -126,6 +127,7 @@ export type Database = {
           name: string
           position?: number
           trello_list_id?: string | null
+          visible_to_client?: boolean
         }
         Update: {
           client_id?: string
@@ -134,6 +136,7 @@ export type Database = {
           name?: string
           position?: number
           trello_list_id?: string | null
+          visible_to_client?: boolean
         }
         Relationships: [
           {

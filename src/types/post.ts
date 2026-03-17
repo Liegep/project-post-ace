@@ -12,6 +12,7 @@ export interface Column {
   clientId: string;
   name: string;
   position: number;
+  visibleToClient: boolean;
 }
 
 export interface Comment {

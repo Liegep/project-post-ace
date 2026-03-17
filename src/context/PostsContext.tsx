@@ -26,6 +26,7 @@ interface PostsContextType {
   renameColumn: (id: string, name: string) => void;
   deleteColumn: (id: string) => void;
   reorderColumns: (columns: Column[]) => void;
+  toggleColumnVisibility: (id: string, visible: boolean) => void;
   movePostToColumn: (postId: string, columnId: string | null) => void;
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   unarchivePost: (id: string, columnId?: string | null, clientInitiated?: boolean) => void;
@@ -102,7 +103,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       setPosts((postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || [])));
       setTags((tagsRes.data || []).map((t: any) => ({ id: t.id, name: t.name, color: t.color })));
-      setColumns((columnsRes.data || []).map((c: any) => ({ id: c.id, clientId: c.client_id, name: c.name, position: c.position })));
+      setColumns((columnsRes.data || []).map((c: any) => ({ id: c.id, clientId: c.client_id, name: c.name, position: c.position, visibleToClient: c.visible_to_client ?? false })));
       setLoading(false);
     };
     fetchAll();
@@ -204,7 +205,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
           .single();
         if (newCol) {
           newColumnId = (newCol as any).id;
-          setColumns((prev) => [...prev, { id: (newCol as any).id, clientId, name: "Aprovados", position: maxPos }]);
+          setColumns((prev) => [...prev, { id: (newCol as any).id, clientId, name: "Aprovados", position: maxPos, visibleToClient: false }]);
         }
       }
     }
@@ -288,7 +289,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       position,
     } as any).select().single();
     if (error) throw error;
-    const col: Column = { id: data.id, clientId: data.client_id, name: data.name, position: data.position };
+    const col: Column = { id: data.id, clientId: data.client_id, name: data.name, position: data.position, visibleToClient: data.visible_to_client ?? false };
     setColumns((prev) => [...prev, col]);
     return col;
   }, [clientId, columns.length]);
@@ -311,6 +312,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     for (let i = 0; i < newColumns.length; i++) {
       await supabase.from("columns").update({ position: i } as any).eq("id", newColumns[i].id);
     }
+  }, []);
+
+  const toggleColumnVisibility = useCallback(async (id: string, visible: boolean) => {
+    setColumns((prev) => prev.map((c) => (c.id === id ? { ...c, visibleToClient: visible } : c)));
+    await supabase.from("columns").update({ visible_to_client: visible } as any).eq("id", id);
   }, []);
 
   const reorderPostsInColumn = useCallback(async (columnId: string | null, orderedPostIds: string[]) => {
@@ -376,7 +382,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     <PostsContext.Provider value={{
       clientId, posts: activePosts, archivedPosts, tags, columns, postingPeriod, companyLogo, setPostingPeriod, setCompanyLogo,
       addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost,
-      addTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns,
+      addTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns, toggleColumnVisibility,
       movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, loading,
     }}>
       {children}
