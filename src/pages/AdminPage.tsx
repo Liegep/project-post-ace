@@ -753,7 +753,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               variant={selectionMode ? "default" : "outline"}
               onClick={() => selectionMode ? exitSelectionMode() : setSelectionMode(true)}
             >
-              <CheckSquare className="mr-2 h-4 w-4" /> {selectionMode ? "Cancelar" : "Selecionar"}
+              <CheckSquare className="mr-2 h-4 w-4" /> {selectionMode ? t("cancel") : t("select")}
             </Button>
             {!trackingEnabled && (
               <Button variant="outline" onClick={enableTracking}>
