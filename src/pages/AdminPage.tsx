@@ -386,13 +386,14 @@ const KanbanBoard = ({
   );
 };
 
-const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode, selectedPostIds, onToggleSelect }: {
+const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode, selectedPostIds, onToggleSelect, t }: {
   archivedPosts: Post[];
   unarchivePost: (id: string) => void;
   deletePost: (id: string) => void;
   selectionMode?: boolean;
   selectedPostIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
+  t: (key: any) => string;
 }) => {
   const grouped = archivedPosts.reduce<Record<string, Post[]>>((acc, post) => {
     const date = post.archivedAt || post.createdAt;
