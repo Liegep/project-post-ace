@@ -574,7 +574,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
 
   const handleBulkDelete = async () => {
     const ids = Array.from(selectedPostIds);
-    if (!confirm(`Excluir ${ids.length} posts permanentemente?`)) return;
+    if (!confirm(t("confirmBulkDelete").replace("{count}", String(ids.length)))) return;
     await bulkDeletePosts(ids);
     exitSelectionMode();
     toast({ title: `${ids.length} posts excluídos` });
