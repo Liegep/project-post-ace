@@ -151,55 +151,61 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
             )}
 
-            {hasContent && (
-              <div className="space-y-8">
-                {/* Visible columns as horizontal board */}
-                {visibleColumnPosts.length > 0 && (
-                  <div className="flex gap-4 overflow-x-auto pb-4">
-                    {visibleColumnPosts.map(({ column, posts: colPosts }) => (
-                      <div key={column.id} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
-                        <div className="mb-4 flex items-center gap-2">
-                          <span className="text-sm font-semibold text-foreground">{column.name}</span>
-                          <span className="text-xs text-muted-foreground">({colPosts.length})</span>
-                        </div>
-                        <div className="space-y-4">
-                          {sortByDate(colPosts).map((post) => (
-                            <PostCard key={post.id} post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex flex-col lg:flex-row gap-6">
-                  {entradaPosts.length > 0 && (
-                    <div className="w-full lg:w-80 shrink-0">
-                      <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
-                      <div className="space-y-4 rounded-xl bg-muted/30 p-4">
-                        {sortByDate(entradaPosts).map((post) => (
-                          <PostCard key={post.id} post={post} isAdmin={false} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex-1 min-w-0">
-                    {readyPosts.length > 0 && (
-                      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {sortByDate(readyPosts).map((post) => (
-                          <PostCard key={post.id} post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+            <div className="flex flex-col lg:flex-row gap-6">
+              <div className="flex-1 min-w-0 space-y-8">
+                {hasContent ? (
+                  <>
+                    {/* Visible columns as horizontal board */}
+                    {visibleColumnPosts.length > 0 && (
+                      <div className="flex gap-4 overflow-x-auto pb-4">
+                        {visibleColumnPosts.map(({ column, posts: colPosts }) => (
+                          <div key={column.id} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
+                            <div className="mb-4 flex items-center gap-2">
+                              <span className="text-sm font-semibold text-foreground">{column.name}</span>
+                              <span className="text-xs text-muted-foreground">({colPosts.length})</span>
+                            </div>
+                            <div className="space-y-4">
+                              {sortByDate(colPosts).map((post) => (
+                                <PostCard key={post.id} post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                              ))}
+                            </div>
+                          </div>
                         ))}
                       </div>
                     )}
-                  </div>
 
-                  {clientData.tracking_enabled && clientData.tracking_visible_to_client && (
-                    <TrackingPanel clientId={clientData.id} posts={posts} columns={columns} />
-                  )}
-                </div>
+                    <div className="flex flex-col lg:flex-row gap-6">
+                      {entradaPosts.length > 0 && (
+                        <div className="w-full lg:w-80 shrink-0">
+                          <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
+                          <div className="space-y-4 rounded-xl bg-muted/30 p-4">
+                            {sortByDate(entradaPosts).map((post) => (
+                              <PostCard key={post.id} post={post} isAdmin={false} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex-1 min-w-0">
+                        {readyPosts.length > 0 && (
+                          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            {sortByDate(readyPosts).map((post) => (
+                              <PostCard key={post.id} post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
+                )}
               </div>
-            )}
+
+              {clientData.tracking_enabled && clientData.tracking_visible_to_client && (
+                <TrackingPanel clientId={clientData.id} posts={posts} columns={columns} />
+              )}
+            </div>
           </>
         ) : (
           <div>
