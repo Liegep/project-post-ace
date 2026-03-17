@@ -645,7 +645,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       setAddingColumn(false);
     } catch (err) {
       console.error(err);
-      toast({ title: "Erro ao criar coluna", variant: "destructive" });
+      toast({ title: t("columnCreateError"), variant: "destructive" });
     } finally {
       addingColumnRef.current = false;
     }
