@@ -416,7 +416,7 @@ const AdminDashboard = () => {
                 await supabase.auth.signOut();
                 navigate("/login");
               }}
-              title="Sair"
+              title={t("signOut")}
             >
               <LogOut className="h-4 w-4" />
             </Button>
