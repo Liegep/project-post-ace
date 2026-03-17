@@ -150,7 +150,10 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
             />
           </div>
           <div>
-            <Label htmlFor="edit-caption">{t("caption")}</Label>
+            <div className="flex items-center justify-between mb-1">
+              <Label htmlFor="edit-caption">{t("caption")}</Label>
+              <HashtagManager clientId={clientId} onInsert={(h) => setCaption((prev) => prev ? `${prev}\n\n${h}` : h)} />
+            </div>
             <Textarea id="edit-caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("captionPlaceholder")} className="min-h-[100px]" />
           </div>
           <div className="grid grid-cols-2 gap-4">
