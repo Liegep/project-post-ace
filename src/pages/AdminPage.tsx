@@ -106,6 +106,7 @@ interface KanbanBoardProps {
   movePostToColumn: (postId: string, columnId: string | null) => void;
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   t: (key: any) => string;
+  toggleColumnVisibility: (id: string, visible: boolean) => void;
   selectionMode?: boolean;
   selectedPostIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
