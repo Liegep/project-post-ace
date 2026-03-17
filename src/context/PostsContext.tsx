@@ -289,7 +289,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       position,
     } as any).select().single();
     if (error) throw error;
-    const col: Column = { id: data.id, clientId: data.client_id, name: data.name, position: data.position };
+    const col: Column = { id: data.id, clientId: data.client_id, name: data.name, position: data.position, visibleToClient: data.visible_to_client ?? false };
     setColumns((prev) => [...prev, col]);
     return col;
   }, [clientId, columns.length]);
