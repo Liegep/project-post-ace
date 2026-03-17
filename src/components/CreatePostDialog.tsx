@@ -100,8 +100,8 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
 
       if (clientCreated && success) {
         toast({
-          title: "✅ Post enviado com sucesso!",
-          description: "Seu post foi recebido e está aguardando revisão da equipe.",
+          title: t("postSentSuccess"),
+          description: t("postSentDesc"),
           duration: 5000,
         });
       }
