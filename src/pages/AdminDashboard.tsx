@@ -91,7 +91,7 @@ const AdminDashboard = () => {
   const handleChangePassword = async () => {
     setPasswordError("");
     if (newPassword.length < 6) {
-      setPasswordError("A senha deve ter pelo menos 6 caracteres");
+      setPasswordError(t("passwordMinError"));
       return;
     }
     if (newPassword !== confirmNewPassword) {
