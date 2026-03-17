@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN allow_client_create_post boolean NOT NULL DEFAULT false;
