@@ -673,7 +673,7 @@ const AdminDashboard = () => {
                     className="flex-1"
                     onClick={() => navigate(`/admin/${client.slug}`)}
                   >
-                    Gerenciar
+                    {t("manage")}
                   </Button>
                   <Button
                     variant="outline"
