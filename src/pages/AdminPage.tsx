@@ -978,7 +978,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     {columns.map((col) => (
                       <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
                     ))}
-                    <SelectItem value="__unassigned__">Sem coluna</SelectItem>
+                    <SelectItem value="__unassigned__">{t("noColumn")}</SelectItem>
                   </SelectContent>
                 </Select>
               )}
