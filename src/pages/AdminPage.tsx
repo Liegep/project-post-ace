@@ -362,7 +362,7 @@ const KanbanBoard = ({
               className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-muted-foreground/30 py-12 text-sm text-muted-foreground hover:border-accent hover:text-accent transition-colors"
             >
               <Plus className="h-5 w-5" /> {t("newColumn")}
-              Nova coluna
+              
             </button>
           )}
         </div>
