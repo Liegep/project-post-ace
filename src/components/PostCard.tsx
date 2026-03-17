@@ -256,6 +256,9 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, tracki
             ) : (
               <TagDisplay tagIds={post.tags} tags={tags} />
             )}
+            {trackingEnabled && (
+              <PostTrackingLabels postId={post.id} clientId={clientId} isAdmin={isAdmin} />
+            )}
             {post.caption && (
               isAdmin ? (
                 <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
