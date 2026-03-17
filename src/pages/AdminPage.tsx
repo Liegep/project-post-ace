@@ -79,6 +79,7 @@ interface ClientData {
   trello_board_id: string;
   show_archived_to_client: boolean;
   tracking_enabled: boolean;
+  tracking_visible_to_client: boolean;
 }
 
 interface KanbanBoardProps {
@@ -451,7 +452,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [allowClientEditCaption, setAllowClientEditCaption] = useState((clientData as any).allow_client_edit_caption ?? false);
   const [allowClientCreatePost, setAllowClientCreatePost] = useState((clientData as any).allow_client_create_post ?? false);
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
-  const [trackingVisibleToClient, setTrackingVisibleToClient] = useState((clientData as any).tracking_visible_to_client ?? false);
+  const [trackingVisibleToClient, setTrackingVisibleToClient] = useState(clientData.tracking_visible_to_client ?? false);
 
   const toggleShowArchivedToClient = async (checked: boolean) => {
     setShowArchivedToClient(checked);
@@ -859,7 +860,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     visibleToClient={trackingVisibleToClient}
                     onToggleVisibility={async (visible) => {
                       setTrackingVisibleToClient(visible);
-                      await supabase.from("clients").update({ tracking_visible_to_client: visible } as any).eq("id", clientData.id);
+                      await supabase.from("clients").update({ tracking_visible_to_client: visible }).eq("id", clientData.id);
                     }}
                   />
                 )}
