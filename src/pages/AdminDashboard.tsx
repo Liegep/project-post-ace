@@ -121,7 +121,47 @@ const AdminDashboard = () => {
     fetchFeedbacks();
     fetchUnarchiveNotifs();
     fetchClientCreatedNotifs();
+    fetchTodayPosts();
   }, []);
+
+  const fetchTodayPosts = async () => {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
+
+    const { data: posts } = await supabase
+      .from("posts")
+      .select("id, title, client_id, deadline")
+      .gte("deadline", startOfDay)
+      .lt("deadline", endOfDay)
+      .eq("archived", false)
+      .order("deadline", { ascending: true });
+
+    if (!posts || posts.length === 0) {
+      setTodayPosts([]);
+      return;
+    }
+
+    const clientIds = [...new Set(posts.map((p: any) => p.client_id).filter(Boolean))];
+    const { data: clientsData } = await supabase
+      .from("clients")
+      .select("id, name, slug, logo_url")
+      .in("id", clientIds);
+
+    const clientMap: Record<string, { name: string; slug: string; logo_url: string }> = {};
+    (clientsData || []).forEach((c: any) => { clientMap[c.id] = { name: c.name, slug: c.slug, logo_url: c.logo_url }; });
+
+    setTodayPosts(
+      posts.map((p: any) => ({
+        postId: p.id,
+        postTitle: p.title,
+        clientName: clientMap[p.client_id]?.name || "—",
+        clientSlug: clientMap[p.client_id]?.slug || "",
+        clientLogo: clientMap[p.client_id]?.logo_url || "",
+        deadline: p.deadline,
+      }))
+    );
+  };
 
   const fetchClients = async () => {
     setLoading(true);
