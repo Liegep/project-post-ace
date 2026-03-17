@@ -3,11 +3,12 @@ import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PostsProvider, usePosts } from "@/context/PostsContext";
 import { PostCard } from "@/components/PostCard";
+import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Archive, LayoutGrid, RotateCcw } from "lucide-react";
+import { Archive, LayoutGrid, RotateCcw, Plus } from "lucide-react";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -22,6 +23,7 @@ interface ClientData {
   posting_period: string;
   show_archived_to_client: boolean;
   allow_client_edit_caption: boolean;
+  allow_client_create_post: boolean;
   tracking_enabled: boolean;
 }
 
@@ -34,6 +36,8 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   );
 
   const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
 
   const readyPosts = posts.filter((p) => p.status === "pronto");
 
@@ -120,7 +124,22 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               <h2 className="mb-6 text-center text-3xl font-bold text-foreground">{t("postsForApproval")}</h2>
             )}
 
-            {!hasContent && (
+            {clientData.allow_client_create_post && (
+              <div className="mb-4 flex justify-center">
+                <Button
+                  onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }}
+                  className="bg-accent text-accent-foreground hover:bg-accent/90"
+                >
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  Criar post
+                </Button>
+              </div>
+            )}
+
+            {!hasContent && !clientData.allow_client_create_post && (
+              <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
+            )}
+            {!hasContent && clientData.allow_client_create_post && (
               <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
             )}
 
@@ -209,6 +228,14 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           </div>
         )}
       </main>
+
+      {clientData.allow_client_create_post && (
+        <CreatePostDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          defaultColumnId={createInColumnId}
+        />
+      )}
     </div>
   );
 };

@@ -440,6 +440,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
   const [showArchivedToClient, setShowArchivedToClient] = useState(clientData.show_archived_to_client);
   const [allowClientEditCaption, setAllowClientEditCaption] = useState((clientData as any).allow_client_edit_caption ?? false);
+  const [allowClientCreatePost, setAllowClientCreatePost] = useState((clientData as any).allow_client_create_post ?? false);
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
 
   const toggleShowArchivedToClient = async (checked: boolean) => {
@@ -450,6 +451,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const toggleAllowClientEditCaption = async (checked: boolean) => {
     setAllowClientEditCaption(checked);
     await supabase.from("clients").update({ allow_client_edit_caption: checked } as any).eq("id", clientData.id);
+  };
+
+  const toggleAllowClientCreatePost = async (checked: boolean) => {
+    setAllowClientCreatePost(checked);
+    await supabase.from("clients").update({ allow_client_create_post: checked } as any).eq("id", clientData.id);
   };
 
   const enableTracking = async () => {
@@ -747,6 +753,17 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <label htmlFor="allow-client-edit-caption" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
                   <Pencil className="h-3.5 w-3.5" />
                   {allowClientEditCaption ? "Cliente pode editar legenda" : "Cliente não edita legenda"}
+                </label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="allow-client-create-post"
+                  checked={allowClientCreatePost}
+                  onCheckedChange={toggleAllowClientCreatePost}
+                />
+                <label htmlFor="allow-client-create-post" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                  <Plus className="h-3.5 w-3.5" />
+                  {allowClientCreatePost ? "Cliente pode criar posts" : "Cliente não cria posts"}
                 </label>
               </div>
               {trackingEnabled && (
