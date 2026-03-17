@@ -744,7 +744,7 @@ const AdminDashboard = () => {
             </div>
 
             <div>
-              <Label>Logo</Label>
+              <Label>{t("logo")}</Label>
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoFile} />
               {logoPreview ? (
                 <div className="mt-1 flex items-center gap-3">
