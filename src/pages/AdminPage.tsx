@@ -1020,7 +1020,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 onKeyDown={(e) => { if (e.key === "Enter") handleTrelloSync(); }}
               />
               <p className="mt-1 text-xs text-muted-foreground">
-                Encontre o Board ID na URL do Trello: trello.com/b/<strong>BOARD_ID</strong>/nome-do-board
+                {t("trelloBoardIdHelp")}
               </p>
             </div>
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
