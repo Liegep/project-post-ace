@@ -74,6 +74,7 @@ type TranslationKeys = {
   tagAltered: string;
   tagScheduled: string;
   tagPublished: string;
+  tagChangeRequested: string;
   // Media
   media: string;
   clickToSelectMedia: string;
