@@ -684,6 +684,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             >
               <CheckSquare className="mr-2 h-4 w-4" /> {selectionMode ? "Cancelar" : "Selecionar"}
             </Button>
+            {!trackingEnabled && (
+              <Button variant="outline" onClick={enableTracking}>
+                <ClipboardList className="mr-2 h-4 w-4" /> Criar Acompanhamento
+              </Button>
+            )}
             <Button variant="outline" onClick={() => setTrelloSyncOpen(true)}>
               <RefreshCw className="mr-2 h-4 w-4" /> Trello Sync
             </Button>
