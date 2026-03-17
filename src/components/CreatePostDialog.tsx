@@ -94,6 +94,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
         status,
         tags: selectedTags,
         columnId,
+        clientCreated: clientCreated || false,
       });
 
       setTitle("");
