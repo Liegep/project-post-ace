@@ -11,6 +11,8 @@ import ClientPage from "./pages/ClientPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import AcceptInvitePage from "./pages/AcceptInvitePage.tsx";
+import SocialDashboard from "./pages/SocialDashboard.tsx";
+import SocialCallbackPage from "./pages/SocialCallbackPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -29,6 +31,8 @@ const App = () => (
             <Route path="/" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
             <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
             <Route path="/admin/:slug" element={<AuthGuard><AdminPage /></AuthGuard>} />
+            <Route path="/social" element={<AuthGuard><SocialDashboard /></AuthGuard>} />
+            <Route path="/social/callback" element={<SocialCallbackPage />} />
             <Route path="/client/:slug" element={<ClientPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

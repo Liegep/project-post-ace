@@ -212,6 +212,104 @@ export type Database = {
           },
         ]
       }
+      meta_accounts: {
+        Row: {
+          access_token: string
+          client_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          meta_user_id: string
+          meta_user_name: string
+          token_expires_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          meta_user_id: string
+          meta_user_name?: string
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          meta_user_id?: string
+          meta_user_name?: string
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_accounts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meta_pages: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          instagram_account_id: string | null
+          instagram_username: string | null
+          meta_account_id: string
+          page_access_token: string
+          page_id: string
+          page_name: string
+          platform: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          instagram_account_id?: string | null
+          instagram_username?: string | null
+          meta_account_id: string
+          page_access_token: string
+          page_id: string
+          page_name?: string
+          platform?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          instagram_account_id?: string | null
+          instagram_username?: string | null
+          meta_account_id?: string
+          page_access_token?: string
+          page_id?: string
+          page_name?: string
+          platform?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meta_pages_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meta_pages_meta_account_id_fkey"
+            columns: ["meta_account_id"]
+            isOneToOne: false
+            referencedRelation: "meta_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_tracking: {
         Row: {
           completed: boolean
@@ -338,6 +436,166 @@ export type Database = {
           },
         ]
       }
+      social_logs: {
+        Row: {
+          action: string
+          created_at: string
+          error_message: string | null
+          id: string
+          request_payload: Json | null
+          response_payload: Json | null
+          social_post_id: string
+          success: boolean
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          social_post_id: string
+          success?: boolean
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          request_payload?: Json | null
+          response_payload?: Json | null
+          social_post_id?: string
+          success?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_logs_social_post_id_fkey"
+            columns: ["social_post_id"]
+            isOneToOne: false
+            referencedRelation: "social_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_post_history: {
+        Row: {
+          change_note: string
+          changed_by: string | null
+          created_at: string
+          id: string
+          new_status: Database["public"]["Enums"]["social_post_status"]
+          old_status: Database["public"]["Enums"]["social_post_status"] | null
+          social_post_id: string
+        }
+        Insert: {
+          change_note?: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_status: Database["public"]["Enums"]["social_post_status"]
+          old_status?: Database["public"]["Enums"]["social_post_status"] | null
+          social_post_id: string
+        }
+        Update: {
+          change_note?: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_status?: Database["public"]["Enums"]["social_post_status"]
+          old_status?: Database["public"]["Enums"]["social_post_status"] | null
+          social_post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_post_history_social_post_id_fkey"
+            columns: ["social_post_id"]
+            isOneToOne: false
+            referencedRelation: "social_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_posts: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          caption: string
+          client_id: string
+          created_at: string
+          created_by: string | null
+          error_message: string | null
+          id: string
+          media_type: string
+          media_urls: string[]
+          meta_page_id: string | null
+          meta_post_id: string | null
+          notes: string
+          platform: string
+          published_at: string | null
+          retry_count: number
+          scheduled_at: string | null
+          status: Database["public"]["Enums"]["social_post_status"]
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          caption?: string
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          media_type?: string
+          media_urls?: string[]
+          meta_page_id?: string | null
+          meta_post_id?: string | null
+          notes?: string
+          platform?: string
+          published_at?: string | null
+          retry_count?: number
+          scheduled_at?: string | null
+          status?: Database["public"]["Enums"]["social_post_status"]
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          caption?: string
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          error_message?: string | null
+          id?: string
+          media_type?: string
+          media_urls?: string[]
+          meta_page_id?: string | null
+          meta_post_id?: string | null
+          notes?: string
+          platform?: string
+          published_at?: string | null
+          retry_count?: number
+          scheduled_at?: string | null
+          status?: Database["public"]["Enums"]["social_post_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_posts_meta_page_id_fkey"
+            columns: ["meta_page_id"]
+            isOneToOne: false
+            referencedRelation: "meta_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tags: {
         Row: {
           client_id: string | null
@@ -441,6 +699,15 @@ export type Database = {
     }
     Enums: {
       app_role: "admin"
+      social_post_status:
+        | "draft"
+        | "pending_approval"
+        | "approved"
+        | "scheduled"
+        | "publishing"
+        | "published"
+        | "error"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -569,6 +836,16 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin"],
+      social_post_status: [
+        "draft",
+        "pending_approval",
+        "approved",
+        "scheduled",
+        "publishing",
+        "published",
+        "error",
+        "cancelled",
+      ],
     },
   },
 } as const
