@@ -61,6 +61,7 @@ const AdminDashboard = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   useEffect(() => {
     fetchClients();
