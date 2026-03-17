@@ -13,7 +13,7 @@ interface PostsContextType {
   companyLogo: string;
   setPostingPeriod: (period: string) => void;
   setCompanyLogo: (url: string) => void;
-  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date; clientCreated?: boolean }) => void;
+  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date; clientCreated?: boolean }) => Promise<boolean>;
   updatePostStatus: (id: string, status: PostStatus) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
   addComment: (postId: string, author: string, text: string) => void;
@@ -114,16 +114,42 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, [clientId]);
 
   const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date; clientCreated?: boolean }) => {
+    let resolvedColumnId = post.columnId || null;
+
+    // When client creates a post, always assign to "entrada" column
+    if (post.clientCreated && clientId) {
+      // Try to find existing "entrada" column
+      const { data: existingCols } = await supabase
+        .from("columns")
+        .select("id, name")
+        .eq("client_id", clientId);
+
+      const entradaCol = (existingCols || []).find((c: any) => c.name.toLowerCase() === "entrada");
+      if (entradaCol) {
+        resolvedColumnId = entradaCol.id;
+      } else {
+        // Create "entrada" column
+        const { data: newCol } = await supabase
+          .from("columns")
+          .insert({ client_id: clientId, name: "Entrada", position: 0 } as any)
+          .select()
+          .single();
+        if (newCol) {
+          resolvedColumnId = (newCol as any).id;
+        }
+      }
+    }
+
     const insertData: Record<string, any> = {
       title: post.title,
       image_url: post.imageUrl || '',
       media_type: post.mediaType || 'image',
       media_urls: post.mediaUrls || [],
       caption: post.caption || '',
-      status: post.status,
+      status: post.clientCreated ? 'em_desenvolvimento' : post.status,
       tags: post.tags || [],
       client_id: clientId,
-      column_id: post.columnId || null,
+      column_id: resolvedColumnId,
     };
     if (post.deadline) {
       insertData.deadline = post.deadline.toISOString();
@@ -135,6 +161,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (data && !error) {
       setPosts((prev) => [dbPostToPost(data, []), ...prev]);
     }
+    return !error;
   }, [clientId]);
 
   const updatePostStatus = useCallback(async (id: string, status: PostStatus) => {
