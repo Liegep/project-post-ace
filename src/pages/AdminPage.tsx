@@ -860,7 +860,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     visibleToClient={trackingVisibleToClient}
                     onToggleVisibility={async (visible) => {
                       setTrackingVisibleToClient(visible);
-                      await supabase.from("clients").update({ tracking_visible_to_client: visible } as any).eq("id", clientData.id);
+                      await supabase.from("clients").update({ tracking_visible_to_client: visible }).eq("id", clientData.id);
                     }}
                   />
                 )}
