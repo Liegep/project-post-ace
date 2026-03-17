@@ -330,6 +330,7 @@ const sv: TranslationKeys = {
   statusWritingCaption: "Skriver Bildtext",
   statusReady: "Klart",
   statusFinalized: "Avslutat",
+  statusChangeRequested: "Ändring Begärd",
   labelPending: "Väntande",
   labelApproved: "Godkänt",
   labelChangeRequested: "Ändring Begärd",
