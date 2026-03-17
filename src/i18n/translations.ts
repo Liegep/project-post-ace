@@ -293,6 +293,7 @@ const pt: TranslationKeys = {
   confirmDeleteClient: "Tem certeza que deseja excluir este cliente?",
   // Admin Page
   noColumn: "Sem coluna",
+  columnLabel: "Coluna",
   columnName: "Nome da coluna",
   cancel: "Cancelar",
   newColumn: "Nova coluna",
