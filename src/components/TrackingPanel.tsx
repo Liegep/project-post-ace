@@ -77,9 +77,9 @@ function SortableItem({ post, isEntrada }: { post: Post; isEntrada: boolean }) {
         </>
       ) : (
         <>
-          <Circle className={cn("h-3 w-3 shrink-0", isDev ? "text-warning-foreground" : isEntrada ? "text-orange-500" : "text-muted-foreground")} />
-          <span className="text-sm font-medium text-foreground truncate flex-1">{post.title}</span>
-          <Badge variant="outline" className={cn("text-[10px] shrink-0", isEntrada && !isDev ? "bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-700" : statusInfo.className)}>
+          <Circle className={cn("h-3 w-3 shrink-0", isDev ? "text-warning-foreground" : isEntrada ? "text-red-500" : "text-muted-foreground")} />
+          <span className={cn("text-sm font-medium truncate flex-1", isEntrada ? "text-red-700 dark:text-red-400" : "text-foreground")}>{post.title}</span>
+          <Badge variant="outline" className={cn("text-[10px] shrink-0 font-semibold", isEntrada && !isDev ? "bg-red-500 text-white border-red-500 dark:bg-red-600 dark:border-red-600" : statusInfo.className)}>
             {isEntrada ? "Entrada" : statusInfo.label}
           </Badge>
         </>
