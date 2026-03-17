@@ -705,7 +705,7 @@ const AdminDashboard = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Nome do Cliente</Label>
+              <Label>{t("clientName")}</Label>
               <Input
                 value={name}
                 onChange={(e) => handleNameChange(e.target.value)}
