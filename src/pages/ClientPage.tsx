@@ -41,6 +41,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
   const [createOpen, setCreateOpen] = useState(false);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
+  const [detailPost, setDetailPost] = useState<Post | null>(null);
 
   const readyPosts = posts.filter((p) => p.status === "pronto");
 
