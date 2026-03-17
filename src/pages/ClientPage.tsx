@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PostsProvider, usePosts } from "@/context/PostsContext";
+import { Post } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
+import { PostDetailDialog } from "@/components/PostDetailDialog";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
@@ -39,6 +41,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
   const [createOpen, setCreateOpen] = useState(false);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
+  const [detailPost, setDetailPost] = useState<Post | null>(null);
 
   const readyPosts = posts.filter((p) => p.status === "pronto");
 
@@ -164,7 +167,9 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                             </div>
                             <div className="space-y-4">
                               {sortByDate(colPosts).map((post) => (
-                                <PostCard key={post.id} post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                                <div key={post.id} className="cursor-pointer" onClick={() => setDetailPost(post)}>
+                                  <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                                </div>
                               ))}
                             </div>
                           </div>
@@ -178,7 +183,9 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                           <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
                           <div className="space-y-4 rounded-xl bg-muted/30 p-4">
                             {sortByDate(entradaPosts).map((post) => (
-                              <PostCard key={post.id} post={post} isAdmin={false} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} />
+                              <div key={post.id} className="cursor-pointer" onClick={() => setDetailPost(post)}>
+                                <PostCard post={post} isAdmin={false} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} />
+                              </div>
                             ))}
                           </div>
                         </div>
@@ -188,7 +195,9 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                         {readyPosts.length > 0 && (
                           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             {sortByDate(readyPosts).map((post) => (
-                              <PostCard key={post.id} post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                              <div key={post.id} className="cursor-pointer" onClick={() => setDetailPost(post)}>
+                                <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                              </div>
                             ))}
                           </div>
                         )}
@@ -266,6 +275,14 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           clientCreated
         />
       )}
+
+      <PostDetailDialog
+        post={detailPost}
+        open={!!detailPost}
+        onOpenChange={(v) => { if (!v) setDetailPost(null); }}
+        tags={tags}
+        t={t}
+      />
     </div>
   );
 };
