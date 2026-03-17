@@ -52,6 +52,15 @@ interface ClientCreatedNotification {
   createdAt: string;
 }
 
+interface TodayPost {
+  postId: string;
+  postTitle: string;
+  clientName: string;
+  clientSlug: string;
+  clientLogo: string;
+  deadline: string;
+}
+
 const AdminDashboard = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -59,6 +68,7 @@ const AdminDashboard = () => {
   const [feedbacks, setFeedbacks] = useState<FeedbackNotification[]>([]);
   const [unarchiveNotifs, setUnarchiveNotifs] = useState<UnarchiveNotification[]>([]);
   const [clientCreatedNotifs, setClientCreatedNotifs] = useState<ClientCreatedNotification[]>([]);
+  const [todayPosts, setTodayPosts] = useState<TodayPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
