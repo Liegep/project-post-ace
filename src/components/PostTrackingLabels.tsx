@@ -28,12 +28,12 @@ export const PostTrackingLabels = ({ postId, clientId, isAdmin = false }: PostTr
     const load = async () => {
       if (!stepsCache[clientId]) {
         if (!stepsFetching[clientId]) {
-          stepsFetching[clientId] = supabase.from("tracking_steps").select("*").eq("client_id", clientId).order("position")
-            .then(({ data }) => {
-              const steps = (data || []).map((s: any) => ({ id: s.id, name: s.name, color: s.color, position: s.position }));
-              stepsCache[clientId] = steps;
-              return steps;
-            });
+          stepsFetching[clientId] = (async () => {
+            const { data } = await supabase.from("tracking_steps").select("*").eq("client_id", clientId).order("position");
+            const s = (data || []).map((s: any) => ({ id: s.id, name: s.name, color: s.color, position: s.position }));
+            stepsCache[clientId] = s;
+            return s;
+          })();
         }
         await stepsFetching[clientId];
       }
