@@ -631,6 +631,35 @@ export type Database = {
           },
         ]
       }
+      tracking_order: {
+        Row: {
+          client_id: string
+          id: string
+          post_ids: string[]
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          id?: string
+          post_ids?: string[]
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          id?: string
+          post_ids?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tracking_order_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tracking_steps: {
         Row: {
           client_id: string
