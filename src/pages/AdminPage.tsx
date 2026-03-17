@@ -1012,7 +1012,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Board ID do Trello</Label>
+              <Label>{t("trelloBoardId")}</Label>
               <Input
                 value={trelloBoardId}
                 onChange={(e) => setTrelloBoardId(e.target.value)}
