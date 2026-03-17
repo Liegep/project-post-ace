@@ -49,7 +49,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     mediaType: (row.media_type || "image") as MediaType,
     mediaUrls,
     caption: row.caption,
-    deadline: row.deadline ? new Date(row.deadline) : new Date(),
+    deadline: row.deadline ? new Date(row.deadline) : null,
     status: row.status as PostStatus,
     clientLabel: row.client_label as ClientLabel,
     comments,
