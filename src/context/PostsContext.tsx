@@ -225,7 +225,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, []);
 
   const updatePost = useCallback(async (id: string, updates: Partial<Post>) => {
-    // Auto-archive when "publicado" tag is added
+    // Auto-archive/unarchive based on "publicado" tag
     if (updates.tags !== undefined) {
       const currentPost = posts.find((p) => p.id === id);
       const hadPublicado = currentPost?.tags.includes("publicado") ?? false;
@@ -233,6 +233,9 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       if (!hadPublicado && hasPublicado) {
         updates.archived = true;
         updates.archivedAt = new Date();
+      } else if (hadPublicado && !hasPublicado) {
+        updates.archived = false;
+        updates.archivedAt = null;
       }
     }
 
