@@ -961,7 +961,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             <>
               <Select onValueChange={(v) => handleBulkStatusChange(v as PostStatus)}>
                 <SelectTrigger className="h-8 w-auto min-w-[140px] text-xs">
-                  <SelectValue placeholder="Mudar status" />
+                  <SelectValue placeholder={t("changeStatus")} />
                 </SelectTrigger>
                 <SelectContent>
                   {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
