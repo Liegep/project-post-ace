@@ -73,6 +73,7 @@ export type Database = {
           posting_period: string
           show_archived_to_client: boolean
           slug: string
+          tracking_enabled: boolean
           trello_board_id: string
           updated_at: string
         }
@@ -86,6 +87,7 @@ export type Database = {
           posting_period?: string
           show_archived_to_client?: boolean
           slug: string
+          tracking_enabled?: boolean
           trello_board_id?: string
           updated_at?: string
         }
@@ -99,6 +101,7 @@ export type Database = {
           posting_period?: string
           show_archived_to_client?: boolean
           slug?: string
+          tracking_enabled?: boolean
           trello_board_id?: string
           updated_at?: string
         }
@@ -199,6 +202,48 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_tracking: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          id: string
+          post_id: string
+          step_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          post_id: string
+          step_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string
+          step_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_tracking_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_tracking_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "tracking_steps"
             referencedColumns: ["id"]
           },
         ]
@@ -309,6 +354,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "tags_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tracking_steps: {
+        Row: {
+          client_id: string
+          color: string
+          created_at: string
+          id: string
+          name: string
+          position: number
+        }
+        Insert: {
+          client_id: string
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+        }
+        Update: {
+          client_id?: string
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tracking_steps_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
