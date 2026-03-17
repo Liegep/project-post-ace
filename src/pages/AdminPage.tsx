@@ -201,6 +201,13 @@ const KanbanBoard = ({
                 )}
                 <div className="flex items-center gap-1">
                   <button
+                    onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
+                    className="rounded p-1 text-muted-foreground hover:bg-accent/10 hover:text-accent"
+                    title="Adicionar post"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </button>
+                  <button
                     onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}
                     className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                   >
@@ -233,12 +240,8 @@ const KanbanBoard = ({
                   )}
                 </DroppableColumn>
               </SortableContext>
-              <button
-                onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
-                className="mt-3 flex w-full items-center justify-center gap-1 rounded-lg border-2 border-dashed border-muted-foreground/30 py-2 text-xs text-muted-foreground hover:border-accent hover:text-accent transition-colors"
-              >
-                <Plus className="h-3.5 w-3.5" /> Adicionar post
-              </button>
+
+
             </div>
           );
         })}
