@@ -58,11 +58,11 @@ function SortableItem({ post, isEntrada }: { post: Post; isEntrada: boolean }) {
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center gap-1 rounded-lg border px-2 py-2",
+        "flex items-center gap-1 rounded-lg border-2 px-2 py-2",
         isDone && "border-success/20 bg-success/5",
         isDev && "border-warning/20 bg-warning/5",
-        isEntrada && !isDone && !isDev && "border-orange-400/30 bg-orange-50 dark:bg-orange-950/20",
-        !isDone && !isDev && !isEntrada && "bg-card"
+        isEntrada && !isDone && !isDev && "border-red-400 bg-red-50 dark:bg-red-950/30 dark:border-red-600",
+        !isDone && !isDev && !isEntrada && "border-transparent bg-card"
       )}
     >
       <button {...attributes} {...listeners} className="cursor-grab touch-none text-muted-foreground hover:text-foreground shrink-0">
