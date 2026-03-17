@@ -701,7 +701,7 @@ const AdminDashboard = () => {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{editingClient ? "Editar Cliente" : "Novo Cliente"}</DialogTitle>
+            <DialogTitle>{editingClient ? t("editClient") : t("newClient")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
