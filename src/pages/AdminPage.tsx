@@ -111,6 +111,7 @@ interface KanbanBoardProps {
   selectionMode?: boolean;
   selectedPostIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
+  reorderColumns: (columns: { id: string; name: string; position: number; visibleToClient: boolean }[]) => void;
 }
 
 const KanbanBoard = ({
