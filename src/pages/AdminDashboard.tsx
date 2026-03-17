@@ -466,13 +466,13 @@ const AdminDashboard = () => {
 
         {/* Feedback notifications */}
         {feedbacks.length > 0 && (
-          <div className="rounded-xl border bg-card p-4">
+          <div className="rounded-xl border border-amber-400/30 bg-amber-500/5 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-warning/20">
-                <Bell className="h-4 w-4 text-warning-foreground" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/20">
+                <Bell className="h-4 w-4 text-amber-500" />
               </div>
               <h2 className="font-semibold text-foreground">Feedbacks dos Clientes</h2>
-              <span className="rounded-full bg-warning/20 px-2 py-0.5 text-xs font-semibold text-warning-foreground">
+              <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-500">
                 {feedbacks.length}
               </span>
             </div>
