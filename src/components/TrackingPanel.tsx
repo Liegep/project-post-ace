@@ -24,6 +24,7 @@ import { useState, useEffect } from "react";
 interface TrackingPanelProps {
   clientId: string;
   posts: Post[];
+  columns?: { id: string; name: string }[];
   isAdmin?: boolean;
   visibleToClient?: boolean;
   onToggleVisibility?: (visible: boolean) => void;
@@ -38,7 +39,7 @@ const STATUS_LABELS: Record<string, { label: string; className: string }> = {
   finalizado: { label: "Finalizado", className: "bg-success/20 text-success border-success/30" },
 };
 
-function SortableItem({ post }: { post: Post }) {
+function SortableItem({ post, isEntrada }: { post: Post; isEntrada: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: post.id });
 
   const style = {
@@ -60,7 +61,8 @@ function SortableItem({ post }: { post: Post }) {
         "flex items-center gap-1 rounded-lg border px-2 py-2",
         isDone && "border-success/20 bg-success/5",
         isDev && "border-warning/20 bg-warning/5",
-        !isDone && !isDev && "bg-card"
+        isEntrada && !isDone && !isDev && "border-orange-400/30 bg-orange-50 dark:bg-orange-950/20",
+        !isDone && !isDev && !isEntrada && "bg-card"
       )}
     >
       <button {...attributes} {...listeners} className="cursor-grab touch-none text-muted-foreground hover:text-foreground shrink-0">
@@ -75,10 +77,10 @@ function SortableItem({ post }: { post: Post }) {
         </>
       ) : (
         <>
-          <Circle className={cn("h-3 w-3 shrink-0", isDev ? "text-warning-foreground" : "text-muted-foreground")} />
+          <Circle className={cn("h-3 w-3 shrink-0", isDev ? "text-warning-foreground" : isEntrada ? "text-orange-500" : "text-muted-foreground")} />
           <span className="text-sm font-medium text-foreground truncate flex-1">{post.title}</span>
-          <Badge variant="outline" className={cn("text-[10px] shrink-0", statusInfo.className)}>
-            {statusInfo.label}
+          <Badge variant="outline" className={cn("text-[10px] shrink-0", isEntrada && !isDev ? "bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-700" : statusInfo.className)}>
+            {isEntrada ? "Entrada" : statusInfo.label}
           </Badge>
         </>
       )}
@@ -86,8 +88,11 @@ function SortableItem({ post }: { post: Post }) {
   );
 }
 
-export const TrackingPanel = ({ clientId, posts, isAdmin = false, visibleToClient, onToggleVisibility, onReorderPosts }: TrackingPanelProps) => {
+export const TrackingPanel = ({ clientId, posts, columns = [], isAdmin = false, visibleToClient, onToggleVisibility, onReorderPosts }: TrackingPanelProps) => {
   const [orderedPosts, setOrderedPosts] = useState<Post[]>(posts);
+
+  // Find "entrada" column ID
+  const entradaColumnId = columns.find((c) => c.name.toLowerCase() === "entrada")?.id;
 
   useEffect(() => {
     setOrderedPosts((prev) => {
@@ -107,6 +112,9 @@ export const TrackingPanel = ({ clientId, posts, isAdmin = false, visibleToClien
   );
 
   const allIds = orderedPosts.map((p) => p.id);
+
+  const isEntrada = (post: Post) =>
+    post.status === "entrada" || (entradaColumnId != null && post.columnId === entradaColumnId);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -148,7 +156,7 @@ export const TrackingPanel = ({ clientId, posts, isAdmin = false, visibleToClien
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={allIds} strategy={verticalListSortingStrategy}>
               {orderedPosts.map((post) => (
-                <SortableItem key={post.id} post={post} />
+                <SortableItem key={post.id} post={post} isEntrada={isEntrada(post)} />
               ))}
             </SortableContext>
           </DndContext>
