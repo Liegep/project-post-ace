@@ -102,7 +102,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       setPosts((postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || [])));
       setTags((tagsRes.data || []).map((t: any) => ({ id: t.id, name: t.name, color: t.color })));
-      setColumns((columnsRes.data || []).map((c: any) => ({ id: c.id, clientId: c.client_id, name: c.name, position: c.position })));
+      setColumns((columnsRes.data || []).map((c: any) => ({ id: c.id, clientId: c.client_id, name: c.name, position: c.position, visibleToClient: c.visible_to_client ?? false })));
       setLoading(false);
     };
     fetchAll();
