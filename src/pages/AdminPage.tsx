@@ -256,14 +256,14 @@ const KanbanBoard = ({
                     <button
                       onClick={() => toggleColumnVisibility(col.id, !col.visibleToClient)}
                       className={`rounded p-1 transition-colors ${col.visibleToClient ? "text-primary hover:bg-primary/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
-                      title={col.visibleToClient ? "Visível para o cliente" : "Oculto para o cliente"}
+                      title={col.visibleToClient ? t("visibleToClient") : t("hiddenFromClient")}
                     >
                       {col.visibleToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                     </button>
                     <button
                       onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
                       className="rounded p-1 text-muted-foreground hover:bg-accent/10 hover:text-accent"
-                      title="Adicionar post"
+                      title={t("addPost")}
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
@@ -309,7 +309,7 @@ const KanbanBoard = ({
         {unassignedPosts.length > 0 && (
           <div className="w-80 shrink-0 rounded-xl border bg-muted/30 p-4">
             <div className="mb-4 flex items-center gap-2">
-              <span className="text-sm font-semibold text-muted-foreground">Sem coluna</span>
+              <span className="text-sm font-semibold text-muted-foreground">{t("noColumn")}</span>
               <span className="text-xs text-muted-foreground">({unassignedPosts.length})</span>
             </div>
             <SortableContext items={unassignedPosts.map((p) => p.id)} strategy={verticalListSortingStrategy}>
@@ -344,15 +344,15 @@ const KanbanBoard = ({
                   if (e.key === "Enter") handleAddColumn();
                   if (e.key === "Escape") { setNewColumnName(""); setAddingColumn(false); }
                 }}
-                placeholder="Nome da coluna"
+                placeholder={t("columnName")}
                 className="mb-2"
               />
               <div className="flex gap-2">
                 <Button size="sm" onClick={handleAddColumn} className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
-                  Criar
+                  {t("create")}
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => { setNewColumnName(""); setAddingColumn(false); }}>
-                  Cancelar
+                  {t("cancel")}
                 </Button>
               </div>
             </div>
@@ -361,8 +361,8 @@ const KanbanBoard = ({
               onClick={() => setAddingColumn(true)}
               className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-muted-foreground/30 py-12 text-sm text-muted-foreground hover:border-accent hover:text-accent transition-colors"
             >
-              <Plus className="h-5 w-5" />
-              Nova coluna
+              <Plus className="h-5 w-5" /> {t("newColumn")}
+              
             </button>
           )}
         </div>
@@ -386,13 +386,14 @@ const KanbanBoard = ({
   );
 };
 
-const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode, selectedPostIds, onToggleSelect }: {
+const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode, selectedPostIds, onToggleSelect, t }: {
   archivedPosts: Post[];
   unarchivePost: (id: string) => void;
   deletePost: (id: string) => void;
   selectionMode?: boolean;
   selectedPostIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
+  t: (key: any) => string;
 }) => {
   const grouped = archivedPosts.reduce<Record<string, Post[]>>((acc, post) => {
     const date = post.archivedAt || post.createdAt;
@@ -414,8 +415,8 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
         <div className="mb-4 rounded-full bg-muted p-6">
           <Archive className="h-8 w-8 text-muted-foreground" />
         </div>
-        <h2 className="text-xl font-semibold text-foreground">Nenhum post arquivado</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Posts com status "Finalizado" aparecerão aqui</p>
+        <h2 className="text-xl font-semibold text-foreground">{t("noArchivedPosts")}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t("archivedPostsAppearHere")}</p>
       </div>
     );
   }
@@ -450,13 +451,13 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
                         className="flex-1 text-xs"
                         onClick={() => unarchivePost(post.id)}
                       >
-                        <RotateCcw className="mr-1 h-3 w-3" /> Restaurar
+                        <RotateCcw className="mr-1 h-3 w-3" /> {t("restore")}
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         className="text-destructive hover:text-destructive text-xs"
-                        onClick={() => { if (confirm("Excluir permanentemente?")) deletePost(post.id); }}
+                        onClick={() => { if (confirm(t("deletePermanently"))) deletePost(post.id); }}
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
@@ -543,7 +544,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     }
     await supabase.from("clients").update({ tracking_enabled: true } as any).eq("id", clientData.id);
     setTrackingEnabled(true);
-    toast({ title: "Acompanhamento criado!", description: "A coluna de acompanhamento foi adicionada ao quadro." });
+    toast({ title: t("trackingCreated"), description: t("trackingCreatedDesc") });
   };
 
   const disableTracking = async () => {
@@ -569,22 +570,22 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     const ids = Array.from(selectedPostIds);
     await bulkUpdateStatus(ids, status);
     exitSelectionMode();
-    toast({ title: `${ids.length} posts atualizados` });
+    toast({ title: `${ids.length} ${t("postsUpdated")}` });
   };
 
   const handleBulkDelete = async () => {
     const ids = Array.from(selectedPostIds);
-    if (!confirm(`Excluir ${ids.length} posts permanentemente?`)) return;
+    if (!confirm(t("confirmBulkDelete").replace("{count}", String(ids.length)))) return;
     await bulkDeletePosts(ids);
     exitSelectionMode();
-    toast({ title: `${ids.length} posts excluídos` });
+    toast({ title: `${ids.length} ${t("postsDeleted")}` });
   };
 
   const handleBulkUnarchive = async () => {
     const ids = Array.from(selectedPostIds);
     for (const id of ids) await unarchivePost(id);
     exitSelectionMode();
-    toast({ title: `${ids.length} posts restaurados` });
+    toast({ title: `${ids.length} ${t("postsRestored")}` });
   };
 
   const handleBulkMoveToColumn = async (columnId: string) => {
@@ -592,7 +593,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     const targetColumnId = columnId === "__unassigned__" ? null : columnId;
     await bulkMoveToColumn(ids, targetColumnId);
     exitSelectionMode();
-    toast({ title: `${ids.length} posts movidos` });
+    toast({ title: `${ids.length} ${t("postsMoved")}` });
   };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -645,7 +646,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       setAddingColumn(false);
     } catch (err) {
       console.error(err);
-      toast({ title: "Erro ao criar coluna", variant: "destructive" });
+      toast({ title: t("columnCreateError"), variant: "destructive" });
     } finally {
       addingColumnRef.current = false;
     }
@@ -659,7 +660,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   };
 
   const handleDeleteColumn = (id: string) => {
-    if (!confirm("Excluir esta coluna? Os posts serão movidos para 'Sem coluna'.")) return;
+    if (!confirm(t("deleteColumnConfirm"))) return;
     deleteColumn(id);
   };
 
@@ -687,15 +688,14 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       // Save board ID to client record
       await supabase.from("clients").update({ trello_board_id: trelloBoardId.trim() } as any).eq("id", clientData.id);
       toast({
-        title: "Sincronização concluída!",
-        description: `${result.summary.tags} etiquetas, ${result.summary.columns} colunas, ${result.summary.postsCreated ?? result.summary.posts ?? 0} posts criados, ${result.summary.postsUpdated ?? 0} posts atualizados.`,
+        title: t("syncComplete"),
+        description: `${result.summary.tags} ${t("tags")}, ${result.summary.columns} cols, ${result.summary.postsCreated ?? result.summary.posts ?? 0} posts`,
       });
       setTrelloSyncOpen(false);
-      // Reload page to refresh data
       window.location.reload();
     } catch (err: any) {
       console.error(err);
-      toast({ title: "Erro na sincronização", description: err.message, variant: "destructive" });
+      toast({ title: t("syncError"), description: err.message, variant: "destructive" });
     } finally {
       setSyncing(false);
     }
@@ -753,15 +753,15 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               variant={selectionMode ? "default" : "outline"}
               onClick={() => selectionMode ? exitSelectionMode() : setSelectionMode(true)}
             >
-              <CheckSquare className="mr-2 h-4 w-4" /> {selectionMode ? "Cancelar" : "Selecionar"}
+              <CheckSquare className="mr-2 h-4 w-4" /> {selectionMode ? t("cancel") : t("select")}
             </Button>
             {!trackingEnabled && (
               <Button variant="outline" onClick={enableTracking}>
-                <ClipboardList className="mr-2 h-4 w-4" /> Criar Acompanhamento
+                <ClipboardList className="mr-2 h-4 w-4" /> {t("createTracking")}
               </Button>
             )}
             <Button variant="outline" onClick={() => setTrelloSyncOpen(true)}>
-              <RefreshCw className="mr-2 h-4 w-4" /> Trello Sync
+              <RefreshCw className="mr-2 h-4 w-4" /> {t("trelloSync")}
             </Button>
             <Button onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newPost")}
@@ -778,15 +778,15 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               onClick={() => setActiveTab("board")}
               className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "board" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
-              <LayoutGrid className="mr-1.5 inline h-4 w-4" />
-              Quadro
+              <LayoutGrid className="mr-1.5 inline h-4 w-4" /> {t("board")}
+              
             </button>
             <button
               onClick={() => setActiveTab("archived")}
               className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "archived" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
-              <Archive className="mr-1.5 inline h-4 w-4" />
-              Arquivados
+              <Archive className="mr-1.5 inline h-4 w-4" /> {t("archived")}
+              
               {archivedPosts.length > 0 && (
                 <span className="ml-1.5 rounded-full bg-muted-foreground/20 px-1.5 py-0.5 text-[10px] font-semibold">
                   {archivedPosts.length}
@@ -803,7 +803,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               />
               <label htmlFor="show-archived-client" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
                 {showArchivedToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
-                {showArchivedToClient ? "Visível para o cliente" : "Oculto do cliente"}
+                {showArchivedToClient ? t("visibleToClient") : t("hiddenFromClient")}
               </label>
             </div>
           )}
@@ -817,7 +817,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 />
                 <label htmlFor="allow-client-edit-caption" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
                   <Pencil className="h-3.5 w-3.5" />
-                  {allowClientEditCaption ? "Cliente pode editar legenda" : "Cliente não edita legenda"}
+                  {allowClientEditCaption ? t("clientCanEditCaption") : t("clientCannotEditCaption")}
                 </label>
               </div>
               <div className="flex items-center gap-2">
@@ -828,7 +828,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 />
                 <label htmlFor="allow-client-create-post" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
                   <Plus className="h-3.5 w-3.5" />
-                  {allowClientCreatePost ? "Cliente pode criar posts" : "Cliente não cria posts"}
+                  {allowClientCreatePost ? t("clientCanCreatePosts") : t("clientCannotCreatePosts")}
                 </label>
               </div>
               {trackingEnabled && (
@@ -840,7 +840,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   />
                   <label htmlFor="tracking-toggle" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
                     <ClipboardList className="h-3.5 w-3.5" />
-                    Acompanhamento ativo
+                    {t("trackingActive")}
                   </label>
                 </div>
               )}
@@ -866,7 +866,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   onClick={() => { setPeriodDraft(postingPeriod); setEditingPeriod(true); }}
                   className="group flex items-center gap-2 text-2xl font-bold text-foreground hover:text-accent transition-colors"
                 >
-                  {postingPeriod || "Clique para definir o período"}
+                  {postingPeriod || t("clickToSetPeriod")}
                   <Pencil className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
                 </button>
               )}
@@ -948,6 +948,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             selectionMode={selectionMode}
             selectedPostIds={selectedPostIds}
             onToggleSelect={toggleSelect}
+            t={t}
           />
         )}
       </main>
@@ -955,13 +956,13 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       {/* Floating bulk action bar */}
       {selectionMode && selectedPostIds.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl border bg-card px-5 py-3 shadow-xl">
-          <span className="text-sm font-semibold text-foreground">{selectedPostIds.size} selecionado(s)</span>
+          <span className="text-sm font-semibold text-foreground">{selectedPostIds.size} {t("selected")}</span>
           <div className="h-6 w-px bg-border" />
           {activeTab === "board" ? (
             <>
               <Select onValueChange={(v) => handleBulkStatusChange(v as PostStatus)}>
                 <SelectTrigger className="h-8 w-auto min-w-[140px] text-xs">
-                  <SelectValue placeholder="Mudar status" />
+                  <SelectValue placeholder={t("changeStatus")} />
                 </SelectTrigger>
                 <SelectContent>
                   {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
@@ -972,27 +973,27 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               {columns.length > 0 && (
                 <Select onValueChange={(v) => handleBulkMoveToColumn(v)}>
                   <SelectTrigger className="h-8 w-auto min-w-[140px] text-xs">
-                    <SelectValue placeholder="Mover p/ coluna" />
+                    <SelectValue placeholder={t("moveToColumn")} />
                   </SelectTrigger>
                   <SelectContent>
                     {columns.map((col) => (
                       <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
                     ))}
-                    <SelectItem value="__unassigned__">Sem coluna</SelectItem>
+                    <SelectItem value="__unassigned__">{t("noColumn")}</SelectItem>
                   </SelectContent>
                 </Select>
               )}
               <Button size="sm" variant="outline" onClick={() => handleBulkStatusChange("finalizado")}>
-                <Archive className="mr-1.5 h-3.5 w-3.5" /> Arquivar
+                <Archive className="mr-1.5 h-3.5 w-3.5" /> {t("archive")}
               </Button>
             </>
           ) : (
             <Button size="sm" variant="outline" onClick={handleBulkUnarchive}>
-              <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Restaurar
+              <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> {t("restore")}
             </Button>
           )}
           <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={handleBulkDelete}>
-            <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Excluir
+            <Trash2 className="mr-1.5 h-3.5 w-3.5" /> {t("deleteAction")}
           </Button>
           <div className="h-6 w-px bg-border" />
           <Button size="sm" variant="ghost" onClick={exitSelectionMode}>
@@ -1008,23 +1009,23 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       <Dialog open={trelloSyncOpen} onOpenChange={setTrelloSyncOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Sincronizar com Trello</DialogTitle>
+            <DialogTitle>{t("syncWithTrello")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Board ID do Trello</Label>
+              <Label>{t("trelloBoardId")}</Label>
               <Input
                 value={trelloBoardId}
                 onChange={(e) => setTrelloBoardId(e.target.value)}
-                placeholder="Ex: abc123def456"
+                placeholder={t("trelloBoardIdPlaceholder")}
                 onKeyDown={(e) => { if (e.key === "Enter") handleTrelloSync(); }}
               />
               <p className="mt-1 text-xs text-muted-foreground">
-                Encontre o Board ID na URL do Trello: trello.com/b/<strong>BOARD_ID</strong>/nome-do-board
+                {t("trelloBoardIdHelp")}
               </p>
             </div>
             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              ⚠️ A sincronização substituirá todas as colunas e posts existentes deste cliente.
+              {t("trelloSyncWarning")}
             </div>
             <Button
               onClick={handleTrelloSync}
@@ -1032,9 +1033,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
             >
               {syncing ? (
-                <><RefreshCw className="mr-2 h-4 w-4 animate-spin" /> Sincronizando...</>
+                <><RefreshCw className="mr-2 h-4 w-4 animate-spin" /> {t("syncing")}</>
               ) : (
-                <><RefreshCw className="mr-2 h-4 w-4" /> Iniciar Sincronização</>
+                <><RefreshCw className="mr-2 h-4 w-4" /> {t("startSync")}</>
               )}
             </Button>
           </div>

@@ -10,7 +10,15 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export const I18nProvider: React.FC<{ children: React.ReactNode; defaultLocale?: Locale }> = ({ children, defaultLocale = "pt" }) => {
-  const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const [locale, setLocaleState] = useState<Locale>(() => {
+    const saved = localStorage.getItem("admin_locale");
+    return (saved as Locale) || defaultLocale;
+  });
+
+  const setLocale = useCallback((loc: Locale) => {
+    setLocaleState(loc);
+    localStorage.setItem("admin_locale", loc);
+  }, []);
 
   const t = useCallback(
     (key: keyof typeof translations.pt) => translations[locale][key] || key,

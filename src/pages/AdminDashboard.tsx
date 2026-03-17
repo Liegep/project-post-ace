@@ -91,26 +91,26 @@ const AdminDashboard = () => {
   const handleChangePassword = async () => {
     setPasswordError("");
     if (newPassword.length < 6) {
-      setPasswordError("A senha deve ter pelo menos 6 caracteres");
+      setPasswordError(t("passwordMinError"));
       return;
     }
     if (newPassword !== confirmNewPassword) {
-      setPasswordError("As senhas não coincidem");
+      setPasswordError(t("passwordMismatch"));
       return;
     }
     setPasswordSaving(true);
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) {
-        setPasswordError("Erro ao atualizar senha");
+        setPasswordError(t("passwordUpdateError"));
         return;
       }
-      toast({ title: "Senha atualizada com sucesso!" });
+      toast({ title: t("passwordUpdated") });
       setChangePasswordOpen(false);
       setNewPassword("");
       setConfirmNewPassword("");
     } catch {
-      setPasswordError("Erro ao atualizar senha");
+      setPasswordError(t("passwordUpdateError"));
     } finally {
       setPasswordSaving(false);
     }
@@ -374,7 +374,7 @@ const AdminDashboard = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
+    if (!confirm(t("confirmDeleteClient"))) return;
     await supabase.from("clients").delete().eq("id", id);
     fetchClients();
   };
@@ -382,7 +382,7 @@ const AdminDashboard = () => {
   const copyClientUrl = (slug: string) => {
     const url = `${window.location.origin}/client/${slug}`;
     navigator.clipboard.writeText(url);
-    toast({ title: "Link copiado!", description: url });
+    toast({ title: t("linkCopied"), description: url });
   };
 
   const baseUrl = window.location.origin;
@@ -393,21 +393,21 @@ const AdminDashboard = () => {
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">ContentFlow</h1>
-            <p className="text-sm text-muted-foreground">Selecione ou crie um cliente</p>
+            <p className="text-sm text-muted-foreground">{t("selectOrCreateClient")}</p>
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
             <Button variant="outline" size="sm" onClick={() => navigate("/social")}>
-              <CalendarClock className="mr-1 h-4 w-4" /> Social
+              <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
             </Button>
             <Button variant="outline" size="sm" onClick={() => setChangePasswordOpen(true)}>
-              <KeyRound className="mr-1 h-4 w-4" /> Senha
+              <KeyRound className="mr-1 h-4 w-4" /> {t("password")}
             </Button>
             <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}>
-              <UserPlus className="mr-1 h-4 w-4" /> Convidar
+              <UserPlus className="mr-1 h-4 w-4" /> {t("invite")}
             </Button>
             <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Plus className="mr-2 h-4 w-4" /> Novo Cliente
+              <Plus className="mr-2 h-4 w-4" /> {t("newClient")}
             </Button>
             <Button
               variant="ghost"
@@ -416,7 +416,7 @@ const AdminDashboard = () => {
                 await supabase.auth.signOut();
                 navigate("/login");
               }}
-              title="Sair"
+              title={t("signOut")}
             >
               <LogOut className="h-4 w-4" />
             </Button>
@@ -432,7 +432,7 @@ const AdminDashboard = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20">
                 <CalendarClock className="h-4 w-4 text-blue-500" />
               </div>
-              <h2 className="font-semibold text-foreground">Posts para Hoje</h2>
+              <h2 className="font-semibold text-foreground">{t("postsForToday")}</h2>
               <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-xs font-semibold text-blue-500">
                 {todayPosts.length}
               </span>
@@ -471,7 +471,7 @@ const AdminDashboard = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/20">
                 <Bell className="h-4 w-4 text-amber-500" />
               </div>
-              <h2 className="font-semibold text-foreground">Feedbacks dos Clientes</h2>
+              <h2 className="font-semibold text-foreground">{t("clientFeedbacks")}</h2>
               <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-500">
                 {feedbacks.length}
               </span>
@@ -525,7 +525,7 @@ const AdminDashboard = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/20">
                 <RotateCcw className="h-4 w-4 text-emerald-500" />
               </div>
-              <h2 className="font-semibold text-foreground">Posts Restaurados pelo Cliente</h2>
+              <h2 className="font-semibold text-foreground">{t("restoredByClient")}</h2>
               <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-semibold text-emerald-500">
                 {unarchiveNotifs.length}
               </span>
@@ -548,8 +548,8 @@ const AdminDashboard = () => {
                     <p className="text-sm font-medium text-foreground truncate">{n.postTitle}</p>
                     <p className="text-xs text-muted-foreground">{n.clientName}</p>
                   </div>
-                  <span className="shrink-0 inline-flex rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-500">
-                    Restaurado
+              <span className="shrink-0 inline-flex rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-500">
+                    {t("restored")}
                   </span>
                   <span className="text-[10px] text-muted-foreground shrink-0">
                     {new Date(n.unarchivedAt).toLocaleDateString("pt-BR")}
@@ -574,7 +574,7 @@ const AdminDashboard = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/20">
                 <FilePlus className="h-4 w-4 text-violet-500" />
               </div>
-              <h2 className="font-semibold text-foreground">Posts Criados pelo Cliente</h2>
+              <h2 className="font-semibold text-foreground">{t("postsCreatedByClient")}</h2>
               <span className="rounded-full bg-violet-500/20 px-2 py-0.5 text-xs font-semibold text-violet-500">
                 {clientCreatedNotifs.length}
               </span>
@@ -598,7 +598,7 @@ const AdminDashboard = () => {
                     <p className="text-xs text-muted-foreground">{n.clientName}</p>
                   </div>
                   <span className="shrink-0 inline-flex rounded-full bg-violet-500/20 px-2 py-0.5 text-[10px] font-semibold text-violet-500">
-                    Novo post
+                    {t("createdByClient")}
                   </span>
                   <span className="text-[10px] text-muted-foreground shrink-0">
                     {new Date(n.createdAt).toLocaleDateString("pt-BR")}
@@ -624,10 +624,10 @@ const AdminDashboard = () => {
             <div className="mb-4 rounded-full bg-muted p-6">
               <Plus className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h2 className="text-xl font-semibold text-foreground">Nenhum cliente ainda</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Crie seu primeiro cliente para começar</p>
+            <h2 className="text-xl font-semibold text-foreground">{t("noClientsYet")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("createFirstClient")}</p>
             <Button onClick={openCreate} className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
-              <Plus className="mr-2 h-4 w-4" /> Criar Cliente
+              <Plus className="mr-2 h-4 w-4" /> {t("createClient")}
             </Button>
           </div>
         ) : (
@@ -673,7 +673,7 @@ const AdminDashboard = () => {
                     className="flex-1"
                     onClick={() => navigate(`/admin/${client.slug}`)}
                   >
-                    Gerenciar
+                    {t("manage")}
                   </Button>
                   <Button
                     variant="outline"
@@ -701,21 +701,21 @@ const AdminDashboard = () => {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{editingClient ? "Editar Cliente" : "Novo Cliente"}</DialogTitle>
+            <DialogTitle>{editingClient ? t("editClient") : t("newClient")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Nome do Cliente</Label>
+              <Label>{t("clientName")}</Label>
               <Input
                 value={name}
                 onChange={(e) => handleNameChange(e.target.value)}
-                placeholder="Ex: Empresa XYZ"
+                placeholder={t("clientNamePlaceholder")}
                 onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
               />
             </div>
 
             <div>
-              <Label>Slug (URL)</Label>
+              <Label>{t("slugUrl")}</Label>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">/client/</span>
                 <Input
@@ -728,7 +728,7 @@ const AdminDashboard = () => {
             </div>
 
             <div>
-              <Label>Idioma do Cliente</Label>
+              <Label>{t("clientLanguage")}</Label>
               <Select value={locale} onValueChange={(v) => setLocale(v as Locale)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -744,13 +744,13 @@ const AdminDashboard = () => {
             </div>
 
             <div>
-              <Label>Logo</Label>
+              <Label>{t("logo")}</Label>
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoFile} />
               {logoPreview ? (
                 <div className="mt-1 flex items-center gap-3">
                   <img src={logoPreview} alt="Logo" className="h-14 w-14 rounded-lg object-contain border" />
                   <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-                    Alterar
+                    {t("change")}
                   </Button>
                 </div>
               ) : (
@@ -759,8 +759,8 @@ const AdminDashboard = () => {
                   onClick={() => fileInputRef.current?.click()}
                   className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-muted-foreground/30 py-6 text-sm text-muted-foreground transition-colors hover:border-accent hover:text-accent"
                 >
-                  <ImagePlus className="h-5 w-5" />
-                  Selecionar logo
+                  <ImagePlus className="h-5 w-5" /> {t("selectLogo")}
+                  
                 </button>
               )}
             </div>
@@ -770,7 +770,7 @@ const AdminDashboard = () => {
               disabled={saving || !name || !slug}
               className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
             >
-              {saving ? "..." : editingClient ? "Salvar" : "Criar Cliente"}
+              {saving ? "..." : editingClient ? t("save") : t("createClient")}
             </Button>
           </div>
         </DialogContent>
@@ -781,21 +781,21 @@ const AdminDashboard = () => {
       <Dialog open={changePasswordOpen} onOpenChange={(open) => { setChangePasswordOpen(open); if (!open) { setNewPassword(""); setConfirmNewPassword(""); setPasswordError(""); } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Alterar Senha</DialogTitle>
+            <DialogTitle>{t("changePassword")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
-              <Label htmlFor="newPassword">Nova senha</Label>
-              <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
+              <Label htmlFor="newPassword">{t("newPassword")}</Label>
+              <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t("minChars")} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmNewPassword">Confirmar nova senha</Label>
-              <Input id="confirmNewPassword" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} placeholder="Repita a senha" />
+              <Label htmlFor="confirmNewPassword">{t("confirmNewPassword")}</Label>
+              <Input id="confirmNewPassword" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} placeholder={t("repeatPassword")} />
             </div>
             {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
             <Button onClick={handleChangePassword} disabled={passwordSaving} className="w-full">
               <KeyRound className="mr-2 h-4 w-4" />
-              {passwordSaving ? "Salvando..." : "Salvar nova senha"}
+              {passwordSaving ? t("saving") : t("saveNewPassword")}
             </Button>
           </div>
         </DialogContent>

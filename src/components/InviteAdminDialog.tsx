@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +28,7 @@ interface InviteAdminDialogProps {
 }
 
 const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
@@ -57,18 +59,18 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
 
       if (error || data?.error) {
         toast({
-          title: "Erro ao enviar convite",
-          description: data?.error || "Tente novamente",
+          title: t("inviteError"),
+          description: data?.error || "",
           variant: "destructive",
         });
         return;
       }
 
-      toast({ title: "Convite criado!", description: `Convite para ${email} criado com sucesso.` });
+      toast({ title: t("inviteCreated"), description: `${t("invite")} ${email}` });
       setEmail("");
       fetchInvitations();
     } catch {
-      toast({ title: "Erro", description: "Erro ao criar convite", variant: "destructive" });
+      toast({ title: t("inviteError"), variant: "destructive" });
     } finally {
       setSending(false);
     }
@@ -78,7 +80,7 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
     const url = `${window.location.origin}/accept-invite?token=${token}`;
     navigator.clipboard.writeText(url);
     setCopiedToken(token);
-    toast({ title: "Link copiado!" });
+    toast({ title: t("linkCopied") });
     setTimeout(() => setCopiedToken(null), 2000);
   };
 
@@ -88,7 +90,7 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
-            Convidar Administrador
+            {t("inviteAdmin")}
           </DialogTitle>
         </DialogHeader>
 
@@ -100,19 +102,19 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@exemplo.com"
+              placeholder="email@example.com"
               required
             />
           </div>
           <Button type="submit" disabled={sending} size="sm">
             <Mail className="mr-1 h-4 w-4" />
-            {sending ? "..." : "Convidar"}
+            {sending ? "..." : t("invite")}
           </Button>
         </form>
 
         {invitations.length > 0 && (
           <div className="space-y-2 mt-4">
-            <h3 className="text-sm font-semibold text-foreground">Convites</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t("invitations")}</h3>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {invitations.map((inv) => (
                 <div
@@ -122,24 +124,24 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground truncate">{inv.email}</p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(inv.created_at).toLocaleDateString("pt-BR")}
+                      {new Date(inv.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   {inv.accepted_at ? (
                     <span className="flex items-center gap-1 text-xs text-success font-medium">
-                      <Check className="h-3 w-3" /> Aceito
+                      <Check className="h-3 w-3" /> {t("accepted")}
                     </span>
                   ) : new Date(inv.expires_at) < new Date() ? (
-                    <span className="text-xs text-muted-foreground">Expirado</span>
+                    <span className="text-xs text-muted-foreground">{t("expired")}</span>
                   ) : (
                     <>
                       <span className="flex items-center gap-1 text-xs text-warning font-medium">
-                        <Clock className="h-3 w-3" /> Pendente
+                        <Clock className="h-3 w-3" /> {t("pending")}
                       </span>
                       <button
                         onClick={() => copyInviteLink(inv.token)}
                         className="rounded p-1 hover:bg-background"
-                        title="Copiar link"
+                        title={t("linkCopied")}
                       >
                         {copiedToken === inv.token ? (
                           <Check className="h-3.5 w-3.5 text-success" />
