@@ -437,10 +437,16 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
   const [showArchivedToClient, setShowArchivedToClient] = useState(clientData.show_archived_to_client);
+  const [allowClientEditCaption, setAllowClientEditCaption] = useState((clientData as any).allow_client_edit_caption ?? false);
 
   const toggleShowArchivedToClient = async (checked: boolean) => {
     setShowArchivedToClient(checked);
     await supabase.from("clients").update({ show_archived_to_client: checked } as any).eq("id", clientData.id);
+  };
+
+  const toggleAllowClientEditCaption = async (checked: boolean) => {
+    setAllowClientEditCaption(checked);
+    await supabase.from("clients").update({ allow_client_edit_caption: checked } as any).eq("id", clientData.id);
   };
 
   const toggleSelect = (id: string) => {
@@ -691,6 +697,19 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               <label htmlFor="show-archived-client" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
                 {showArchivedToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                 {showArchivedToClient ? "Visível para o cliente" : "Oculto do cliente"}
+              </label>
+            </div>
+          )}
+          {activeTab === "board" && (
+            <div className="flex items-center gap-2 ml-3">
+              <Switch
+                id="allow-client-edit-caption"
+                checked={allowClientEditCaption}
+                onCheckedChange={toggleAllowClientEditCaption}
+              />
+              <label htmlFor="allow-client-edit-caption" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                <Pencil className="h-3.5 w-3.5" />
+                {allowClientEditCaption ? "Cliente pode editar legenda" : "Cliente não edita legenda"}
               </label>
             </div>
           )}

@@ -20,6 +20,7 @@ interface ClientData {
   locale: string;
   posting_period: string;
   show_archived_to_client: boolean;
+  allow_client_edit_caption: boolean;
 }
 
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
@@ -127,8 +128,8 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                   <div className="w-full lg:w-80 shrink-0">
                     <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
                     <div className="space-y-4 rounded-xl bg-muted/30 p-4">
-                      {sortByDate(entradaPosts).map((post) => (
-                        <PostCard key={post.id} post={post} isAdmin={false} hideFeedback />
+                       {sortByDate(entradaPosts).map((post) => (
+                        <PostCard key={post.id} post={post} isAdmin={false} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} />
                       ))}
                     </div>
                   </div>
@@ -137,8 +138,8 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <div className="flex-1 min-w-0">
                   {readyPosts.length > 0 && (
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                      {sortByDate(readyPosts).map((post) => (
-                        <PostCard key={post.id} post={post} isAdmin={false} />
+                       {sortByDate(readyPosts).map((post) => (
+                        <PostCard key={post.id} post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
                       ))}
                     </div>
                   )}
