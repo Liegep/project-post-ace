@@ -195,7 +195,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                   </div>
 
                   {clientData.tracking_enabled && clientData.tracking_visible_to_client && (
-                    <TrackingPanel clientId={clientData.id} posts={[...readyPosts, ...entradaPosts]} />
+                    <TrackingPanel clientId={clientData.id} posts={posts} />
                   )}
                 </div>
               </div>
