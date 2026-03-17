@@ -157,11 +157,11 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
               <Input id="deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
             </div>
             <div>
-              <Label>{t("caption") === "Legenda" ? "Coluna" : "Column"}</Label>
+              <Label>{t("noColumn").split(" ")[0] === "Sem" ? "Coluna" : t("noColumn").includes("column") ? "Column" : t("noColumn").includes("colonna") ? "Colonna" : t("noColumn").includes("columna") ? "Columna" : "Kolumn"}</Label>
               <Select value={columnId ?? "none"} onValueChange={(v) => setColumnId(v === "none" ? null : v)}>
                 <SelectTrigger><SelectValue placeholder="..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">{t("noPosts") === "Nenhum post" ? "Sem coluna" : "No column"}</SelectItem>
+                  <SelectItem value="none">{t("noColumn")}</SelectItem>
                   {columns.map((col) => (
                     <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
                   ))}
