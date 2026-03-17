@@ -114,6 +114,26 @@ interface KanbanBoardProps {
   reorderColumns: (columns: { id: string; name: string; position: number; visibleToClient: boolean }[]) => void;
 }
 
+const SortableColumn = ({ col, children }: { col: { id: string }; children: React.ReactNode }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: `col-${col.id}`,
+    data: { type: "column", columnId: col.id },
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing mb-1 flex justify-center">
+        <GripVertical className="h-4 w-4 text-muted-foreground/50 rotate-90" />
+      </div>
+      {children}
+    </div>
+  );
+};
+
 const KanbanBoard = ({
   posts, columns, unassignedPosts, editingColumnId, editingColumnName,
   setEditingColumnId, setEditingColumnName, editColumnInputRef, handleRenameColumn,
@@ -122,15 +142,22 @@ const KanbanBoard = ({
   newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
   toggleColumnVisibility,
   selectionMode, selectedPostIds, onToggleSelect,
+  reorderColumns,
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
+  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
   );
 
   const handleDragStart = (event: DragStartEvent) => {
-    const post = posts.find((p) => p.id === event.active.id);
-    if (post) setActivePost(post);
+    const data = event.active.data.current;
+    if (data?.type === "column") {
+      setActiveColumnId(data.columnId);
+    } else {
+      const post = posts.find((p) => p.id === event.active.id);
+      if (post) setActivePost(post);
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
