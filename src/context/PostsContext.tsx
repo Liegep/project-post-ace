@@ -58,6 +58,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     position: row.position ?? 0,
     archived: row.archived ?? false,
     archivedAt: row.archived_at ? new Date(row.archived_at) : null,
+    trelloCardId: row.trello_card_id || null,
   };
 }
 
