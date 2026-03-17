@@ -584,7 +584,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     const ids = Array.from(selectedPostIds);
     for (const id of ids) await unarchivePost(id);
     exitSelectionMode();
-    toast({ title: `${ids.length} posts restaurados` });
+    toast({ title: `${ids.length} ${t("postsRestored")}` });
   };
 
   const handleBulkMoveToColumn = async (columnId: string) => {
