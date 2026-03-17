@@ -240,42 +240,57 @@ export const TrackingPanel = ({ clientId, posts, isAdmin = false }: TrackingPane
         </div>
       )}
 
-      {/* Posts tracking list */}
-      <div className="space-y-2 max-h-[calc(100vh-350px)] overflow-y-auto pr-1">
+      {/* Posts checklist */}
+      <div className="space-y-1.5 max-h-[calc(100vh-350px)] overflow-y-auto pr-1">
         {posts.map((post) => {
+          const isFinalized = post.status === "finalizado";
           const progress = getPostProgress(post.id);
           const isCollapsed = collapsedPosts.has(post.id);
-          const allDone = progress === 100;
+          const allStepsDone = progress === 100;
 
           return (
             <div
               key={post.id}
               className={cn(
                 "rounded-lg border p-3 transition-colors",
-                allDone ? "bg-success/5 border-success/20" : "bg-card"
+                isFinalized ? "bg-success/5 border-success/20" : "bg-card"
               )}
             >
-              {/* Post title + progress */}
-              <button
-                onClick={() => toggleCollapse(post.id)}
-                className="w-full flex items-center gap-2 text-left"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    {allDone && <Check className="h-3.5 w-3.5 text-success shrink-0" />}
-                    <p className={cn("text-xs font-semibold truncate", allDone && "text-success")}>{post.title}</p>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Progress value={progress} className="h-1.5 flex-1" />
-                    <span className="text-[10px] font-bold text-muted-foreground shrink-0">{progress}%</span>
-                  </div>
+              {/* Simple checklist item: post name + finalized indicator */}
+              <div className="flex items-center gap-2.5">
+                <div
+                  className={cn(
+                    "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition-all",
+                    isFinalized
+                      ? "border-success bg-success"
+                      : "border-muted-foreground/30"
+                  )}
+                >
+                  {isFinalized && <Check className="h-3 w-3 text-success-foreground" />}
                 </div>
-                {isCollapsed ? <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" /> : <ChevronUp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />}
-              </button>
+                <div className="flex-1 min-w-0">
+                  <p className={cn(
+                    "text-sm font-medium truncate",
+                    isFinalized ? "line-through text-muted-foreground" : "text-foreground"
+                  )}>
+                    {post.title}
+                  </p>
+                </div>
+                {isFinalized && (
+                  <Badge variant="outline" className="text-[10px] bg-success/10 text-success border-success/30 shrink-0">
+                    Finalizado
+                  </Badge>
+                )}
+                {!isFinalized && steps.length > 0 && (
+                  <button onClick={() => toggleCollapse(post.id)} className="shrink-0 text-muted-foreground hover:text-foreground">
+                    {isCollapsed ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+                  </button>
+                )}
+              </div>
 
-              {/* Steps checklist */}
-              {!isCollapsed && steps.length > 0 && (
-                <div className="mt-2 space-y-1 border-t pt-2">
+              {/* Steps detail (only if not finalized and expanded) */}
+              {!isFinalized && !isCollapsed && steps.length > 0 && (
+                <div className="mt-2 ml-7 space-y-1 border-t pt-2">
                   {steps.map((step) => {
                     const done = isStepCompleted(post.id, step.id);
                     return (
