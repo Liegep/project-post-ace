@@ -685,6 +685,29 @@ const AdminDashboard = () => {
       </Dialog>
 
       <InviteAdminDialog open={inviteOpen} onOpenChange={setInviteOpen} />
+
+      <Dialog open={changePasswordOpen} onOpenChange={(open) => { setChangePasswordOpen(open); if (!open) { setNewPassword(""); setConfirmNewPassword(""); setPasswordError(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Alterar Senha</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">Nova senha</Label>
+              <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmNewPassword">Confirmar nova senha</Label>
+              <Input id="confirmNewPassword" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} placeholder="Repita a senha" />
+            </div>
+            {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
+            <Button onClick={handleChangePassword} disabled={passwordSaving} className="w-full">
+              <KeyRound className="mr-2 h-4 w-4" />
+              {passwordSaving ? "Salvando..." : "Salvar nova senha"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
