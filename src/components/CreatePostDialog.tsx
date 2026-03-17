@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePosts } from "@/context/PostsContext";
 import { useI18n } from "@/i18n/I18nContext";
 import { HashtagManager } from "@/components/HashtagManager";
@@ -34,8 +34,12 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId }: Create
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Sync columnId when defaultColumnId changes (e.g., opening from a specific column)
+  useEffect(() => {
+    if (open) setColumnId(defaultColumnId ?? null);
+  }, [open, defaultColumnId]);
+
   const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen) setColumnId(defaultColumnId ?? null);
     onOpenChange(isOpen);
   };
 
