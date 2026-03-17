@@ -55,7 +55,7 @@ const SortableItem = ({
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 50 : undefined,
-    opacity: isDragging ? 0.7 : 1,
+    opacity: isDragging ? 0.5 : 1,
   };
 
   return (
@@ -64,23 +64,30 @@ const SortableItem = ({
       style={style}
       className={`relative rounded-lg border overflow-hidden aspect-square group ${
         isCover ? "ring-2 ring-accent" : ""
-      }`}
+      } ${isDragging ? "shadow-lg ring-2 ring-primary" : ""}`}
     >
+      {/* Draggable overlay area */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute inset-0 z-10 cursor-grab active:cursor-grabbing"
+      />
+
       {item.type === "video" ? (
         <video src={item.url} className="h-full w-full object-cover" muted />
       ) : (
         <img src={item.url} alt="Preview" className="h-full w-full object-cover" />
       )}
 
-      {/* Drag handle */}
-      <button
-        type="button"
-        {...attributes}
-        {...listeners}
-        className="absolute top-1 left-1 rounded-full bg-background/80 p-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
-      >
-        <GripVertical className="h-3 w-3" />
-      </button>
+      {/* Drag indicator */}
+      <div className="absolute top-1 left-1 rounded-full bg-background/80 p-1 shadow-sm">
+        <GripVertical className="h-3 w-3 text-muted-foreground" />
+      </div>
+
+      {/* Order number */}
+      <div className="absolute top-1 left-1/2 -translate-x-1/2 rounded-full bg-background/80 px-1.5 py-0.5 text-[10px] font-bold text-foreground shadow-sm">
+        {index + 1}
+      </div>
 
       {/* Cover badge / button */}
       <button
@@ -89,7 +96,7 @@ const SortableItem = ({
           e.stopPropagation();
           onSetCover();
         }}
-        className={`absolute bottom-1 left-1 rounded-full px-1.5 py-0.5 text-[9px] font-semibold flex items-center gap-0.5 transition-opacity ${
+        className={`absolute bottom-1 left-1 z-20 rounded-full px-1.5 py-0.5 text-[9px] font-semibold flex items-center gap-0.5 transition-opacity ${
           isCover
             ? "bg-accent text-accent-foreground opacity-100"
             : "bg-background/80 text-muted-foreground opacity-0 group-hover:opacity-100"
@@ -107,7 +114,7 @@ const SortableItem = ({
           e.stopPropagation();
           onRemove();
         }}
-        className="absolute top-1 right-1 rounded-full bg-background/80 p-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+        className="absolute top-1 right-1 z-20 rounded-full bg-background/80 p-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
       >
         <X className="h-3 w-3" />
       </button>
