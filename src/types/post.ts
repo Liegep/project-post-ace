@@ -1,4 +1,4 @@
-export type PostStatus = "entrada" | "em_desenvolvimento" | "escrevendo_legenda" | "pronto" | "finalizado";
+export type PostStatus = "entrada" | "em_desenvolvimento" | "escrevendo_legenda" | "pronto" | "finalizado" | "alteracao_solicitada";
 export type ClientLabel = "aprovado" | "alteracao_solicitada" | "leia_comentario" | "pendente" | "de_seu_feedback";
 
 export interface Tag {
