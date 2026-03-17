@@ -857,6 +857,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     clientId={clientData.id}
                     posts={posts}
                     columns={columns}
+                    tags={tags}
                     isAdmin
                     visibleToClient={trackingVisibleToClient}
                     onToggleVisibility={async (visible) => {
