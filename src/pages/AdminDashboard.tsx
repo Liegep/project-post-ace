@@ -709,7 +709,7 @@ const AdminDashboard = () => {
               <Input
                 value={name}
                 onChange={(e) => handleNameChange(e.target.value)}
-                placeholder="Ex: Empresa XYZ"
+                placeholder={t("clientNamePlaceholder")}
                 onKeyDown={(e) => { if (e.key === "Enter") handleSave(); }}
               />
             </div>
