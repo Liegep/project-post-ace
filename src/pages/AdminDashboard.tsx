@@ -433,7 +433,7 @@ const AdminDashboard = () => {
                 <CalendarClock className="h-4 w-4 text-blue-500" />
               </div>
               <h2 className="font-semibold text-foreground">Posts para Hoje</h2>
-              <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs font-semibold text-primary">
+              <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-xs font-semibold text-blue-500">
                 {todayPosts.length}
               </span>
             </div>
