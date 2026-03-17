@@ -577,7 +577,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     if (!confirm(t("confirmBulkDelete").replace("{count}", String(ids.length)))) return;
     await bulkDeletePosts(ids);
     exitSelectionMode();
-    toast({ title: `${ids.length} posts excluídos` });
+    toast({ title: `${ids.length} ${t("postsDeleted")}` });
   };
 
   const handleBulkUnarchive = async () => {
