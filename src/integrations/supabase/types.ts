@@ -75,6 +75,7 @@ export type Database = {
           show_archived_to_client: boolean
           slug: string
           tracking_enabled: boolean
+          tracking_visible_to_client: boolean
           trello_board_id: string
           updated_at: string
         }
@@ -90,6 +91,7 @@ export type Database = {
           show_archived_to_client?: boolean
           slug: string
           tracking_enabled?: boolean
+          tracking_visible_to_client?: boolean
           trello_board_id?: string
           updated_at?: string
         }
@@ -105,6 +107,7 @@ export type Database = {
           show_archived_to_client?: boolean
           slug?: string
           tracking_enabled?: boolean
+          tracking_visible_to_client?: boolean
           trello_board_id?: string
           updated_at?: string
         }
