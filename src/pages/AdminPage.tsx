@@ -420,7 +420,7 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
     posts, archivedPosts, columns, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
-    companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn,
+    companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn, toggleColumnVisibility,
     movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn,
   } = usePosts();
   const { t } = useI18n();
