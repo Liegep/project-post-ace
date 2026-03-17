@@ -866,7 +866,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   onClick={() => { setPeriodDraft(postingPeriod); setEditingPeriod(true); }}
                   className="group flex items-center gap-2 text-2xl font-bold text-foreground hover:text-accent transition-colors"
                 >
-                  {postingPeriod || "Clique para definir o período"}
+                  {postingPeriod || t("clickToSetPeriod")}
                   <Pencil className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground" />
                 </button>
               )}
