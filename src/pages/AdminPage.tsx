@@ -437,10 +437,16 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
   const [showArchivedToClient, setShowArchivedToClient] = useState(clientData.show_archived_to_client);
+  const [allowClientEditCaption, setAllowClientEditCaption] = useState((clientData as any).allow_client_edit_caption ?? false);
 
   const toggleShowArchivedToClient = async (checked: boolean) => {
     setShowArchivedToClient(checked);
     await supabase.from("clients").update({ show_archived_to_client: checked } as any).eq("id", clientData.id);
+  };
+
+  const toggleAllowClientEditCaption = async (checked: boolean) => {
+    setAllowClientEditCaption(checked);
+    await supabase.from("clients").update({ allow_client_edit_caption: checked } as any).eq("id", clientData.id);
   };
 
   const toggleSelect = (id: string) => {
