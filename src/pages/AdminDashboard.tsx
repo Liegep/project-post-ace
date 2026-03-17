@@ -548,8 +548,8 @@ const AdminDashboard = () => {
                     <p className="text-sm font-medium text-foreground truncate">{n.postTitle}</p>
                     <p className="text-xs text-muted-foreground">{n.clientName}</p>
                   </div>
-                  <span className="shrink-0 inline-flex rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-500">
-                    Restaurado
+              <span className="shrink-0 inline-flex rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-500">
+                    {t("restored")}
                   </span>
                   <span className="text-[10px] text-muted-foreground shrink-0">
                     {new Date(n.unarchivedAt).toLocaleDateString("pt-BR")}
