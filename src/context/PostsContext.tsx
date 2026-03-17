@@ -13,7 +13,7 @@ interface PostsContextType {
   companyLogo: string;
   setPostingPeriod: (period: string) => void;
   setCompanyLogo: (url: string) => void;
-  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt"> & { deadline?: Date }) => void;
+  addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date }) => void;
   updatePostStatus: (id: string, status: PostStatus) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
   addComment: (postId: string, author: string, text: string) => void;
@@ -58,6 +58,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     position: row.position ?? 0,
     archived: row.archived ?? false,
     archivedAt: row.archived_at ? new Date(row.archived_at) : null,
+    trelloCardId: row.trello_card_id || null,
   };
 }
 
@@ -112,7 +113,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("clients").update({ posting_period: period } as any).eq("id", clientId);
   }, [clientId]);
 
-  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt"> & { deadline?: Date }) => {
+  const addPost = useCallback(async (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date }) => {
     const insertData: Record<string, any> = {
       title: post.title,
       image_url: post.imageUrl || '',

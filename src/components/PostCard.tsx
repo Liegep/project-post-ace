@@ -155,6 +155,13 @@ export const PostCard = ({ post, isAdmin, hideFeedback, onStatusChange, onDelete
             </div>
           )}
           <h3 className={`font-bold leading-snug text-foreground ${isCompact ? "text-sm" : "text-lg"} flex-1`}>{post.title}</h3>
+          {post.trelloCardId && (
+            <span title="Sincronizado com Trello" className="shrink-0 mt-0.5">
+              <svg className="h-4 w-4 text-[#0079BF]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 3H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM10.5 17a1.5 1.5 0 0 1-1.5-1.5V7a1.5 1.5 0 0 1 3 0v8.5a1.5 1.5 0 0 1-1.5 1.5zm5-3a1.5 1.5 0 0 1-1.5-1.5V7a1.5 1.5 0 0 1 3 0v6.5a1.5 1.5 0 0 1-1.5 1.5z"/>
+              </svg>
+            </span>
+          )}
         </div>
       </div>
 

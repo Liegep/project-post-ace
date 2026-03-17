@@ -41,6 +41,7 @@ export interface Post {
   position: number;
   archived: boolean;
   archivedAt: Date | null;
+  trelloCardId: string | null;
 }
 
 export const DEFAULT_TAGS: Tag[] = [
