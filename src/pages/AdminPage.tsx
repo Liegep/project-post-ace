@@ -309,7 +309,7 @@ const KanbanBoard = ({
         {unassignedPosts.length > 0 && (
           <div className="w-80 shrink-0 rounded-xl border bg-muted/30 p-4">
             <div className="mb-4 flex items-center gap-2">
-              <span className="text-sm font-semibold text-muted-foreground">Sem coluna</span>
+              <span className="text-sm font-semibold text-muted-foreground">{t("noColumn")}</span>
               <span className="text-xs text-muted-foreground">({unassignedPosts.length})</span>
             </div>
             <SortableContext items={unassignedPosts.map((p) => p.id)} strategy={verticalListSortingStrategy}>
