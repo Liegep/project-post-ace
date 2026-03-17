@@ -427,10 +427,10 @@ const AdminDashboard = () => {
       <main className="mx-auto max-w-5xl p-6 space-y-6">
         {/* Today's posts reminder */}
         {todayPosts.length > 0 && (
-          <div className="rounded-xl border bg-card p-4">
+          <div className="rounded-xl border border-blue-400/30 bg-blue-500/5 p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
-                <CalendarClock className="h-4 w-4 text-primary" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500/20">
+                <CalendarClock className="h-4 w-4 text-blue-500" />
               </div>
               <h2 className="font-semibold text-foreground">Posts para Hoje</h2>
               <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs font-semibold text-primary">
