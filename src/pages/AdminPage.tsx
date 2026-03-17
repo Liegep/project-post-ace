@@ -1032,9 +1032,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
             >
               {syncing ? (
-                <><RefreshCw className="mr-2 h-4 w-4 animate-spin" /> Sincronizando...</>
+                <><RefreshCw className="mr-2 h-4 w-4 animate-spin" /> {t("syncing")}</>
               ) : (
-                <><RefreshCw className="mr-2 h-4 w-4" /> Iniciar Sincronização</>
+                <><RefreshCw className="mr-2 h-4 w-4" /> {t("startSync")}</>
               )}
             </Button>
           </div>
