@@ -272,6 +272,7 @@ const es: TranslationKeys = {
   statusWritingCaption: "Escribiendo Leyenda",
   statusReady: "Listo",
   statusFinalized: "Finalizado",
+  statusChangeRequested: "Cambio Solicitado",
   labelPending: "Pendiente",
   labelApproved: "Aprobado",
   labelChangeRequested: "Cambio Solicitado",
