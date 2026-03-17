@@ -79,6 +79,7 @@ interface ClientData {
   trello_board_id: string;
   show_archived_to_client: boolean;
   tracking_enabled: boolean;
+  tracking_visible_to_client: boolean;
 }
 
 interface KanbanBoardProps {
