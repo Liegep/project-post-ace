@@ -100,43 +100,97 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create auth user
-    const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-    });
+    // Check if user already exists
+    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
+    const existingUser = existingUsers?.users?.find((u: any) => u.email === email);
 
-    if (createError) {
-      return new Response(JSON.stringify({ error: createError.message }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    let targetUserId: string;
+
+    if (existingUser) {
+      targetUserId = existingUser.id;
+
+      // Update password
+      await supabaseAdmin.auth.admin.updateUserById(targetUserId, { password });
+
+      // Ensure client role exists
+      const { data: hasClientRole } = await supabaseAdmin.rpc("has_role", {
+        _user_id: targetUserId,
+        _role: "client",
+      });
+      if (!hasClientRole) {
+        await supabaseAdmin.from("user_roles").insert({
+          user_id: targetUserId,
+          role: "client",
+        });
+      }
+
+      // Ensure profile exists
+      const { data: existingProfile } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .eq("id", targetUserId)
+        .maybeSingle();
+      if (!existingProfile) {
+        await supabaseAdmin.from("profiles").insert({
+          id: targetUserId,
+          full_name: client_name || email,
+          email,
+          role: "client",
+        });
+      }
+
+      // Check if assignment already exists
+      const { data: existingAssignment } = await supabaseAdmin
+        .from("user_client_assignments")
+        .select("id")
+        .eq("user_id", targetUserId)
+        .eq("client_id", client_id)
+        .maybeSingle();
+      if (!existingAssignment) {
+        await supabaseAdmin.from("user_client_assignments").insert({
+          user_id: targetUserId,
+          client_id,
+          assigned_by: userId,
+        });
+      }
+    } else {
+      // Create new auth user
+      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+      });
+
+      if (createError) {
+        return new Response(JSON.stringify({ error: createError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      targetUserId = newUser.user.id;
+
+      await supabaseAdmin.from("user_roles").insert({
+        user_id: targetUserId,
+        role: "client",
+      });
+
+      await supabaseAdmin.from("profiles").insert({
+        id: targetUserId,
+        full_name: client_name || email,
+        email,
+        role: "client",
+      });
+
+      await supabaseAdmin.from("user_client_assignments").insert({
+        user_id: targetUserId,
+        client_id,
+        assigned_by: userId,
       });
     }
 
-    // Assign client role
-    await supabaseAdmin.from("user_roles").insert({
-      user_id: newUser.user.id,
-      role: "client",
-    });
-
-    // Create profile
-    await supabaseAdmin.from("profiles").insert({
-      id: newUser.user.id,
-      full_name: client_name || email,
-      email,
-      role: "client",
-    });
-
-    // Assign to client
-    await supabaseAdmin.from("user_client_assignments").insert({
-      user_id: newUser.user.id,
-      client_id,
-      assigned_by: userId,
-    });
-
     return new Response(
-      JSON.stringify({ success: true, user_id: newUser.user.id }),
+      JSON.stringify({ success: true, user_id: targetUserId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
