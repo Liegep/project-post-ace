@@ -279,7 +279,7 @@ export default function SocialDashboard() {
           </TabsList>
 
           <TabsContent value="calendar" className="mt-4">
-            <SocialCalendar posts={filteredPosts} onPostClick={handleEdit} />
+            <SocialCalendar posts={filteredPosts} scheduledPosts={scheduledKanbanPosts} onPostClick={handleEdit} />
           </TabsContent>
 
           <TabsContent value="list" className="mt-4">
