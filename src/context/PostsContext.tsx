@@ -104,7 +104,25 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
         commentsMap[c.post_id].push(comment);
       });
 
-      setPosts((postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || [])));
+      const fetchedPosts = (postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || []));
+      
+      // Auto-archive posts past their deadline
+      const now = new Date();
+      const toArchive = fetchedPosts.filter((p: Post) => 
+        p.deadline && new Date(p.deadline) < now && !p.archived
+      );
+      if (toArchive.length > 0) {
+        for (const p of toArchive) {
+          await supabase.from("posts").update({ 
+            archived: true, 
+            archived_at: new Date().toISOString() 
+          } as any).eq("id", p.id);
+          p.archived = true;
+          p.archivedAt = new Date();
+        }
+      }
+
+      setPosts(fetchedPosts);
       
       const dbTags = tagsRes.data || [];
       const dbTagIds = new Set(dbTags.map((tag: any) => tag.id));
