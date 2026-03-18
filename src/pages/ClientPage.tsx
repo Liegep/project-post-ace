@@ -96,11 +96,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
       </header>
 
       <main className="mx-auto max-w-full p-6">
-        {/* Client Briefs for Approval */}
-        <div className="mb-8">
-          <ClientBriefs clientId={clientData.id} clientName={clientData.name} />
-        </div>
-
         {postingPeriod && (
           <div className="mb-4 flex justify-center">
             <span className="rounded-full bg-primary px-6 py-2 text-lg font-bold text-primary-foreground shadow-md">
@@ -108,6 +103,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             </span>
           </div>
         )}
+
+        {/* Client Briefs for Approval */}
+        <div className="mb-8">
+          <ClientBriefs clientId={clientData.id} clientName={clientData.name} />
+        </div>
 
         {clientData.show_archived_to_client && (
           <div className="mb-6 flex items-center justify-center">
