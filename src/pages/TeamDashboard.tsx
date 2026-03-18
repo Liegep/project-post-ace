@@ -242,9 +242,9 @@ const TeamDashboard = () => {
     return d.toDateString() === today.toDateString();
   });
 
-  const pendingPosts = posts.filter(p => p.status === "entrada");
-  const inProgressPosts = posts.filter(p => ["em desenvolvimento", "escrevendo legenda"].includes(p.status));
-  const readyPosts = posts.filter(p => ["pronto", "finalizado"].includes(p.status));
+  const pendingPosts = posts.filter(p => p.status.includes("entrada"));
+  const inProgressPosts = posts.filter(p => p.status.some(s => ["em_desenvolvimento", "escrevendo_legenda"].includes(s)));
+  const readyPosts = posts.filter(p => p.status.some(s => ["pronto", "finalizado"].includes(s)));
   const feedbackPosts = posts.filter(p => p.clientLabel !== "pendente");
 
   const STATUS_OPTIONS = ["entrada", "em desenvolvimento", "escrevendo legenda", "pronto", "finalizado"];
