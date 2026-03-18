@@ -737,28 +737,6 @@ const AdminDashboard = () => {
 
       <InviteAdminDialog open={inviteOpen} onOpenChange={setInviteOpen} />
 
-      <Dialog open={changePasswordOpen} onOpenChange={(open) => { setChangePasswordOpen(open); if (!open) { setNewPassword(""); setConfirmNewPassword(""); setPasswordError(""); } }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("changePassword")}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">{t("newPassword")}</Label>
-              <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t("minChars")} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmNewPassword">{t("confirmNewPassword")}</Label>
-              <Input id="confirmNewPassword" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} placeholder={t("repeatPassword")} />
-            </div>
-            {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
-            <Button onClick={handleChangePassword} disabled={passwordSaving} className="w-full">
-              <KeyRound className="mr-2 h-4 w-4" />
-              {passwordSaving ? t("saving") : t("saveNewPassword")}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
