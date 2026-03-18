@@ -10,6 +10,7 @@ import { LABEL_CONFIG } from "@/types/post";
 import { CalendarClock, Bell, MessageCircle, Clock, CheckCircle, AlertCircle, FileText, X, CalendarDays } from "lucide-react";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { toast } from "@/hooks/use-toast";
+import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
 
 interface AssignedClient {
   id: string;
