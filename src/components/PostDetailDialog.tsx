@@ -20,6 +20,7 @@ const STATUS_KEYS: Record<PostStatus, string> = {
   pronto: "statusReady",
   finalizado: "statusFinalized",
   alteracao_solicitada: "statusChangeRequested",
+  agendado: "statusScheduled",
 };
 
 const LABEL_KEYS: Record<ClientLabel, string> = {

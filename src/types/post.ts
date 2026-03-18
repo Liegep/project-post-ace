@@ -1,4 +1,4 @@
-export type PostStatus = "entrada" | "em_desenvolvimento" | "escrevendo_legenda" | "pronto" | "finalizado" | "alteracao_solicitada";
+export type PostStatus = "entrada" | "em_desenvolvimento" | "escrevendo_legenda" | "pronto" | "finalizado" | "alteracao_solicitada" | "agendado";
 export type ClientLabel = "aprovado" | "alteracao_solicitada" | "leia_comentario" | "pendente" | "de_seu_feedback";
 
 export interface Tag {
@@ -68,6 +68,7 @@ export const STATUS_CONFIG: Record<PostStatus, { label: string; color: string }>
   pronto: { label: "Enviar para Cliente", color: "bg-success text-success-foreground" },
   finalizado: { label: "Finalizado", color: "bg-primary text-primary-foreground" },
   alteracao_solicitada: { label: "Alteração Solicitada", color: "bg-violet-600 text-white" },
+  agendado: { label: "Agendado", color: "bg-purple-600 text-white" },
 };
 
 export const LABEL_CONFIG: Record<ClientLabel, { label: string; color: string }> = {

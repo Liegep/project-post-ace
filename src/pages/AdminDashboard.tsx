@@ -28,6 +28,7 @@ interface Client {
 interface FeedbackNotification {
   postId: string;
   postTitle: string;
+  clientId: string;
   clientName: string;
   clientSlug: string;
   clientLogo: string;
@@ -165,6 +166,7 @@ const AdminDashboard = () => {
       posts.map((p: any) => ({
         postId: p.id,
         postTitle: p.title,
+        clientId: p.client_id,
         clientName: clientMap[p.client_id]?.name || "—",
         clientSlug: clientMap[p.client_id]?.slug || "",
         clientLogo: clientMap[p.client_id]?.logo_url || "",
@@ -211,6 +213,40 @@ const AdminDashboard = () => {
     e.stopPropagation();
     await supabase.from("posts").update({ client_label: "pendente" } as any).eq("id", postId);
     setFeedbacks((prev) => prev.filter((fb) => fb.postId !== postId));
+  };
+
+  const markAsAgendado = async (fb: FeedbackNotification, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Ensure "Agendados" column exists for this client
+    const { data: existingCols } = await supabase
+      .from("columns")
+      .select("id, name")
+      .eq("client_id", fb.clientId);
+
+    let agendadosColId: string;
+    const agendadosCol = (existingCols || []).find((c: any) => c.name.toLowerCase() === "agendados");
+    if (agendadosCol) {
+      agendadosColId = agendadosCol.id;
+    } else {
+      const maxPos = (existingCols || []).length;
+      const { data: newCol } = await supabase
+        .from("columns")
+        .insert({ client_id: fb.clientId, name: "Agendados", position: maxPos } as any)
+        .select()
+        .single();
+      if (!newCol) return;
+      agendadosColId = (newCol as any).id;
+    }
+
+    // Update post: set status to agendado, move to Agendados column, reset label
+    await supabase.from("posts").update({
+      status: ["agendado"],
+      column_id: agendadosColId,
+      client_label: "pendente",
+    } as any).eq("id", fb.postId);
+
+    setFeedbacks((prev) => prev.filter((f) => f.postId !== fb.postId));
+    toast({ title: "Post agendado", description: `"${fb.postTitle}" movido para a coluna Agendados.` });
   };
 
   const dismissUnarchiveNotif = async (postId: string, e: React.MouseEvent) => {
@@ -463,6 +499,14 @@ const AdminDashboard = () => {
                     <span className="text-[10px] text-muted-foreground shrink-0">
                       {new Date(fb.updatedAt).toLocaleDateString("pt-BR")}
                     </span>
+                    <button
+                      onClick={(e) => markAsAgendado(fb, e)}
+                      className="shrink-0 inline-flex items-center rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-purple-700 transition-colors"
+                      title="Marcar como Agendado"
+                    >
+                      <CalendarClock className="h-3 w-3 mr-0.5" />
+                      Agendado
+                    </button>
                     <button
                       onClick={(e) => dismissFeedback(fb.postId, e)}
                       className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"

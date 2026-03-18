@@ -28,6 +28,7 @@ type TranslationKeys = {
   statusReady: string;
   statusFinalized: string;
   statusChangeRequested: string;
+  statusScheduled: string;
   // Client labels
   labelPending: string;
   labelApproved: string;
@@ -236,6 +237,7 @@ const pt: TranslationKeys = {
   statusReady: "Enviar para Cliente",
   statusFinalized: "Finalizado",
   statusChangeRequested: "Alteração Solicitada",
+  statusScheduled: "Agendado",
   labelPending: "Pendente",
   labelApproved: "Aprovado",
   labelChangeRequested: "Alteração Solicitada",
@@ -422,6 +424,7 @@ const en: TranslationKeys = {
   statusReady: "Ready",
   statusFinalized: "Finalized",
   statusChangeRequested: "Change Requested",
+  statusScheduled: "Scheduled",
   labelPending: "Pending",
   labelApproved: "Approved",
   labelChangeRequested: "Change Requested",
@@ -606,6 +609,7 @@ const it: TranslationKeys = {
   statusReady: "Pronto",
   statusFinalized: "Finalizzato",
   statusChangeRequested: "Modifica Richiesta",
+  statusScheduled: "Programmato",
   labelPending: "In Attesa",
   labelApproved: "Approvato",
   labelChangeRequested: "Modifica Richiesta",
@@ -790,6 +794,7 @@ const es: TranslationKeys = {
   statusReady: "Listo",
   statusFinalized: "Finalizado",
   statusChangeRequested: "Cambio Solicitado",
+  statusScheduled: "Programado",
   labelPending: "Pendiente",
   labelApproved: "Aprobado",
   labelChangeRequested: "Cambio Solicitado",
@@ -974,6 +979,7 @@ const sv: TranslationKeys = {
   statusReady: "Klart",
   statusFinalized: "Avslutat",
   statusChangeRequested: "Ändring Begärd",
+  statusScheduled: "Schemalagd",
   labelPending: "Väntande",
   labelApproved: "Godkänt",
   labelChangeRequested: "Ändring Begärd",
