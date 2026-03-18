@@ -43,6 +43,8 @@ interface FeedbackNotification {
   label: string;
   updatedAt: string;
   deadline: string | null;
+  imageUrl: string;
+  mediaUrls: string[];
 }
 
 interface UnarchiveNotification {
