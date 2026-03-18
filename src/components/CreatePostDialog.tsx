@@ -111,7 +111,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
       setCoverIndex(0);
       setCaption("");
       setDeadline("");
-      setStatus("entrada");
+      setStatus(["entrada"]);
       setColumnId(null);
       setSelectedTags([]);
       handleOpenChange(false);

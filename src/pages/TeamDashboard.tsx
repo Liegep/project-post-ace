@@ -26,7 +26,7 @@ interface PostSummary {
   clientLogo: string;
   postId: string;
   postTitle: string;
-  status: string;
+  status: string[];
   clientLabel: string;
   deadline: string | null;
   updatedAt: string;
