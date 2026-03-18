@@ -14,3 +14,15 @@ verify_jwt = false
 
 [functions.social-scheduler]
 verify_jwt = false
+
+[functions.create-team-member]
+verify_jwt = false
+
+[functions.trello-push]
+verify_jwt = false
+
+[functions.trello-sync]
+verify_jwt = false
+
+[functions.send-admin-invite]
+verify_jwt = false
