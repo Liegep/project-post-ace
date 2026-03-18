@@ -123,6 +123,8 @@ export type Database = {
         Row: {
           appointment_date: string
           appointment_time: string
+          cancelled: boolean
+          cancelled_at: string | null
           category: string
           completed: boolean
           completed_at: string | null
@@ -136,6 +138,8 @@ export type Database = {
         Insert: {
           appointment_date: string
           appointment_time?: string
+          cancelled?: boolean
+          cancelled_at?: string | null
           category?: string
           completed?: boolean
           completed_at?: string | null
@@ -149,6 +153,8 @@ export type Database = {
         Update: {
           appointment_date?: string
           appointment_time?: string
+          cancelled?: boolean
+          cancelled_at?: string | null
           category?: string
           completed?: boolean
           completed_at?: string | null

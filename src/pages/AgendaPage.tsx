@@ -15,7 +15,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import {
   Plus, ChevronLeft, ChevronRight, CalendarIcon, Check, Clock,
-  Trash2, ArrowLeft, CalendarDays, CalendarRange, Calendar as CalendarLucide
+  Trash2, ArrowLeft, CalendarDays, CalendarRange, Calendar as CalendarLucide, XCircle, Ban
 } from "lucide-react";
 import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, addMonths, subMonths, addWeeks, subWeeks, getDaysInMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -30,6 +30,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   tarefa: "bg-accent/20 text-accent-foreground",
   pessoal: "bg-purple-500/20 text-purple-600",
   urgente: "bg-destructive/20 text-destructive",
+  "último post": "bg-blue-600/20 text-blue-600",
 };
 
 const getCategoryStyle = (cat: string) => CATEGORY_COLORS[cat.toLowerCase()] || CATEGORY_COLORS[""];
@@ -37,7 +38,7 @@ const getCategoryStyle = (cat: string) => CATEGORY_COLORS[cat.toLowerCase()] || 
 const AgendaPage = () => {
   const navigate = useNavigate();
   const { t } = useI18n();
-  const { appointments, loading, createAppointment, createBatch, toggleComplete, deleteAppointment } = useAppointments();
+  const { appointments, loading, createAppointment, createBatch, toggleComplete, toggleCancelled, deleteAppointment } = useAppointments();
 
   const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -151,8 +152,9 @@ const AgendaPage = () => {
     return format(currentDate, "MMMM 'de' yyyy", { locale: ptBR });
   };
 
-  const pendingCount = filteredAppointments.filter(a => !a.completed).length;
+  const pendingCount = filteredAppointments.filter(a => !a.completed && !a.cancelled).length;
   const completedCount = filteredAppointments.filter(a => a.completed).length;
+  const cancelledCount = filteredAppointments.filter(a => a.cancelled).length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -224,6 +226,9 @@ const AgendaPage = () => {
               <Badge variant="outline" className="gap-1 bg-success/10 text-success border-success/30">
                 <Check className="h-3 w-3" /> {completedCount}
               </Badge>
+              <Badge variant="outline" className="gap-1 bg-destructive/10 text-destructive border-destructive/30">
+                <Ban className="h-3 w-3" /> {cancelledCount}
+              </Badge>
             </div>
 
             <Button onClick={() => openCreateForDate()} className="bg-accent text-accent-foreground hover:bg-accent/90 gap-1.5">
@@ -253,6 +258,7 @@ const AgendaPage = () => {
             }
             appointmentsByDate={appointmentsByDate}
             onToggle={toggleComplete}
+            onCancel={toggleCancelled}
             onDelete={deleteAppointment}
             onCreateClick={(d) => openCreateForDate(d)}
           />
@@ -303,7 +309,7 @@ const AgendaPage = () => {
               />
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {["", "reunião", "tarefa", "pessoal", "urgente"].map(cat => (
+              {["", "reunião", "tarefa", "pessoal", "urgente", "último post"].map(cat => (
                 <button
                   key={cat}
                   onClick={() => setFormCategory(cat)}
@@ -366,11 +372,12 @@ interface DayListViewProps {
   dates: Date[];
   appointmentsByDate: Record<string, Appointment[]>;
   onToggle: (id: string, completed: boolean) => void;
+  onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
   onCreateClick: (date: Date) => void;
 }
 
-const DayListView = ({ dates, appointmentsByDate, onToggle, onDelete, onCreateClick }: DayListViewProps) => {
+const DayListView = ({ dates, appointmentsByDate, onToggle, onCancel, onDelete, onCreateClick }: DayListViewProps) => {
   return (
     <div className="space-y-4">
       {dates.map(date => {
@@ -379,7 +386,7 @@ const DayListView = ({ dates, appointmentsByDate, onToggle, onDelete, onCreateCl
         const today = isToday(date);
 
         return (
-          <div key={dateStr} className={cn("rounded-xl border transition-colors", today ? "border-accent/50 bg-accent/5" : "bg-card")}>
+          <div key={dateStr} className={cn("rounded-xl border transition-colors", today ? "border-accent/50 bg-amber-50/80 dark:bg-amber-950/20" : "bg-white dark:bg-card")}>
             {/* Day header */}
             <div className="flex items-center justify-between px-4 py-3 border-b">
               <div className="flex items-center gap-3">
@@ -414,7 +421,7 @@ const DayListView = ({ dates, appointmentsByDate, onToggle, onDelete, onCreateCl
               ) : (
                 <div className="space-y-1.5">
                   {dayAppointments.map(apt => (
-                    <AppointmentCard key={apt.id} appointment={apt} onToggle={onToggle} onDelete={onDelete} />
+                    <AppointmentCard key={apt.id} appointment={apt} onToggle={onToggle} onCancel={onCancel} onDelete={onDelete} />
                   ))}
                 </div>
               )}
@@ -428,23 +435,31 @@ const DayListView = ({ dates, appointmentsByDate, onToggle, onDelete, onCreateCl
 
 // ── Appointment Card ────────────────────────────────────────────────────────────
 
-const AppointmentCard = ({ appointment: apt, onToggle, onDelete }: {
+const AppointmentCard = ({ appointment: apt, onToggle, onCancel, onDelete }: {
   appointment: Appointment;
   onToggle: (id: string, completed: boolean) => void;
+  onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
 }) => {
   const now = new Date();
   const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
-  const isOverdue = !apt.completed && isBefore(aptDateTime, now);
+  const isOverdue = !apt.completed && !apt.cancelled && isBefore(aptDateTime, now);
+  const isLastPost = apt.category.toLowerCase() === "último post";
+
+  const rowBg = apt.completed
+    ? "bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800"
+    : apt.cancelled
+      ? "bg-red-100 dark:bg-red-950/40 border border-red-300 dark:border-red-800"
+      : isLastPost
+        ? "bg-blue-100 dark:bg-blue-950/40 border border-blue-400 dark:border-blue-800"
+        : isOverdue
+          ? "bg-destructive/5 border border-destructive/20"
+          : "bg-white dark:bg-card hover:bg-muted/50 border border-transparent";
 
   return (
     <div className={cn(
       "group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-all",
-      apt.completed
-        ? "bg-success/5 opacity-70"
-        : isOverdue
-          ? "bg-destructive/5 border border-destructive/20"
-          : "hover:bg-muted/50"
+      rowBg
     )}>
       {/* Complete button */}
       <button
@@ -452,10 +467,12 @@ const AppointmentCard = ({ appointment: apt, onToggle, onDelete }: {
         className={cn(
           "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all",
           apt.completed
-            ? "bg-success border-success text-white"
-            : isOverdue
-              ? "border-destructive hover:bg-destructive/10"
-              : "border-muted-foreground/40 hover:border-primary hover:bg-primary/10"
+            ? "bg-emerald-500 border-emerald-500 text-white"
+            : apt.cancelled
+              ? "border-muted-foreground/30"
+              : isOverdue
+                ? "border-destructive hover:bg-destructive/10"
+                : "border-muted-foreground/40 hover:border-primary hover:bg-primary/10"
         )}
       >
         {apt.completed && <Check className="h-3 w-3" />}
@@ -466,7 +483,7 @@ const AppointmentCard = ({ appointment: apt, onToggle, onDelete }: {
         <div className="flex items-center gap-2">
           <span className={cn(
             "text-sm font-medium",
-            apt.completed ? "line-through text-muted-foreground" : "text-foreground"
+            apt.completed ? "line-through text-emerald-700 dark:text-emerald-400" : apt.cancelled ? "line-through text-red-500 dark:text-red-400" : "text-foreground"
           )}>
             {apt.title}
           </span>
@@ -475,33 +492,51 @@ const AppointmentCard = ({ appointment: apt, onToggle, onDelete }: {
               {apt.category}
             </span>
           )}
-          {isOverdue && !apt.completed && (
+          {isOverdue && !apt.completed && !apt.cancelled && (
             <Badge variant="outline" className="text-[10px] border-destructive/30 text-destructive bg-destructive/10">
               Atrasado
             </Badge>
           )}
           {apt.completed && (
-            <Badge variant="outline" className="text-[10px] border-success/30 text-success bg-success/10">
+            <Badge variant="outline" className="text-[10px] border-emerald-400/50 text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400">
               Concluído
+            </Badge>
+          )}
+          {apt.cancelled && (
+            <Badge variant="outline" className="text-[10px] border-red-400/50 text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400">
+              Cancelado
             </Badge>
           )}
         </div>
         {apt.description && (
-          <p className={cn("text-xs mt-0.5", apt.completed ? "text-muted-foreground/60 line-through" : "text-muted-foreground")}>
+          <p className={cn("text-xs mt-0.5", apt.completed || apt.cancelled ? "text-muted-foreground/60 line-through" : "text-muted-foreground")}>
             {apt.description}
           </p>
         )}
       </div>
 
-      {/* Time */}
+      {/* Time + actions */}
       <div className="flex items-center gap-2 shrink-0">
         <span className={cn(
           "flex items-center gap-1 text-xs font-mono",
-          apt.completed ? "text-muted-foreground/50" : isOverdue ? "text-destructive" : "text-muted-foreground"
+          apt.completed ? "text-emerald-600/60 dark:text-emerald-400/60" : apt.cancelled ? "text-red-500/60" : isOverdue ? "text-destructive" : "text-muted-foreground"
         )}>
           <Clock className="h-3 w-3" />
           {apt.appointmentTime}
         </span>
+        {/* Cancel button */}
+        <button
+          onClick={() => onCancel(apt.id, !apt.cancelled)}
+          className={cn(
+            "rounded-full p-1 transition-all",
+            apt.cancelled
+              ? "text-red-500 opacity-100"
+              : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+          )}
+          title={apt.cancelled ? "Desfazer cancelamento" : "Cancelar"}
+        >
+          <Ban className="h-3.5 w-3.5" />
+        </button>
         <button
           onClick={() => onDelete(apt.id)}
           className="opacity-0 group-hover:opacity-100 rounded-full p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
@@ -577,20 +612,27 @@ const MonthView = ({ currentDate, appointmentsByDate, onDayClick, onCreateClick 
               </div>
               {dayApts.length > 0 && (
                 <div className="mt-1 space-y-0.5">
-                  {dayApts.slice(0, 3).map(apt => (
-                    <div
-                      key={apt.id}
-                      className={cn(
-                        "rounded px-1.5 py-0.5 text-[10px] font-medium truncate",
-                        apt.completed
-                          ? "bg-success/10 text-success line-through"
-                          : getCategoryStyle(apt.category)
-                      )}
-                    >
-                      <span className="font-mono mr-1">{apt.appointmentTime}</span>
-                      {apt.title}
-                    </div>
-                  ))}
+                  {dayApts.slice(0, 3).map(apt => {
+                    const isLastPost = apt.category.toLowerCase() === "último post";
+                    return (
+                      <div
+                        key={apt.id}
+                        className={cn(
+                          "rounded px-1.5 py-0.5 text-[10px] font-medium truncate",
+                          apt.completed
+                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 line-through"
+                            : apt.cancelled
+                              ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 line-through"
+                              : isLastPost
+                                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                                : getCategoryStyle(apt.category)
+                        )}
+                      >
+                        <span className="font-mono mr-1">{apt.appointmentTime}</span>
+                        {apt.title}
+                      </div>
+                    );
+                  })}
                   {dayApts.length > 3 && (
                     <div className="text-[10px] text-muted-foreground pl-1">+{dayApts.length - 3} mais</div>
                   )}
