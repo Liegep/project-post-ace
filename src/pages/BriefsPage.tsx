@@ -165,7 +165,7 @@ const BriefsPage = () => {
     setFormPlannedDate(undefined);
     setFormContentType("post");
     setFormStatus("draft");
-    setFormAssignedTo("");
+    setFormAssignedTo("none");
     setFormInternalNotes("");
     setEditingBrief(null);
   };
