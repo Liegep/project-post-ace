@@ -271,6 +271,7 @@ const TeamDashboard = () => {
       </header>
 
       <main className="mx-auto max-w-5xl p-6 space-y-6">
+        <TodayAppointmentsWidget />
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
