@@ -392,9 +392,9 @@ const TeamDashboard = () => {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {clients.map(client => {
                   const clientPosts = posts.filter(p => p.clientId === client.id);
-                  const pending = clientPosts.filter(p => p.status === "entrada").length;
-                  const inProgress = clientPosts.filter(p => ["em desenvolvimento", "escrevendo legenda"].includes(p.status)).length;
-                  const ready = clientPosts.filter(p => ["pronto", "finalizado"].includes(p.status)).length;
+                  const pending = clientPosts.filter(p => p.status.includes("entrada")).length;
+                  const inProgress = clientPosts.filter(p => p.status.some(s => ["em_desenvolvimento", "escrevendo_legenda"].includes(s))).length;
+                  const ready = clientPosts.filter(p => p.status.some(s => ["pronto", "finalizado"].includes(s))).length;
                   return (
                     <div
                       key={client.id}

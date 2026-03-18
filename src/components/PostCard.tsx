@@ -375,17 +375,31 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
         )}
 
         {isAdmin && (
-          <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
-            <Select value={post.status} onValueChange={(v) => onStatusChange?.(v as PostStatus)}>
-              <SelectTrigger className={`flex-1 text-xs ${isCompact ? "h-7" : "h-8"}`}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
-                  <SelectItem key={key} value={key}>{t(STATUS_KEYS[key])}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-wrap items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
+            {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => {
+              const isChecked = post.status.includes(key);
+              return (
+                <label key={key} className="flex items-center gap-1 cursor-pointer">
+                  <Checkbox
+                    checked={isChecked}
+                    onCheckedChange={(checked) => {
+                      let newStatus: PostStatus[];
+                      if (checked) {
+                        newStatus = [...post.status, key];
+                      } else {
+                        newStatus = post.status.filter((s) => s !== key);
+                      }
+                      if (newStatus.length === 0) newStatus = [key]; // at least one
+                      onStatusChange?.(newStatus);
+                    }}
+                    className="h-3.5 w-3.5"
+                  />
+                  <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CONFIG[key].color}`}>
+                    {t(STATUS_KEYS[key])}
+                  </span>
+                </label>
+              );
+            })}
             <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
               <Trash2 className="h-4 w-4" />
             </Button>

@@ -167,7 +167,7 @@ export const TrackingPanel = ({ clientId, posts, columns = [], tags = [], isAdmi
   const allIds = orderedPosts.map((p) => p.id);
 
   const isEntrada = (post: Post) =>
-    post.status === "entrada" || (entradaColumnId != null && post.columnId === entradaColumnId);
+    post.status.includes("entrada") || (entradaColumnId != null && post.columnId === entradaColumnId);
 
   const saveOrder = useCallback(async (ids: string[]) => {
     savedOrderRef.current = ids;

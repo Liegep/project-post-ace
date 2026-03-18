@@ -43,11 +43,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
   const [detailPost, setDetailPost] = useState<Post | null>(null);
 
-  const readyPosts = posts.filter((p) => p.status === "pronto");
+  const readyPosts = posts.filter((p) => p.status.includes("pronto"));
 
   const entradaColumn = columns.find((c) => c.name.toLowerCase() === "entrada");
   const entradaPosts = entradaColumn
-    ? posts.filter((p) => p.columnId === entradaColumn.id && p.status === "em_desenvolvimento")
+    ? posts.filter((p) => p.columnId === entradaColumn.id && p.status.includes("em_desenvolvimento"))
     : [];
 
   // Columns explicitly visible to client (excluding entrada which has its own section)

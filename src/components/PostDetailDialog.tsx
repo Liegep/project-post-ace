@@ -91,9 +91,11 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t }: PostDeta
           <h2 className="text-xl font-bold text-foreground">{post.title}</h2>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${statusConfig.color}`}>
-              {t(STATUS_KEYS[post.status])}
-            </span>
+            {post.status.map((s) => (
+              <span key={s} className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_CONFIG[s].color}`}>
+                {t(STATUS_KEYS[s])}
+              </span>
+            ))}
             <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${labelConfig.color}`}>
               {t(LABEL_KEYS[post.clientLabel])}
             </span>
