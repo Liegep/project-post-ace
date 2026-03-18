@@ -51,10 +51,10 @@ function SortableItem({ post, isEntrada, tags }: { post: Post; isEntrada: boolea
     zIndex: isDragging ? 10 : undefined,
   };
 
-  const isDone = post.status === "finalizado";
-  const isDev = post.status === "em_desenvolvimento";
-  const isChangeRequested = post.status === "alteracao_solicitada";
-  const statusInfo = STATUS_LABELS[post.status] || STATUS_LABELS.entrada;
+  const isDone = post.status.includes("finalizado");
+  const isDev = post.status.includes("em_desenvolvimento");
+  const isChangeRequested = post.status.includes("alteracao_solicitada");
+  const statusInfo = STATUS_LABELS[post.status[0]] || STATUS_LABELS.entrada;
 
   const postTags = post.tags
     .map((tagId) => tags.find((t) => t.id === tagId))
