@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, Globe } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { LABEL_CONFIG } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
@@ -30,6 +30,7 @@ interface Client {
   youtube_url: string;
   linkedin_url: string;
   twitter_url: string;
+  website_url: string;
 }
 
 interface FeedbackNotification {
@@ -98,6 +99,7 @@ const AdminDashboard = () => {
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [twitterUrl, setTwitterUrl] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
 
 
   useEffect(() => {
@@ -363,6 +365,7 @@ const AdminDashboard = () => {
     setYoutubeUrl(client.youtube_url || "");
     setLinkedinUrl(client.linkedin_url || "");
     setTwitterUrl(client.twitter_url || "");
+    setWebsiteUrl(client.website_url || "");
     setDialogOpen(true);
   };
 
@@ -387,6 +390,7 @@ const AdminDashboard = () => {
         youtube_url: youtubeUrl,
         linkedin_url: linkedinUrl,
         twitter_url: twitterUrl,
+        website_url: websiteUrl,
       };
 
       if (editingClient) {
@@ -737,6 +741,11 @@ const AdminDashboard = () => {
                             <Twitter className="h-3.5 w-3.5" />
                           </a>
                         )}
+                        {client.website_url && (
+                          <a href={client.website_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-primary transition-colors" title="Website">
+                            <Globe className="h-3.5 w-3.5" />
+                          </a>
+                        )}
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground">
@@ -880,6 +889,10 @@ const AdminDashboard = () => {
                 <div className="flex items-center gap-2">
                   <Twitter className="h-4 w-4 shrink-0" />
                   <Input value={twitterUrl} onChange={(e) => setTwitterUrl(e.target.value)} placeholder="https://x.com/..." className="flex-1" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-primary shrink-0" />
+                  <Input value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} placeholder="https://meusite.com.br" className="flex-1" />
                 </div>
               </div>
             </div>
