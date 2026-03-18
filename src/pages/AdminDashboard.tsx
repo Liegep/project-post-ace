@@ -36,6 +36,11 @@ interface Client {
   website_url: string;
 }
 
+interface ClientUser {
+  userId: string;
+  email: string;
+}
+
 interface FeedbackNotification {
   postId: string;
   postTitle: string;
