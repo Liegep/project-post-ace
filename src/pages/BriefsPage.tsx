@@ -223,18 +223,19 @@ const BriefsPage = () => {
 
   const duplicateBrief = async (brief: Brief) => {
     const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from("content_briefs").insert({
+    const dupPayload: any = {
       client_id: brief.client_id,
       title: `${brief.title} (cópia)`,
       description: brief.description,
       caption: brief.caption,
       planned_date: brief.planned_date,
       content_type: brief.content_type,
-      status: "draft" as string,
+      status: "draft",
       assigned_to: brief.assigned_to,
       internal_notes: brief.internal_notes,
       created_by: user?.id,
-    });
+    };
+    const { error } = await supabase.from("content_briefs").insert(dupPayload);
     if (!error) {
       toast({ title: "Pauta duplicada" });
       loadData();
