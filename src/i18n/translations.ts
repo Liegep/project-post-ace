@@ -979,6 +979,7 @@ const sv: TranslationKeys = {
   statusReady: "Klart",
   statusFinalized: "Avslutat",
   statusChangeRequested: "Ändring Begärd",
+  statusScheduled: "Schemalagd",
   labelPending: "Väntande",
   labelApproved: "Godkänt",
   labelChangeRequested: "Ändring Begärd",
