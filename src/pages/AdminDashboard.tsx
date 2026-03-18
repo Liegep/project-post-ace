@@ -166,6 +166,7 @@ const AdminDashboard = () => {
       posts.map((p: any) => ({
         postId: p.id,
         postTitle: p.title,
+        clientId: p.client_id,
         clientName: clientMap[p.client_id]?.name || "—",
         clientSlug: clientMap[p.client_id]?.slug || "",
         clientLogo: clientMap[p.client_id]?.logo_url || "",
