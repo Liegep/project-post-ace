@@ -1,13 +1,21 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Facebook, Instagram } from "lucide-react";
+import { ChevronLeft, ChevronRight, Facebook, Instagram, FileText } from "lucide-react";
 import { SocialStatusBadge } from "./SocialStatusBadge";
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+export interface ScheduledKanbanPost {
+  id: string;
+  title: string;
+  client_name: string;
+  deadline: string;
+}
+
 interface SocialCalendarProps {
   posts: SocialPost[];
+  scheduledPosts?: ScheduledKanbanPost[];
   onPostClick: (post: SocialPost) => void;
 }
 
