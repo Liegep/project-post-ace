@@ -390,6 +390,7 @@ const AdminDashboard = () => {
         youtube_url: youtubeUrl,
         linkedin_url: linkedinUrl,
         twitter_url: twitterUrl,
+        website_url: websiteUrl,
       };
 
       if (editingClient) {
