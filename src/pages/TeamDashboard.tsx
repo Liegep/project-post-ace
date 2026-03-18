@@ -262,9 +262,6 @@ const TeamDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
-            <Button variant="outline" size="sm" onClick={() => navigate("/agenda")}>
-              <CalendarDays className="mr-1 h-4 w-4" /> Agenda
-            </Button>
             <UserProfileMenu />
           </div>
         </div>

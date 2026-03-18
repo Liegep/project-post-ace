@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
-import { User, KeyRound, LogOut, Camera } from "lucide-react";
+import { User, KeyRound, LogOut, Camera, CalendarDays } from "lucide-react";
 
 const UserProfileMenu = () => {
   const { t } = useI18n();
@@ -160,6 +160,10 @@ const UserProfileMenu = () => {
           <DropdownMenuItem onClick={() => setPasswordOpen(true)}>
             <KeyRound className="mr-2 h-4 w-4" />
             {t("changePassword")}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/agenda")}>
+            <CalendarDays className="mr-2 h-4 w-4" />
+            Agenda
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
