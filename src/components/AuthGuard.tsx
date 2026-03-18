@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface AuthGuardProps {
   children: React.ReactNode;
-  allowedRoles?: ("admin" | "team_member")[];
+  allowedRoles?: ("admin" | "team_member" | "client")[];
 }
 
 const AuthGuard = ({ children, allowedRoles = ["admin", "team_member"] }: AuthGuardProps) => {
