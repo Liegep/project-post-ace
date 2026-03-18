@@ -411,6 +411,9 @@ const AdminDashboard = () => {
             <Button variant="outline" size="sm" onClick={() => navigate("/social")}>
               <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
             </Button>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/ideas")} title="Ideias de Pauta">
+              <span className="text-lg">💡</span>
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}>
               <UserPlus className="mr-1 h-4 w-4" /> {t("invite")}
             </Button>
