@@ -93,6 +93,30 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
   );
 };
 
+const downloadFile = async (url: string, filename: string) => {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+  } catch {
+    window.open(url, "_blank");
+  }
+};
+
+const downloadAllFiles = async (urls: string[], postTitle: string) => {
+  for (let i = 0; i < urls.length; i++) {
+    const ext = urls[i].split(".").pop()?.split("?")[0] || "jpg";
+    await downloadFile(urls[i], `${postTitle}_${i + 1}.${ext}`);
+  }
+};
+
 export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags, clientId } = usePosts();
   const { t } = useI18n();
