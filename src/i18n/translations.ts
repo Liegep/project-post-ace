@@ -233,7 +233,7 @@ const pt: TranslationKeys = {
   statusEntry: "Entrada",
   statusInDevelopment: "Em Desenvolvimento",
   statusWritingCaption: "Escrevendo Legenda",
-  statusReady: "Pronto",
+  statusReady: "Enviar para Cliente",
   statusFinalized: "Finalizado",
   statusChangeRequested: "Alteração Solicitada",
   labelPending: "Pendente",
