@@ -357,6 +357,12 @@ const AdminDashboard = () => {
     setLocale(client.locale as Locale);
     setLogoPreview(client.logo_url);
     setLogoFile(null);
+    setInstagramUrl(client.instagram_url || "");
+    setFacebookUrl(client.facebook_url || "");
+    setTiktokUrl(client.tiktok_url || "");
+    setYoutubeUrl(client.youtube_url || "");
+    setLinkedinUrl(client.linkedin_url || "");
+    setTwitterUrl(client.twitter_url || "");
     setDialogOpen(true);
   };
 
