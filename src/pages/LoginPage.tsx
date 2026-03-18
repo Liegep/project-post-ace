@@ -21,31 +21,40 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (signInError) {
+      if (signInError || !data.user) {
         setError("E-mail ou senha inválidos");
         return;
       }
 
-      // Check role and redirect accordingly
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: isAdmin } = await supabase.rpc("has_role" as any, {
-          _user_id: user.id,
+      const userId = data.user.id;
+      const [{ data: isAdmin }, { data: isTeamMember }] = await Promise.all([
+        supabase.rpc("has_role" as any, {
+          _user_id: userId,
           _role: "admin",
-        });
-        if (isAdmin) {
-          navigate("/");
-        } else {
-          navigate("/team");
-        }
-      } else {
-        navigate("/");
+        }),
+        supabase.rpc("has_role" as any, {
+          _user_id: userId,
+          _role: "team_member",
+        }),
+      ]);
+
+      if (isAdmin) {
+        navigate("/", { replace: true });
+        return;
       }
+
+      if (isTeamMember) {
+        navigate("/team", { replace: true });
+        return;
+      }
+
+      setError("Seu usuário não tem acesso liberado");
+      await supabase.auth.signOut();
     } catch {
       setError("Erro ao fazer login");
     } finally {
