@@ -152,8 +152,9 @@ const AgendaPage = () => {
     return format(currentDate, "MMMM 'de' yyyy", { locale: ptBR });
   };
 
-  const pendingCount = filteredAppointments.filter(a => !a.completed).length;
+  const pendingCount = filteredAppointments.filter(a => !a.completed && !a.cancelled).length;
   const completedCount = filteredAppointments.filter(a => a.completed).length;
+  const cancelledCount = filteredAppointments.filter(a => a.cancelled).length;
 
   return (
     <div className="min-h-screen bg-background">
