@@ -4,22 +4,34 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface AuthGuardProps {
   children: React.ReactNode;
+  allowedRoles?: ("admin" | "team_member")[];
 }
 
-const AuthGuard = ({ children }: AuthGuardProps) => {
+const AuthGuard = ({ children, allowedRoles = ["admin", "team_member"] }: AuthGuardProps) => {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
     const checkAuth = async (userId: string) => {
-      // Check admin role via has_role RPC
-      const { data } = await supabase.rpc("has_role" as any, {
+      for (const role of allowedRoles) {
+        const { data } = await supabase.rpc("has_role" as any, {
+          _user_id: userId,
+          _role: role,
+        });
+        if (data) {
+          setAuthorized(true);
+          setChecking(false);
+          return;
+        }
+      }
+      // If team_member tries to access admin-only route, redirect to team dashboard
+      const { data: isTeam } = await supabase.rpc("has_role" as any, {
         _user_id: userId,
-        _role: "admin",
+        _role: "team_member",
       });
-      if (data) {
-        setAuthorized(true);
+      if (isTeam) {
+        navigate("/team");
       } else {
         navigate("/login");
       }
@@ -37,7 +49,6 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
       }
     );
 
-    // Initial check
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session?.user) {
         setChecking(false);
