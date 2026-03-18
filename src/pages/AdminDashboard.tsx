@@ -372,26 +372,13 @@ const AdminDashboard = () => {
             <Button variant="outline" size="sm" onClick={() => navigate("/social")}>
               <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setChangePasswordOpen(true)}>
-              <KeyRound className="mr-1 h-4 w-4" /> {t("password")}
-            </Button>
             <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}>
               <UserPlus className="mr-1 h-4 w-4" /> {t("invite")}
             </Button>
             <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newClient")}
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                navigate("/login");
-              }}
-              title={t("signOut")}
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
+            <UserProfileMenu />
           </div>
         </div>
       </header>
