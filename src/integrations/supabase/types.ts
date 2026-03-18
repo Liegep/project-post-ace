@@ -44,6 +44,57 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_notifications: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          id: string
+          message: string
+          post_id: string | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          post_id?: string | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          post_id?: string | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_notifications_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admin_notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           key: string
@@ -313,6 +364,76 @@ export type Database = {
           },
         ]
       }
+      post_feedback: {
+        Row: {
+          created_at: string
+          from_user_id: string
+          id: string
+          message: string
+          post_id: string
+          to_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          from_user_id: string
+          id?: string
+          message?: string
+          post_id: string
+          to_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          message?: string
+          post_id?: string
+          to_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_feedback_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          id: string
+          new_status: string
+          old_status: string | null
+          post_id: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_status: string
+          old_status?: string | null
+          post_id: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          new_status?: string
+          old_status?: string | null
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_status_history_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_tracking: {
         Row: {
           completed: boolean
@@ -438,6 +559,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Relationships: []
       }
       social_logs: {
         Row: {
@@ -695,6 +846,38 @@ export type Database = {
           },
         ]
       }
+      user_client_assignments: {
+        Row: {
+          assigned_by: string | null
+          client_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          client_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          client_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_client_assignments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -721,6 +904,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_client_ids: { Args: { _user_id: string }; Returns: string[] }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
