@@ -526,7 +526,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   }, [searchParams, posts]);
 
 
-    setShowArchivedToClient(checked);
+    const toggleShowArchivedToClient = async (checked: boolean) => {
     await supabase.from("clients").update({ show_archived_to_client: checked } as any).eq("id", clientData.id);
   };
 
