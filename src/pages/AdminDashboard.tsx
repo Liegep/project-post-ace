@@ -14,9 +14,10 @@ import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, Globe, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { LABEL_CONFIG } from "@/types/post";
+import { LABEL_CONFIG, Post, PostStatus, ClientLabel, STATUS_CONFIG, Tag, DEFAULT_TAGS } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
 import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
+import { PostDetailDialog } from "@/components/PostDetailDialog";
 
 interface Client {
   id: string;
@@ -107,6 +108,8 @@ const AdminDashboard = () => {
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [viewPost, setViewPost] = useState<Post | null>(null);
+  const [viewPostOpen, setViewPostOpen] = useState(false);
   const [instagramUrl, setInstagramUrl] = useState("");
   const [facebookUrl, setFacebookUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
@@ -571,7 +574,34 @@ const AdminDashboard = () => {
                 return (
                   <div
                     key={n.id}
-                    onClick={() => client ? navigate(`/admin/${client.slug}?postId=${n.postId}`) : undefined}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if (!n.postId) return;
+                      const { data: postData } = await supabase.from("posts").select("*").eq("id", n.postId).maybeSingle();
+                      if (postData) {
+                        const p: Post = {
+                          id: postData.id,
+                          title: postData.title,
+                          imageUrl: postData.image_url,
+                          mediaType: (postData.media_type as any) || "image",
+                          mediaUrls: postData.media_urls || [],
+                          caption: postData.caption || "",
+                          deadline: postData.deadline ? new Date(postData.deadline) : null,
+                          status: (postData.status || []) as PostStatus[],
+                          clientLabel: (postData.client_label || "pendente") as ClientLabel,
+                          comments: [],
+                          tags: postData.tags || [],
+                          createdAt: new Date(postData.created_at),
+                          columnId: postData.column_id,
+                          position: postData.position,
+                          archived: postData.archived,
+                          archivedAt: postData.archived_at ? new Date(postData.archived_at) : null,
+                          trelloCardId: postData.trello_card_id,
+                        };
+                        setViewPost(p);
+                        setViewPostOpen(true);
+                      }
+                    }}
                     className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5 cursor-pointer hover:bg-muted transition-colors"
                   >
                     {client?.logo_url ? (
@@ -1028,6 +1058,7 @@ const AdminDashboard = () => {
       </Dialog>
 
       <InviteAdminDialog open={inviteOpen} onOpenChange={setInviteOpen} />
+      <PostDetailDialog post={viewPost} open={viewPostOpen} onOpenChange={setViewPostOpen} tags={DEFAULT_TAGS} t={t} />
 
     </div>
   );
