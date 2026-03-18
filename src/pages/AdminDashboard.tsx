@@ -36,6 +36,11 @@ interface Client {
   website_url: string;
 }
 
+interface ClientUser {
+  userId: string;
+  email: string;
+}
+
 interface FeedbackNotification {
   postId: string;
   postTitle: string;
@@ -117,6 +122,9 @@ const AdminDashboard = () => {
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [twitterUrl, setTwitterUrl] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientPassword, setClientPassword] = useState("");
+  const [existingClientUser, setExistingClientUser] = useState<ClientUser | null>(null);
 
   const fetchStatusNotifs = async () => {
     const { data } = await supabase
@@ -402,10 +410,13 @@ const AdminDashboard = () => {
     setYoutubeUrl("");
     setLinkedinUrl("");
     setTwitterUrl("");
+    setClientEmail("");
+    setClientPassword("");
+    setExistingClientUser(null);
     setDialogOpen(true);
   };
 
-  const openEdit = (client: Client) => {
+  const openEdit = async (client: Client) => {
     setEditingClient(client);
     setName(client.name);
     setSlug(client.slug);
@@ -419,6 +430,41 @@ const AdminDashboard = () => {
     setLinkedinUrl(client.linkedin_url || "");
     setTwitterUrl(client.twitter_url || "");
     setWebsiteUrl(client.website_url || "");
+    setClientPassword("");
+
+    // Load existing client user
+    const { data: assignments } = await supabase
+      .from("user_client_assignments")
+      .select("user_id")
+      .eq("client_id", client.id);
+
+    if (assignments && assignments.length > 0) {
+      // Check if any assigned user has client role
+      for (const a of assignments) {
+        const { data: hasClientRole } = await supabase.rpc("has_role" as any, {
+          _user_id: a.user_id,
+          _role: "client",
+        });
+        if (hasClientRole) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("email")
+            .eq("id", a.user_id)
+            .single();
+          setExistingClientUser({ userId: a.user_id, email: profile?.email || "" });
+          setClientEmail(profile?.email || "");
+          break;
+        }
+      }
+      if (!existingClientUser) {
+        setExistingClientUser(null);
+        setClientEmail("");
+      }
+    } else {
+      setExistingClientUser(null);
+      setClientEmail("");
+    }
+
     setDialogOpen(true);
   };
 
@@ -446,6 +492,8 @@ const AdminDashboard = () => {
         website_url: websiteUrl,
       };
 
+      let clientId = editingClient?.id;
+
       if (editingClient) {
         await supabase.from("clients").update({
           name,
@@ -455,13 +503,56 @@ const AdminDashboard = () => {
           ...socialFields,
         } as any).eq("id", editingClient.id);
       } else {
-        await supabase.from("clients").insert({
+        const { data: newClient } = await supabase.from("clients").insert({
           name,
           slug,
           locale,
           logo_url: logoUrl,
           ...socialFields,
-        } as any);
+        } as any).select().single();
+        clientId = (newClient as any)?.id;
+      }
+
+      // Create or update client user login
+      if (clientId && clientEmail) {
+        if (existingClientUser) {
+          // Update existing client user
+          if (clientEmail !== existingClientUser.email || clientPassword) {
+            const { data: result, error: fnError } = await supabase.functions.invoke("create-client-user", {
+              body: {
+                mode: "update",
+                user_id: existingClientUser.userId,
+                email: clientEmail !== existingClientUser.email ? clientEmail : undefined,
+                password: clientPassword || undefined,
+              },
+            });
+            if (fnError) {
+              toast({ title: "Erro ao atualizar login do cliente", description: fnError.message, variant: "destructive" });
+            } else if (result?.error) {
+              toast({ title: "Erro ao atualizar login do cliente", description: result.error, variant: "destructive" });
+            } else {
+              toast({ title: "Login do cliente atualizado" });
+            }
+          }
+        } else if (clientPassword) {
+          // Create new client user
+          const { data: result, error: fnError } = await supabase.functions.invoke("create-client-user", {
+            body: {
+              mode: "create",
+              email: clientEmail,
+              password: clientPassword,
+              client_id: clientId,
+              client_name: name,
+            },
+          });
+          if (fnError) {
+            toast({ title: "Erro ao criar login do cliente", description: fnError.message, variant: "destructive" });
+          } else if (result?.error) {
+            toast({ title: "Erro ao criar login do cliente", description: result.error, variant: "destructive" });
+          } else {
+            toast({ title: "Login do cliente criado com sucesso" });
+          }
+        }
       }
 
       setDialogOpen(false);
@@ -1048,6 +1139,38 @@ const AdminDashboard = () => {
                 <div className="flex items-center gap-2">
                   <Globe className="h-4 w-4 text-primary shrink-0" />
                   <Input value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} placeholder="https://meusite.com.br" className="flex-1" />
+                </div>
+              </div>
+            </div>
+
+            {/* Login do cliente */}
+            <div className="border-t pt-4">
+              <Label className="text-sm font-semibold">Login do Cliente</Label>
+              <p className="text-xs text-muted-foreground mb-2">
+                {existingClientUser
+                  ? "Atualize o e-mail ou senha do cliente"
+                  : "Crie um acesso para o cliente visualizar seus conteúdos"}
+              </p>
+              <div className="space-y-2">
+                <div>
+                  <Label className="text-xs">E-mail do cliente</Label>
+                  <Input
+                    type="email"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    placeholder="cliente@email.com"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">
+                    {existingClientUser ? "Nova senha (deixe vazio para manter)" : "Senha"}
+                  </Label>
+                  <Input
+                    type="password"
+                    value={clientPassword}
+                    onChange={(e) => setClientPassword(e.target.value)}
+                    placeholder={existingClientUser ? "••••••••" : "Mínimo 6 caracteres"}
+                  />
                 </div>
               </div>
             </div>
