@@ -17,29 +17,35 @@ export type Database = {
       admin_invitations: {
         Row: {
           accepted_at: string | null
+          client_ids: string[]
           created_at: string
           email: string
           expires_at: string
           id: string
           invited_by: string | null
+          role: Database["public"]["Enums"]["app_role"]
           token: string
         }
         Insert: {
           accepted_at?: string | null
+          client_ids?: string[]
           created_at?: string
           email: string
           expires_at?: string
           id?: string
           invited_by?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
           token: string
         }
         Update: {
           accepted_at?: string | null
+          client_ids?: string[]
           created_at?: string
           email?: string
           expires_at?: string
           id?: string
           invited_by?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
           token?: string
         }
         Relationships: []
