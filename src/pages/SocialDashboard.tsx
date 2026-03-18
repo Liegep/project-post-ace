@@ -43,6 +43,8 @@ export default function SocialDashboard() {
 
   const { posts, pages, loading, createPost, updatePost, deletePost, duplicatePost, publishPost, cancelPost, approvePost, fetchPages } = useSocialPosts(selectedClientId || null);
 
+  const [scheduledKanbanPosts, setScheduledKanbanPosts] = useState<ScheduledKanbanPost[]>([]);
+
   useEffect(() => {
     supabase.from("clients").select("id, name, slug, logo_url").order("name").then(({ data }) => {
       const clientList = (data || []) as Client[];
@@ -51,6 +53,28 @@ export default function SocialDashboard() {
         setSelectedClientId(clientList[0].id);
       }
     });
+  }, []);
+
+  // Fetch kanban posts with "agendado" status that have a deadline
+  useEffect(() => {
+    async function fetchScheduledKanban() {
+      const { data } = await supabase
+        .from("posts")
+        .select("id, title, deadline, client_id, clients(name)")
+        .contains("status", ["agendado"])
+        .not("deadline", "is", null) as any;
+      
+      if (data) {
+        const mapped: ScheduledKanbanPost[] = data.map((p: any) => ({
+          id: p.id,
+          title: p.title,
+          client_name: p.clients?.name || "—",
+          deadline: p.deadline,
+        }));
+        setScheduledKanbanPosts(mapped);
+      }
+    }
+    fetchScheduledKanban();
   }, []);
 
   const filteredPosts = useMemo(() => {
