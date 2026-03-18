@@ -215,6 +215,40 @@ const AdminDashboard = () => {
     setFeedbacks((prev) => prev.filter((fb) => fb.postId !== postId));
   };
 
+  const markAsAgendado = async (fb: FeedbackNotification, e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Ensure "Agendados" column exists for this client
+    const { data: existingCols } = await supabase
+      .from("columns")
+      .select("id, name")
+      .eq("client_id", fb.clientId);
+
+    let agendadosColId: string;
+    const agendadosCol = (existingCols || []).find((c: any) => c.name.toLowerCase() === "agendados");
+    if (agendadosCol) {
+      agendadosColId = agendadosCol.id;
+    } else {
+      const maxPos = (existingCols || []).length;
+      const { data: newCol } = await supabase
+        .from("columns")
+        .insert({ client_id: fb.clientId, name: "Agendados", position: maxPos } as any)
+        .select()
+        .single();
+      if (!newCol) return;
+      agendadosColId = (newCol as any).id;
+    }
+
+    // Update post: set status to agendado, move to Agendados column, reset label
+    await supabase.from("posts").update({
+      status: ["agendado"],
+      column_id: agendadosColId,
+      client_label: "pendente",
+    } as any).eq("id", fb.postId);
+
+    setFeedbacks((prev) => prev.filter((f) => f.postId !== fb.postId));
+    toast({ title: "Post agendado", description: `"${fb.postTitle}" movido para a coluna Agendados.` });
+  };
+
   const dismissUnarchiveNotif = async (postId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     await supabase.from("posts").update({ client_unarchived_at: null } as any).eq("id", postId);
