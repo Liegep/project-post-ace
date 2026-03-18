@@ -414,9 +414,6 @@ const AdminDashboard = () => {
             <Button variant="ghost" size="icon" onClick={() => navigate("/ideas")} title="Ideias de Pauta">
               <span className="text-lg">💡</span>
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}>
-              <UserPlus className="mr-1 h-4 w-4" /> {t("invite")}
-            </Button>
             <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newClient")}
             </Button>
