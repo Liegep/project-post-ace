@@ -404,7 +404,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("posts").update(dbUpdates as any).eq("id", id);
   }, []);
 
-  const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus) => {
+  const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus[]) => {
     const updates: Record<string, any> = { status };
     setPosts((prev) => prev.map((p) => ids.includes(p.id) ? { ...p, status } : p));
     await supabase.from("posts").update(updates).in("id", ids);
