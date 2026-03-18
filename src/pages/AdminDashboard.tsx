@@ -741,6 +741,11 @@ const AdminDashboard = () => {
                             <Twitter className="h-3.5 w-3.5" />
                           </a>
                         )}
+                        {client.website_url && (
+                          <a href={client.website_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-primary transition-colors" title="Website">
+                            <Globe className="h-3.5 w-3.5" />
+                          </a>
+                        )}
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground">
