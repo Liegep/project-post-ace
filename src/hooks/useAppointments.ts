@@ -117,5 +117,5 @@ export function useAppointments() {
     await supabase.from("appointments").update(dbUpdates).eq("id", id);
   }, []);
 
-  return { appointments, loading, createAppointment, toggleComplete, deleteAppointment, updateAppointment, refetch: fetchAppointments };
+  return { appointments, loading, createAppointment, createBatch, toggleComplete, deleteAppointment, updateAppointment, refetch: fetchAppointments };
 }
