@@ -574,7 +574,34 @@ const AdminDashboard = () => {
                 return (
                   <div
                     key={n.id}
-                    onClick={() => client ? navigate(`/admin/${client.slug}?postId=${n.postId}`) : undefined}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      if (!n.postId) return;
+                      const { data: postData } = await supabase.from("posts").select("*").eq("id", n.postId).maybeSingle();
+                      if (postData) {
+                        const p: Post = {
+                          id: postData.id,
+                          title: postData.title,
+                          imageUrl: postData.image_url,
+                          mediaType: (postData.media_type as any) || "image",
+                          mediaUrls: postData.media_urls || [],
+                          caption: postData.caption || "",
+                          deadline: postData.deadline ? new Date(postData.deadline) : null,
+                          status: (postData.status || []) as PostStatus[],
+                          clientLabel: (postData.client_label || "pendente") as ClientLabel,
+                          comments: [],
+                          tags: postData.tags || [],
+                          createdAt: new Date(postData.created_at),
+                          columnId: postData.column_id,
+                          position: postData.position,
+                          archived: postData.archived,
+                          archivedAt: postData.archived_at ? new Date(postData.archived_at) : null,
+                          trelloCardId: postData.trello_card_id,
+                        };
+                        setViewPost(p);
+                        setViewPostOpen(true);
+                      }
+                    }}
                     className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5 cursor-pointer hover:bg-muted transition-colors"
                   >
                     {client?.logo_url ? (
