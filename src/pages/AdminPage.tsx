@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PostsProvider, usePosts } from "@/context/PostsContext";
 import { Post, PostStatus, STATUS_CONFIG } from "@/types/post";
@@ -509,8 +509,24 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
   const [trackingVisibleToClient, setTrackingVisibleToClient] = useState(clientData.tracking_visible_to_client ?? false);
 
-  const toggleShowArchivedToClient = async (checked: boolean) => {
-    setShowArchivedToClient(checked);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Auto-open post from query param (e.g. from dashboard notification)
+  useEffect(() => {
+    const postId = searchParams.get("postId");
+    if (postId && posts.length > 0) {
+      const found = posts.find((p) => p.id === postId);
+      if (found) {
+        setEditPost(found);
+        // Clean up the query param
+        searchParams.delete("postId");
+        setSearchParams(searchParams, { replace: true });
+      }
+    }
+  }, [searchParams, posts]);
+
+
+    const toggleShowArchivedToClient = async (checked: boolean) => {
     await supabase.from("clients").update({ show_archived_to_client: checked } as any).eq("id", clientData.id);
   };
 
