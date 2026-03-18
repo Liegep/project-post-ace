@@ -680,9 +680,6 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   // Posts without a column
   const unassignedPosts = posts.filter((p) => !p.columnId).sort((a, b) => a.position - b.position);
 
-      setSyncing(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background">
