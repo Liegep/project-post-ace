@@ -28,6 +28,7 @@ type TranslationKeys = {
   statusReady: string;
   statusFinalized: string;
   statusChangeRequested: string;
+  statusScheduled: string;
   // Client labels
   labelPending: string;
   labelApproved: string;
