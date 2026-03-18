@@ -176,6 +176,7 @@ export default function SocialDashboard() {
                 <SelectValue placeholder="Selecionar cliente" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">Todos os clientes</SelectItem>
                 {clients.map((c) => (
                   <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                 ))}
