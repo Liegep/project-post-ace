@@ -953,6 +953,15 @@ const es: TranslationKeys = {
   notifications: "Notificaciones",
   adminFeedback: "Feedback del Admin",
   statusUpdated: "¡Estado actualizado!",
+  myProfile: "Mi Perfil",
+  editProfileDesc: "Edita tu nombre y foto",
+  profileUpdated: "¡Perfil actualizado!",
+  changePasswordDesc: "Establece una nueva contraseña",
+  error: "Error",
+  inviteMember: "Invitar Miembro",
+  inviteMemberDesc: "Invita a alguien como miembro del equipo o administrador",
+  roleLabel: "Tipo de acceso",
+  sendInvite: "Enviar Invitación",
 };
 
 const sv: TranslationKeys = {
