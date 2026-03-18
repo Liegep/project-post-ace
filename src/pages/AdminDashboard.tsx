@@ -122,6 +122,9 @@ const AdminDashboard = () => {
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [twitterUrl, setTwitterUrl] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientPassword, setClientPassword] = useState("");
+  const [existingClientUser, setExistingClientUser] = useState<ClientUser | null>(null);
 
   const fetchStatusNotifs = async () => {
     const { data } = await supabase
