@@ -544,7 +544,33 @@ const AdminDashboard = () => {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{fb.postTitle}</p>
+                      <HoverCard openDelay={200} closeDelay={100}>
+                        <HoverCardTrigger asChild>
+                          <p className="text-sm font-medium text-foreground truncate cursor-pointer hover:underline">{fb.postTitle}</p>
+                        </HoverCardTrigger>
+                        <HoverCardContent side="top" className="w-72 p-2" onClick={(e) => e.stopPropagation()}>
+                          {(() => {
+                            const previewUrls = fb.mediaUrls.length > 0 ? fb.mediaUrls : fb.imageUrl ? [fb.imageUrl] : [];
+                            return previewUrls.length > 0 ? (
+                              <div className="space-y-2">
+                                <p className="text-xs font-semibold text-foreground truncate">{fb.postTitle}</p>
+                                <div className={cn("grid gap-1", previewUrls.length > 1 ? "grid-cols-2" : "grid-cols-1")}>
+                                  {previewUrls.slice(0, 4).map((url, i) => (
+                                    <img key={i} src={url} alt={`${fb.postTitle} ${i + 1}`} className="w-full rounded-md object-cover aspect-square" />
+                                  ))}
+                                </div>
+                                {previewUrls.length > 4 && (
+                                  <p className="text-[10px] text-muted-foreground text-center">+{previewUrls.length - 4} mais</p>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
+                                Sem mídia
+                              </div>
+                            );
+                          })()}
+                        </HoverCardContent>
+                      </HoverCard>
                       <p className="text-xs text-muted-foreground">{fb.clientName}</p>
                     </div>
                     {labelConfig && (
