@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { LABEL_CONFIG } from "@/types/post";
-import { CalendarClock, Bell, MessageCircle, Clock, CheckCircle, AlertCircle, FileText, X } from "lucide-react";
+import { CalendarClock, Bell, MessageCircle, Clock, CheckCircle, AlertCircle, FileText, X, CalendarDays } from "lucide-react";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { toast } from "@/hooks/use-toast";
 
@@ -261,6 +261,9 @@ const TeamDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
+            <Button variant="outline" size="sm" onClick={() => navigate("/agenda")}>
+              <CalendarDays className="mr-1 h-4 w-4" /> Agenda
+            </Button>
             <UserProfileMenu />
           </div>
         </div>

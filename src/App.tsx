@@ -15,6 +15,7 @@ import SocialDashboard from "./pages/SocialDashboard.tsx";
 import SocialCallbackPage from "./pages/SocialCallbackPage.tsx";
 import TeamManagementPage from "./pages/TeamManagementPage.tsx";
 import TeamDashboard from "./pages/TeamDashboard.tsx";
+import AgendaPage from "./pages/AgendaPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/social/callback" element={<SocialCallbackPage />} />
             <Route path="/team" element={<AuthGuard allowedRoles={["team_member"]}><TeamDashboard /></AuthGuard>} />
             <Route path="/team-management" element={<AuthGuard allowedRoles={["admin"]}><TeamManagementPage /></AuthGuard>} />
+            <Route path="/agenda" element={<AuthGuard allowedRoles={["admin", "team_member"]}><AgendaPage /></AuthGuard>} />
             <Route path="/client/:slug" element={<ClientPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
