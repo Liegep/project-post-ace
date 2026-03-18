@@ -1137,6 +1137,15 @@ const sv: TranslationKeys = {
   notifications: "Aviseringar",
   adminFeedback: "Admin Feedback",
   statusUpdated: "Status uppdaterad!",
+  myProfile: "Min Profil",
+  editProfileDesc: "Redigera ditt namn och foto",
+  profileUpdated: "Profil uppdaterad!",
+  changePasswordDesc: "Ange ett nytt lösenord",
+  error: "Fel",
+  inviteMember: "Bjud in Medlem",
+  inviteMemberDesc: "Bjud in någon som teammedlem eller administratör",
+  roleLabel: "Åtkomsttyp",
+  sendInvite: "Skicka Inbjudan",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };
