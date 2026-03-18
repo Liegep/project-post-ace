@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, Globe } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 import { LABEL_CONFIG } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
 import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
@@ -43,6 +45,8 @@ interface FeedbackNotification {
   label: string;
   updatedAt: string;
   deadline: string | null;
+  imageUrl: string;
+  mediaUrls: string[];
 }
 
 interface UnarchiveNotification {
@@ -160,7 +164,7 @@ const AdminDashboard = () => {
     // Fetch posts where client gave feedback (label != pendente)
     const { data: posts } = await supabase
       .from("posts")
-      .select("id, title, client_label, client_id, updated_at, deadline")
+      .select("id, title, client_label, client_id, updated_at, deadline, image_url, media_urls")
       .neq("client_label", "pendente")
       .order("updated_at", { ascending: false });
 
@@ -189,6 +193,8 @@ const AdminDashboard = () => {
         label: p.client_label,
         updatedAt: p.updated_at,
         deadline: p.deadline || null,
+        imageUrl: p.image_url || "",
+        mediaUrls: p.media_urls || [],
       }))
     );
   };
@@ -539,7 +545,33 @@ const AdminDashboard = () => {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{fb.postTitle}</p>
+                      <HoverCard openDelay={200} closeDelay={100}>
+                        <HoverCardTrigger asChild>
+                          <p className="text-sm font-medium text-foreground truncate cursor-pointer hover:underline">{fb.postTitle}</p>
+                        </HoverCardTrigger>
+                        <HoverCardContent side="top" className="w-72 p-2" onClick={(e) => e.stopPropagation()}>
+                          {(() => {
+                            const previewUrls = fb.mediaUrls.length > 0 ? fb.mediaUrls : fb.imageUrl ? [fb.imageUrl] : [];
+                            return previewUrls.length > 0 ? (
+                              <div className="space-y-2">
+                                <p className="text-xs font-semibold text-foreground truncate">{fb.postTitle}</p>
+                                <div className={cn("grid gap-1", previewUrls.length > 1 ? "grid-cols-2" : "grid-cols-1")}>
+                                  {previewUrls.slice(0, 4).map((url, i) => (
+                                    <img key={i} src={url} alt={`${fb.postTitle} ${i + 1}`} className="w-full rounded-md object-cover aspect-square" />
+                                  ))}
+                                </div>
+                                {previewUrls.length > 4 && (
+                                  <p className="text-[10px] text-muted-foreground text-center">+{previewUrls.length - 4} mais</p>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
+                                Sem mídia
+                              </div>
+                            );
+                          })()}
+                        </HoverCardContent>
+                      </HoverCard>
                       <p className="text-xs text-muted-foreground">{fb.clientName}</p>
                     </div>
                     {labelConfig && (
