@@ -960,7 +960,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
           <div className="h-6 w-px bg-border" />
           {activeTab === "board" ? (
             <>
-              <Select onValueChange={(v) => handleBulkStatusChange(v as PostStatus)}>
+              <Select onValueChange={(v) => handleBulkStatusChange([v as PostStatus])}>
                 <SelectTrigger className="h-8 w-auto min-w-[140px] text-xs">
                   <SelectValue placeholder={t("changeStatus")} />
                 </SelectTrigger>
