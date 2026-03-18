@@ -258,6 +258,7 @@ const AgendaPage = () => {
             }
             appointmentsByDate={appointmentsByDate}
             onToggle={toggleComplete}
+            onCancel={toggleCancelled}
             onDelete={deleteAppointment}
             onCreateClick={(d) => openCreateForDate(d)}
           />
