@@ -39,7 +39,8 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t }: PostDeta
   const hasMedia = allMedia.length > 0;
   const currentUrl = allMedia[mediaIndex] || allMedia[0];
   const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
-  const statusConfig = STATUS_CONFIG[post.status];
+  const primaryStatus = post.status[0] || "entrada";
+  const statusConfig = STATUS_CONFIG[primaryStatus];
   const labelConfig = LABEL_CONFIG[post.clientLabel];
 
   const postTags = post.tags
