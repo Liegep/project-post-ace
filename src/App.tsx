@@ -40,6 +40,7 @@ const App = () => (
             <Route path="/team" element={<AuthGuard allowedRoles={["team_member"]}><TeamDashboard /></AuthGuard>} />
             <Route path="/team-management" element={<AuthGuard allowedRoles={["admin"]}><TeamManagementPage /></AuthGuard>} />
             <Route path="/agenda" element={<AuthGuard allowedRoles={["admin", "team_member"]}><AgendaPage /></AuthGuard>} />
+            <Route path="/ideas" element={<AuthGuard allowedRoles={["admin", "team_member"]}><IdeasPage /></AuthGuard>} />
             <Route path="/client/:slug" element={<ClientPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
