@@ -11,6 +11,8 @@ export interface Appointment {
   category: string;
   completed: boolean;
   completedAt: Date | null;
+  cancelled: boolean;
+  cancelledAt: Date | null;
   createdAt: Date;
 }
 
@@ -48,6 +50,8 @@ export function useAppointments() {
         category: r.category || "",
         completed: r.completed,
         completedAt: r.completed_at ? new Date(r.completed_at) : null,
+        cancelled: r.cancelled || false,
+        cancelledAt: r.cancelled_at ? new Date(r.cancelled_at) : null,
         createdAt: new Date(r.created_at),
       })));
     }
@@ -95,8 +99,21 @@ export function useAppointments() {
     const updates: Record<string, any> = {
       completed,
       completed_at: completed ? new Date().toISOString() : null,
+      cancelled: false,
+      cancelled_at: null,
     };
-    setAppointments(prev => prev.map(a => a.id === id ? { ...a, completed, completedAt: completed ? new Date() : null } : a));
+    setAppointments(prev => prev.map(a => a.id === id ? { ...a, completed, completedAt: completed ? new Date() : null, cancelled: false, cancelledAt: null } : a));
+    await supabase.from("appointments").update(updates).eq("id", id);
+  }, []);
+
+  const toggleCancelled = useCallback(async (id: string, cancelled: boolean) => {
+    const updates: Record<string, any> = {
+      cancelled,
+      cancelled_at: cancelled ? new Date().toISOString() : null,
+      completed: false,
+      completed_at: null,
+    };
+    setAppointments(prev => prev.map(a => a.id === id ? { ...a, cancelled, cancelledAt: cancelled ? new Date() : null, completed: false, completedAt: null } : a));
     await supabase.from("appointments").update(updates).eq("id", id);
   }, []);
 
@@ -117,5 +134,5 @@ export function useAppointments() {
     await supabase.from("appointments").update(dbUpdates).eq("id", id);
   }, []);
 
-  return { appointments, loading, createAppointment, createBatch, toggleComplete, deleteAppointment, updateAppointment, refetch: fetchAppointments };
+  return { appointments, loading, createAppointment, createBatch, toggleComplete, toggleCancelled, deleteAppointment, updateAppointment, refetch: fetchAppointments };
 }
