@@ -213,6 +213,17 @@ type TranslationKeys = {
   notifications: string;
   adminFeedback: string;
   statusUpdated: string;
+  // User profile menu
+  myProfile: string;
+  editProfileDesc: string;
+  profileUpdated: string;
+  changePasswordDesc: string;
+  error: string;
+  // Invite unified
+  inviteMember: string;
+  inviteMemberDesc: string;
+  roleLabel: string;
+  sendInvite: string;
 };
 
 const pt: TranslationKeys = {
@@ -390,6 +401,15 @@ const pt: TranslationKeys = {
   notifications: "Notificações",
   adminFeedback: "Feedback do Admin",
   statusUpdated: "Status atualizado!",
+  myProfile: "Meu Perfil",
+  editProfileDesc: "Edite seu nome e foto",
+  profileUpdated: "Perfil atualizado!",
+  changePasswordDesc: "Defina uma nova senha",
+  error: "Erro",
+  inviteMember: "Convidar Membro",
+  inviteMemberDesc: "Convide alguém para a equipe ou como administrador",
+  roleLabel: "Tipo de acesso",
+  sendInvite: "Enviar Convite",
 };
 
 const en: TranslationKeys = {
@@ -565,6 +585,15 @@ const en: TranslationKeys = {
   notifications: "Notifications",
   adminFeedback: "Admin Feedback",
   statusUpdated: "Status updated!",
+  myProfile: "My Profile",
+  editProfileDesc: "Edit your name and photo",
+  profileUpdated: "Profile updated!",
+  changePasswordDesc: "Set a new password",
+  error: "Error",
+  inviteMember: "Invite Member",
+  inviteMemberDesc: "Invite someone as team member or admin",
+  roleLabel: "Access type",
+  sendInvite: "Send Invite",
 };
 
 const it: TranslationKeys = {
@@ -740,6 +769,15 @@ const it: TranslationKeys = {
   notifications: "Notifiche",
   adminFeedback: "Feedback Admin",
   statusUpdated: "Stato aggiornato!",
+  myProfile: "Il Mio Profilo",
+  editProfileDesc: "Modifica il tuo nome e la foto",
+  profileUpdated: "Profilo aggiornato!",
+  changePasswordDesc: "Imposta una nuova password",
+  error: "Errore",
+  inviteMember: "Invita Membro",
+  inviteMemberDesc: "Invita qualcuno come membro del team o amministratore",
+  roleLabel: "Tipo di accesso",
+  sendInvite: "Invia Invito",
 };
 
 const es: TranslationKeys = {
@@ -915,6 +953,15 @@ const es: TranslationKeys = {
   notifications: "Notificaciones",
   adminFeedback: "Feedback del Admin",
   statusUpdated: "¡Estado actualizado!",
+  myProfile: "Mi Perfil",
+  editProfileDesc: "Edita tu nombre y foto",
+  profileUpdated: "¡Perfil actualizado!",
+  changePasswordDesc: "Establece una nueva contraseña",
+  error: "Error",
+  inviteMember: "Invitar Miembro",
+  inviteMemberDesc: "Invita a alguien como miembro del equipo o administrador",
+  roleLabel: "Tipo de acceso",
+  sendInvite: "Enviar Invitación",
 };
 
 const sv: TranslationKeys = {
@@ -1090,6 +1137,15 @@ const sv: TranslationKeys = {
   notifications: "Aviseringar",
   adminFeedback: "Admin Feedback",
   statusUpdated: "Status uppdaterad!",
+  myProfile: "Min Profil",
+  editProfileDesc: "Redigera ditt namn och foto",
+  profileUpdated: "Profil uppdaterad!",
+  changePasswordDesc: "Ange ett nytt lösenord",
+  error: "Fel",
+  inviteMember: "Bjud in Medlem",
+  inviteMemberDesc: "Bjud in någon som teammedlem eller administratör",
+  roleLabel: "Åtkomsttyp",
+  sendInvite: "Skicka Inbjudan",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };

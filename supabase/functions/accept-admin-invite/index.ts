@@ -56,6 +56,9 @@ Deno.serve(async (req) => {
       );
     }
 
+    const role = invitation.role || "admin";
+    const clientIds: string[] = invitation.client_ids || [];
+
     // Create user via admin API
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email: invitation.email,
@@ -70,11 +73,29 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Assign admin role
+    // Assign role
     await supabaseAdmin.from("user_roles").insert({
       user_id: newUser.user.id,
-      role: "admin",
+      role,
     });
+
+    // Create profile
+    await supabaseAdmin.from("profiles").insert({
+      id: newUser.user.id,
+      full_name: invitation.email.split("@")[0],
+      email: invitation.email,
+      role,
+    });
+
+    // Assign clients for team members
+    if (role === "team_member" && clientIds.length > 0) {
+      const assignments = clientIds.map((client_id: string) => ({
+        user_id: newUser.user.id,
+        client_id,
+        assigned_by: invitation.invited_by,
+      }));
+      await supabaseAdmin.from("user_client_assignments").insert(assignments);
+    }
 
     // Mark invitation as accepted
     await supabaseAdmin
@@ -83,7 +104,7 @@ Deno.serve(async (req) => {
       .eq("id", invitation.id);
 
     return new Response(
-      JSON.stringify({ success: true, email: invitation.email }),
+      JSON.stringify({ success: true, email: invitation.email, role }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {

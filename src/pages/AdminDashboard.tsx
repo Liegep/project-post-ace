@@ -5,11 +5,12 @@ import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, LogOut, FilePlus, KeyRound, CalendarClock, Users } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { LABEL_CONFIG } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
@@ -82,39 +83,7 @@ const AdminDashboard = () => {
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [passwordSaving, setPasswordSaving] = useState(false);
 
-  const handleChangePassword = async () => {
-    setPasswordError("");
-    if (newPassword.length < 6) {
-      setPasswordError(t("passwordMinError"));
-      return;
-    }
-    if (newPassword !== confirmNewPassword) {
-      setPasswordError(t("passwordMismatch"));
-      return;
-    }
-    setPasswordSaving(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) {
-        setPasswordError(t("passwordUpdateError"));
-        return;
-      }
-      toast({ title: t("passwordUpdated") });
-      setChangePasswordOpen(false);
-      setNewPassword("");
-      setConfirmNewPassword("");
-    } catch {
-      setPasswordError(t("passwordUpdateError"));
-    } finally {
-      setPasswordSaving(false);
-    }
-  };
 
   useEffect(() => {
     fetchClients();
@@ -403,26 +372,13 @@ const AdminDashboard = () => {
             <Button variant="outline" size="sm" onClick={() => navigate("/social")}>
               <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setChangePasswordOpen(true)}>
-              <KeyRound className="mr-1 h-4 w-4" /> {t("password")}
-            </Button>
             <Button variant="outline" size="sm" onClick={() => setInviteOpen(true)}>
               <UserPlus className="mr-1 h-4 w-4" /> {t("invite")}
             </Button>
             <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newClient")}
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                navigate("/login");
-              }}
-              title={t("signOut")}
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
+            <UserProfileMenu />
           </div>
         </div>
       </header>
@@ -781,28 +737,6 @@ const AdminDashboard = () => {
 
       <InviteAdminDialog open={inviteOpen} onOpenChange={setInviteOpen} />
 
-      <Dialog open={changePasswordOpen} onOpenChange={(open) => { setChangePasswordOpen(open); if (!open) { setNewPassword(""); setConfirmNewPassword(""); setPasswordError(""); } }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t("changePassword")}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">{t("newPassword")}</Label>
-              <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t("minChars")} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmNewPassword">{t("confirmNewPassword")}</Label>
-              <Input id="confirmNewPassword" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} placeholder={t("repeatPassword")} />
-            </div>
-            {passwordError && <p className="text-sm text-destructive">{passwordError}</p>}
-            <Button onClick={handleChangePassword} disabled={passwordSaving} className="w-full">
-              <KeyRound className="mr-2 h-4 w-4" />
-              {passwordSaving ? t("saving") : t("saveNewPassword")}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
