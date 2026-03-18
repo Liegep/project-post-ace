@@ -47,11 +47,7 @@ export default function SocialDashboard() {
 
   useEffect(() => {
     supabase.from("clients").select("id, name, slug, logo_url").order("name").then(({ data }) => {
-      const clientList = (data || []) as Client[];
-      setClients(clientList);
-      if (clientList.length > 0 && !selectedClientId) {
-        setSelectedClientId(clientList[0].id);
-      }
+      setClients((data || []) as Client[]);
     });
   }, []);
 
