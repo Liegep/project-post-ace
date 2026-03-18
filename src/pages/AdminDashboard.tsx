@@ -424,6 +424,9 @@ const AdminDashboard = () => {
       </header>
 
       <main className="mx-auto max-w-5xl p-6 space-y-6">
+        {/* Today's appointments */}
+        <TodayAppointmentsWidget />
+
         {/* Today's posts reminder */}
         {todayPosts.length > 0 && (
           <div className="rounded-xl border border-blue-400/30 bg-blue-500/5 p-4">
