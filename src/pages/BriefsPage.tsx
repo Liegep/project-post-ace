@@ -116,7 +116,7 @@ const BriefsPage = () => {
   const [formPlannedDate, setFormPlannedDate] = useState<Date | undefined>();
   const [formContentType, setFormContentType] = useState("post");
   const [formStatus, setFormStatus] = useState<BriefStatus>("draft");
-  const [formAssignedTo, setFormAssignedTo] = useState("");
+  const [formAssignedTo, setFormAssignedTo] = useState("none");
   const [formInternalNotes, setFormInternalNotes] = useState("");
 
   useEffect(() => {
@@ -165,7 +165,7 @@ const BriefsPage = () => {
     setFormPlannedDate(undefined);
     setFormContentType("post");
     setFormStatus("draft");
-    setFormAssignedTo("");
+    setFormAssignedTo("none");
     setFormInternalNotes("");
     setEditingBrief(null);
   };
@@ -184,7 +184,7 @@ const BriefsPage = () => {
     setFormPlannedDate(brief.planned_date ? new Date(brief.planned_date) : undefined);
     setFormContentType(brief.content_type);
     setFormStatus(brief.status);
-    setFormAssignedTo(brief.assigned_to || "");
+    setFormAssignedTo(brief.assigned_to || "none");
     setFormInternalNotes(brief.internal_notes);
     setDialogOpen(true);
   };
@@ -203,7 +203,7 @@ const BriefsPage = () => {
       planned_date: formPlannedDate ? format(formPlannedDate, "yyyy-MM-dd") : null,
       content_type: formContentType,
       status: formStatus,
-      assigned_to: formAssignedTo || null,
+      assigned_to: formAssignedTo === "none" ? null : formAssignedTo,
       internal_notes: formInternalNotes,
     };
 
@@ -531,7 +531,7 @@ const BriefsPage = () => {
                 <Select value={formAssignedTo} onValueChange={setFormAssignedTo}>
                   <SelectTrigger><SelectValue placeholder="Nenhum" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Nenhum</SelectItem>
+                    <SelectItem value="none">Nenhum</SelectItem>
                     {teamMembers.map((m) => <SelectItem key={m.id} value={m.id}>{m.full_name || m.email}</SelectItem>)}
                   </SelectContent>
                 </Select>
