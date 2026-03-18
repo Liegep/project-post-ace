@@ -181,10 +181,44 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
   const updatePostStatus = useCallback(async (id: string, status: PostStatus) => {
     const updates: Record<string, any> = { status };
+    const post = posts.find(p => p.id === id);
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
     await supabase.from("posts").update(updates).eq("id", id);
     pushToTrello(id, "update");
-  }, []);
+
+    // Notify admins when status is "pronto" or "finalizado"
+    if (["pronto", "finalizado"].includes(status)) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", session.user.id)
+          .maybeSingle();
+        const userName = (profile as any)?.full_name || session.user.email || "Usuário";
+
+        // Get client name
+        let clientName = "";
+        if (post?.clientId) {
+          const { data: clientData } = await supabase
+            .from("clients")
+            .select("name")
+            .eq("id", post.clientId)
+            .maybeSingle();
+          clientName = (clientData as any)?.name || "";
+        }
+
+        await supabase.from("admin_notifications").insert({
+          type: "status_change",
+          title: `${userName}${clientName ? " - " + clientName : ""}`,
+          message: `Post "${post?.title || ""}" marcado como "${status}" por ${userName}`,
+          client_id: post?.clientId || null,
+          post_id: id,
+          user_id: null,
+        } as any);
+      }
+    }
+  }, [posts]);
 
   const updateClientLabel = useCallback(async (id: string, label: ClientLabel) => {
     let newColumnId: string | undefined;
