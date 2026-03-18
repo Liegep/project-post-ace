@@ -531,7 +531,7 @@ const BriefsPage = () => {
                 <Select value={formAssignedTo} onValueChange={setFormAssignedTo}>
                   <SelectTrigger><SelectValue placeholder="Nenhum" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Nenhum</SelectItem>
+                    <SelectItem value="none">Nenhum</SelectItem>
                     {teamMembers.map((m) => <SelectItem key={m.id} value={m.id}>{m.full_name || m.email}</SelectItem>)}
                   </SelectContent>
                 </Select>
