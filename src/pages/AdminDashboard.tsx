@@ -92,6 +92,7 @@ const AdminDashboard = () => {
   const [feedbacks, setFeedbacks] = useState<FeedbackNotification[]>([]);
   const [unarchiveNotifs, setUnarchiveNotifs] = useState<UnarchiveNotification[]>([]);
   const [clientCreatedNotifs, setClientCreatedNotifs] = useState<ClientCreatedNotification[]>([]);
+  const [statusNotifs, setStatusNotifs] = useState<StatusNotification[]>([]);
   const [todayPosts, setTodayPosts] = useState<TodayPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
