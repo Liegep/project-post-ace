@@ -187,6 +187,32 @@ type TranslationKeys = {
   // Post sent by client
   postSentSuccess: string;
   postSentDesc: string;
+  // Team management
+  teamManagement: string;
+  manageTeamMembers: string;
+  newMember: string;
+  noTeamMembers: string;
+  createFirstMember: string;
+  createMember: string;
+  fullName: string;
+  fullNamePlaceholder: string;
+  assignClients: string;
+  assignClientsTo: string;
+  noClientsAssigned: string;
+  teamMemberCreated: string;
+  assignmentsUpdated: string;
+  confirmDeleteMember: string;
+  memberDeleted: string;
+  team: string;
+  // Team dashboard
+  hello: string;
+  teamMember: string;
+  yourClients: string;
+  myClients: string;
+  contactAdmin: string;
+  notifications: string;
+  adminFeedback: string;
+  statusUpdated: string;
 };
 
 const pt: TranslationKeys = {
