@@ -69,7 +69,7 @@ function SortableItem({ post, isEntrada, tags }: { post: Post; isEntrada: boolea
         isDone && "border-success/30 bg-success/5",
         isDev && "border-warning/30 bg-warning/5",
         isChangeRequested && "border-destructive/30 bg-destructive/5",
-        isEntrada && !isDone && !isDev && !isChangeRequested && "border-red-400 bg-red-50 dark:bg-red-950/30 dark:border-red-600",
+        isEntrada && !isDone && !isDev && !isChangeRequested && "border-foreground bg-foreground/95 dark:bg-foreground/90",
         !isDone && !isDev && !isEntrada && !isChangeRequested && "border-border bg-card"
       )}
     >
@@ -86,9 +86,9 @@ function SortableItem({ post, isEntrada, tags }: { post: Post; isEntrada: boolea
           </>
         ) : (
           <>
-            <Circle className={cn("h-3 w-3 shrink-0", isDev ? "text-warning-foreground" : isChangeRequested ? "text-destructive" : isEntrada ? "text-red-500" : "text-muted-foreground")} />
-            <span className={cn("text-sm font-medium truncate flex-1", isEntrada ? "text-red-700 dark:text-red-400" : isChangeRequested ? "text-destructive" : "text-foreground")}>{post.title}</span>
-            <Badge variant="outline" className={cn("text-[10px] shrink-0 font-semibold", isEntrada && !isDev ? "bg-red-500 text-white border-red-500 dark:bg-red-600 dark:border-red-600" : statusInfo.className)}>
+            <Circle className={cn("h-3 w-3 shrink-0", isDev ? "text-warning-foreground" : isChangeRequested ? "text-destructive" : isEntrada ? "text-background" : "text-muted-foreground")} />
+            <span className={cn("text-sm font-medium truncate flex-1", isEntrada ? "text-background" : isChangeRequested ? "text-destructive" : "text-foreground")}>{post.title}</span>
+            <Badge variant="outline" className={cn("text-[10px] shrink-0 font-semibold", isEntrada && !isDev ? "bg-background text-foreground border-background" : statusInfo.className)}>
               {isEntrada ? "Entrada" : statusInfo.label}
             </Badge>
           </>
