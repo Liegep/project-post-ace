@@ -492,6 +492,8 @@ const AdminDashboard = () => {
         website_url: websiteUrl,
       };
 
+      let clientId = editingClient?.id;
+
       if (editingClient) {
         await supabase.from("clients").update({
           name,
@@ -501,13 +503,56 @@ const AdminDashboard = () => {
           ...socialFields,
         } as any).eq("id", editingClient.id);
       } else {
-        await supabase.from("clients").insert({
+        const { data: newClient } = await supabase.from("clients").insert({
           name,
           slug,
           locale,
           logo_url: logoUrl,
           ...socialFields,
-        } as any);
+        } as any).select().single();
+        clientId = (newClient as any)?.id;
+      }
+
+      // Create or update client user login
+      if (clientId && clientEmail) {
+        if (existingClientUser) {
+          // Update existing client user
+          if (clientEmail !== existingClientUser.email || clientPassword) {
+            const { data: result, error: fnError } = await supabase.functions.invoke("create-client-user", {
+              body: {
+                mode: "update",
+                user_id: existingClientUser.userId,
+                email: clientEmail !== existingClientUser.email ? clientEmail : undefined,
+                password: clientPassword || undefined,
+              },
+            });
+            if (fnError) {
+              toast({ title: "Erro ao atualizar login do cliente", description: fnError.message, variant: "destructive" });
+            } else if (result?.error) {
+              toast({ title: "Erro ao atualizar login do cliente", description: result.error, variant: "destructive" });
+            } else {
+              toast({ title: "Login do cliente atualizado" });
+            }
+          }
+        } else if (clientPassword) {
+          // Create new client user
+          const { data: result, error: fnError } = await supabase.functions.invoke("create-client-user", {
+            body: {
+              mode: "create",
+              email: clientEmail,
+              password: clientPassword,
+              client_id: clientId,
+              client_name: name,
+            },
+          });
+          if (fnError) {
+            toast({ title: "Erro ao criar login do cliente", description: fnError.message, variant: "destructive" });
+          } else if (result?.error) {
+            toast({ title: "Erro ao criar login do cliente", description: result.error, variant: "destructive" });
+          } else {
+            toast({ title: "Login do cliente criado com sucesso" });
+          }
+        }
       }
 
       setDialogOpen(false);
