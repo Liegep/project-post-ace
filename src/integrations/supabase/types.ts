@@ -219,49 +219,67 @@ export type Database = {
           allow_client_create_post: boolean
           allow_client_edit_caption: boolean
           created_at: string
+          facebook_url: string
           id: string
+          instagram_url: string
+          linkedin_url: string
           locale: string
           logo_url: string
           name: string
           posting_period: string
           show_archived_to_client: boolean
           slug: string
+          tiktok_url: string
           tracking_enabled: boolean
           tracking_visible_to_client: boolean
           trello_board_id: string
+          twitter_url: string
           updated_at: string
+          youtube_url: string
         }
         Insert: {
           allow_client_create_post?: boolean
           allow_client_edit_caption?: boolean
           created_at?: string
+          facebook_url?: string
           id?: string
+          instagram_url?: string
+          linkedin_url?: string
           locale?: string
           logo_url?: string
           name: string
           posting_period?: string
           show_archived_to_client?: boolean
           slug: string
+          tiktok_url?: string
           tracking_enabled?: boolean
           tracking_visible_to_client?: boolean
           trello_board_id?: string
+          twitter_url?: string
           updated_at?: string
+          youtube_url?: string
         }
         Update: {
           allow_client_create_post?: boolean
           allow_client_edit_caption?: boolean
           created_at?: string
+          facebook_url?: string
           id?: string
+          instagram_url?: string
+          linkedin_url?: string
           locale?: string
           logo_url?: string
           name?: string
           posting_period?: string
           show_archived_to_client?: boolean
           slug?: string
+          tiktok_url?: string
           tracking_enabled?: boolean
           tracking_visible_to_client?: boolean
           trello_board_id?: string
+          twitter_url?: string
           updated_at?: string
+          youtube_url?: string
         }
         Relationships: []
       }
