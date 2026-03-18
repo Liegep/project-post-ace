@@ -17,8 +17,10 @@ import {
   Plus, ChevronLeft, ChevronRight, CalendarIcon, Check, Clock,
   Trash2, ArrowLeft, CalendarDays, CalendarRange, Calendar as CalendarLucide
 } from "lucide-react";
-import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, addMonths, subMonths, addWeeks, subWeeks } from "date-fns";
+import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, addMonths, subMonths, addWeeks, subWeeks, getDaysInMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+type RepeatMode = "none" | "week" | "month";
 
 type ViewMode = "day" | "week" | "month";
 
