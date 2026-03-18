@@ -184,7 +184,7 @@ const BriefsPage = () => {
     setFormPlannedDate(brief.planned_date ? new Date(brief.planned_date) : undefined);
     setFormContentType(brief.content_type);
     setFormStatus(brief.status);
-    setFormAssignedTo(brief.assigned_to || "");
+    setFormAssignedTo(brief.assigned_to || "none");
     setFormInternalNotes(brief.internal_notes);
     setDialogOpen(true);
   };
