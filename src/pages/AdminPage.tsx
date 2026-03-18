@@ -985,42 +985,6 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} defaultColumnId={createInColumnId} />
       <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
 
-      {/* Trello Sync Dialog */}
-      <Dialog open={trelloSyncOpen} onOpenChange={setTrelloSyncOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t("syncWithTrello")}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label>{t("trelloBoardId")}</Label>
-              <Input
-                value={trelloBoardId}
-                onChange={(e) => setTrelloBoardId(e.target.value)}
-                placeholder={t("trelloBoardIdPlaceholder")}
-                onKeyDown={(e) => { if (e.key === "Enter") handleTrelloSync(); }}
-              />
-              <p className="mt-1 text-xs text-muted-foreground">
-                {t("trelloBoardIdHelp")}
-              </p>
-            </div>
-            <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-              {t("trelloSyncWarning")}
-            </div>
-            <Button
-              onClick={handleTrelloSync}
-              disabled={syncing || !trelloBoardId.trim()}
-              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
-            >
-              {syncing ? (
-                <><RefreshCw className="mr-2 h-4 w-4 animate-spin" /> {t("syncing")}</>
-              ) : (
-                <><RefreshCw className="mr-2 h-4 w-4" /> {t("startSync")}</>
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
