@@ -365,6 +365,7 @@ const AdminDashboard = () => {
     setYoutubeUrl(client.youtube_url || "");
     setLinkedinUrl(client.linkedin_url || "");
     setTwitterUrl(client.twitter_url || "");
+    setWebsiteUrl(client.website_url || "");
     setDialogOpen(true);
   };
 
