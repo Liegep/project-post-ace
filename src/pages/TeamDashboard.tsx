@@ -261,17 +261,7 @@ const TeamDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                navigate("/login");
-              }}
-              title={t("signOut")}
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
+            <UserProfileMenu />
           </div>
         </div>
       </header>
