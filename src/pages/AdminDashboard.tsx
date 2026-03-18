@@ -14,6 +14,7 @@ import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bel
 import { toast } from "@/hooks/use-toast";
 import { LABEL_CONFIG } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
+import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
 
 interface Client {
   id: string;
