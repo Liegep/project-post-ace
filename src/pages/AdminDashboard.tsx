@@ -416,7 +416,7 @@ const AdminDashboard = () => {
     setDialogOpen(true);
   };
 
-  const openEdit = (client: Client) => {
+  const openEdit = async (client: Client) => {
     setEditingClient(client);
     setName(client.name);
     setSlug(client.slug);
@@ -430,6 +430,41 @@ const AdminDashboard = () => {
     setLinkedinUrl(client.linkedin_url || "");
     setTwitterUrl(client.twitter_url || "");
     setWebsiteUrl(client.website_url || "");
+    setClientPassword("");
+
+    // Load existing client user
+    const { data: assignments } = await supabase
+      .from("user_client_assignments")
+      .select("user_id")
+      .eq("client_id", client.id);
+
+    if (assignments && assignments.length > 0) {
+      // Check if any assigned user has client role
+      for (const a of assignments) {
+        const { data: hasClientRole } = await supabase.rpc("has_role" as any, {
+          _user_id: a.user_id,
+          _role: "client",
+        });
+        if (hasClientRole) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("email")
+            .eq("id", a.user_id)
+            .single();
+          setExistingClientUser({ userId: a.user_id, email: profile?.email || "" });
+          setClientEmail(profile?.email || "");
+          break;
+        }
+      }
+      if (!existingClientUser) {
+        setExistingClientUser(null);
+        setClientEmail("");
+      }
+    } else {
+      setExistingClientUser(null);
+      setClientEmail("");
+    }
+
     setDialogOpen(true);
   };
 
