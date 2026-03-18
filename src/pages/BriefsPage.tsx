@@ -473,6 +473,14 @@ const BriefsPage = () => {
                     <Button
                       variant="ghost"
                       size="sm"
+                      className="h-7 text-xs gap-1 text-destructive hover:text-destructive"
+                      onClick={(e) => { e.stopPropagation(); setDeletingBrief(brief); }}
+                    >
+                      <Trash2 className="h-3 w-3" /> Apagar
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className={cn("h-7 text-xs gap-1 ml-auto", brief.status === "pending_approval" ? "text-amber-600" : "text-muted-foreground")}
                       onClick={(e) => { e.stopPropagation(); toggleClientVisibility(brief); }}
                     >
