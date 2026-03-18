@@ -252,7 +252,7 @@ const BriefsPage = () => {
   };
 
   const updateStatus = async (briefId: string, newStatus: BriefStatus) => {
-    const { error } = await supabase.from("content_briefs").update({ status: newStatus as string }).eq("id", briefId);
+    const { error } = await supabase.from("content_briefs").update({ status: newStatus } as any).eq("id", briefId);
     if (!error) {
       toast({ title: `Status atualizado para ${STATUS_CONFIG[newStatus].label}` });
       loadData();
