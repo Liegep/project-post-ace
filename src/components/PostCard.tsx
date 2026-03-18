@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Post, PostStatus, ClientLabel, STATUS_CONFIG, LABEL_CONFIG } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
 import { useI18n } from "@/i18n/I18nContext";
@@ -376,32 +377,51 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
         )}
 
         {isAdmin && (
-          <div className="flex flex-wrap items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
-            {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => {
-              const isChecked = post.status.includes(key);
-              return (
-                <label key={key} className="flex items-center gap-1 cursor-pointer">
-                  <Checkbox
-                    checked={isChecked}
-                    onCheckedChange={(checked) => {
-                      let newStatus: PostStatus[];
-                      if (checked) {
-                        newStatus = [...post.status, key];
-                      } else {
-                        newStatus = post.status.filter((s) => s !== key);
-                      }
-                      if (newStatus.length === 0) newStatus = [key]; // at least one
-                      onStatusChange?.(newStatus);
-                    }}
-                    className="h-3.5 w-3.5"
-                  />
-                  <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CONFIG[key].color}`}>
-                    {t(STATUS_KEYS[key])}
-                  </span>
-                </label>
-              );
-            })}
-            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
+          <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="flex-1 flex items-center gap-1.5 rounded-md border border-muted-foreground/20 px-2 py-1.5 hover:bg-muted/50 transition-colors">
+                  <div className="flex flex-wrap items-center gap-1 flex-1 min-w-0">
+                    {post.status.map((s) => (
+                      <span key={s} className={`inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CONFIG[s].color}`}>
+                        {t(STATUS_KEYS[s])}
+                      </span>
+                    ))}
+                  </div>
+                  <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-52 p-2" align="start">
+                <p className="text-xs font-semibold text-muted-foreground mb-2 px-1">Status</p>
+                <div className="space-y-0.5">
+                  {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => {
+                    const isChecked = post.status.includes(key);
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          let newStatus: PostStatus[];
+                          if (isChecked) {
+                            newStatus = post.status.filter((s) => s !== key);
+                          } else {
+                            newStatus = [...post.status, key];
+                          }
+                          if (newStatus.length === 0) newStatus = [key];
+                          onStatusChange?.(newStatus);
+                        }}
+                        className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted cursor-pointer transition-colors"
+                      >
+                        <Checkbox checked={isChecked} className="h-3.5 w-3.5 pointer-events-none" />
+                        <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CONFIG[key].color}`}>
+                          {t(STATUS_KEYS[key])}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </PopoverContent>
+            </Popover>
+            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
