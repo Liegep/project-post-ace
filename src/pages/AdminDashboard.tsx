@@ -24,6 +24,12 @@ interface Client {
   locale: string;
   posting_period: string;
   created_at: string;
+  instagram_url: string;
+  facebook_url: string;
+  tiktok_url: string;
+  youtube_url: string;
+  linkedin_url: string;
+  twitter_url: string;
 }
 
 interface FeedbackNotification {
