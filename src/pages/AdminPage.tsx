@@ -680,36 +680,6 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   // Posts without a column
   const unassignedPosts = posts.filter((p) => !p.columnId).sort((a, b) => a.position - b.position);
 
-  const handleTrelloSync = async () => {
-    if (!trelloBoardId.trim()) return;
-    setSyncing(true);
-    try {
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-      const res = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/trello-sync`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ boardId: trelloBoardId.trim(), clientId: clientData.id }),
-        }
-      );
-      const result = await res.json();
-      if (!result.success) throw new Error(result.error);
-      // Save board ID to client record
-      await supabase.from("clients").update({ trello_board_id: trelloBoardId.trim() } as any).eq("id", clientData.id);
-      toast({
-        title: t("syncComplete"),
-        description: `${result.summary.tags} ${t("tags")}, ${result.summary.columns} cols, ${result.summary.postsCreated ?? result.summary.posts ?? 0} posts`,
-      });
-      setTrelloSyncOpen(false);
-      window.location.reload();
-    } catch (err: any) {
-      console.error(err);
-      toast({ title: t("syncError"), description: err.message, variant: "destructive" });
-    } finally {
       setSyncing(false);
     }
   };
