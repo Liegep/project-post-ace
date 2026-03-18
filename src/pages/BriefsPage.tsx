@@ -19,8 +19,9 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import {
   ArrowLeft, Plus, CalendarIcon, Copy, Eye, EyeOff, Send, Check, X,
-  Filter, Search, Pencil, MessageCircle, Paperclip, FileText
+  Filter, Search, Pencil, MessageCircle, Paperclip, FileText, Trash2
 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 type BriefStatus = "draft" | "internal" | "pending_approval" | "approved" | "rejected" | "published";
 
