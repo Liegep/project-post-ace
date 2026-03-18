@@ -299,7 +299,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
       <div className={`px-4 space-y-2 ${isCompact ? "pb-3 pt-1" : "p-4 pt-3"}`}>
         {!hasMedia && (
           <div className="flex items-center gap-1.5 flex-wrap">
-            {post.status.map((s) => (
+            {post.status.filter((s) => isAdmin || s !== "pronto").map((s) => (
               <span key={s} className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${STATUS_CONFIG[s].color}`}>
                 {t(STATUS_KEYS[s])}
               </span>
