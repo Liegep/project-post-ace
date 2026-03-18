@@ -161,6 +161,10 @@ const UserProfileMenu = () => {
             <KeyRound className="mr-2 h-4 w-4" />
             {t("changePassword")}
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/agenda")}>
+            <CalendarDays className="mr-2 h-4 w-4" />
+            Agenda
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={async () => {
