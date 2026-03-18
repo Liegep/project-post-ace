@@ -148,9 +148,10 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
     });
   };
 
-  const statusConfig = STATUS_CONFIG[post.status];
+  const primaryStatus = post.status[0] || "entrada";
+  const statusConfig = STATUS_CONFIG[primaryStatus];
   const labelConfig = LABEL_CONFIG[post.clientLabel];
-  const isOverdue = post.deadline ? new Date() > post.deadline && post.status !== "pronto" : false;
+  const isOverdue = post.deadline ? new Date() > post.deadline && !post.status.includes("pronto") : false;
 
   const handleAddComment = () => {
     if (!commentText.trim()) return;
