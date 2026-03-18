@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
-import { User, KeyRound, LogOut, Camera } from "lucide-react";
+import { User, KeyRound, LogOut, Camera, CalendarDays } from "lucide-react";
 
 const UserProfileMenu = () => {
   const { t } = useI18n();
