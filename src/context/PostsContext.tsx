@@ -199,11 +199,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
         // Get client name
         let clientName = "";
-        if (post?.clientId) {
+        if (clientId) {
           const { data: clientData } = await supabase
             .from("clients")
             .select("name")
-            .eq("id", post.clientId)
+            .eq("id", clientId)
             .maybeSingle();
           clientName = (clientData as any)?.name || "";
         }
@@ -212,13 +212,13 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
           type: "status_change",
           title: `${userName}${clientName ? " - " + clientName : ""}`,
           message: `Post "${post?.title || ""}" marcado como "${status}" por ${userName}`,
-          client_id: post?.clientId || null,
+          client_id: clientId || null,
           post_id: id,
           user_id: null,
         } as any);
       }
     }
-  }, [posts]);
+  }, [posts, clientId]);
 
   const updateClientLabel = useCallback(async (id: string, label: ClientLabel) => {
     let newColumnId: string | undefined;
