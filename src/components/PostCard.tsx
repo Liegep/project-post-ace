@@ -229,10 +229,12 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
                 </div>
               </>
             )}
-            <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
-              <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${statusConfig.color}`}>
-                {t(STATUS_KEYS[post.status])}
-              </span>
+            <div className="absolute bottom-2 right-2 flex items-center gap-1.5 flex-wrap justify-end">
+              {post.status.map((s) => (
+                <span key={s} className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${STATUS_CONFIG[s].color}`}>
+                  {t(STATUS_KEYS[s])}
+                </span>
+              ))}
               <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}>
                 {t(LABEL_KEYS[post.clientLabel])}
               </span>
