@@ -309,7 +309,7 @@ const AgendaPage = () => {
               />
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {["", "reunião", "tarefa", "pessoal", "urgente"].map(cat => (
+              {["", "reunião", "tarefa", "pessoal", "urgente", "último post"].map(cat => (
                 <button
                   key={cat}
                   onClick={() => setFormCategory(cat)}
