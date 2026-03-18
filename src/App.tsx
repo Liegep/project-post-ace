@@ -36,7 +36,7 @@ const App = () => (
             <Route path="/accept-invite" element={<AcceptInvitePage />} />
             <Route path="/" element={<AuthGuard allowedRoles={["admin"]}><AdminDashboard /></AuthGuard>} />
             <Route path="/admin" element={<AuthGuard allowedRoles={["admin"]}><AdminDashboard /></AuthGuard>} />
-            <Route path="/admin/:slug" element={<AuthGuard allowedRoles={["admin"]}><AdminPage /></AuthGuard>} />
+            <Route path="/admin/:slug" element={<AuthGuard allowedRoles={["admin", "team_member"]}><AdminPage /></AuthGuard>} />
             <Route path="/social" element={<AuthGuard allowedRoles={["admin"]}><SocialDashboard /></AuthGuard>} />
             <Route path="/social/callback" element={<SocialCallbackPage />} />
             <Route path="/team" element={<AuthGuard allowedRoles={["team_member"]}><TeamDashboard /></AuthGuard>} />
