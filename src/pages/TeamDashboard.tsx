@@ -210,7 +210,7 @@ const TeamDashboard = () => {
     // Record history
     await supabase.from("post_status_history").insert({
       post_id: post.postId,
-      old_status: post.status,
+      old_status: post.status.join(','),
       new_status: status,
       changed_by: session.user.id,
     } as any);
