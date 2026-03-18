@@ -37,7 +37,7 @@ const getCategoryStyle = (cat: string) => CATEGORY_COLORS[cat.toLowerCase()] || 
 const AgendaPage = () => {
   const navigate = useNavigate();
   const { t } = useI18n();
-  const { appointments, loading, createAppointment, toggleComplete, deleteAppointment } = useAppointments();
+  const { appointments, loading, createAppointment, createBatch, toggleComplete, deleteAppointment } = useAppointments();
 
   const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [currentDate, setCurrentDate] = useState(new Date());
