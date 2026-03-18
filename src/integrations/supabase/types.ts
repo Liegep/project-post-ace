@@ -161,6 +161,59 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_posts: {
+        Row: {
+          caption: string
+          client_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          media_type: string
+          media_urls: string[]
+          publish_date: string
+          publish_time: string
+          status: Database["public"]["Enums"]["calendar_post_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          caption?: string
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          media_type?: string
+          media_urls?: string[]
+          publish_date: string
+          publish_time?: string
+          status?: Database["public"]["Enums"]["calendar_post_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          media_type?: string
+          media_urls?: string[]
+          publish_date?: string
+          publish_time?: string
+          status?: Database["public"]["Enums"]["calendar_post_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_posts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           allow_client_create_post: boolean
@@ -1025,6 +1078,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "team_member"
+      calendar_post_status:
+        | "draft"
+        | "in_review"
+        | "approved"
+        | "scheduled"
+        | "published"
       social_post_status:
         | "draft"
         | "pending_approval"
@@ -1162,6 +1221,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "team_member"],
+      calendar_post_status: [
+        "draft",
+        "in_review",
+        "approved",
+        "scheduled",
+        "published",
+      ],
       social_post_status: [
         "draft",
         "pending_approval",
