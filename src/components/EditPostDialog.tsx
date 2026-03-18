@@ -104,7 +104,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         mediaType: mediaItems[0]?.type || "image",
         mediaUrls: finalUrls,
         caption,
-        deadline: new Date(deadline),
+        deadline: deadline ? new Date(deadline) : null,
         tags: selectedTags,
       });
       await updatePostStatus(post.id, status);
