@@ -249,6 +249,21 @@ const BriefsPage = () => {
     }
   };
 
+  const handleDeleteBrief = async () => {
+    if (!deletingBrief) return;
+    const { error } = await supabase.from("content_briefs").delete().eq("id", deletingBrief.id);
+    if (error) {
+      toast({ title: "Erro ao apagar pauta", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Pauta apagada" });
+      if (detailBrief?.id === deletingBrief.id) {
+        setDetailOpen(false);
+        setDetailBrief(null);
+      }
+      loadData();
+    }
+    setDeletingBrief(null);
+
   const toggleClientVisibility = async (brief: Brief) => {
     const newStatus: BriefStatus = brief.status === "pending_approval" ? "internal" : "pending_approval";
     const { error } = await supabase.from("content_briefs").update({ status: newStatus } as any).eq("id", brief.id);
