@@ -120,6 +120,10 @@ const BriefsPage = () => {
   const [formInternalNotes, setFormInternalNotes] = useState("");
 
   useEffect(() => {
+    const clientParam = searchParams.get("client");
+    if (clientParam) {
+      setFilterClient(clientParam);
+    }
     loadData();
   }, []);
 
