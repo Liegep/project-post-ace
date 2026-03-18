@@ -430,17 +430,28 @@ const TeamDashboard = () => {
                           <CheckCircle className="h-3 w-3" /> {ready}
                         </span>
                       </div>
-                      <div className="mt-4">
+                      <div className="mt-4 flex gap-2">
                         <Button
                           variant="default"
                           size="sm"
-                          className="w-full"
+                          className="flex-1"
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/admin/${client.slug}`);
                           }}
                         >
                           {t("manage")}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/briefs?client=${client.id}`);
+                          }}
+                        >
+                          <FileText className="h-3.5 w-3.5" /> Pautas
                         </Button>
                       </div>
                     </div>
