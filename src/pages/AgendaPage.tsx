@@ -377,7 +377,7 @@ interface DayListViewProps {
   onCreateClick: (date: Date) => void;
 }
 
-const DayListView = ({ dates, appointmentsByDate, onToggle, onDelete, onCreateClick }: DayListViewProps) => {
+const DayListView = ({ dates, appointmentsByDate, onToggle, onCancel, onDelete, onCreateClick }: DayListViewProps) => {
   return (
     <div className="space-y-4">
       {dates.map(date => {
