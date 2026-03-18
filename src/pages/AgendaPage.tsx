@@ -17,8 +17,10 @@ import {
   Plus, ChevronLeft, ChevronRight, CalendarIcon, Check, Clock,
   Trash2, ArrowLeft, CalendarDays, CalendarRange, Calendar as CalendarLucide
 } from "lucide-react";
-import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, addMonths, subMonths, addWeeks, subWeeks } from "date-fns";
+import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, addMonths, subMonths, addWeeks, subWeeks, getDaysInMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+type RepeatMode = "none" | "week" | "month";
 
 type ViewMode = "day" | "week" | "month";
 
@@ -35,7 +37,7 @@ const getCategoryStyle = (cat: string) => CATEGORY_COLORS[cat.toLowerCase()] || 
 const AgendaPage = () => {
   const navigate = useNavigate();
   const { t } = useI18n();
-  const { appointments, loading, createAppointment, toggleComplete, deleteAppointment } = useAppointments();
+  const { appointments, loading, createAppointment, createBatch, toggleComplete, deleteAppointment } = useAppointments();
 
   const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -48,6 +50,7 @@ const AgendaPage = () => {
   const [formDate, setFormDate] = useState<Date>(new Date());
   const [formTime, setFormTime] = useState("09:00");
   const [formCategory, setFormCategory] = useState("");
+  const [formRepeat, setFormRepeat] = useState<RepeatMode>("none");
   const [saving, setSaving] = useState(false);
 
   const navigateDate = (dir: number) => {
@@ -85,13 +88,40 @@ const AgendaPage = () => {
   const handleCreate = async () => {
     if (!formTitle.trim()) return;
     setSaving(true);
-    await createAppointment({
+
+    const baseInput = {
       title: formTitle.trim(),
       description: formDesc.trim(),
-      appointmentDate: format(formDate, "yyyy-MM-dd"),
       appointmentTime: formTime,
       category: formCategory,
-    });
+    };
+
+    if (formRepeat === "none") {
+      await createAppointment({
+        ...baseInput,
+        appointmentDate: format(formDate, "yyyy-MM-dd"),
+      });
+    } else {
+      // Generate dates for the repeat period
+      let dates: Date[] = [];
+      if (formRepeat === "week") {
+        const weekStart = startOfWeek(formDate, { weekStartsOn: 1 });
+        const weekEnd = endOfWeek(formDate, { weekStartsOn: 1 });
+        dates = eachDayOfInterval({ start: weekStart, end: weekEnd });
+      } else {
+        const monthStart = startOfMonth(formDate);
+        const monthEnd = endOfMonth(formDate);
+        dates = eachDayOfInterval({ start: monthStart, end: monthEnd });
+      }
+
+      const inputs = dates.map(d => ({
+        ...baseInput,
+        appointmentDate: format(d, "yyyy-MM-dd"),
+      }));
+
+      await createBatch(inputs);
+    }
+
     setSaving(false);
     setDialogOpen(false);
     setFormTitle("");
@@ -99,6 +129,7 @@ const AgendaPage = () => {
     setFormDate(new Date());
     setFormTime("09:00");
     setFormCategory("");
+    setFormRepeat("none");
   };
 
   const openCreateForDate = (date?: Date) => {
@@ -107,6 +138,7 @@ const AgendaPage = () => {
     setFormDesc("");
     setFormTime("09:00");
     setFormCategory("");
+    setFormRepeat("none");
     setDialogOpen(true);
   };
 
@@ -286,8 +318,40 @@ const AgendaPage = () => {
                 </button>
               ))}
             </div>
+            {/* Repeat options */}
+            <div className="space-y-1.5">
+              <span className="text-xs font-medium text-muted-foreground">Repetir</span>
+              <div className="flex gap-1.5">
+                {([
+                  { mode: "none" as RepeatMode, label: "Não repetir" },
+                  { mode: "week" as RepeatMode, label: "Semana toda" },
+                  { mode: "month" as RepeatMode, label: "Mês todo" },
+                ]).map(({ mode, label }) => (
+                  <button
+                    key={mode}
+                    onClick={() => setFormRepeat(mode)}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-medium border transition-all",
+                      formRepeat === mode
+                        ? "ring-2 ring-primary ring-offset-1 bg-primary/10 text-primary"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {formRepeat !== "none" && (
+                <p className="text-[11px] text-muted-foreground">
+                  {formRepeat === "week"
+                    ? `Será criado para cada dia da semana de ${format(startOfWeek(formDate, { weekStartsOn: 1 }), "dd/MM")} a ${format(endOfWeek(formDate, { weekStartsOn: 1 }), "dd/MM")}`
+                    : `Será criado para cada dia do mês de ${format(startOfMonth(formDate), "MMMM", { locale: ptBR })} (${getDaysInMonth(formDate)} dias)`
+                  }
+                </p>
+              )}
+            </div>
             <Button onClick={handleCreate} disabled={saving || !formTitle.trim()} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              {saving ? "Salvando..." : "Criar compromisso"}
+              {saving ? "Salvando..." : formRepeat !== "none" ? `Criar para ${formRepeat === "week" ? "a semana" : "o mês"} todo` : "Criar compromisso"}
             </Button>
           </div>
         </DialogContent>

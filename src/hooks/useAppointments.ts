@@ -73,6 +73,24 @@ export function useAppointments() {
     return !error;
   }, [fetchAppointments]);
 
+  const createBatch = useCallback(async (inputs: CreateAppointment[]) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session || inputs.length === 0) return false;
+
+    const rows = inputs.map(input => ({
+      user_id: session.user.id,
+      title: input.title,
+      description: input.description || "",
+      appointment_date: input.appointmentDate,
+      appointment_time: input.appointmentTime,
+      category: input.category || "",
+    }));
+
+    const { error } = await supabase.from("appointments").insert(rows as any);
+    if (!error) await fetchAppointments();
+    return !error;
+  }, [fetchAppointments]);
+
   const toggleComplete = useCallback(async (id: string, completed: boolean) => {
     const updates: Record<string, any> = {
       completed,
@@ -99,5 +117,5 @@ export function useAppointments() {
     await supabase.from("appointments").update(dbUpdates).eq("id", id);
   }, []);
 
-  return { appointments, loading, createAppointment, toggleComplete, deleteAppointment, updateAppointment, refetch: fetchAppointments };
+  return { appointments, loading, createAppointment, createBatch, toggleComplete, deleteAppointment, updateAppointment, refetch: fetchAppointments };
 }
