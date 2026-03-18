@@ -33,6 +33,16 @@ export function useUserRole() {
       });
       if (isTeam) {
         setRole("team_member");
+        setLoading(false);
+        return;
+      }
+
+      const { data: isClient } = await supabase.rpc("has_role" as any, {
+        _user_id: session.user.id,
+        _role: "client",
+      });
+      if (isClient) {
+        setRole("client");
       }
       setLoading(false);
     };

@@ -25,13 +25,39 @@ const AuthGuard = ({ children, allowedRoles = ["admin", "team_member"] }: AuthGu
           return;
         }
       }
-      // If team_member tries to access admin-only route, redirect to team dashboard
+      // Redirect to appropriate dashboard based on role
       const { data: isTeam } = await supabase.rpc("has_role" as any, {
         _user_id: userId,
         _role: "team_member",
       });
       if (isTeam) {
         navigate("/team");
+        return;
+      }
+
+      const { data: isClientUser } = await supabase.rpc("has_role" as any, {
+        _user_id: userId,
+        _role: "client",
+      });
+      if (isClientUser) {
+        // Redirect client to their own page
+        const { data: assignments } = await supabase
+          .from("user_client_assignments")
+          .select("client_id")
+          .eq("user_id", userId)
+          .limit(1);
+        if (assignments && assignments.length > 0) {
+          const { data: clientData } = await supabase
+            .from("clients")
+            .select("slug")
+            .eq("id", assignments[0].client_id)
+            .single();
+          if (clientData) {
+            navigate(`/client/${clientData.slug}`);
+            return;
+          }
+        }
+        navigate("/login");
       } else {
         navigate("/login");
       }
