@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type UserRole = "admin" | "team_member" | null;
+export type UserRole = "admin" | "team_member" | "client" | null;
 
 export function useUserRole() {
   const [role, setRole] = useState<UserRole>(null);
@@ -33,6 +33,16 @@ export function useUserRole() {
       });
       if (isTeam) {
         setRole("team_member");
+        setLoading(false);
+        return;
+      }
+
+      const { data: isClient } = await supabase.rpc("has_role" as any, {
+        _user_id: session.user.id,
+        _role: "client",
+      });
+      if (isClient) {
+        setRole("client");
       }
       setLoading(false);
     };

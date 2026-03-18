@@ -32,7 +32,7 @@ const LoginPage = () => {
       }
 
       const userId = data.user.id;
-      const [{ data: isAdmin }, { data: isTeamMember }] = await Promise.all([
+      const [{ data: isAdmin }, { data: isTeamMember }, { data: isClient }] = await Promise.all([
         supabase.rpc("has_role" as any, {
           _user_id: userId,
           _role: "admin",
@@ -40,6 +40,10 @@ const LoginPage = () => {
         supabase.rpc("has_role" as any, {
           _user_id: userId,
           _role: "team_member",
+        }),
+        supabase.rpc("has_role" as any, {
+          _user_id: userId,
+          _role: "client",
         }),
       ]);
 
@@ -50,6 +54,32 @@ const LoginPage = () => {
 
       if (isTeamMember) {
         navigate("/team", { replace: true });
+        return;
+      }
+
+      if (isClient) {
+        // Get the client's assigned client slug
+        const { data: assignments } = await supabase
+          .from("user_client_assignments")
+          .select("client_id")
+          .eq("user_id", userId)
+          .limit(1);
+
+        if (assignments && assignments.length > 0) {
+          const { data: clientData } = await supabase
+            .from("clients")
+            .select("slug")
+            .eq("id", assignments[0].client_id)
+            .single();
+
+          if (clientData) {
+            navigate(`/client/${clientData.slug}`, { replace: true });
+            return;
+          }
+        }
+
+        setError("Nenhum cliente vinculado à sua conta");
+        await supabase.auth.signOut();
         return;
       }
 

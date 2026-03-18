@@ -302,12 +302,47 @@ const ClientPage = () => {
   useEffect(() => {
     if (!slug) { setNotFound(true); setLoading(false); return; }
     const load = async () => {
+      // Load client data
       const { data } = await supabase.from("clients").select("*").eq("slug", slug).maybeSingle();
       if (!data) {
         setNotFound(true);
-      } else {
-        setClientData(data as ClientData);
+        setLoading(false);
+        return;
       }
+
+      // Check if user is a client-role user — restrict to assigned client only
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: isClient } = await supabase.rpc("has_role" as any, {
+          _user_id: session.user.id,
+          _role: "client",
+        });
+        const { data: isAdmin } = await supabase.rpc("has_role" as any, {
+          _user_id: session.user.id,
+          _role: "admin",
+        });
+        const { data: isTeam } = await supabase.rpc("has_role" as any, {
+          _user_id: session.user.id,
+          _role: "team_member",
+        });
+
+        // Client-role users can only access their assigned client
+        if (isClient && !isAdmin && !isTeam) {
+          const { data: assignments } = await supabase
+            .from("user_client_assignments")
+            .select("client_id")
+            .eq("user_id", session.user.id);
+          
+          const assignedIds = (assignments || []).map(a => a.client_id);
+          if (!assignedIds.includes(data.id)) {
+            setNotFound(true);
+            setLoading(false);
+            return;
+          }
+        }
+      }
+
+      setClientData(data as ClientData);
       setLoading(false);
     };
     load();
