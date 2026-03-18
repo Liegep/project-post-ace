@@ -50,6 +50,7 @@ const AgendaPage = () => {
   const [formDate, setFormDate] = useState<Date>(new Date());
   const [formTime, setFormTime] = useState("09:00");
   const [formCategory, setFormCategory] = useState("");
+  const [formRepeat, setFormRepeat] = useState<RepeatMode>("none");
   const [saving, setSaving] = useState(false);
 
   const navigateDate = (dir: number) => {
