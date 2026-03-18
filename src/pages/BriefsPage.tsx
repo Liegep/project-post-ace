@@ -19,8 +19,9 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import {
   ArrowLeft, Plus, CalendarIcon, Copy, Eye, EyeOff, Send, Check, X,
-  Filter, Search, Pencil, MessageCircle, Paperclip, FileText
+  Filter, Search, Pencil, MessageCircle, Paperclip, FileText, Trash2
 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 type BriefStatus = "draft" | "internal" | "pending_approval" | "approved" | "rejected" | "published";
 
@@ -107,6 +108,7 @@ const BriefsPage = () => {
   const [detailOpen, setDetailOpen] = useState(false);
   const [comments, setComments] = useState<BriefComment[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [deletingBrief, setDeletingBrief] = useState<Brief | null>(null);
 
   // Form state
   const [formClientId, setFormClientId] = useState("");
@@ -245,6 +247,22 @@ const BriefsPage = () => {
       toast({ title: "Pauta duplicada" });
       loadData();
     }
+  };
+
+  const handleDeleteBrief = async () => {
+    if (!deletingBrief) return;
+    const { error } = await supabase.from("content_briefs").delete().eq("id", deletingBrief.id);
+    if (error) {
+      toast({ title: "Erro ao apagar pauta", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Pauta apagada" });
+      if (detailBrief?.id === deletingBrief.id) {
+        setDetailOpen(false);
+        setDetailBrief(null);
+      }
+      loadData();
+    }
+    setDeletingBrief(null);
   };
 
   const toggleClientVisibility = async (brief: Brief) => {
@@ -451,6 +469,14 @@ const BriefsPage = () => {
                     </Button>
                     <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={(e) => { e.stopPropagation(); duplicateBrief(brief); }}>
                       <Copy className="h-3 w-3" /> Duplicar
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs gap-1 text-destructive hover:text-destructive"
+                      onClick={(e) => { e.stopPropagation(); setDeletingBrief(brief); }}
+                    >
+                      <Trash2 className="h-3 w-3" /> Apagar
                     </Button>
                     <Button
                       variant="ghost"
@@ -671,6 +697,24 @@ const BriefsPage = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deletingBrief} onOpenChange={(v) => { if (!v) setDeletingBrief(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apagar pauta</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja apagar a pauta "{deletingBrief?.title}"? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteBrief} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Apagar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
