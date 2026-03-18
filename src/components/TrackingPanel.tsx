@@ -69,7 +69,7 @@ function SortableItem({ post, isEntrada, tags }: { post: Post; isEntrada: boolea
         isDone && "border-success/30 bg-success/5",
         isDev && "border-warning/30 bg-warning/5",
         isChangeRequested && "border-destructive/30 bg-destructive/5",
-        isEntrada && !isDone && !isDev && !isChangeRequested && "border-red-400 bg-red-50 dark:bg-red-950/30 dark:border-red-600",
+        isEntrada && !isDone && !isDev && !isChangeRequested && "border-foreground bg-foreground/95 dark:bg-foreground/90",
         !isDone && !isDev && !isEntrada && !isChangeRequested && "border-border bg-card"
       )}
     >
