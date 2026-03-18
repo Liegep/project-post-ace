@@ -99,6 +99,7 @@ const AdminDashboard = () => {
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [twitterUrl, setTwitterUrl] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
 
 
   useEffect(() => {
