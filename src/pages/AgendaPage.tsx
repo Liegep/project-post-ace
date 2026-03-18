@@ -318,8 +318,40 @@ const AgendaPage = () => {
                 </button>
               ))}
             </div>
+            {/* Repeat options */}
+            <div className="space-y-1.5">
+              <span className="text-xs font-medium text-muted-foreground">Repetir</span>
+              <div className="flex gap-1.5">
+                {([
+                  { mode: "none" as RepeatMode, label: "Não repetir" },
+                  { mode: "week" as RepeatMode, label: "Semana toda" },
+                  { mode: "month" as RepeatMode, label: "Mês todo" },
+                ]).map(({ mode, label }) => (
+                  <button
+                    key={mode}
+                    onClick={() => setFormRepeat(mode)}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-medium border transition-all",
+                      formRepeat === mode
+                        ? "ring-2 ring-primary ring-offset-1 bg-primary/10 text-primary"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {formRepeat !== "none" && (
+                <p className="text-[11px] text-muted-foreground">
+                  {formRepeat === "week"
+                    ? `Será criado para cada dia da semana de ${format(startOfWeek(formDate, { weekStartsOn: 1 }), "dd/MM")} a ${format(endOfWeek(formDate, { weekStartsOn: 1 }), "dd/MM")}`
+                    : `Será criado para cada dia do mês de ${format(startOfMonth(formDate), "MMMM", { locale: ptBR })} (${getDaysInMonth(formDate)} dias)`
+                  }
+                </p>
+              )}
+            </div>
             <Button onClick={handleCreate} disabled={saving || !formTitle.trim()} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              {saving ? "Salvando..." : "Criar compromisso"}
+              {saving ? "Salvando..." : formRepeat !== "none" ? `Criar para ${formRepeat === "week" ? "a semana" : "o mês"} todo` : "Criar compromisso"}
             </Button>
           </div>
         </DialogContent>
