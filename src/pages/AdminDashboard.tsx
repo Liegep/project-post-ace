@@ -122,6 +122,7 @@ const AdminDashboard = () => {
     fetchUnarchiveNotifs();
     fetchClientCreatedNotifs();
     fetchTodayPosts();
+    fetchStatusNotifs();
   }, []);
 
   const fetchTodayPosts = async () => {
