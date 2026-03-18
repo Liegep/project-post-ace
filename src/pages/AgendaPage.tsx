@@ -15,7 +15,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import {
   Plus, ChevronLeft, ChevronRight, CalendarIcon, Check, Clock,
-  Trash2, ArrowLeft, CalendarDays, CalendarRange, Calendar as CalendarLucide
+  Trash2, ArrowLeft, CalendarDays, CalendarRange, Calendar as CalendarLucide, XCircle, Ban
 } from "lucide-react";
 import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, addMonths, subMonths, addWeeks, subWeeks, getDaysInMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
