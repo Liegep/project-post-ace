@@ -108,6 +108,7 @@ const BriefsPage = () => {
   const [detailOpen, setDetailOpen] = useState(false);
   const [comments, setComments] = useState<BriefComment[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [deletingBrief, setDeletingBrief] = useState<Brief | null>(null);
 
   // Form state
   const [formClientId, setFormClientId] = useState("");
