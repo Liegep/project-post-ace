@@ -93,7 +93,7 @@ interface KanbanBoardProps {
   editColumnInputRef: React.RefObject<HTMLInputElement>;
   handleRenameColumn: (id: string) => void;
   handleDeleteColumn: (id: string) => void;
-  updatePostStatus: (id: string, status: PostStatus) => void;
+  updatePostStatus: (id: string, status: PostStatus[]) => void;
   deletePost: (id: string) => void;
   setEditPost: (post: Post) => void;
   setCreateInColumnId: (id: string | null) => void;
