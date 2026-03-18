@@ -263,6 +263,7 @@ const BriefsPage = () => {
       loadData();
     }
     setDeletingBrief(null);
+  };
 
   const toggleClientVisibility = async (brief: Brief) => {
     const newStatus: BriefStatus = brief.status === "pending_approval" ? "internal" : "pending_approval";
