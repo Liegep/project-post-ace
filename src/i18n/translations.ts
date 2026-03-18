@@ -187,6 +187,32 @@ type TranslationKeys = {
   // Post sent by client
   postSentSuccess: string;
   postSentDesc: string;
+  // Team management
+  teamManagement: string;
+  manageTeamMembers: string;
+  newMember: string;
+  noTeamMembers: string;
+  createFirstMember: string;
+  createMember: string;
+  fullName: string;
+  fullNamePlaceholder: string;
+  assignClients: string;
+  assignClientsTo: string;
+  noClientsAssigned: string;
+  teamMemberCreated: string;
+  assignmentsUpdated: string;
+  confirmDeleteMember: string;
+  memberDeleted: string;
+  team: string;
+  // Team dashboard
+  hello: string;
+  teamMember: string;
+  yourClients: string;
+  myClients: string;
+  contactAdmin: string;
+  notifications: string;
+  adminFeedback: string;
+  statusUpdated: string;
 };
 
 const pt: TranslationKeys = {
@@ -340,6 +366,30 @@ const pt: TranslationKeys = {
   syncError: "Erro na sincronização",
   postSentSuccess: "✅ Post enviado com sucesso!",
   postSentDesc: "Seu post foi recebido e está aguardando revisão da equipe.",
+  teamManagement: "Gestão da Equipe",
+  manageTeamMembers: "Gerencie os membros da equipe e atribuições",
+  newMember: "Novo Membro",
+  noTeamMembers: "Nenhum membro da equipe",
+  createFirstMember: "Crie o primeiro membro para começar",
+  createMember: "Criar Membro",
+  fullName: "Nome Completo",
+  fullNamePlaceholder: "Ex: João Silva",
+  assignClients: "Atribuir Clientes",
+  assignClientsTo: "Atribuir clientes a",
+  noClientsAssigned: "Nenhum cliente atribuído",
+  teamMemberCreated: "Membro da equipe criado!",
+  assignmentsUpdated: "Atribuições atualizadas!",
+  confirmDeleteMember: "Tem certeza que deseja remover este membro?",
+  memberDeleted: "Membro removido!",
+  team: "Equipe",
+  hello: "Olá",
+  teamMember: "Membro da equipe",
+  yourClients: "Seus clientes",
+  myClients: "Meus Clientes",
+  contactAdmin: "Entre em contato com o administrador para atribuição de clientes",
+  notifications: "Notificações",
+  adminFeedback: "Feedback do Admin",
+  statusUpdated: "Status atualizado!",
 };
 
 const en: TranslationKeys = {
@@ -491,6 +541,30 @@ const en: TranslationKeys = {
   syncError: "Sync error",
   postSentSuccess: "✅ Post sent successfully!",
   postSentDesc: "Your post was received and is awaiting team review.",
+  teamManagement: "Team Management",
+  manageTeamMembers: "Manage team members and assignments",
+  newMember: "New Member",
+  noTeamMembers: "No team members",
+  createFirstMember: "Create the first member to get started",
+  createMember: "Create Member",
+  fullName: "Full Name",
+  fullNamePlaceholder: "E.g.: John Doe",
+  assignClients: "Assign Clients",
+  assignClientsTo: "Assign clients to",
+  noClientsAssigned: "No clients assigned",
+  teamMemberCreated: "Team member created!",
+  assignmentsUpdated: "Assignments updated!",
+  confirmDeleteMember: "Are you sure you want to remove this member?",
+  memberDeleted: "Member removed!",
+  team: "Team",
+  hello: "Hello",
+  teamMember: "Team member",
+  yourClients: "Your clients",
+  myClients: "My Clients",
+  contactAdmin: "Contact the admin for client assignments",
+  notifications: "Notifications",
+  adminFeedback: "Admin Feedback",
+  statusUpdated: "Status updated!",
 };
 
 const it: TranslationKeys = {
@@ -642,6 +716,30 @@ const it: TranslationKeys = {
   syncError: "Errore di sincronizzazione",
   postSentSuccess: "✅ Post inviato con successo!",
   postSentDesc: "Il tuo post è stato ricevuto ed è in attesa di revisione.",
+  teamManagement: "Gestione Team",
+  manageTeamMembers: "Gestisci i membri del team e le assegnazioni",
+  newMember: "Nuovo Membro",
+  noTeamMembers: "Nessun membro del team",
+  createFirstMember: "Crea il primo membro per iniziare",
+  createMember: "Crea Membro",
+  fullName: "Nome Completo",
+  fullNamePlaceholder: "Es: Mario Rossi",
+  assignClients: "Assegna Clienti",
+  assignClientsTo: "Assegna clienti a",
+  noClientsAssigned: "Nessun cliente assegnato",
+  teamMemberCreated: "Membro del team creato!",
+  assignmentsUpdated: "Assegnazioni aggiornate!",
+  confirmDeleteMember: "Sei sicuro di voler rimuovere questo membro?",
+  memberDeleted: "Membro rimosso!",
+  team: "Team",
+  hello: "Ciao",
+  teamMember: "Membro del team",
+  yourClients: "I tuoi clienti",
+  myClients: "I Miei Clienti",
+  contactAdmin: "Contatta l'amministratore per l'assegnazione dei clienti",
+  notifications: "Notifiche",
+  adminFeedback: "Feedback Admin",
+  statusUpdated: "Stato aggiornato!",
 };
 
 const es: TranslationKeys = {
@@ -793,6 +891,30 @@ const es: TranslationKeys = {
   syncError: "Error de sincronización",
   postSentSuccess: "✅ ¡Publicación enviada con éxito!",
   postSentDesc: "Tu publicación fue recibida y está en espera de revisión.",
+  teamManagement: "Gestión del Equipo",
+  manageTeamMembers: "Gestiona los miembros del equipo y asignaciones",
+  newMember: "Nuevo Miembro",
+  noTeamMembers: "Sin miembros del equipo",
+  createFirstMember: "Crea el primer miembro para comenzar",
+  createMember: "Crear Miembro",
+  fullName: "Nombre Completo",
+  fullNamePlaceholder: "Ej: Juan García",
+  assignClients: "Asignar Clientes",
+  assignClientsTo: "Asignar clientes a",
+  noClientsAssigned: "Sin clientes asignados",
+  teamMemberCreated: "¡Miembro del equipo creado!",
+  assignmentsUpdated: "¡Asignaciones actualizadas!",
+  confirmDeleteMember: "¿Estás seguro de que quieres eliminar este miembro?",
+  memberDeleted: "¡Miembro eliminado!",
+  team: "Equipo",
+  hello: "Hola",
+  teamMember: "Miembro del equipo",
+  yourClients: "Tus clientes",
+  myClients: "Mis Clientes",
+  contactAdmin: "Contacta al administrador para la asignación de clientes",
+  notifications: "Notificaciones",
+  adminFeedback: "Feedback del Admin",
+  statusUpdated: "¡Estado actualizado!",
 };
 
 const sv: TranslationKeys = {
@@ -944,6 +1066,30 @@ const sv: TranslationKeys = {
   syncError: "Synkroniseringsfel",
   postSentSuccess: "✅ Inlägg skickat!",
   postSentDesc: "Ditt inlägg har mottagits och väntar på granskning.",
+  teamManagement: "Teamhantering",
+  manageTeamMembers: "Hantera teammedlemmar och tilldelningar",
+  newMember: "Ny Medlem",
+  noTeamMembers: "Inga teammedlemmar",
+  createFirstMember: "Skapa den första medlemmen för att komma igång",
+  createMember: "Skapa Medlem",
+  fullName: "Fullständigt Namn",
+  fullNamePlaceholder: "T.ex.: Erik Svensson",
+  assignClients: "Tilldela Klienter",
+  assignClientsTo: "Tilldela klienter till",
+  noClientsAssigned: "Inga klienter tilldelade",
+  teamMemberCreated: "Teammedlem skapad!",
+  assignmentsUpdated: "Tilldelningar uppdaterade!",
+  confirmDeleteMember: "Är du säker på att du vill ta bort denna medlem?",
+  memberDeleted: "Medlem borttagen!",
+  team: "Team",
+  hello: "Hej",
+  teamMember: "Teammedlem",
+  yourClients: "Dina klienter",
+  myClients: "Mina Klienter",
+  contactAdmin: "Kontakta administratören för klienttilldelning",
+  notifications: "Aviseringar",
+  adminFeedback: "Admin Feedback",
+  statusUpdated: "Status uppdaterad!",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };

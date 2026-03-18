@@ -13,6 +13,8 @@ import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import AcceptInvitePage from "./pages/AcceptInvitePage.tsx";
 import SocialDashboard from "./pages/SocialDashboard.tsx";
 import SocialCallbackPage from "./pages/SocialCallbackPage.tsx";
+import TeamManagementPage from "./pages/TeamManagementPage.tsx";
+import TeamDashboard from "./pages/TeamDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -29,10 +31,12 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/accept-invite" element={<AcceptInvitePage />} />
             <Route path="/" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
-            <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
+            <Route path="/admin" element={<AuthGuard allowedRoles={["admin"]}><AdminDashboard /></AuthGuard>} />
             <Route path="/admin/:slug" element={<AuthGuard><AdminPage /></AuthGuard>} />
-            <Route path="/social" element={<AuthGuard><SocialDashboard /></AuthGuard>} />
+            <Route path="/social" element={<AuthGuard allowedRoles={["admin"]}><SocialDashboard /></AuthGuard>} />
             <Route path="/social/callback" element={<SocialCallbackPage />} />
+            <Route path="/team" element={<AuthGuard allowedRoles={["team_member"]}><TeamDashboard /></AuthGuard>} />
+            <Route path="/team-management" element={<AuthGuard allowedRoles={["admin"]}><TeamManagementPage /></AuthGuard>} />
             <Route path="/client/:slug" element={<ClientPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

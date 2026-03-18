@@ -31,7 +31,21 @@ const LoginPage = () => {
         return;
       }
 
-      navigate("/");
+      // Check role and redirect accordingly
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: isAdmin } = await supabase.rpc("has_role" as any, {
+          _user_id: user.id,
+          _role: "admin",
+        });
+        if (isAdmin) {
+          navigate("/");
+        } else {
+          navigate("/team");
+        }
+      } else {
+        navigate("/");
+      }
     } catch {
       setError("Erro ao fazer login");
     } finally {
