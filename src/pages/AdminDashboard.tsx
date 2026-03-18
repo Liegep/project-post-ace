@@ -13,6 +13,7 @@ import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, Globe } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 import { LABEL_CONFIG } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
 import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
