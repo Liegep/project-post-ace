@@ -410,6 +410,9 @@ const AdminDashboard = () => {
     setYoutubeUrl("");
     setLinkedinUrl("");
     setTwitterUrl("");
+    setClientEmail("");
+    setClientPassword("");
+    setExistingClientUser(null);
     setDialogOpen(true);
   };
 
