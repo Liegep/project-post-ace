@@ -86,7 +86,7 @@ export function useSocialPosts(clientId: string | null) {
   useEffect(() => {
     if (!clientId) return;
     const channel = supabase
-      .channel("social_posts_changes")
+      .channel(`social_posts_changes_${clientId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "social_posts", filter: `client_id=eq.${clientId}` }, () => {
         fetchPosts();
       })
