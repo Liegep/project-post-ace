@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { LABEL_CONFIG } from "@/types/post";
-import { LogOut, CalendarClock, Bell, MessageCircle, Clock, CheckCircle, AlertCircle, FileText, X } from "lucide-react";
+import { CalendarClock, Bell, MessageCircle, Clock, CheckCircle, AlertCircle, FileText, X } from "lucide-react";
+import UserProfileMenu from "@/components/UserProfileMenu";
 import { toast } from "@/hooks/use-toast";
 
 interface AssignedClient {
@@ -260,17 +261,7 @@ const TeamDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                navigate("/login");
-              }}
-              title={t("signOut")}
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
+            <UserProfileMenu />
           </div>
         </div>
       </header>
