@@ -115,6 +115,32 @@ const AdminDashboard = () => {
   const [twitterUrl, setTwitterUrl] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
 
+  const fetchStatusNotifs = async () => {
+    const { data } = await supabase
+      .from("admin_notifications")
+      .select("*")
+      .eq("type", "status_change")
+      .eq("read", false)
+      .order("created_at", { ascending: false });
+
+    setStatusNotifs(
+      (data || []).map((n: any) => ({
+        id: n.id,
+        title: n.title,
+        message: n.message,
+        clientId: n.client_id,
+        postId: n.post_id,
+        createdAt: n.created_at,
+      }))
+    );
+  };
+
+  const dismissStatusNotif = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await supabase.from("admin_notifications").update({ read: true } as any).eq("id", id);
+    setStatusNotifs((prev) => prev.filter((n) => n.id !== id));
+  };
+
 
   useEffect(() => {
     fetchClients();
