@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,6 +86,7 @@ const CONTENT_TYPES = [
 
 const BriefsPage = () => {
   const { t } = useI18n();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -119,6 +120,10 @@ const BriefsPage = () => {
   const [formInternalNotes, setFormInternalNotes] = useState("");
 
   useEffect(() => {
+    const clientParam = searchParams.get("client");
+    if (clientParam) {
+      setFilterClient(clientParam);
+    }
     loadData();
   }, []);
 
