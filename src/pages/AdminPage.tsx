@@ -37,7 +37,7 @@ const DroppableColumn = ({ id, children }: { id: string; children: React.ReactNo
 
 const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: {
   post: Post;
-  onStatusChange: (s: PostStatus) => void;
+  onStatusChange: (s: PostStatus[]) => void;
   onDelete: () => void;
   onEdit: () => void;
   selectionMode?: boolean;
@@ -93,7 +93,7 @@ interface KanbanBoardProps {
   editColumnInputRef: React.RefObject<HTMLInputElement>;
   handleRenameColumn: (id: string) => void;
   handleDeleteColumn: (id: string) => void;
-  updatePostStatus: (id: string, status: PostStatus) => void;
+  updatePostStatus: (id: string, status: PostStatus[]) => void;
   deletePost: (id: string) => void;
   setEditPost: (post: Post) => void;
   setCreateInColumnId: (id: string | null) => void;
@@ -566,9 +566,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     setSelectedPostIds(new Set());
   };
 
-  const handleBulkStatusChange = async (status: PostStatus) => {
+  const handleBulkStatusChange = async (statuses: PostStatus[]) => {
     const ids = Array.from(selectedPostIds);
-    await bulkUpdateStatus(ids, status);
+    await bulkUpdateStatus(ids, statuses);
     exitSelectionMode();
     toast({ title: `${ids.length} ${t("postsUpdated")}` });
   };
@@ -960,7 +960,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
           <div className="h-6 w-px bg-border" />
           {activeTab === "board" ? (
             <>
-              <Select onValueChange={(v) => handleBulkStatusChange(v as PostStatus)}>
+              <Select onValueChange={(v) => handleBulkStatusChange([v as PostStatus])}>
                 <SelectTrigger className="h-8 w-auto min-w-[140px] text-xs">
                   <SelectValue placeholder={t("changeStatus")} />
                 </SelectTrigger>
@@ -983,7 +983,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   </SelectContent>
                 </Select>
               )}
-              <Button size="sm" variant="outline" onClick={() => handleBulkStatusChange("finalizado")}>
+              <Button size="sm" variant="outline" onClick={() => handleBulkStatusChange(["finalizado"])}>
                 <Archive className="mr-1.5 h-3.5 w-3.5" /> {t("archive")}
               </Button>
             </>

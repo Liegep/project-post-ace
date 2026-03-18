@@ -499,7 +499,7 @@ export type Database = {
           media_type: string
           media_urls: string[]
           position: number
-          status: string
+          status: string[]
           tags: string[]
           title: string
           trello_card_id: string | null
@@ -521,7 +521,7 @@ export type Database = {
           media_type?: string
           media_urls?: string[]
           position?: number
-          status?: string
+          status?: string[]
           tags?: string[]
           title: string
           trello_card_id?: string | null
@@ -543,7 +543,7 @@ export type Database = {
           media_type?: string
           media_urls?: string[]
           position?: number
-          status?: string
+          status?: string[]
           tags?: string[]
           title?: string
           trello_card_id?: string | null

@@ -33,7 +33,7 @@ export interface Post {
   mediaUrls: string[];
   caption: string;
   deadline: Date | null;
-  status: PostStatus;
+  status: PostStatus[];
   clientLabel: ClientLabel;
   comments: Comment[];
   tags: string[]; // tag ids

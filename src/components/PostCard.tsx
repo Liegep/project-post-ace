@@ -55,7 +55,7 @@ interface PostCardProps {
   isAdmin: boolean;
   hideFeedback?: boolean;
   allowEditCaption?: boolean;
-  onStatusChange?: (status: PostStatus) => void;
+  onStatusChange?: (status: PostStatus[]) => void;
   onDelete?: () => void;
   onEdit?: () => void;
   selectionMode?: boolean;
@@ -148,9 +148,10 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
     });
   };
 
-  const statusConfig = STATUS_CONFIG[post.status];
+  const primaryStatus = post.status[0] || "entrada";
+  const statusConfig = STATUS_CONFIG[primaryStatus];
   const labelConfig = LABEL_CONFIG[post.clientLabel];
-  const isOverdue = post.deadline ? new Date() > post.deadline && post.status !== "pronto" : false;
+  const isOverdue = post.deadline ? new Date() > post.deadline && !post.status.includes("pronto") : false;
 
   const handleAddComment = () => {
     if (!commentText.trim()) return;
@@ -228,10 +229,12 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
                 </div>
               </>
             )}
-            <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
-              <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${statusConfig.color}`}>
-                {t(STATUS_KEYS[post.status])}
-              </span>
+            <div className="absolute bottom-2 right-2 flex items-center gap-1.5 flex-wrap justify-end">
+              {post.status.map((s) => (
+                <span key={s} className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${STATUS_CONFIG[s].color}`}>
+                  {t(STATUS_KEYS[s])}
+                </span>
+              ))}
               <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}>
                 {t(LABEL_KEYS[post.clientLabel])}
               </span>
@@ -295,10 +298,12 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
 
       <div className={`px-4 space-y-2 ${isCompact ? "pb-3 pt-1" : "p-4 pt-3"}`}>
         {!hasMedia && (
-          <div className="flex items-center gap-1.5">
-            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusConfig.color}`}>
-              {t(STATUS_KEYS[post.status])}
-            </span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {post.status.map((s) => (
+              <span key={s} className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${STATUS_CONFIG[s].color}`}>
+                {t(STATUS_KEYS[s])}
+              </span>
+            ))}
             <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
               {t(LABEL_KEYS[post.clientLabel])}
             </span>
@@ -370,17 +375,31 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
         )}
 
         {isAdmin && (
-          <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
-            <Select value={post.status} onValueChange={(v) => onStatusChange?.(v as PostStatus)}>
-              <SelectTrigger className={`flex-1 text-xs ${isCompact ? "h-7" : "h-8"}`}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
-                  <SelectItem key={key} value={key}>{t(STATUS_KEYS[key])}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-wrap items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
+            {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => {
+              const isChecked = post.status.includes(key);
+              return (
+                <label key={key} className="flex items-center gap-1 cursor-pointer">
+                  <Checkbox
+                    checked={isChecked}
+                    onCheckedChange={(checked) => {
+                      let newStatus: PostStatus[];
+                      if (checked) {
+                        newStatus = [...post.status, key];
+                      } else {
+                        newStatus = post.status.filter((s) => s !== key);
+                      }
+                      if (newStatus.length === 0) newStatus = [key]; // at least one
+                      onStatusChange?.(newStatus);
+                    }}
+                    className="h-3.5 w-3.5"
+                  />
+                  <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CONFIG[key].color}`}>
+                    {t(STATUS_KEYS[key])}
+                  </span>
+                </label>
+              );
+            })}
             <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
               <Trash2 className="h-4 w-4" />
             </Button>

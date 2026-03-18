@@ -26,7 +26,7 @@ interface PostSummary {
   clientLogo: string;
   postId: string;
   postTitle: string;
-  status: string;
+  status: string[];
   clientLabel: string;
   deadline: string | null;
   updatedAt: string;
@@ -145,7 +145,7 @@ const TeamDashboard = () => {
       clientLogo: clientMap[p.client_id]?.logo_url || "",
       postId: p.id,
       postTitle: p.title,
-      status: p.status,
+      status: Array.isArray(p.status) ? p.status : [p.status],
       clientLabel: p.client_label,
       deadline: p.deadline,
       updatedAt: p.updated_at,
@@ -210,13 +210,13 @@ const TeamDashboard = () => {
     // Record history
     await supabase.from("post_status_history").insert({
       post_id: post.postId,
-      old_status: post.status,
+      old_status: post.status.join(','),
       new_status: status,
       changed_by: session.user.id,
     } as any);
 
     // Update post
-    await supabase.from("posts").update({ status } as any).eq("id", post.postId);
+    await supabase.from("posts").update({ status: [status] } as any).eq("id", post.postId);
 
     // Create notification for admin if status is ready/finalizado
     if (["pronto", "finalizado"].includes(status.toLowerCase())) {
@@ -231,7 +231,7 @@ const TeamDashboard = () => {
     }
 
     // Refresh
-    setPosts(prev => prev.map(p => p.postId === post.postId ? { ...p, status } : p));
+    setPosts(prev => prev.map(p => p.postId === post.postId ? { ...p, status: [status] } : p));
     toast({ title: t("statusUpdated") });
   };
 
@@ -242,9 +242,9 @@ const TeamDashboard = () => {
     return d.toDateString() === today.toDateString();
   });
 
-  const pendingPosts = posts.filter(p => p.status === "entrada");
-  const inProgressPosts = posts.filter(p => ["em desenvolvimento", "escrevendo legenda"].includes(p.status));
-  const readyPosts = posts.filter(p => ["pronto", "finalizado"].includes(p.status));
+  const pendingPosts = posts.filter(p => p.status.includes("entrada"));
+  const inProgressPosts = posts.filter(p => p.status.some(s => ["em_desenvolvimento", "escrevendo_legenda"].includes(s)));
+  const readyPosts = posts.filter(p => p.status.some(s => ["pronto", "finalizado"].includes(s)));
   const feedbackPosts = posts.filter(p => p.clientLabel !== "pendente");
 
   const STATUS_OPTIONS = ["entrada", "em desenvolvimento", "escrevendo legenda", "pronto", "finalizado"];
@@ -392,9 +392,9 @@ const TeamDashboard = () => {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {clients.map(client => {
                   const clientPosts = posts.filter(p => p.clientId === client.id);
-                  const pending = clientPosts.filter(p => p.status === "entrada").length;
-                  const inProgress = clientPosts.filter(p => ["em desenvolvimento", "escrevendo legenda"].includes(p.status)).length;
-                  const ready = clientPosts.filter(p => ["pronto", "finalizado"].includes(p.status)).length;
+                  const pending = clientPosts.filter(p => p.status.includes("entrada")).length;
+                  const inProgress = clientPosts.filter(p => p.status.some(s => ["em_desenvolvimento", "escrevendo_legenda"].includes(s))).length;
+                  const ready = clientPosts.filter(p => p.status.some(s => ["pronto", "finalizado"].includes(s))).length;
                   return (
                     <div
                       key={client.id}

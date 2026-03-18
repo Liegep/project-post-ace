@@ -30,7 +30,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [coverIndex, setCoverIndex] = useState(0);
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
-  const [status, setStatus] = useState<PostStatus>("em_desenvolvimento");
+  const [status, setStatus] = useState<PostStatus[]>(["em_desenvolvimento"]);
   const [columnId, setColumnId] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -50,7 +50,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       setCoverIndex(coverIdx >= 0 ? coverIdx : 0);
       setCaption(post.caption);
       setDeadline(post.deadline ? format(post.deadline, "yyyy-MM-dd") : "");
-      setStatus(post.status);
+      setStatus(Array.isArray(post.status) ? post.status : [post.status]);
       setColumnId(post.columnId);
       setSelectedTags(post.tags);
     }

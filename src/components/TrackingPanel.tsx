@@ -51,10 +51,10 @@ function SortableItem({ post, isEntrada, tags }: { post: Post; isEntrada: boolea
     zIndex: isDragging ? 10 : undefined,
   };
 
-  const isDone = post.status === "finalizado";
-  const isDev = post.status === "em_desenvolvimento";
-  const isChangeRequested = post.status === "alteracao_solicitada";
-  const statusInfo = STATUS_LABELS[post.status] || STATUS_LABELS.entrada;
+  const isDone = post.status.includes("finalizado");
+  const isDev = post.status.includes("em_desenvolvimento");
+  const isChangeRequested = post.status.includes("alteracao_solicitada");
+  const statusInfo = STATUS_LABELS[post.status[0]] || STATUS_LABELS.entrada;
 
   const postTags = post.tags
     .map((tagId) => tags.find((t) => t.id === tagId))
@@ -167,7 +167,7 @@ export const TrackingPanel = ({ clientId, posts, columns = [], tags = [], isAdmi
   const allIds = orderedPosts.map((p) => p.id);
 
   const isEntrada = (post: Post) =>
-    post.status === "entrada" || (entradaColumnId != null && post.columnId === entradaColumnId);
+    post.status.includes("entrada") || (entradaColumnId != null && post.columnId === entradaColumnId);
 
   const saveOrder = useCallback(async (ids: string[]) => {
     savedOrderRef.current = ids;

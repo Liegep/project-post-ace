@@ -30,7 +30,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
   const [coverIndex, setCoverIndex] = useState(0);
   const [caption, setCaption] = useState("");
   const [deadline, setDeadline] = useState("");
-  const [status, setStatus] = useState<PostStatus>("entrada");
+  const [status, setStatus] = useState<PostStatus[]>(["entrada"]);
   const [columnId, setColumnId] = useState<string | null>(defaultColumnId ?? null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -111,7 +111,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
       setCoverIndex(0);
       setCaption("");
       setDeadline("");
-      setStatus("entrada");
+      setStatus(["entrada"]);
       setColumnId(null);
       setSelectedTags([]);
       handleOpenChange(false);

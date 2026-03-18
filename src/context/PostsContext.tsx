@@ -14,7 +14,7 @@ interface PostsContextType {
   setPostingPeriod: (period: string) => void;
   setCompanyLogo: (url: string) => void;
   addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date; clientCreated?: boolean }) => Promise<boolean>;
-  updatePostStatus: (id: string, status: PostStatus) => void;
+  updatePostStatus: (id: string, status: PostStatus[]) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
   addComment: (postId: string, author: string, text: string) => void;
   deletePost: (id: string) => void;
@@ -30,7 +30,7 @@ interface PostsContextType {
   movePostToColumn: (postId: string, columnId: string | null) => void;
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   unarchivePost: (id: string, columnId?: string | null, clientInitiated?: boolean) => void;
-  bulkUpdateStatus: (ids: string[], status: PostStatus) => void;
+  bulkUpdateStatus: (ids: string[], status: PostStatus[]) => void;
   bulkDeletePosts: (ids: string[]) => void;
   bulkMoveToColumn: (ids: string[], columnId: string | null) => void;
   loading: boolean;
@@ -50,7 +50,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     mediaUrls,
     caption: row.caption,
     deadline: row.deadline ? new Date(row.deadline) : null,
-    status: row.status as PostStatus,
+    status: (Array.isArray(row.status) ? row.status : [row.status]) as PostStatus[],
     clientLabel: row.client_label as ClientLabel,
     comments,
     tags: row.tags || [],
@@ -161,7 +161,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       media_type: post.mediaType || 'image',
       media_urls: post.mediaUrls || [],
       caption: post.caption || '',
-      status: post.clientCreated ? 'em_desenvolvimento' : post.status,
+      status: post.clientCreated ? ['em_desenvolvimento'] : (Array.isArray(post.status) ? post.status : [post.status]),
       tags: post.tags || [],
       client_id: clientId,
       column_id: resolvedColumnId,
@@ -179,15 +179,15 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     return !error;
   }, [clientId]);
 
-  const updatePostStatus = useCallback(async (id: string, status: PostStatus) => {
+  const updatePostStatus = useCallback(async (id: string, status: PostStatus[]) => {
     const updates: Record<string, any> = { status };
     const post = posts.find(p => p.id === id);
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
     await supabase.from("posts").update(updates).eq("id", id);
     pushToTrello(id, "update");
 
-    // Notify admins when status is "pronto" or "finalizado"
-    if (["pronto", "finalizado"].includes(status)) {
+    // Notify admins when status includes "pronto" or "finalizado"
+    if (status.some(s => ["pronto", "finalizado"].includes(s))) {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         const { data: profile } = await supabase
@@ -211,7 +211,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
         await supabase.from("admin_notifications").insert({
           type: "status_change",
           title: `${userName}${clientName ? " - " + clientName : ""}`,
-          message: `Post "${post?.title || ""}" marcado como "${status}" por ${userName}`,
+          message: `Post "${post?.title || ""}" marcado como "${status.join(', ')}" por ${userName}`,
           client_id: clientId || null,
           post_id: id,
           user_id: null,
@@ -395,16 +395,16 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, [clientId]);
 
   const unarchivePost = useCallback(async (id: string, columnId?: string | null, clientInitiated?: boolean) => {
-    const updates: Partial<Post> = { archived: false, archivedAt: null, status: "pronto" as PostStatus };
+    const updates: Partial<Post> = { archived: false, archivedAt: null, status: ["pronto"] as PostStatus[] };
     if (columnId !== undefined) updates.columnId = columnId;
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
-    const dbUpdates: Record<string, any> = { archived: false, archived_at: null, status: "pronto" };
+    const dbUpdates: Record<string, any> = { archived: false, archived_at: null, status: ["pronto"] };
     if (columnId !== undefined) dbUpdates.column_id = columnId;
     if (clientInitiated) dbUpdates.client_unarchived_at = new Date().toISOString();
     await supabase.from("posts").update(dbUpdates as any).eq("id", id);
   }, []);
 
-  const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus) => {
+  const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus[]) => {
     const updates: Record<string, any> = { status };
     setPosts((prev) => prev.map((p) => ids.includes(p.id) ? { ...p, status } : p));
     await supabase.from("posts").update(updates).in("id", ids);
