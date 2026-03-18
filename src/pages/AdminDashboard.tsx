@@ -341,6 +341,12 @@ const AdminDashboard = () => {
     setLocale("pt");
     setLogoPreview("");
     setLogoFile(null);
+    setInstagramUrl("");
+    setFacebookUrl("");
+    setTiktokUrl("");
+    setYoutubeUrl("");
+    setLinkedinUrl("");
+    setTwitterUrl("");
     setDialogOpen(true);
   };
 
