@@ -52,12 +52,15 @@ export function useSocialPosts(clientId: string | null) {
   const [loading, setLoading] = useState(true);
 
   const fetchPosts = useCallback(async () => {
-    if (!clientId) return;
-    const { data } = await supabase
+    setLoading(true);
+    let query = supabase
       .from("social_posts")
-      .select("*, meta_pages(page_name, platform, instagram_username)")
-      .eq("client_id", clientId)
-      .order("created_at", { ascending: false }) as any;
+      .select("*, meta_pages(page_name, platform, instagram_username), clients(name)")
+      .order("created_at", { ascending: false });
+    if (clientId) {
+      query = query.eq("client_id", clientId);
+    }
+    const { data } = await query as any;
     setPosts(data || []);
     setLoading(false);
   }, [clientId]);
