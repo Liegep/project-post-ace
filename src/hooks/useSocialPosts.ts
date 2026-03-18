@@ -78,10 +78,8 @@ export function useSocialPosts(clientId: string | null) {
   }, [clientId]);
 
   useEffect(() => {
-    if (clientId) {
-      fetchPosts();
-      fetchPages();
-    }
+    fetchPosts();
+    if (clientId) fetchPages();
   }, [clientId, fetchPosts, fetchPages]);
 
   // Realtime subscription
