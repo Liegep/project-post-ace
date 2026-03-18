@@ -509,7 +509,23 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
   const [trackingVisibleToClient, setTrackingVisibleToClient] = useState(clientData.tracking_visible_to_client ?? false);
 
-  const toggleShowArchivedToClient = async (checked: boolean) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Auto-open post from query param (e.g. from dashboard notification)
+  useEffect(() => {
+    const postId = searchParams.get("postId");
+    if (postId && posts.length > 0) {
+      const found = posts.find((p) => p.id === postId);
+      if (found) {
+        setEditPost(found);
+        // Clean up the query param
+        searchParams.delete("postId");
+        setSearchParams(searchParams, { replace: true });
+      }
+    }
+  }, [searchParams, posts]);
+
+
     setShowArchivedToClient(checked);
     await supabase.from("clients").update({ show_archived_to_client: checked } as any).eq("id", clientData.id);
   };
