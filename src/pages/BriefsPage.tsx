@@ -697,6 +697,24 @@ const BriefsPage = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deletingBrief} onOpenChange={(v) => { if (!v) setDeletingBrief(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apagar pauta</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja apagar a pauta "{deletingBrief?.title}"? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteBrief} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Apagar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
