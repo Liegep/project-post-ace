@@ -87,8 +87,54 @@ const ClientBriefs = ({ clientId, clientName }: ClientBriefsProps) => {
   };
 
   const handleApprove = async (briefId: string) => {
+    const brief = briefs.find((b) => b.id === briefId) || detailBrief;
     const { error } = await supabase.from("content_briefs").update({ status: "approved" } as any).eq("id", briefId);
     if (!error) {
+      // Create post in "Pauta" column for this client
+      if (brief) {
+        try {
+          // Find or create "Pauta" column
+          const { data: existingCols } = await supabase
+            .from("columns")
+            .select("id, name, position")
+            .eq("client_id", clientId);
+
+          let pautaColId: string;
+          const pautaCol = (existingCols || []).find((c: any) => c.name.toLowerCase() === "pauta");
+          if (pautaCol) {
+            pautaColId = pautaCol.id;
+          } else {
+            const maxPos = (existingCols || []).length;
+            const { data: newCol } = await supabase
+              .from("columns")
+              .insert({ client_id: clientId, name: "Pauta", position: maxPos } as any)
+              .select()
+              .single();
+            if (newCol) {
+              pautaColId = (newCol as any).id;
+            } else {
+              pautaColId = "";
+            }
+          }
+
+          if (pautaColId) {
+            // Create a post from the brief
+            await supabase.from("posts").insert({
+              title: brief.title,
+              caption: brief.caption || brief.description || "",
+              image_url: "",
+              client_id: clientId,
+              column_id: pautaColId,
+              client_label: "aprovado",
+              status: ["entrada"],
+              position: 0,
+            } as any);
+          }
+        } catch (err) {
+          console.error("Error creating post from brief:", err);
+        }
+      }
+
       toast({ title: "Pauta aprovada!" });
       setDetailBrief((prev) => prev ? { ...prev, status: "approved" } : null);
       loadBriefs();
