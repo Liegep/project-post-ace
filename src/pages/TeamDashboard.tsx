@@ -145,7 +145,7 @@ const TeamDashboard = () => {
       clientLogo: clientMap[p.client_id]?.logo_url || "",
       postId: p.id,
       postTitle: p.title,
-      status: p.status,
+      status: Array.isArray(p.status) ? p.status : [p.status],
       clientLabel: p.client_label,
       deadline: p.deadline,
       updatedAt: p.updated_at,
