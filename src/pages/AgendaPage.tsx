@@ -88,13 +88,40 @@ const AgendaPage = () => {
   const handleCreate = async () => {
     if (!formTitle.trim()) return;
     setSaving(true);
-    await createAppointment({
+
+    const baseInput = {
       title: formTitle.trim(),
       description: formDesc.trim(),
-      appointmentDate: format(formDate, "yyyy-MM-dd"),
       appointmentTime: formTime,
       category: formCategory,
-    });
+    };
+
+    if (formRepeat === "none") {
+      await createAppointment({
+        ...baseInput,
+        appointmentDate: format(formDate, "yyyy-MM-dd"),
+      });
+    } else {
+      // Generate dates for the repeat period
+      let dates: Date[] = [];
+      if (formRepeat === "week") {
+        const weekStart = startOfWeek(formDate, { weekStartsOn: 1 });
+        const weekEnd = endOfWeek(formDate, { weekStartsOn: 1 });
+        dates = eachDayOfInterval({ start: weekStart, end: weekEnd });
+      } else {
+        const monthStart = startOfMonth(formDate);
+        const monthEnd = endOfMonth(formDate);
+        dates = eachDayOfInterval({ start: monthStart, end: monthEnd });
+      }
+
+      const inputs = dates.map(d => ({
+        ...baseInput,
+        appointmentDate: format(d, "yyyy-MM-dd"),
+      }));
+
+      await createBatch(inputs);
+    }
+
     setSaving(false);
     setDialogOpen(false);
     setFormTitle("");
@@ -102,6 +129,7 @@ const AgendaPage = () => {
     setFormDate(new Date());
     setFormTime("09:00");
     setFormCategory("");
+    setFormRepeat("none");
   };
 
   const openCreateForDate = (date?: Date) => {
