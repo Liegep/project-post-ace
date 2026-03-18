@@ -380,12 +380,22 @@ const AdminDashboard = () => {
         logoUrl = data.publicUrl;
       }
 
+      const socialFields = {
+        instagram_url: instagramUrl,
+        facebook_url: facebookUrl,
+        tiktok_url: tiktokUrl,
+        youtube_url: youtubeUrl,
+        linkedin_url: linkedinUrl,
+        twitter_url: twitterUrl,
+      };
+
       if (editingClient) {
         await supabase.from("clients").update({
           name,
           slug,
           locale,
           logo_url: logoUrl,
+          ...socialFields,
         } as any).eq("id", editingClient.id);
       } else {
         await supabase.from("clients").insert({
@@ -393,6 +403,7 @@ const AdminDashboard = () => {
           slug,
           locale,
           logo_url: logoUrl,
+          ...socialFields,
         } as any);
       }
 
