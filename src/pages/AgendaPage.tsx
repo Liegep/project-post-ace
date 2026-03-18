@@ -435,23 +435,31 @@ const DayListView = ({ dates, appointmentsByDate, onToggle, onCancel, onDelete, 
 
 // ── Appointment Card ────────────────────────────────────────────────────────────
 
-const AppointmentCard = ({ appointment: apt, onToggle, onDelete }: {
+const AppointmentCard = ({ appointment: apt, onToggle, onCancel, onDelete }: {
   appointment: Appointment;
   onToggle: (id: string, completed: boolean) => void;
+  onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
 }) => {
   const now = new Date();
   const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
-  const isOverdue = !apt.completed && isBefore(aptDateTime, now);
+  const isOverdue = !apt.completed && !apt.cancelled && isBefore(aptDateTime, now);
+  const isLastPost = apt.category.toLowerCase() === "último post";
+
+  const rowBg = apt.completed
+    ? "bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800"
+    : apt.cancelled
+      ? "bg-red-100 dark:bg-red-950/40 border border-red-300 dark:border-red-800"
+      : isLastPost
+        ? "bg-blue-100 dark:bg-blue-950/40 border border-blue-400 dark:border-blue-800"
+        : isOverdue
+          ? "bg-destructive/5 border border-destructive/20"
+          : "bg-white dark:bg-card hover:bg-muted/50 border border-transparent";
 
   return (
     <div className={cn(
       "group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-all",
-      apt.completed
-        ? "bg-success/5 opacity-70"
-        : isOverdue
-          ? "bg-destructive/5 border border-destructive/20"
-          : "hover:bg-muted/50"
+      rowBg
     )}>
       {/* Complete button */}
       <button
@@ -459,10 +467,12 @@ const AppointmentCard = ({ appointment: apt, onToggle, onDelete }: {
         className={cn(
           "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all",
           apt.completed
-            ? "bg-success border-success text-white"
-            : isOverdue
-              ? "border-destructive hover:bg-destructive/10"
-              : "border-muted-foreground/40 hover:border-primary hover:bg-primary/10"
+            ? "bg-emerald-500 border-emerald-500 text-white"
+            : apt.cancelled
+              ? "border-muted-foreground/30"
+              : isOverdue
+                ? "border-destructive hover:bg-destructive/10"
+                : "border-muted-foreground/40 hover:border-primary hover:bg-primary/10"
         )}
       >
         {apt.completed && <Check className="h-3 w-3" />}
@@ -473,7 +483,7 @@ const AppointmentCard = ({ appointment: apt, onToggle, onDelete }: {
         <div className="flex items-center gap-2">
           <span className={cn(
             "text-sm font-medium",
-            apt.completed ? "line-through text-muted-foreground" : "text-foreground"
+            apt.completed ? "line-through text-emerald-700 dark:text-emerald-400" : apt.cancelled ? "line-through text-red-500 dark:text-red-400" : "text-foreground"
           )}>
             {apt.title}
           </span>
@@ -482,33 +492,51 @@ const AppointmentCard = ({ appointment: apt, onToggle, onDelete }: {
               {apt.category}
             </span>
           )}
-          {isOverdue && !apt.completed && (
+          {isOverdue && !apt.completed && !apt.cancelled && (
             <Badge variant="outline" className="text-[10px] border-destructive/30 text-destructive bg-destructive/10">
               Atrasado
             </Badge>
           )}
           {apt.completed && (
-            <Badge variant="outline" className="text-[10px] border-success/30 text-success bg-success/10">
+            <Badge variant="outline" className="text-[10px] border-emerald-400/50 text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400">
               Concluído
+            </Badge>
+          )}
+          {apt.cancelled && (
+            <Badge variant="outline" className="text-[10px] border-red-400/50 text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400">
+              Cancelado
             </Badge>
           )}
         </div>
         {apt.description && (
-          <p className={cn("text-xs mt-0.5", apt.completed ? "text-muted-foreground/60 line-through" : "text-muted-foreground")}>
+          <p className={cn("text-xs mt-0.5", apt.completed || apt.cancelled ? "text-muted-foreground/60 line-through" : "text-muted-foreground")}>
             {apt.description}
           </p>
         )}
       </div>
 
-      {/* Time */}
+      {/* Time + actions */}
       <div className="flex items-center gap-2 shrink-0">
         <span className={cn(
           "flex items-center gap-1 text-xs font-mono",
-          apt.completed ? "text-muted-foreground/50" : isOverdue ? "text-destructive" : "text-muted-foreground"
+          apt.completed ? "text-emerald-600/60 dark:text-emerald-400/60" : apt.cancelled ? "text-red-500/60" : isOverdue ? "text-destructive" : "text-muted-foreground"
         )}>
           <Clock className="h-3 w-3" />
           {apt.appointmentTime}
         </span>
+        {/* Cancel button */}
+        <button
+          onClick={() => onCancel(apt.id, !apt.cancelled)}
+          className={cn(
+            "rounded-full p-1 transition-all",
+            apt.cancelled
+              ? "text-red-500 opacity-100"
+              : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+          )}
+          title={apt.cancelled ? "Desfazer cancelamento" : "Cancelar"}
+        >
+          <Ban className="h-3.5 w-3.5" />
+        </button>
         <button
           onClick={() => onDelete(apt.id)}
           className="opacity-0 group-hover:opacity-100 rounded-full p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
