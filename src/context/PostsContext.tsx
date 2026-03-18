@@ -179,15 +179,15 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     return !error;
   }, [clientId]);
 
-  const updatePostStatus = useCallback(async (id: string, status: PostStatus) => {
+  const updatePostStatus = useCallback(async (id: string, status: PostStatus[]) => {
     const updates: Record<string, any> = { status };
     const post = posts.find(p => p.id === id);
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
     await supabase.from("posts").update(updates).eq("id", id);
     pushToTrello(id, "update");
 
-    // Notify admins when status is "pronto" or "finalizado"
-    if (["pronto", "finalizado"].includes(status)) {
+    // Notify admins when status includes "pronto" or "finalizado"
+    if (status.some(s => ["pronto", "finalizado"].includes(s))) {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         const { data: profile } = await supabase
