@@ -571,7 +571,7 @@ const AdminDashboard = () => {
                 return (
                   <div
                     key={n.id}
-                    onClick={() => client ? navigate(`/admin/${client.slug}`) : undefined}
+                    onClick={() => client ? navigate(`/admin/${client.slug}?postId=${n.postId}`) : undefined}
                     className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5 cursor-pointer hover:bg-muted transition-colors"
                   >
                     {client?.logo_url ? (
