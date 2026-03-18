@@ -585,6 +585,15 @@ const en: TranslationKeys = {
   notifications: "Notifications",
   adminFeedback: "Admin Feedback",
   statusUpdated: "Status updated!",
+  myProfile: "My Profile",
+  editProfileDesc: "Edit your name and photo",
+  profileUpdated: "Profile updated!",
+  changePasswordDesc: "Set a new password",
+  error: "Error",
+  inviteMember: "Invite Member",
+  inviteMemberDesc: "Invite someone as team member or admin",
+  roleLabel: "Access type",
+  sendInvite: "Send Invite",
 };
 
 const it: TranslationKeys = {
