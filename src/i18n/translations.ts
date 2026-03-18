@@ -213,6 +213,17 @@ type TranslationKeys = {
   notifications: string;
   adminFeedback: string;
   statusUpdated: string;
+  // User profile menu
+  myProfile: string;
+  editProfileDesc: string;
+  profileUpdated: string;
+  changePasswordDesc: string;
+  error: string;
+  // Invite unified
+  inviteMember: string;
+  inviteMemberDesc: string;
+  roleLabel: string;
+  sendInvite: string;
 };
 
 const pt: TranslationKeys = {
