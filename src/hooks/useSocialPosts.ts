@@ -66,7 +66,10 @@ export function useSocialPosts(clientId: string | null) {
   }, [clientId]);
 
   const fetchPages = useCallback(async () => {
-    if (!clientId) return;
+    if (!clientId) {
+      setPages([]);
+      return;
+    }
     const { data } = await supabase
       .from("meta_pages")
       .select("*, meta_accounts(meta_user_name, token_expires_at)")
