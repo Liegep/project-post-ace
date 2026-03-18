@@ -237,6 +237,7 @@ const pt: TranslationKeys = {
   statusReady: "Enviar para Cliente",
   statusFinalized: "Finalizado",
   statusChangeRequested: "Alteração Solicitada",
+  statusScheduled: "Agendado",
   labelPending: "Pendente",
   labelApproved: "Aprovado",
   labelChangeRequested: "Alteração Solicitada",
