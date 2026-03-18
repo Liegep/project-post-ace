@@ -1,17 +1,25 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Facebook, Instagram } from "lucide-react";
+import { ChevronLeft, ChevronRight, Facebook, Instagram, FileText } from "lucide-react";
 import { SocialStatusBadge } from "./SocialStatusBadge";
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+export interface ScheduledKanbanPost {
+  id: string;
+  title: string;
+  client_name: string;
+  deadline: string;
+}
+
 interface SocialCalendarProps {
   posts: SocialPost[];
+  scheduledPosts?: ScheduledKanbanPost[];
   onPostClick: (post: SocialPost) => void;
 }
 
-export function SocialCalendar({ posts, onPostClick }: SocialCalendarProps) {
+export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: SocialCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const monthStart = startOfMonth(currentMonth);
@@ -31,6 +39,16 @@ export function SocialCalendar({ posts, onPostClick }: SocialCalendarProps) {
     });
     return map;
   }, [posts]);
+
+  const kanbanByDay = useMemo(() => {
+    const map: Record<string, ScheduledKanbanPost[]> = {};
+    scheduledPosts.forEach((p) => {
+      const key = format(new Date(p.deadline), "yyyy-MM-dd");
+      if (!map[key]) map[key] = [];
+      map[key].push(p);
+    });
+    return map;
+  }, [scheduledPosts]);
 
   const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
@@ -67,7 +85,10 @@ export function SocialCalendar({ posts, onPostClick }: SocialCalendarProps) {
         {days.map((day) => {
           const key = format(day, "yyyy-MM-dd");
           const dayPosts = postsByDay[key] || [];
+          const dayKanban = kanbanByDay[key] || [];
           const isToday = isSameDay(day, new Date());
+          const totalItems = dayPosts.length + dayKanban.length;
+          const maxVisible = 3;
 
           return (
             <div key={key} className={`bg-card min-h-[100px] p-1.5 ${isToday ? "ring-2 ring-inset ring-primary/30" : ""}`}>
@@ -75,7 +96,19 @@ export function SocialCalendar({ posts, onPostClick }: SocialCalendarProps) {
                 {format(day, "d")}
               </div>
               <div className="space-y-1">
-                {dayPosts.slice(0, 3).map((p) => (
+                {/* Kanban "Agendado" posts */}
+                {dayKanban.slice(0, maxVisible).map((p) => (
+                  <div
+                    key={`kanban-${p.id}`}
+                    className="w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate flex items-center gap-1 bg-accent/50 border border-accent"
+                  >
+                    <FileText className="h-2.5 w-2.5 text-primary shrink-0" />
+                    <span className="truncate font-medium">{p.title}</span>
+                    <span className="text-muted-foreground shrink-0">· {p.client_name}</span>
+                  </div>
+                ))}
+                {/* Social posts */}
+                {dayPosts.slice(0, Math.max(0, maxVisible - dayKanban.length)).map((p) => (
                   <button
                     key={p.id}
                     onClick={() => onPostClick(p)}
@@ -89,8 +122,8 @@ export function SocialCalendar({ posts, onPostClick }: SocialCalendarProps) {
                     <span className="truncate">{p.caption.slice(0, 30) || "Sem legenda"}</span>
                   </button>
                 ))}
-                {dayPosts.length > 3 && (
-                  <p className="text-[10px] text-muted-foreground text-center">+{dayPosts.length - 3} mais</p>
+                {totalItems > maxVisible && (
+                  <p className="text-[10px] text-muted-foreground text-center">+{totalItems - maxVisible} mais</p>
                 )}
               </div>
             </div>

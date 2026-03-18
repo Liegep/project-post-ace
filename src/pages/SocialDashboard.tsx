@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useSocialPosts, type SocialPost, type SocialPostStatus } from "@/hooks/useSocialPosts";
 import { SocialPostCard } from "@/components/social/SocialPostCard";
 import { SocialPostDialog } from "@/components/social/SocialPostDialog";
-import { SocialCalendar } from "@/components/social/SocialCalendar";
+import { SocialCalendar, type ScheduledKanbanPost } from "@/components/social/SocialCalendar";
 import { MetaConnectPanel } from "@/components/social/MetaConnectPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -43,6 +43,8 @@ export default function SocialDashboard() {
 
   const { posts, pages, loading, createPost, updatePost, deletePost, duplicatePost, publishPost, cancelPost, approvePost, fetchPages } = useSocialPosts(selectedClientId || null);
 
+  const [scheduledKanbanPosts, setScheduledKanbanPosts] = useState<ScheduledKanbanPost[]>([]);
+
   useEffect(() => {
     supabase.from("clients").select("id, name, slug, logo_url").order("name").then(({ data }) => {
       const clientList = (data || []) as Client[];
@@ -51,6 +53,28 @@ export default function SocialDashboard() {
         setSelectedClientId(clientList[0].id);
       }
     });
+  }, []);
+
+  // Fetch kanban posts with "agendado" status that have a deadline
+  useEffect(() => {
+    async function fetchScheduledKanban() {
+      const { data } = await supabase
+        .from("posts")
+        .select("id, title, deadline, client_id, clients(name)")
+        .contains("status", ["agendado"])
+        .not("deadline", "is", null) as any;
+      
+      if (data) {
+        const mapped: ScheduledKanbanPost[] = data.map((p: any) => ({
+          id: p.id,
+          title: p.title,
+          client_name: p.clients?.name || "—",
+          deadline: p.deadline,
+        }));
+        setScheduledKanbanPosts(mapped);
+      }
+    }
+    fetchScheduledKanban();
   }, []);
 
   const filteredPosts = useMemo(() => {
@@ -255,7 +279,7 @@ export default function SocialDashboard() {
           </TabsList>
 
           <TabsContent value="calendar" className="mt-4">
-            <SocialCalendar posts={filteredPosts} onPostClick={handleEdit} />
+            <SocialCalendar posts={filteredPosts} scheduledPosts={scheduledKanbanPosts} onPostClick={handleEdit} />
           </TabsContent>
 
           <TabsContent value="list" className="mt-4">
