@@ -401,6 +401,15 @@ const pt: TranslationKeys = {
   notifications: "Notificações",
   adminFeedback: "Feedback do Admin",
   statusUpdated: "Status atualizado!",
+  myProfile: "Meu Perfil",
+  editProfileDesc: "Edite seu nome e foto",
+  profileUpdated: "Perfil atualizado!",
+  changePasswordDesc: "Defina uma nova senha",
+  error: "Erro",
+  inviteMember: "Convidar Membro",
+  inviteMemberDesc: "Convide alguém para a equipe ou como administrador",
+  roleLabel: "Tipo de acesso",
+  sendInvite: "Enviar Convite",
 };
 
 const en: TranslationKeys = {
