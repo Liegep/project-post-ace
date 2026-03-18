@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useSocialPosts, type SocialPost, type SocialPostStatus } from "@/hooks/useSocialPosts";
 import { SocialPostCard } from "@/components/social/SocialPostCard";
 import { SocialPostDialog } from "@/components/social/SocialPostDialog";
-import { SocialCalendar } from "@/components/social/SocialCalendar";
+import { SocialCalendar, type ScheduledKanbanPost } from "@/components/social/SocialCalendar";
 import { MetaConnectPanel } from "@/components/social/MetaConnectPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
