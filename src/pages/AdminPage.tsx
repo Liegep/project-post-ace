@@ -566,9 +566,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     setSelectedPostIds(new Set());
   };
 
-  const handleBulkStatusChange = async (status: PostStatus) => {
+  const handleBulkStatusChange = async (statuses: PostStatus[]) => {
     const ids = Array.from(selectedPostIds);
-    await bulkUpdateStatus(ids, status);
+    await bulkUpdateStatus(ids, statuses);
     exitSelectionMode();
     toast({ title: `${ids.length} ${t("postsUpdated")}` });
   };
