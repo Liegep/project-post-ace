@@ -35,6 +35,7 @@ interface FeedbackNotification {
   clientLogo: string;
   label: string;
   updatedAt: string;
+  deadline: string | null;
 }
 
 interface UnarchiveNotification {
@@ -145,7 +146,7 @@ const AdminDashboard = () => {
     // Fetch posts where client gave feedback (label != pendente)
     const { data: posts } = await supabase
       .from("posts")
-      .select("id, title, client_label, client_id, updated_at")
+      .select("id, title, client_label, client_id, updated_at, deadline")
       .neq("client_label", "pendente")
       .order("updated_at", { ascending: false });
 
@@ -173,6 +174,7 @@ const AdminDashboard = () => {
         clientLogo: clientMap[p.client_id]?.logo_url || "",
         label: p.client_label,
         updatedAt: p.updated_at,
+        deadline: p.deadline || null,
       }))
     );
   };
@@ -501,6 +503,12 @@ const AdminDashboard = () => {
                     {labelConfig && (
                       <span className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
                         {labelConfig.label}
+                      </span>
+                    )}
+                    {fb.deadline && (
+                      <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2 py-0.5 text-[10px] font-semibold text-blue-600">
+                        <CalendarClock className="h-3 w-3" />
+                        {new Date(fb.deadline).toLocaleDateString("pt-BR")}
                       </span>
                     )}
                     <span className="text-[10px] text-muted-foreground shrink-0">
