@@ -261,6 +261,9 @@ const TeamDashboard = () => {
             <p className="text-sm text-muted-foreground">{t("yourClients")}: {clients.length}</p>
           </div>
           <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => navigate("/briefs")}>
+              <FileText className="h-4 w-4" /> Pautas
+            </Button>
             <LanguageSelector />
             <UserProfileMenu />
           </div>
