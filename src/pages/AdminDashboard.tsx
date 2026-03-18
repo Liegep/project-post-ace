@@ -162,7 +162,7 @@ const AdminDashboard = () => {
     // Fetch posts where client gave feedback (label != pendente)
     const { data: posts } = await supabase
       .from("posts")
-      .select("id, title, client_label, client_id, updated_at, deadline")
+      .select("id, title, client_label, client_id, updated_at, deadline, image_url, media_urls")
       .neq("client_label", "pendente")
       .order("updated_at", { ascending: false });
 
