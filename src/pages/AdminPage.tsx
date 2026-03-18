@@ -496,9 +496,6 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const newColumnInputRef = useRef<HTMLInputElement>(null);
   const editColumnInputRef = useRef<HTMLInputElement>(null);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
-  const [trelloSyncOpen, setTrelloSyncOpen] = useState(false);
-  const [trelloBoardId, setTrelloBoardId] = useState(clientData.trello_board_id || "");
-  const [syncing, setSyncing] = useState(false);
 
   // Selection mode state
   const [selectionMode, setSelectionMode] = useState(false);
