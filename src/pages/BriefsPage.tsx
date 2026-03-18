@@ -190,14 +190,14 @@ const BriefsPage = () => {
       return;
     }
 
-    const payload = {
+    const payload: any = {
       client_id: formClientId,
       title: formTitle.trim(),
       description: formDescription,
       caption: formCaption,
       planned_date: formPlannedDate ? format(formPlannedDate, "yyyy-MM-dd") : null,
       content_type: formContentType,
-      status: formStatus as string,
+      status: formStatus,
       assigned_to: formAssignedTo || null,
       internal_notes: formInternalNotes,
     };
@@ -207,7 +207,8 @@ const BriefsPage = () => {
       ({ error } = await supabase.from("content_briefs").update(payload).eq("id", editingBrief.id));
     } else {
       const { data: { user } } = await supabase.auth.getUser();
-      ({ error } = await supabase.from("content_briefs").insert({ ...payload, created_by: user?.id }));
+      payload.created_by = user?.id;
+      ({ error } = await supabase.from("content_briefs").insert(payload));
     }
 
     if (error) {
