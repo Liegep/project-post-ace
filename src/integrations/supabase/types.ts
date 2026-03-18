@@ -314,6 +314,68 @@ export type Database = {
           },
         ]
       }
+      idea_columns: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          position: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ideas: {
+        Row: {
+          column_id: string
+          created_at: string
+          description: string
+          id: string
+          position: number
+          title: string
+          user_id: string
+        }
+        Insert: {
+          column_id: string
+          created_at?: string
+          description?: string
+          id?: string
+          position?: number
+          title: string
+          user_id: string
+        }
+        Update: {
+          column_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          position?: number
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ideas_column_id_fkey"
+            columns: ["column_id"]
+            isOneToOne: false
+            referencedRelation: "idea_columns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meta_accounts: {
         Row: {
           access_token: string
