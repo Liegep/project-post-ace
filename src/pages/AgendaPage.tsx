@@ -372,6 +372,7 @@ interface DayListViewProps {
   dates: Date[];
   appointmentsByDate: Record<string, Appointment[]>;
   onToggle: (id: string, completed: boolean) => void;
+  onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
   onCreateClick: (date: Date) => void;
 }
