@@ -34,7 +34,7 @@ const STATUS_FILTERS: { value: string; label: string; icon: React.ComponentType<
 export default function SocialDashboard() {
   const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
-  const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [selectedClientId, setSelectedClientId] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [showSettings, setShowSettings] = useState(false);
