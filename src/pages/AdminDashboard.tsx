@@ -1058,6 +1058,7 @@ const AdminDashboard = () => {
       </Dialog>
 
       <InviteAdminDialog open={inviteOpen} onOpenChange={setInviteOpen} />
+      <PostDetailDialog post={viewPost} open={viewPostOpen} onOpenChange={setViewPostOpen} tags={DEFAULT_TAGS} t={t} />
 
     </div>
   );
