@@ -83,11 +83,6 @@ const AdminDashboard = () => {
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [passwordSaving, setPasswordSaving] = useState(false);
 
   const handleChangePassword = async () => {
     setPasswordError("");
