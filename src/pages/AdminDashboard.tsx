@@ -35,6 +35,7 @@ interface FeedbackNotification {
   clientLogo: string;
   label: string;
   updatedAt: string;
+  deadline: string | null;
 }
 
 interface UnarchiveNotification {
