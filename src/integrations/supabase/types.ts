@@ -161,6 +161,79 @@ export type Database = {
         }
         Relationships: []
       }
+      brief_attachments: {
+        Row: {
+          brief_id: string
+          created_at: string
+          file_name: string
+          file_url: string
+          id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          brief_id: string
+          created_at?: string
+          file_name?: string
+          file_url: string
+          id?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          brief_id?: string
+          created_at?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brief_attachments_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "content_briefs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brief_comments: {
+        Row: {
+          author_name: string
+          author_role: string
+          brief_id: string
+          created_at: string
+          id: string
+          message: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string
+          author_role?: string
+          brief_id: string
+          created_at?: string
+          id?: string
+          message?: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          author_role?: string
+          brief_id?: string
+          created_at?: string
+          id?: string
+          message?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brief_comments_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "content_briefs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calendar_posts: {
         Row: {
           caption: string
@@ -349,6 +422,62 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_briefs: {
+        Row: {
+          assigned_to: string | null
+          caption: string
+          client_id: string
+          content_type: string
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          internal_notes: string
+          planned_date: string | null
+          status: Database["public"]["Enums"]["brief_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          caption?: string
+          client_id: string
+          content_type?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          internal_notes?: string
+          planned_date?: string | null
+          status?: Database["public"]["Enums"]["brief_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          caption?: string
+          client_id?: string
+          content_type?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          internal_notes?: string
+          planned_date?: string | null
+          status?: Database["public"]["Enums"]["brief_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_briefs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
         ]
@@ -1096,6 +1225,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "team_member"
+      brief_status:
+        | "draft"
+        | "internal"
+        | "pending_approval"
+        | "approved"
+        | "rejected"
+        | "published"
       calendar_post_status:
         | "draft"
         | "in_review"
@@ -1239,6 +1375,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "team_member"],
+      brief_status: [
+        "draft",
+        "internal",
+        "pending_approval",
+        "approved",
+        "rejected",
+        "published",
+      ],
       calendar_post_status: [
         "draft",
         "in_review",

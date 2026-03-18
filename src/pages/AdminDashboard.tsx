@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { LABEL_CONFIG } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
@@ -451,6 +451,9 @@ const AdminDashboard = () => {
             </Button>
             <Button variant="ghost" size="icon" onClick={() => navigate("/calendar")} title="Calendário de Posts">
               <Calendar className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/briefs")} title="Pautas">
+              <FileText className="h-5 w-5" />
             </Button>
             <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newClient")}

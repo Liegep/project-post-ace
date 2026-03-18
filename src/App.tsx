@@ -18,6 +18,7 @@ import TeamDashboard from "./pages/TeamDashboard.tsx";
 import AgendaPage from "./pages/AgendaPage.tsx";
 import IdeasPage from "./pages/IdeasPage.tsx";
 import CalendarPage from "./pages/CalendarPage.tsx";
+import BriefsPage from "./pages/BriefsPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/agenda" element={<AuthGuard allowedRoles={["admin", "team_member"]}><AgendaPage /></AuthGuard>} />
             <Route path="/ideas" element={<AuthGuard allowedRoles={["admin", "team_member"]}><IdeasPage /></AuthGuard>} />
             <Route path="/calendar" element={<AuthGuard allowedRoles={["admin", "team_member"]}><CalendarPage /></AuthGuard>} />
+            <Route path="/briefs" element={<AuthGuard allowedRoles={["admin", "team_member"]}><BriefsPage /></AuthGuard>} />
             <Route path="/client/:slug" element={<ClientPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
