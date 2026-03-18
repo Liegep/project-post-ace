@@ -1142,6 +1142,38 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </div>
+
+            {/* Login do cliente */}
+            <div className="border-t pt-4">
+              <Label className="text-sm font-semibold">Login do Cliente</Label>
+              <p className="text-xs text-muted-foreground mb-2">
+                {existingClientUser
+                  ? "Atualize o e-mail ou senha do cliente"
+                  : "Crie um acesso para o cliente visualizar seus conteúdos"}
+              </p>
+              <div className="space-y-2">
+                <div>
+                  <Label className="text-xs">E-mail do cliente</Label>
+                  <Input
+                    type="email"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    placeholder="cliente@email.com"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">
+                    {existingClientUser ? "Nova senha (deixe vazio para manter)" : "Senha"}
+                  </Label>
+                  <Input
+                    type="password"
+                    value={clientPassword}
+                    onChange={(e) => setClientPassword(e.target.value)}
+                    placeholder={existingClientUser ? "••••••••" : "Mínimo 6 caracteres"}
+                  />
+                </div>
+              </div>
+            </div>
             </div>
 
             <Button
