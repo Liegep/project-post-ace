@@ -174,6 +174,7 @@ const AdminDashboard = () => {
         clientLogo: clientMap[p.client_id]?.logo_url || "",
         label: p.client_label,
         updatedAt: p.updated_at,
+        deadline: p.deadline || null,
       }))
     );
   };
