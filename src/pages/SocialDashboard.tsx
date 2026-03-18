@@ -34,24 +34,20 @@ const STATUS_FILTERS: { value: string; label: string; icon: React.ComponentType<
 export default function SocialDashboard() {
   const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
-  const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [selectedClientId, setSelectedClientId] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [showSettings, setShowSettings] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<SocialPost | null>(null);
 
-  const { posts, pages, loading, createPost, updatePost, deletePost, duplicatePost, publishPost, cancelPost, approvePost, fetchPages } = useSocialPosts(selectedClientId || null);
+  const { posts, pages, loading, createPost, updatePost, deletePost, duplicatePost, publishPost, cancelPost, approvePost, fetchPages } = useSocialPosts(selectedClientId === "all" ? null : selectedClientId);
 
   const [scheduledKanbanPosts, setScheduledKanbanPosts] = useState<ScheduledKanbanPost[]>([]);
 
   useEffect(() => {
     supabase.from("clients").select("id, name, slug, logo_url").order("name").then(({ data }) => {
-      const clientList = (data || []) as Client[];
-      setClients(clientList);
-      if (clientList.length > 0 && !selectedClientId) {
-        setSelectedClientId(clientList[0].id);
-      }
+      setClients((data || []) as Client[]);
     });
   }, []);
 
@@ -180,6 +176,7 @@ export default function SocialDashboard() {
                 <SelectValue placeholder="Selecionar cliente" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">Todos os clientes</SelectItem>
                 {clients.map((c) => (
                   <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                 ))}

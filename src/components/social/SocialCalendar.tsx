@@ -119,7 +119,10 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: Soci
                     ) : (
                       <Facebook className="h-2.5 w-2.5 text-blue-600 shrink-0" />
                     )}
-                    <span className="truncate">{p.caption.slice(0, 30) || "Sem legenda"}</span>
+                    <span className="truncate">{p.caption.slice(0, 20) || "Sem legenda"}</span>
+                    {(p as any).clients?.name && (
+                      <span className="text-muted-foreground shrink-0">· {(p as any).clients.name}</span>
+                    )}
                   </button>
                 ))}
                 {totalItems > maxVisible && (
