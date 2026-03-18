@@ -161,7 +161,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       media_type: post.mediaType || 'image',
       media_urls: post.mediaUrls || [],
       caption: post.caption || '',
-      status: post.clientCreated ? 'em_desenvolvimento' : post.status,
+      status: post.clientCreated ? ['em_desenvolvimento'] : (Array.isArray(post.status) ? post.status : [post.status]),
       tags: post.tags || [],
       client_id: clientId,
       column_id: resolvedColumnId,
