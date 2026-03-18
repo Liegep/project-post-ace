@@ -19,7 +19,7 @@ interface SocialCalendarProps {
   onPostClick: (post: SocialPost) => void;
 }
 
-export function SocialCalendar({ posts, onPostClick }: SocialCalendarProps) {
+export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: SocialCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const monthStart = startOfMonth(currentMonth);
