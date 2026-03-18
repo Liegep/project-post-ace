@@ -191,6 +191,8 @@ const AdminDashboard = () => {
         label: p.client_label,
         updatedAt: p.updated_at,
         deadline: p.deadline || null,
+        imageUrl: p.image_url || "",
+        mediaUrls: p.media_urls || [],
       }))
     );
   };
