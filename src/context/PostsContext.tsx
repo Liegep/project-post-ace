@@ -179,10 +179,44 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     return !error;
   }, [clientId]);
 
+  const ensureAgendadosColumn = useCallback(async (): Promise<string> => {
+    const { data: existingCols } = await supabase
+      .from("columns")
+      .select("id, name")
+      .eq("client_id", clientId);
+
+    const agendadosCol = (existingCols || []).find((c: any) => c.name.toLowerCase() === "agendados");
+    if (agendadosCol) return agendadosCol.id;
+
+    const maxPos = (existingCols || []).length;
+    const { data: newCol } = await supabase
+      .from("columns")
+      .insert({ client_id: clientId, name: "Agendados", position: maxPos } as any)
+      .select()
+      .single();
+    if (newCol) {
+      setColumns((prev) => [...prev, { id: (newCol as any).id, clientId, name: "Agendados", position: maxPos, visibleToClient: false }]);
+      return (newCol as any).id;
+    }
+    throw new Error("Failed to create Agendados column");
+  }, [clientId]);
+
   const updatePostStatus = useCallback(async (id: string, status: PostStatus[]) => {
     const updates: Record<string, any> = { status };
     const post = posts.find(p => p.id === id);
-    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
+
+    // If "agendado" status is being added, move to "Agendados" column
+    let newColumnId: string | undefined;
+    if (status.includes("agendado")) {
+      try {
+        newColumnId = await ensureAgendadosColumn();
+        updates.column_id = newColumnId;
+      } catch (e) {
+        console.error("Failed to ensure Agendados column", e);
+      }
+    }
+
+    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status, ...(newColumnId ? { columnId: newColumnId } : {}) } : p)));
     await supabase.from("posts").update(updates).eq("id", id);
     pushToTrello(id, "update");
 
@@ -218,7 +252,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
         } as any);
       }
     }
-  }, [posts, clientId]);
+  }, [posts, clientId, ensureAgendadosColumn]);
 
   const updateClientLabel = useCallback(async (id: string, label: ClientLabel) => {
     let newColumnId: string | undefined;
