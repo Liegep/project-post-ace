@@ -226,6 +226,9 @@ const AgendaPage = () => {
               <Badge variant="outline" className="gap-1 bg-success/10 text-success border-success/30">
                 <Check className="h-3 w-3" /> {completedCount}
               </Badge>
+              <Badge variant="outline" className="gap-1 bg-destructive/10 text-destructive border-destructive/30">
+                <Ban className="h-3 w-3" /> {cancelledCount}
+              </Badge>
             </div>
 
             <Button onClick={() => openCreateForDate()} className="bg-accent text-accent-foreground hover:bg-accent/90 gap-1.5">
