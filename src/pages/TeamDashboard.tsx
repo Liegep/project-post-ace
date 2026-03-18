@@ -216,7 +216,7 @@ const TeamDashboard = () => {
     } as any);
 
     // Update post
-    await supabase.from("posts").update({ status } as any).eq("id", post.postId);
+    await supabase.from("posts").update({ status: [status] } as any).eq("id", post.postId);
 
     // Create notification for admin if status is ready/finalizado
     if (["pronto", "finalizado"].includes(status.toLowerCase())) {
