@@ -983,7 +983,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   </SelectContent>
                 </Select>
               )}
-              <Button size="sm" variant="outline" onClick={() => handleBulkStatusChange("finalizado")}>
+              <Button size="sm" variant="outline" onClick={() => handleBulkStatusChange(["finalizado"])}>
                 <Archive className="mr-1.5 h-3.5 w-3.5" /> {t("archive")}
               </Button>
             </>

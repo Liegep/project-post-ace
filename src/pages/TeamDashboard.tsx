@@ -231,7 +231,7 @@ const TeamDashboard = () => {
     }
 
     // Refresh
-    setPosts(prev => prev.map(p => p.postId === post.postId ? { ...p, status } : p));
+    setPosts(prev => prev.map(p => p.postId === post.postId ? { ...p, status: [status] } : p));
     toast({ title: t("statusUpdated") });
   };
 
