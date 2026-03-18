@@ -87,7 +87,7 @@ const ClientBriefs = ({ clientId, clientName }: ClientBriefsProps) => {
   };
 
   const handleApprove = async (briefId: string) => {
-    const { error } = await supabase.from("content_briefs").update({ status: "approved" as string }).eq("id", briefId);
+    const { error } = await supabase.from("content_briefs").update({ status: "approved" } as any).eq("id", briefId);
     if (!error) {
       toast({ title: "Pauta aprovada!" });
       setDetailBrief((prev) => prev ? { ...prev, status: "approved" } : null);
