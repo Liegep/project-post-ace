@@ -132,7 +132,7 @@ const TeamDashboard = () => {
 
     // Fetch clients
     const { data: clientsData } = await supabase.from("clients")
-      .select("id, name, slug, logo_url, posting_period")
+      .select("id, name, slug, logo_url, posting_period, instagram_url, facebook_url, tiktok_url, youtube_url, linkedin_url, twitter_url, website_url")
       .in("id", clientIds);
     setClients((clientsData as AssignedClient[]) || []);
 
