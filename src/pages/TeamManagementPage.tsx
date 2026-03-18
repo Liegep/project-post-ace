@@ -135,12 +135,19 @@ const TeamManagementPage = () => {
 
   const handleDeleteMember = async (member: TeamMember) => {
     if (!confirm(t("confirmDeleteMember"))) return;
-    // We can't delete auth user from client-side, so we just remove profile and assignments
-    await supabase.from("user_client_assignments").delete().eq("user_id", member.id);
-    await supabase.from("profiles").delete().eq("id", member.id);
-    await supabase.from("user_roles").delete().eq("user_id", member.id);
-    fetchAll();
-    toast({ title: t("memberDeleted") });
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-auth-user", {
+        body: { user_id: member.id },
+      });
+      if (error || data?.error) {
+        toast({ title: "Erro", description: data?.error || error?.message, variant: "destructive" });
+        return;
+      }
+      fetchAll();
+      toast({ title: t("memberDeleted") });
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    }
   };
 
   const getMemberClients = (memberId: string) => {
