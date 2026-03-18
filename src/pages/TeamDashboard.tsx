@@ -414,7 +414,7 @@ const TeamDashboard = () => {
                           <p className="text-xs text-muted-foreground">{clientPosts.length} posts</p>
                         </div>
                       </div>
-                      <div className="flex gap-2 mt-auto">
+                      <div className="flex gap-2">
                         <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-600">
                           <Clock className="h-3 w-3" /> {pending}
                         </span>
@@ -424,6 +424,19 @@ const TeamDashboard = () => {
                         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600">
                           <CheckCircle className="h-3 w-3" /> {ready}
                         </span>
+                      </div>
+                      <div className="mt-4">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="w-full"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/admin/${client.slug}`);
+                          }}
+                        >
+                          {t("manage")}
+                        </Button>
                       </div>
                     </div>
                   );
