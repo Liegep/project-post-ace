@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical } from "lucide-react";
+import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { PostTrackingLabels } from "@/components/PostTrackingLabels";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -90,6 +91,30 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
       )}
     </div>
   );
+};
+
+const downloadFile = async (url: string, filename: string) => {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+  } catch {
+    window.open(url, "_blank");
+  }
+};
+
+const downloadAllFiles = async (urls: string[], postTitle: string) => {
+  for (let i = 0; i < urls.length; i++) {
+    const ext = urls[i].split(".").pop()?.split("?")[0] || "jpg";
+    await downloadFile(urls[i], `${postTitle}_${i + 1}.${ext}`);
+  }
 };
 
 export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
@@ -226,6 +251,43 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
               </DndContext>
             </div>
           )}
+          {/* Download buttons */}
+          <div className="px-2 py-1.5 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => {
+                      const currentUrl = allMedia[mediaIndex] || allMedia[0];
+                      const ext = currentUrl.split(".").pop()?.split("?")[0] || "jpg";
+                      downloadFile(currentUrl, `${post.title}_${mediaIndex + 1}.${ext}`);
+                    }}
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Baixar foto atual</TooltipContent>
+              </Tooltip>
+              {allMedia.length > 1 && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => downloadAllFiles(allMedia, post.title)}
+                    >
+                      <DownloadCloud className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Baixar todas ({allMedia.length})</TooltipContent>
+                </Tooltip>
+              )}
+            </TooltipProvider>
+          </div>
         </>
       )}
 
