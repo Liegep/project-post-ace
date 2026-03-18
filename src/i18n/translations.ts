@@ -794,6 +794,7 @@ const es: TranslationKeys = {
   statusReady: "Listo",
   statusFinalized: "Finalizado",
   statusChangeRequested: "Cambio Solicitado",
+  statusScheduled: "Programado",
   labelPending: "Pendiente",
   labelApproved: "Aprobado",
   labelChangeRequested: "Cambio Solicitado",
