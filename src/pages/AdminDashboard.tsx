@@ -505,6 +505,12 @@ const AdminDashboard = () => {
                         {labelConfig.label}
                       </span>
                     )}
+                    {fb.deadline && (
+                      <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2 py-0.5 text-[10px] font-semibold text-blue-600">
+                        <CalendarClock className="h-3 w-3" />
+                        {new Date(fb.deadline).toLocaleDateString("pt-BR")}
+                      </span>
+                    )}
                     <span className="text-[10px] text-muted-foreground shrink-0">
                       {new Date(fb.updatedAt).toLocaleDateString("pt-BR")}
                     </span>
