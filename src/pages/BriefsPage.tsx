@@ -203,7 +203,7 @@ const BriefsPage = () => {
       planned_date: formPlannedDate ? format(formPlannedDate, "yyyy-MM-dd") : null,
       content_type: formContentType,
       status: formStatus,
-      assigned_to: formAssignedTo || null,
+      assigned_to: formAssignedTo === "none" ? null : formAssignedTo,
       internal_notes: formInternalNotes,
     };
 
