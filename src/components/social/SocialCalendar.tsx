@@ -40,6 +40,16 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: Soci
     return map;
   }, [posts]);
 
+  const kanbanByDay = useMemo(() => {
+    const map: Record<string, ScheduledKanbanPost[]> = {};
+    scheduledPosts.forEach((p) => {
+      const key = format(new Date(p.deadline), "yyyy-MM-dd");
+      if (!map[key]) map[key] = [];
+      map[key].push(p);
+    });
+    return map;
+  }, [scheduledPosts]);
+
   const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
   return (
