@@ -397,6 +397,9 @@ const AdminDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
+            <Button variant="outline" size="sm" onClick={() => navigate("/team-management")}>
+              <Users className="mr-1 h-4 w-4" /> {t("team")}
+            </Button>
             <Button variant="outline" size="sm" onClick={() => navigate("/social")}>
               <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
             </Button>
