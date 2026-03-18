@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN website_url text NOT NULL DEFAULT '';

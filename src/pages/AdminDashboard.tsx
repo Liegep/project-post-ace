@@ -890,6 +890,10 @@ const AdminDashboard = () => {
                   <Twitter className="h-4 w-4 shrink-0" />
                   <Input value={twitterUrl} onChange={(e) => setTwitterUrl(e.target.value)} placeholder="https://x.com/..." className="flex-1" />
                 </div>
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-primary shrink-0" />
+                  <Input value={websiteUrl} onChange={(e) => setWebsiteUrl(e.target.value)} placeholder="https://meusite.com.br" className="flex-1" />
+                </div>
               </div>
             </div>
             </div>

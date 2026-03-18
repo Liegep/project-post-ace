@@ -308,6 +308,7 @@ export type Database = {
           trello_board_id: string
           twitter_url: string
           updated_at: string
+          website_url: string
           youtube_url: string
         }
         Insert: {
@@ -330,6 +331,7 @@ export type Database = {
           trello_board_id?: string
           twitter_url?: string
           updated_at?: string
+          website_url?: string
           youtube_url?: string
         }
         Update: {
@@ -352,6 +354,7 @@ export type Database = {
           trello_board_id?: string
           twitter_url?: string
           updated_at?: string
+          website_url?: string
           youtube_url?: string
         }
         Relationships: []
