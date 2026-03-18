@@ -386,7 +386,7 @@ const DayListView = ({ dates, appointmentsByDate, onToggle, onCancel, onDelete, 
         const today = isToday(date);
 
         return (
-          <div key={dateStr} className={cn("rounded-xl border transition-colors", today ? "border-accent/50 bg-accent/5" : "bg-card")}>
+          <div key={dateStr} className={cn("rounded-xl border transition-colors", today ? "border-accent/50 bg-amber-50/80 dark:bg-amber-950/20" : "bg-white dark:bg-card")}>
             {/* Day header */}
             <div className="flex items-center justify-between px-4 py-3 border-b">
               <div className="flex items-center gap-3">
