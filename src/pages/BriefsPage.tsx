@@ -86,6 +86,7 @@ const CONTENT_TYPES = [
 
 const BriefsPage = () => {
   const { t } = useI18n();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
