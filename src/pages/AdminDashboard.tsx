@@ -126,16 +126,23 @@ const AdminDashboard = () => {
       .eq("read", false)
       .order("created_at", { ascending: false });
 
-    setStatusNotifs(
-      (data || []).map((n: any) => ({
-        id: n.id,
-        title: n.title,
-        message: n.message,
-        clientId: n.client_id,
-        postId: n.post_id,
-        createdAt: n.created_at,
-      }))
-    );
+    // Deduplicate by postId - keep only the latest notification per post
+    const allNotifs = (data || []).map((n: any) => ({
+      id: n.id,
+      title: n.title,
+      message: n.message,
+      clientId: n.client_id,
+      postId: n.post_id,
+      createdAt: n.created_at,
+    }));
+    const seen = new Map<string, StatusNotification>();
+    allNotifs.forEach((n) => {
+      const key = n.postId || n.id;
+      if (!seen.has(key) || new Date(n.createdAt) > new Date(seen.get(key)!.createdAt)) {
+        seen.set(key, n);
+      }
+    });
+    setStatusNotifs(Array.from(seen.values()));
   };
 
   const dismissStatusNotif = async (id: string, e: React.MouseEvent) => {
