@@ -84,33 +84,6 @@ const AdminDashboard = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
 
-  const handleChangePassword = async () => {
-    setPasswordError("");
-    if (newPassword.length < 6) {
-      setPasswordError(t("passwordMinError"));
-      return;
-    }
-    if (newPassword !== confirmNewPassword) {
-      setPasswordError(t("passwordMismatch"));
-      return;
-    }
-    setPasswordSaving(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) {
-        setPasswordError(t("passwordUpdateError"));
-        return;
-      }
-      toast({ title: t("passwordUpdated") });
-      setChangePasswordOpen(false);
-      setNewPassword("");
-      setConfirmNewPassword("");
-    } catch {
-      setPasswordError(t("passwordUpdateError"));
-    } finally {
-      setPasswordSaving(false);
-    }
-  };
 
   useEffect(() => {
     fetchClients();
