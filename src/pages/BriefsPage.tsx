@@ -244,7 +244,7 @@ const BriefsPage = () => {
 
   const toggleClientVisibility = async (brief: Brief) => {
     const newStatus: BriefStatus = brief.status === "pending_approval" ? "internal" : "pending_approval";
-    const { error } = await supabase.from("content_briefs").update({ status: newStatus as string }).eq("id", brief.id);
+    const { error } = await supabase.from("content_briefs").update({ status: newStatus } as any).eq("id", brief.id);
     if (!error) {
       toast({ title: newStatus === "pending_approval" ? "Enviado para aprovação do cliente" : "Removido da visão do cliente" });
       loadData();
