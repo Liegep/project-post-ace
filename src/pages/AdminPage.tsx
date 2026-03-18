@@ -37,7 +37,7 @@ const DroppableColumn = ({ id, children }: { id: string; children: React.ReactNo
 
 const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: {
   post: Post;
-  onStatusChange: (s: PostStatus) => void;
+  onStatusChange: (s: PostStatus[]) => void;
   onDelete: () => void;
   onEdit: () => void;
   selectionMode?: boolean;
