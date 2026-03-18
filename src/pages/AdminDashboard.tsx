@@ -67,6 +67,15 @@ interface ClientCreatedNotification {
   createdAt: string;
 }
 
+interface StatusNotification {
+  id: string;
+  title: string;
+  message: string;
+  clientId: string | null;
+  postId: string | null;
+  createdAt: string;
+}
+
 interface TodayPost {
   postId: string;
   postTitle: string;
