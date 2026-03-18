@@ -17,6 +17,7 @@ import TeamManagementPage from "./pages/TeamManagementPage.tsx";
 import TeamDashboard from "./pages/TeamDashboard.tsx";
 import AgendaPage from "./pages/AgendaPage.tsx";
 import IdeasPage from "./pages/IdeasPage.tsx";
+import CalendarPage from "./pages/CalendarPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
