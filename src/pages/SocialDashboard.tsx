@@ -41,7 +41,7 @@ export default function SocialDashboard() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<SocialPost | null>(null);
 
-  const { posts, pages, loading, createPost, updatePost, deletePost, duplicatePost, publishPost, cancelPost, approvePost, fetchPages } = useSocialPosts(selectedClientId || null);
+  const { posts, pages, loading, createPost, updatePost, deletePost, duplicatePost, publishPost, cancelPost, approvePost, fetchPages } = useSocialPosts(selectedClientId === "all" ? null : selectedClientId);
 
   const [scheduledKanbanPosts, setScheduledKanbanPosts] = useState<ScheduledKanbanPost[]>([]);
 
