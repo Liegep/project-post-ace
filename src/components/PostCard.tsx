@@ -251,6 +251,43 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
               </DndContext>
             </div>
           )}
+          {/* Download buttons */}
+          <div className="px-2 py-1.5 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => {
+                      const currentUrl = allMedia[mediaIndex] || allMedia[0];
+                      const ext = currentUrl.split(".").pop()?.split("?")[0] || "jpg";
+                      downloadFile(currentUrl, `${post.title}_${mediaIndex + 1}.${ext}`);
+                    }}
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Baixar foto atual</TooltipContent>
+              </Tooltip>
+              {allMedia.length > 1 && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => downloadAllFiles(allMedia, post.title)}
+                    >
+                      <DownloadCloud className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Baixar todas ({allMedia.length})</TooltipContent>
+                </Tooltip>
+              )}
+            </TooltipProvider>
+          </div>
         </>
       )}
 
