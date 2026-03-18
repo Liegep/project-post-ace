@@ -211,7 +211,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
         await supabase.from("admin_notifications").insert({
           type: "status_change",
           title: `${userName}${clientName ? " - " + clientName : ""}`,
-          message: `Post "${post?.title || ""}" marcado como "${status}" por ${userName}`,
+          message: `Post "${post?.title || ""}" marcado como "${status.join(', ')}" por ${userName}`,
           client_id: clientId || null,
           post_id: id,
           user_id: null,
