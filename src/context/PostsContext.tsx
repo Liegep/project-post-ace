@@ -50,7 +50,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     mediaUrls,
     caption: row.caption,
     deadline: row.deadline ? new Date(row.deadline) : null,
-    status: row.status as PostStatus,
+    status: (Array.isArray(row.status) ? row.status : [row.status]) as PostStatus[],
     clientLabel: row.client_label as ClientLabel,
     comments,
     tags: row.tags || [],
