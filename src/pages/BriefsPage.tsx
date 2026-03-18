@@ -116,7 +116,7 @@ const BriefsPage = () => {
   const [formPlannedDate, setFormPlannedDate] = useState<Date | undefined>();
   const [formContentType, setFormContentType] = useState("post");
   const [formStatus, setFormStatus] = useState<BriefStatus>("draft");
-  const [formAssignedTo, setFormAssignedTo] = useState("");
+  const [formAssignedTo, setFormAssignedTo] = useState("none");
   const [formInternalNotes, setFormInternalNotes] = useState("");
 
   useEffect(() => {
