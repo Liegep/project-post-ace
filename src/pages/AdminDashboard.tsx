@@ -500,6 +500,14 @@ const AdminDashboard = () => {
                       {new Date(fb.updatedAt).toLocaleDateString("pt-BR")}
                     </span>
                     <button
+                      onClick={(e) => markAsAgendado(fb, e)}
+                      className="shrink-0 inline-flex items-center rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-purple-700 transition-colors"
+                      title="Marcar como Agendado"
+                    >
+                      <CalendarClock className="h-3 w-3 mr-0.5" />
+                      Agendado
+                    </button>
+                    <button
                       onClick={(e) => dismissFeedback(fb.postId, e)}
                       className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                       title="Dispensar"
