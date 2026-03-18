@@ -138,6 +138,7 @@ const AgendaPage = () => {
     setFormDesc("");
     setFormTime("09:00");
     setFormCategory("");
+    setFormRepeat("none");
     setDialogOpen(true);
   };
 
