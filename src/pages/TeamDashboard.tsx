@@ -18,6 +18,13 @@ interface AssignedClient {
   slug: string;
   logo_url: string;
   posting_period: string;
+  instagram_url: string;
+  facebook_url: string;
+  tiktok_url: string;
+  youtube_url: string;
+  linkedin_url: string;
+  twitter_url: string;
+  website_url: string;
 }
 
 interface PostSummary {
