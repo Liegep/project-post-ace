@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { LABEL_CONFIG } from "@/types/post";
-import { CalendarClock, Bell, MessageCircle, Clock, CheckCircle, AlertCircle, FileText, X, CalendarDays } from "lucide-react";
+import { CalendarClock, Bell, MessageCircle, Clock, CheckCircle, AlertCircle, FileText, X, CalendarDays, Instagram, Facebook, Youtube, Linkedin, Twitter, Globe } from "lucide-react";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { toast } from "@/hooks/use-toast";
 import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
@@ -18,6 +18,13 @@ interface AssignedClient {
   slug: string;
   logo_url: string;
   posting_period: string;
+  instagram_url: string;
+  facebook_url: string;
+  tiktok_url: string;
+  youtube_url: string;
+  linkedin_url: string;
+  twitter_url: string;
+  website_url: string;
 }
 
 interface PostSummary {
@@ -125,7 +132,7 @@ const TeamDashboard = () => {
 
     // Fetch clients
     const { data: clientsData } = await supabase.from("clients")
-      .select("id, name, slug, logo_url, posting_period")
+      .select("id, name, slug, logo_url, posting_period, instagram_url, facebook_url, tiktok_url, youtube_url, linkedin_url, twitter_url, website_url")
       .in("id", clientIds);
     setClients((clientsData as AssignedClient[]) || []);
 
@@ -415,7 +422,46 @@ const TeamDashboard = () => {
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-foreground truncate">{client.name}</h3>
+                          <div className="flex items-center gap-1.5">
+                            <h3 className="font-semibold text-foreground truncate">{client.name}</h3>
+                            <div className="flex items-center gap-0.5 shrink-0">
+                              {client.instagram_url && (
+                                <a href={client.instagram_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-pink-500 transition-colors" title="Instagram">
+                                  <Instagram className="h-3.5 w-3.5" />
+                                </a>
+                              )}
+                              {client.facebook_url && (
+                                <a href={client.facebook_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-blue-600 transition-colors" title="Facebook">
+                                  <Facebook className="h-3.5 w-3.5" />
+                                </a>
+                              )}
+                              {client.tiktok_url && (
+                                <a href={client.tiktok_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors" title="TikTok">
+                                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 3.76.92V6.69Z"/></svg>
+                                </a>
+                              )}
+                              {client.youtube_url && (
+                                <a href={client.youtube_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-red-500 transition-colors" title="YouTube">
+                                  <Youtube className="h-3.5 w-3.5" />
+                                </a>
+                              )}
+                              {client.linkedin_url && (
+                                <a href={client.linkedin_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-blue-700 transition-colors" title="LinkedIn">
+                                  <Linkedin className="h-3.5 w-3.5" />
+                                </a>
+                              )}
+                              {client.twitter_url && (
+                                <a href={client.twitter_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors" title="X (Twitter)">
+                                  <Twitter className="h-3.5 w-3.5" />
+                                </a>
+                              )}
+                              {client.website_url && (
+                                <a href={client.website_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-primary transition-colors" title="Website">
+                                  <Globe className="h-3.5 w-3.5" />
+                                </a>
+                              )}
+                            </div>
+                          </div>
                           <p className="text-xs text-muted-foreground">{clientPosts.length} posts</p>
                         </div>
                       </div>
