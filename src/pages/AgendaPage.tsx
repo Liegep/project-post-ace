@@ -30,6 +30,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   tarefa: "bg-accent/20 text-accent-foreground",
   pessoal: "bg-purple-500/20 text-purple-600",
   urgente: "bg-destructive/20 text-destructive",
+  "último post": "bg-blue-600/20 text-blue-600",
 };
 
 const getCategoryStyle = (cat: string) => CATEGORY_COLORS[cat.toLowerCase()] || CATEGORY_COLORS[""];
