@@ -395,7 +395,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, [clientId]);
 
   const unarchivePost = useCallback(async (id: string, columnId?: string | null, clientInitiated?: boolean) => {
-    const updates: Partial<Post> = { archived: false, archivedAt: null, status: "pronto" as PostStatus };
+    const updates: Partial<Post> = { archived: false, archivedAt: null, status: ["pronto"] as PostStatus[] };
     if (columnId !== undefined) updates.columnId = columnId;
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
     const dbUpdates: Record<string, any> = { archived: false, archived_at: null, status: "pronto" };
