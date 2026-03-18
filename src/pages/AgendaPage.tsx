@@ -421,7 +421,7 @@ const DayListView = ({ dates, appointmentsByDate, onToggle, onCancel, onDelete, 
               ) : (
                 <div className="space-y-1.5">
                   {dayAppointments.map(apt => (
-                    <AppointmentCard key={apt.id} appointment={apt} onToggle={onToggle} onDelete={onDelete} />
+                    <AppointmentCard key={apt.id} appointment={apt} onToggle={onToggle} onCancel={onCancel} onDelete={onDelete} />
                   ))}
                 </div>
               )}
