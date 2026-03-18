@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, CalendarDays, Lightbulb, Calendar } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { LABEL_CONFIG } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
@@ -24,6 +24,12 @@ interface Client {
   locale: string;
   posting_period: string;
   created_at: string;
+  instagram_url: string;
+  facebook_url: string;
+  tiktok_url: string;
+  youtube_url: string;
+  linkedin_url: string;
+  twitter_url: string;
 }
 
 interface FeedbackNotification {
@@ -86,6 +92,12 @@ const AdminDashboard = () => {
   const [saving, setSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [facebookUrl, setFacebookUrl] = useState("");
+  const [tiktokUrl, setTiktokUrl] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [twitterUrl, setTwitterUrl] = useState("");
 
 
   useEffect(() => {
@@ -329,6 +341,12 @@ const AdminDashboard = () => {
     setLocale("pt");
     setLogoPreview("");
     setLogoFile(null);
+    setInstagramUrl("");
+    setFacebookUrl("");
+    setTiktokUrl("");
+    setYoutubeUrl("");
+    setLinkedinUrl("");
+    setTwitterUrl("");
     setDialogOpen(true);
   };
 
@@ -339,6 +357,12 @@ const AdminDashboard = () => {
     setLocale(client.locale as Locale);
     setLogoPreview(client.logo_url);
     setLogoFile(null);
+    setInstagramUrl(client.instagram_url || "");
+    setFacebookUrl(client.facebook_url || "");
+    setTiktokUrl(client.tiktok_url || "");
+    setYoutubeUrl(client.youtube_url || "");
+    setLinkedinUrl(client.linkedin_url || "");
+    setTwitterUrl(client.twitter_url || "");
     setDialogOpen(true);
   };
 
@@ -356,12 +380,22 @@ const AdminDashboard = () => {
         logoUrl = data.publicUrl;
       }
 
+      const socialFields = {
+        instagram_url: instagramUrl,
+        facebook_url: facebookUrl,
+        tiktok_url: tiktokUrl,
+        youtube_url: youtubeUrl,
+        linkedin_url: linkedinUrl,
+        twitter_url: twitterUrl,
+      };
+
       if (editingClient) {
         await supabase.from("clients").update({
           name,
           slug,
           locale,
           logo_url: logoUrl,
+          ...socialFields,
         } as any).eq("id", editingClient.id);
       } else {
         await supabase.from("clients").insert({
@@ -369,6 +403,7 @@ const AdminDashboard = () => {
           slug,
           locale,
           logo_url: logoUrl,
+          ...socialFields,
         } as any);
       }
 
@@ -666,7 +701,41 @@ const AdminDashboard = () => {
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground truncate">{client.name}</h3>
+                    <div className="flex items-center gap-1.5">
+                      <h3 className="font-semibold text-foreground truncate">{client.name}</h3>
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        {client.instagram_url && (
+                          <a href={client.instagram_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-pink-500 transition-colors" title="Instagram">
+                            <Instagram className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                        {client.facebook_url && (
+                          <a href={client.facebook_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-blue-600 transition-colors" title="Facebook">
+                            <Facebook className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                        {client.tiktok_url && (
+                          <a href={client.tiktok_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors" title="TikTok">
+                            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 3.76.92V6.69Z"/></svg>
+                          </a>
+                        )}
+                        {client.youtube_url && (
+                          <a href={client.youtube_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-red-500 transition-colors" title="YouTube">
+                            <Youtube className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                        {client.linkedin_url && (
+                          <a href={client.linkedin_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-blue-700 transition-colors" title="LinkedIn">
+                            <Linkedin className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                        {client.twitter_url && (
+                          <a href={client.twitter_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors" title="X (Twitter)">
+                            <Twitter className="h-3.5 w-3.5" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       {LOCALE_FLAGS[client.locale as Locale]} {LOCALE_LABELS[client.locale as Locale]}
                     </p>
@@ -781,6 +850,36 @@ const AdminDashboard = () => {
                   
                 </button>
               )}
+
+            <div>
+              <Label>Redes Sociais</Label>
+              <div className="mt-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Instagram className="h-4 w-4 text-pink-500 shrink-0" />
+                  <Input value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} placeholder="https://instagram.com/..." className="flex-1" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Facebook className="h-4 w-4 text-blue-600 shrink-0" />
+                  <Input value={facebookUrl} onChange={(e) => setFacebookUrl(e.target.value)} placeholder="https://facebook.com/..." className="flex-1" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 3.76.92V6.69Z"/></svg>
+                  <Input value={tiktokUrl} onChange={(e) => setTiktokUrl(e.target.value)} placeholder="https://tiktok.com/@..." className="flex-1" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Youtube className="h-4 w-4 text-red-500 shrink-0" />
+                  <Input value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="https://youtube.com/..." className="flex-1" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Linkedin className="h-4 w-4 text-blue-700 shrink-0" />
+                  <Input value={linkedinUrl} onChange={(e) => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/..." className="flex-1" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Twitter className="h-4 w-4 shrink-0" />
+                  <Input value={twitterUrl} onChange={(e) => setTwitterUrl(e.target.value)} placeholder="https://x.com/..." className="flex-1" />
+                </div>
+              </div>
+            </div>
             </div>
 
             <Button
