@@ -30,6 +30,7 @@ interface Client {
   youtube_url: string;
   linkedin_url: string;
   twitter_url: string;
+  website_url: string;
 }
 
 interface FeedbackNotification {
