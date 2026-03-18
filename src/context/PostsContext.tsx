@@ -14,7 +14,7 @@ interface PostsContextType {
   setPostingPeriod: (period: string) => void;
   setCompanyLogo: (url: string) => void;
   addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date; clientCreated?: boolean }) => Promise<boolean>;
-  updatePostStatus: (id: string, status: PostStatus) => void;
+  updatePostStatus: (id: string, status: PostStatus[]) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
   addComment: (postId: string, author: string, text: string) => void;
   deletePost: (id: string) => void;
