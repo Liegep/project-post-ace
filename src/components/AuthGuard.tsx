@@ -4,43 +4,55 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface AuthGuardProps {
   children: React.ReactNode;
-  allowedRoles?: ("admin" | "team_member" | "client")[];
+  allowedRoles?: ("super_admin" | "admin" | "colaborador" | "client")[];
 }
 
-const AuthGuard = ({ children, allowedRoles = ["admin", "team_member"] }: AuthGuardProps) => {
+const AuthGuard = ({ children, allowedRoles = ["super_admin", "admin"] }: AuthGuardProps) => {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
     const checkAuth = async (userId: string) => {
-      for (const role of allowedRoles) {
-        const { data } = await supabase.rpc("has_role" as any, {
-          _user_id: userId,
-          _role: role,
-        });
-        if (data) {
-          setAuthorized(true);
-          setChecking(false);
-          return;
-        }
+      // Get user roles
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
+
+      const userRoles = (roles || []).map((r: any) => r.role as string);
+
+      // super_admin inherits admin and colaborador access
+      const effectiveRoles = new Set(userRoles);
+      if (effectiveRoles.has("super_admin")) {
+        effectiveRoles.add("admin");
+        effectiveRoles.add("colaborador");
       }
-      // Redirect to appropriate dashboard based on role
-      const { data: isTeam } = await supabase.rpc("has_role" as any, {
-        _user_id: userId,
-        _role: "team_member",
-      });
-      if (isTeam) {
-        navigate("/team");
+      if (effectiveRoles.has("admin")) {
+        effectiveRoles.add("colaborador");
+      }
+
+      // Check if any allowed role matches
+      const hasAccess = allowedRoles.some(r => effectiveRoles.has(r));
+      
+      if (hasAccess) {
+        setAuthorized(true);
+        setChecking(false);
         return;
       }
 
-      const { data: isClientUser } = await supabase.rpc("has_role" as any, {
-        _user_id: userId,
-        _role: "client",
-      });
-      if (isClientUser) {
-        // Redirect client to their own page
+      // Redirect based on actual role
+      if (effectiveRoles.has("admin") || effectiveRoles.has("super_admin")) {
+        navigate("/admin");
+        return;
+      }
+
+      if (effectiveRoles.has("colaborador")) {
+        navigate("/admin");
+        return;
+      }
+
+      if (effectiveRoles.has("client")) {
         const { data: assignments } = await supabase
           .from("user_client_assignments")
           .select("client_id")
@@ -57,10 +69,9 @@ const AuthGuard = ({ children, allowedRoles = ["admin", "team_member"] }: AuthGu
             return;
           }
         }
-        navigate("/login");
-      } else {
-        navigate("/login");
       }
+
+      navigate("/login");
       setChecking(false);
     };
 

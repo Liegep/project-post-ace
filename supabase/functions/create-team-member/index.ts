@@ -77,10 +77,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Assign team_member role
+    // Assign admin (carteira) role
     await supabaseAdmin.from("user_roles").insert({
       user_id: newUser.user.id,
-      role: "team_member",
+      role: "admin",
     });
 
     // Create profile
@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
       id: newUser.user.id,
       full_name,
       email,
-      role: "team_member",
+      role: "admin",
     });
 
     // Assign clients if provided

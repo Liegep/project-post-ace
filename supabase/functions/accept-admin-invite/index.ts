@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const role = invitation.role || "admin";
+    const role = invitation.role || "super_admin";
     const clientIds: string[] = invitation.client_ids || [];
 
     // Create user via admin API
@@ -87,8 +87,8 @@ Deno.serve(async (req) => {
       role,
     });
 
-    // Assign clients for team members
-    if (role === "team_member" && clientIds.length > 0) {
+    // Assign clients for admin de carteira and colaboradores
+    if ((role === "admin" || role === "colaborador") && clientIds.length > 0) {
       const assignments = clientIds.map((client_id: string) => ({
         user_id: newUser.user.id,
         client_id,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type UserRole = "admin" | "team_member" | "client" | null;
+export type UserRole = "super_admin" | "admin" | "colaborador" | "client" | null;
 
 export function useUserRole() {
   const [role, setRole] = useState<UserRole>(null);
@@ -17,31 +17,21 @@ export function useUserRole() {
       }
       setUserId(session.user.id);
 
-      const { data: isAdmin } = await supabase.rpc("has_role" as any, {
-        _user_id: session.user.id,
-        _role: "admin",
-      });
-      if (isAdmin) {
+      // Check roles in priority order
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id);
+
+      const userRoles = (roles || []).map((r: any) => r.role as string);
+
+      if (userRoles.includes("super_admin")) {
+        setRole("super_admin");
+      } else if (userRoles.includes("admin")) {
         setRole("admin");
-        setLoading(false);
-        return;
-      }
-
-      const { data: isTeam } = await supabase.rpc("has_role" as any, {
-        _user_id: session.user.id,
-        _role: "team_member",
-      });
-      if (isTeam) {
-        setRole("team_member");
-        setLoading(false);
-        return;
-      }
-
-      const { data: isClient } = await supabase.rpc("has_role" as any, {
-        _user_id: session.user.id,
-        _role: "client",
-      });
-      if (isClient) {
+      } else if (userRoles.includes("colaborador")) {
+        setRole("colaborador");
+      } else if (userRoles.includes("client")) {
         setRole("client");
       }
       setLoading(false);
@@ -49,5 +39,10 @@ export function useUserRole() {
     check();
   }, []);
 
-  return { role, userId, loading };
+  const isSuperAdmin = role === "super_admin";
+  const isAdmin = role === "admin" || role === "super_admin";
+  const isColaborador = role === "colaborador";
+  const isClient = role === "client";
+
+  return { role, userId, loading, isSuperAdmin, isAdmin, isColaborador, isClient };
 }

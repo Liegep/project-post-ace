@@ -26,11 +26,11 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Check if any admin already exists
+    // Check if any super_admin already exists
     const { data: existingRoles } = await supabaseAdmin
       .from("user_roles")
       .select("id")
-      .eq("role", "admin")
+      .eq("role", "super_admin")
       .limit(1);
 
     if (existingRoles && existingRoles.length > 0) {
@@ -54,10 +54,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Assign admin role
+    // Assign super_admin role
     await supabaseAdmin.from("user_roles").insert({
       user_id: newUser.user.id,
-      role: "admin",
+      role: "super_admin",
     });
 
     return new Response(
