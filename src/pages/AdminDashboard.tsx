@@ -252,8 +252,27 @@ const AdminDashboard = () => {
 
   const fetchClients = async () => {
     setLoading(true);
-    const { data } = await supabase.from("clients").select("*").order("created_at", { ascending: false });
-    setClients((data as Client[]) || []);
+    
+    if (isSuperAdmin) {
+      // Super admin sees all clients
+      const { data } = await supabase.from("clients").select("*").order("created_at", { ascending: false });
+      setClients((data as Client[]) || []);
+    } else if (currentUserId) {
+      // Admin de carteira and colaborador see only assigned clients
+      const { data: assignments } = await supabase
+        .from("user_client_assignments")
+        .select("client_id")
+        .eq("user_id", currentUserId);
+      
+      const clientIds = (assignments || []).map((a: any) => a.client_id);
+      if (clientIds.length > 0) {
+        const { data } = await supabase.from("clients").select("*").in("id", clientIds).order("created_at", { ascending: false });
+        setClients((data as Client[]) || []);
+      } else {
+        setClients([]);
+      }
+    }
+    
     setLoading(false);
   };
 
