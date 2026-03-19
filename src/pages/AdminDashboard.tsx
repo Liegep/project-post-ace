@@ -735,7 +735,7 @@ const AdminDashboard = () => {
       }
 
       setDialogOpen(false);
-      fetchClients();
+      fetchClients().then(() => fetchClientUsers());
     } catch (err) {
       console.error(err);
     } finally {
