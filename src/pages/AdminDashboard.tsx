@@ -179,6 +179,7 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
+    if (role === null && currentUserId === null) return; // still loading
     fetchClients();
     fetchFeedbacks();
     fetchUnarchiveNotifs();
@@ -198,10 +199,17 @@ const AdminDashboard = () => {
         },
         (payload) => {
           const newLabel = (payload.new as any).client_label;
-          const oldLabel = (payload.old as any).client_label;
-          if (newLabel && newLabel !== "pendente" && newLabel !== oldLabel) {
+          if (newLabel && newLabel !== "pendente") {
             playNotificationSound();
             fetchFeedbacks();
+          }
+          if ((payload.new as any).client_unarchived_at && !(payload.old as any).client_unarchived_at) {
+            playNotificationSound();
+            fetchUnarchiveNotifs();
+          }
+          if ((payload.new as any).client_created_at && !(payload.old as any).client_created_at) {
+            playNotificationSound();
+            fetchClientCreatedNotifs();
           }
         }
       )
@@ -210,7 +218,7 @@ const AdminDashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [role, currentUserId]);
 
   const fetchTodayPosts = async () => {
     const today = new Date();
