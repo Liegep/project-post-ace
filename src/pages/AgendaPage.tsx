@@ -338,6 +338,43 @@ const AgendaPage = () => {
                 </button>
               ))}
             </div>
+            {/* Tag selector */}
+            {tags.length > 0 && (
+              <div className="space-y-1.5">
+                <span className="text-xs font-medium text-muted-foreground">Etiqueta</span>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    onClick={() => setFormTagId(null)}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-medium border transition-all",
+                      formTagId === null
+                        ? "ring-2 ring-primary ring-offset-1 bg-muted text-foreground"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    Nenhuma
+                  </button>
+                  {tags.map(tag => (
+                    <button
+                      key={tag.id}
+                      onClick={() => setFormTagId(tag.id)}
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs font-medium border transition-all",
+                        formTagId === tag.id ? "ring-2 ring-offset-1" : "opacity-70 hover:opacity-100"
+                      )}
+                      style={{
+                        backgroundColor: tag.color + "30",
+                        color: tag.color,
+                        borderColor: tag.color + "60",
+                        ...(formTagId === tag.id ? { ringColor: tag.color } : {}),
+                      }}
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             {/* Repeat options */}
             <div className="space-y-1.5">
               <span className="text-xs font-medium text-muted-foreground">Repetir</span>
