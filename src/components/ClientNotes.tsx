@@ -160,12 +160,8 @@ export const ClientNotes = ({ clientId, onCountChange }: ClientNotesProps) => {
   };
 
   return (
-    <div className="mt-8">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <StickyNote className="h-5 w-5 text-amber-500" />
-          <h2 className="text-lg font-bold">{t("clientNotes")}</h2>
-        </div>
+    <div>
+      <div className="flex items-center justify-end mb-4">
         <Button size="sm" onClick={() => setCreateOpen(true)} className="gap-1.5">
           <Plus className="h-4 w-4" />
           {t("newNote")}
