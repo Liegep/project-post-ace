@@ -414,6 +414,7 @@ export type Database = {
         Row: {
           allow_client_create_post: boolean
           allow_client_edit_caption: boolean
+          client_type: string
           created_at: string
           facebook_url: string
           id: string
@@ -439,6 +440,7 @@ export type Database = {
         Insert: {
           allow_client_create_post?: boolean
           allow_client_edit_caption?: boolean
+          client_type?: string
           created_at?: string
           facebook_url?: string
           id?: string
@@ -464,6 +466,7 @@ export type Database = {
         Update: {
           allow_client_create_post?: boolean
           allow_client_edit_caption?: boolean
+          client_type?: string
           created_at?: string
           facebook_url?: string
           id?: string
