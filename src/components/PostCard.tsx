@@ -428,19 +428,21 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
         )}
 
         {!isAdmin && !hideFeedback && (
-          <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
-            <SelectTrigger className="h-9 w-full text-sm font-semibold bg-info text-info-foreground border-info hover:bg-info/90 rounded-lg">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="de_seu_feedback">💬 {t("labelGiveFeedback")}</SelectItem>
-              {(Object.keys(LABEL_KEYS) as ClientLabel[])
-                .filter((key) => key !== "de_seu_feedback")
-                .map((key) => (
-                  <SelectItem key={key} value={key}>{t(LABEL_KEYS[key])}</SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
+          <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
+            <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
+              <SelectTrigger className="h-9 w-full text-sm font-semibold bg-info text-info-foreground border-info hover:bg-info/90 rounded-lg">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="de_seu_feedback">💬 {t("labelGiveFeedback")}</SelectItem>
+                {(Object.keys(LABEL_KEYS) as ClientLabel[])
+                  .filter((key) => key !== "de_seu_feedback")
+                  .map((key) => (
+                    <SelectItem key={key} value={key}>{t(LABEL_KEYS[key])}</SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
         )}
       </div>
 
