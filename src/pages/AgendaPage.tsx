@@ -821,6 +821,8 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreate
                 <div className="mt-1 space-y-0.5">
                   {dayApts.slice(0, 3).map(apt => {
                     const isLastPost = apt.category.toLowerCase() === "último post";
+                    const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
+                    const useTagColor = !apt.completed && !apt.cancelled && !isLastPost && aptTag;
                     return (
                       <div
                         key={apt.id}
@@ -832,8 +834,11 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreate
                               ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 line-through"
                               : isLastPost
                                 ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                                : getCategoryStyle(apt.category)
+                                : useTagColor
+                                  ? ""
+                                  : getCategoryStyle(apt.category)
                         )}
+                        style={useTagColor ? { backgroundColor: aptTag!.color + "25", color: aptTag!.color } : undefined}
                       >
                         <span className="font-mono mr-1">{apt.appointmentTime}</span>
                         {apt.title}
