@@ -44,7 +44,7 @@ interface ClientNotesProps {
   onCountChange?: (count: number) => void;
 }
 
-export const ClientNotes = ({ clientId }: ClientNotesProps) => {
+export const ClientNotes = ({ clientId, onCountChange }: ClientNotesProps) => {
   const { t } = useI18n();
   const [notes, setNotes] = useState<ClientNote[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
