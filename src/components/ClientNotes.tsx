@@ -85,6 +85,7 @@ export const ClientNotes = ({ clientId, onCountChange }: ClientNotesProps) => {
       }))
     );
     setLoading(false);
+    onCountChange?.((data as any[]).length);
   };
 
   useEffect(() => {
