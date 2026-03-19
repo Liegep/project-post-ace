@@ -143,6 +143,7 @@ const AdminDashboard = () => {
   const [clientEmail, setClientEmail] = useState("");
   const [clientPassword, setClientPassword] = useState("");
   const [existingClientUser, setExistingClientUser] = useState<ClientUser | null>(null);
+  const [clientType, setClientType] = useState("standard");
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareClientId, setShareClientId] = useState<string | null>(null);
   const [allAdmins, setAllAdmins] = useState<{ id: string; full_name: string; email: string }[]>([]);
