@@ -181,7 +181,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
     >
       {!isAdmin && hasAlteradoTag && (
         <div className="bg-warning px-3 py-1.5 text-center text-xs font-bold text-warning-foreground">
-          ✏️ {t("tagAltered") || "Alterado"} — {t("readComment") || "Verifique as alterações"}
+          ✏️ {t("tagAltered") || "Alterado"} — Verifique as alterações
         </div>
       )}
       <div className={`p-4 ${isCompact ? "pb-2" : "pb-2"}`}>
