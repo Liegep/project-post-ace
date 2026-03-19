@@ -209,6 +209,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           <ClientBriefs clientId={clientData.id} clientName={clientData.name} />
         </div>
 
+        {/* Upcoming Posts Widget */}
+        <div className="mb-8">
+          <UpcomingPostsWidget posts={[...posts, ...archivedPosts]} />
+        </div>
+
         {clientData.show_archived_to_client && (
           <div className="mb-6 flex items-center justify-center">
             <div className="flex rounded-lg border bg-muted p-1">
