@@ -547,13 +547,15 @@ const DayListView = ({ dates, appointmentsByDate, tags, onToggle, onCancel, onDe
 
 // ── Appointment Card ────────────────────────────────────────────────────────────
 
-const AppointmentCard = ({ appointment: apt, onToggle, onCancel, onDelete }: {
+const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete }: {
   appointment: Appointment;
+  tags: AppointmentTag[];
   onToggle: (id: string, completed: boolean) => void;
   onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
 }) => {
   const [detailOpen, setDetailOpen] = useState(false);
+  const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
   const now = new Date();
   const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
   const isOverdue = !apt.completed && !apt.cancelled && isBefore(aptDateTime, now);
