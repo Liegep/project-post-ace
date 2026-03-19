@@ -751,11 +751,12 @@ const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete 
 interface MonthViewProps {
   currentDate: Date;
   appointmentsByDate: Record<string, Appointment[]>;
+  tags: AppointmentTag[];
   onDayClick: (date: Date) => void;
   onCreateClick: (date: Date) => void;
 }
 
-const MonthView = ({ currentDate, appointmentsByDate, onDayClick, onCreateClick }: MonthViewProps) => {
+const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreateClick }: MonthViewProps) => {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
