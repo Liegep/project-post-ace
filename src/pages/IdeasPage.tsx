@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Plus, ArrowLeft, Trash2, MoreVertical, GripVertical, Pencil } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import UserProfileMenu from "@/components/UserProfileMenu";
+import { MobileNav } from "@/components/MobileNav";
 
 interface IdeaColumn {
   id: string;
@@ -179,24 +180,25 @@ const IdeasPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
-      <header className="border-b bg-card px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+      <header className="border-b bg-card px-4 py-3 md:px-6 md:py-4 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 md:gap-3 min-w-0">
+          <MobileNav title="Ideias" />
+          <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-xl font-bold text-foreground">💡 Ideias de Pauta</h1>
+          <h1 className="text-base md:text-xl font-bold text-foreground truncate">💡 Ideias de Pauta</h1>
         </div>
         <UserProfileMenu />
       </header>
 
       {/* Board */}
-      <div className="p-6 flex gap-4 overflow-x-auto min-h-[calc(100vh-73px)]">
+      <div className="p-4 md:p-6 flex gap-4 overflow-x-auto min-h-[calc(100vh-73px)]">
         {columns.map((col) => {
           const colIdeas = ideas.filter(i => i.column_id === col.id).sort((a, b) => a.position - b.position);
           return (
-            <div key={col.id} className="flex-shrink-0 w-72">
+            <div key={col.id} className="flex-shrink-0 w-64 md:w-72">
               <div className="bg-muted rounded-lg p-3">
                 {/* Column header */}
                 <div className="flex items-center justify-between mb-3">
@@ -268,7 +270,7 @@ const IdeasPage = () => {
         })}
 
         {/* Add column */}
-        <div className="flex-shrink-0 w-72">
+        <div className="flex-shrink-0 w-64 md:w-72">
           {addingCol ? (
             <div className="bg-muted rounded-lg p-3 space-y-2">
               <Input

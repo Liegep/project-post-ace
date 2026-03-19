@@ -10,6 +10,7 @@ import {
   ArrowLeft, ChevronLeft, ChevronRight, Plus, Check, Clock,
   CalendarDays, LayoutGrid, List, Columns3
 } from "lucide-react";
+import { MobileNav } from "@/components/MobileNav";
 import {
   format, startOfMonth, endOfMonth, eachDayOfInterval, getDay,
   addMonths, subMonths, addWeeks, subWeeks, addDays, subDays,
@@ -387,51 +388,51 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
-      <header className="border-b bg-card px-4 py-3 sticky top-0 z-40">
-        <div className="mx-auto max-w-7xl flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+      <header className="border-b bg-card px-3 py-2.5 md:px-4 md:py-3 sticky top-0 z-40">
+        <div className="mx-auto max-w-7xl flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2 md:gap-3">
+            <MobileNav title="Calendário" />
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <CalendarDays className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-bold text-foreground">Calendário de Posts</h1>
+            <CalendarDays className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
+            <h1 className="text-sm md:text-lg font-bold text-foreground truncate">Calendário</h1>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* Nav */}
-            <Button variant="outline" size="sm" onClick={goToToday}>Hoje</Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate_date("prev")}><ChevronLeft className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate_date("next")}><ChevronRight className="h-4 w-4" /></Button>
-            <span className="text-sm font-semibold capitalize min-w-[140px] text-center">{headerLabel}</span>
+          <div className="flex items-center gap-1 md:gap-2 flex-wrap">
+            <Button variant="outline" size="sm" className="text-xs h-7 md:h-8" onClick={goToToday}>Hoje</Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7 md:h-8 md:w-8" onClick={() => navigate_date("prev")}><ChevronLeft className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7 md:h-8 md:w-8" onClick={() => navigate_date("next")}><ChevronRight className="h-4 w-4" /></Button>
+            <span className="text-xs md:text-sm font-semibold capitalize text-center">{headerLabel}</span>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
             {/* View toggle */}
             <div className="flex bg-muted rounded-lg p-0.5">
               {([
                 { mode: "month" as ViewMode, icon: LayoutGrid, label: "Mês" },
-                { mode: "week" as ViewMode, icon: Columns3, label: "Semana" },
+                { mode: "week" as ViewMode, icon: Columns3, label: "Sem" },
                 { mode: "day" as ViewMode, icon: List, label: "Dia" },
               ]).map(({ mode, icon: Icon, label }) => (
                 <button
                   key={mode}
                   onClick={() => setViewMode(mode)}
-                  className={`flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${viewMode === mode ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  className={`flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 text-[11px] md:text-xs font-medium rounded-md transition-colors ${viewMode === mode ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
-                  <Icon className="h-3.5 w-3.5" /> {label}
+                  <Icon className="h-3 w-3 md:h-3.5 md:w-3.5" /> {label}
                 </button>
               ))}
             </div>
 
-            {/* Filters */}
+            {/* Filters - hidden on very small screens, shown on sm+ */}
             <Select value={filterClient} onValueChange={setFilterClient}>
-              <SelectTrigger className="w-[160px] h-8 text-xs">
+              <SelectTrigger className="w-[100px] md:w-[160px] h-7 md:h-8 text-[11px] md:text-xs">
                 <SelectValue placeholder="Cliente" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os clientes</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {clients.map((c) => (
                   <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                 ))}
@@ -439,7 +440,7 @@ export default function CalendarPage() {
             </Select>
 
             <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-[140px] h-8 text-xs">
+              <SelectTrigger className="hidden sm:flex w-[140px] h-7 md:h-8 text-[11px] md:text-xs">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -455,8 +456,8 @@ export default function CalendarPage() {
               </SelectContent>
             </Select>
 
-            <Button size="sm" onClick={() => openCreate()}>
-              <Plus className="mr-1 h-4 w-4" /> Novo Post
+            <Button size="sm" className="h-7 md:h-8 text-xs" onClick={() => openCreate()}>
+              <Plus className="h-4 w-4 md:mr-1" /> <span className="hidden md:inline">Novo</span>
             </Button>
           </div>
         </div>

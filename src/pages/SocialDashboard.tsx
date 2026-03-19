@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,10 +9,10 @@ import { SocialPostCard } from "@/components/social/SocialPostCard";
 import { SocialPostDialog } from "@/components/social/SocialPostDialog";
 import { SocialCalendar, type ScheduledKanbanPost } from "@/components/social/SocialCalendar";
 import { MetaConnectPanel } from "@/components/social/MetaConnectPanel";
+import { MobileNav } from "@/components/MobileNav";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Plus, CalendarDays, List, ArrowLeft, Facebook, Instagram, Settings, FileText, CheckCircle, Clock, Send, AlertTriangle, LogOut } from "lucide-react";
-import { useEffect } from "react";
 
 interface Client {
   id: string;
@@ -154,43 +154,45 @@ export default function SocialDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
-      <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+      <header className="border-b bg-card px-4 py-3 md:px-6 md:py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <MobileNav title="Social" />
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div>
-              <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-                <CalendarDays className="h-5 w-5 text-primary" />
-                Agendamento Social
+            <div className="min-w-0">
+              <h1 className="text-base md:text-xl font-bold text-foreground flex items-center gap-2 truncate">
+                <CalendarDays className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
+                <span className="truncate">Agendamento Social</span>
               </h1>
-              <p className="text-sm text-muted-foreground">Gerencie e agende posts para Facebook e Instagram</p>
+              <p className="text-xs text-muted-foreground hidden sm:block">Gerencie e agende posts para Facebook e Instagram</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
             <Select value={selectedClientId} onValueChange={setSelectedClientId}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Selecionar cliente" />
+              <SelectTrigger className="w-[120px] md:w-[200px] text-xs md:text-sm">
+                <SelectValue placeholder="Cliente" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os clientes</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 {clients.map((c) => (
                   <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Button variant="outline" size="icon" onClick={() => setShowSettings(!showSettings)} title="Configurar Contas">
+            <Button variant="outline" size="icon" className="h-8 w-8 md:h-9 md:w-9" onClick={() => setShowSettings(!showSettings)} title="Configurar Contas">
               <Settings className="h-4 w-4" />
             </Button>
-            <Button onClick={() => { setEditingPost(null); setDialogOpen(true); }}>
-              <Plus className="mr-2 h-4 w-4" /> Novo Post
+            <Button size="sm" onClick={() => { setEditingPost(null); setDialogOpen(true); }}>
+              <Plus className="h-4 w-4 md:mr-2" /> <span className="hidden md:inline">Novo Post</span>
             </Button>
             <Button
               variant="ghost"
               size="icon"
+              className="hidden md:inline-flex"
               onClick={async () => {
                 await supabase.auth.signOut();
                 navigate("/login");
@@ -203,14 +205,14 @@ export default function SocialDashboard() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl p-6 space-y-6">
+      <main className="mx-auto max-w-6xl p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Meta accounts panel */}
         {showSettings && selectedClientId && (
           <MetaConnectPanel clientId={selectedClientId} pages={pages} onRefresh={fetchPages} />
         )}
 
         {/* Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-3">
           {[
             { label: "Total", value: metrics.total, color: "text-foreground" },
             { label: "Rascunhos", value: metrics.draft, color: "text-muted-foreground" },
@@ -218,23 +220,23 @@ export default function SocialDashboard() {
             { label: "Publicados", value: metrics.published, color: "text-success" },
             { label: "Erros", value: metrics.errors, color: "text-destructive" },
           ].map((m) => (
-            <Card key={m.label}>
-              <CardContent className="p-4 text-center">
-                <p className={`text-2xl font-bold ${m.color}`}>{m.value}</p>
-                <p className="text-xs text-muted-foreground">{m.label}</p>
+            <Card key={m.label} className={m.label === "Total" || m.label === "Erros" ? "col-span-1" : ""}>
+              <CardContent className="p-3 md:p-4 text-center">
+                <p className={`text-lg md:text-2xl font-bold ${m.color}`}>{m.value}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground">{m.label}</p>
               </CardContent>
             </Card>
           ))}
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-3 items-center">
-          <div className="flex gap-1 bg-muted rounded-lg p-1">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2 md:gap-3 items-start sm:items-center overflow-x-auto">
+          <div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto max-w-full">
             {STATUS_FILTERS.map((f) => (
               <button
                 key={f.value}
                 onClick={() => setStatusFilter(f.value)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                   statusFilter === f.value ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -245,21 +247,21 @@ export default function SocialDashboard() {
           <div className="flex gap-1 bg-muted rounded-lg p-1">
             <button
               onClick={() => setPlatformFilter("all")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${platformFilter === "all" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+              className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-medium rounded-md transition-colors ${platformFilter === "all" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
               Todos
             </button>
             <button
               onClick={() => setPlatformFilter("facebook")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors flex items-center gap-1 ${platformFilter === "facebook" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+              className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-medium rounded-md transition-colors flex items-center gap-1 ${platformFilter === "facebook" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
-              <Facebook className="h-3 w-3" /> Facebook
+              <Facebook className="h-3 w-3" /> <span className="hidden sm:inline">Facebook</span>
             </button>
             <button
               onClick={() => setPlatformFilter("instagram")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors flex items-center gap-1 ${platformFilter === "instagram" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+              className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-medium rounded-md transition-colors flex items-center gap-1 ${platformFilter === "instagram" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
-              <Instagram className="h-3 w-3" /> Instagram
+              <Instagram className="h-3 w-3" /> <span className="hidden sm:inline">Instagram</span>
             </button>
           </div>
         </div>

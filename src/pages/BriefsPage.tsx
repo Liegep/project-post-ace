@@ -21,6 +21,7 @@ import {
   ArrowLeft, Plus, CalendarIcon, Copy, Eye, EyeOff, Send, Check, X,
   Filter, Search, Pencil, MessageCircle, Paperclip, FileText, Trash2
 } from "lucide-react";
+import { MobileNav } from "@/components/MobileNav";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 type BriefStatus = "draft" | "internal" | "pending_approval" | "approved" | "rejected" | "published";
@@ -339,16 +340,17 @@ const BriefsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
+        <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 md:gap-3 px-3 md:px-4">
+          <MobileNav title="Pautas" />
+          <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/admin")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-bold">Pautas</h1>
+          <div className="flex items-center gap-2 min-w-0">
+            <FileText className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
+            <h1 className="text-base md:text-lg font-bold truncate">Pautas</h1>
           </div>
           <div className="ml-auto flex items-center gap-2">
             <LanguageSelector />
@@ -357,49 +359,49 @@ const BriefsPage = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl p-4 space-y-4">
+      <main className="mx-auto max-w-7xl p-3 md:p-4 space-y-4">
         {/* Actions + search */}
-        <div className="flex flex-wrap items-center gap-3">
-          <Button onClick={openCreate} className="gap-1.5">
-            <Plus className="h-4 w-4" /> Nova Pauta
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+          <Button onClick={openCreate} size="sm" className="gap-1.5">
+            <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Nova Pauta</span><span className="sm:hidden">Nova</span>
           </Button>
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <div className="relative flex-1 min-w-[140px] max-w-sm">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar pautas..."
+              placeholder="Buscar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 h-8 md:h-9 text-sm"
             />
           </div>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
+        <div className="flex flex-wrap items-center gap-1.5 md:gap-2 overflow-x-auto">
+          <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
           <Select value={filterClient} onValueChange={setFilterClient}>
-            <SelectTrigger className="w-[160px] h-8 text-xs"><SelectValue placeholder="Cliente" /></SelectTrigger>
+            <SelectTrigger className="w-[120px] md:w-[160px] h-7 md:h-8 text-[11px] md:text-xs"><SelectValue placeholder="Cliente" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os clientes</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
               {clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-[170px] h-8 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
+            <SelectTrigger className="w-[120px] md:w-[170px] h-7 md:h-8 text-[11px] md:text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os status</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
               {Object.entries(STATUS_CONFIG).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue placeholder="Tipo" /></SelectTrigger>
+            <SelectTrigger className="hidden sm:flex w-[140px] h-7 md:h-8 text-[11px] md:text-xs"><SelectValue placeholder="Tipo" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os tipos</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
               {CONTENT_TYPES.map((ct) => <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={filterAssigned} onValueChange={setFilterAssigned}>
-            <SelectTrigger className="w-[160px] h-8 text-xs"><SelectValue placeholder="Responsável" /></SelectTrigger>
+            <SelectTrigger className="hidden sm:flex w-[160px] h-7 md:h-8 text-[11px] md:text-xs"><SelectValue placeholder="Responsável" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
               {teamMembers.map((m) => <SelectItem key={m.id} value={m.id}>{m.full_name || m.email}</SelectItem>)}

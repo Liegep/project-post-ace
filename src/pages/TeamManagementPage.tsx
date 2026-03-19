@@ -10,9 +10,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { ArrowLeft, Plus, Users, Pencil, Trash2, Shield, UserCheck, Eye, Link2 } from "lucide-react";
+import { MobileNav } from "@/components/MobileNav";
+import { ArrowLeft, Plus, Users, Pencil, Trash2, Shield, UserCheck, Eye, Link2, MoreVertical } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface TeamMember {
   id: string;
@@ -255,29 +257,30 @@ const TeamManagementPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+      <header className="border-b bg-card px-4 py-3 md:px-6 md:py-4">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-2">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <MobileNav title="Equipe" />
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-                <Users className="h-6 w-6" /> {t("teamManagement")}
+            <div className="min-w-0">
+              <h1 className="text-lg md:text-2xl font-bold text-foreground flex items-center gap-2 truncate">
+                <Users className="h-5 w-5 md:h-6 md:w-6 shrink-0" /> {t("teamManagement")}
               </h1>
-              <p className="text-sm text-muted-foreground">{t("manageTeamMembers")}</p>
+              <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">{t("manageTeamMembers")}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 shrink-0">
             <LanguageSelector />
-            <Button onClick={() => setCreateOpen(true)} className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Plus className="mr-2 h-4 w-4" /> {t("newMember")}
+            <Button onClick={() => setCreateOpen(true)} size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <Plus className="h-4 w-4 md:mr-2" /> <span className="hidden md:inline">{t("newMember")}</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl p-6">
+      <main className="mx-auto max-w-5xl p-4 md:p-6">
         {/* Role filter */}
         <div className="mb-6 flex flex-wrap gap-2">
           {[
@@ -327,51 +330,75 @@ const TeamManagementPage = () => {
               const memberClients = getMemberClients(member.id);
               const memberRole = getUserRole(member.id);
               return (
-                <div key={member.id} className="rounded-xl border bg-card p-5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-foreground">{member.full_name}</h3>
-                          <RoleBadge role={memberRole} />
-                        </div>
-                        <p className="text-sm text-muted-foreground">{member.email}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {isSuperAdmin && (
-                        <Button variant="outline" size="sm" onClick={() => openRoleDialog(member)}>
-                          <Shield className="mr-1 h-3.5 w-3.5" /> Papel
-                        </Button>
-                      )}
-                      <Button variant="outline" size="sm" onClick={() => openAssign(member)}>
-                        {memberRole === "client" ? (
-                          <><Link2 className="mr-1 h-3.5 w-3.5" /> Vincular ao cliente</>
-                        ) : (
-                          <><Pencil className="mr-1 h-3.5 w-3.5" /> {t("assignClients")}</>
-                        )}
-                      </Button>
-                      {isSuperAdmin && (
-                        <Button variant="outline" size="sm" onClick={() => handleDeleteMember(member)} className="text-destructive hover:text-destructive">
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                  {memberClients.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {memberClients.map(c => (
-                        <span key={c.id} className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                          {c.logo_url && <img src={c.logo_url} className="h-4 w-4 rounded-full object-contain" alt="" />}
-                          {c.name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  {memberClients.length === 0 && memberRole !== "super_admin" && (
-                    <p className="mt-2 text-xs text-muted-foreground italic">{t("noClientsAssigned")}</p>
-                  )}
-                </div>
+                <div key={member.id} className="rounded-xl border bg-card p-4 md:p-5">
+                   <div className="flex items-start justify-between gap-2">
+                     <div className="min-w-0 flex-1">
+                       <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                         <h3 className="font-semibold text-foreground text-sm md:text-base truncate">{member.full_name}</h3>
+                         <RoleBadge role={memberRole} />
+                       </div>
+                       <p className="text-xs md:text-sm text-muted-foreground truncate">{member.email}</p>
+                     </div>
+                     {/* Desktop actions */}
+                     <div className="hidden md:flex items-center gap-2 shrink-0">
+                       {isSuperAdmin && (
+                         <Button variant="outline" size="sm" onClick={() => openRoleDialog(member)}>
+                           <Shield className="mr-1 h-3.5 w-3.5" /> Papel
+                         </Button>
+                       )}
+                       <Button variant="outline" size="sm" onClick={() => openAssign(member)}>
+                         {memberRole === "client" ? (
+                           <><Link2 className="mr-1 h-3.5 w-3.5" /> Vincular</>
+                         ) : (
+                           <><Pencil className="mr-1 h-3.5 w-3.5" /> {t("assignClients")}</>
+                         )}
+                       </Button>
+                       {isSuperAdmin && (
+                         <Button variant="outline" size="sm" onClick={() => handleDeleteMember(member)} className="text-destructive hover:text-destructive">
+                           <Trash2 className="h-3.5 w-3.5" />
+                         </Button>
+                       )}
+                     </div>
+                     {/* Mobile actions dropdown */}
+                     <div className="md:hidden shrink-0">
+                       <DropdownMenu>
+                         <DropdownMenuTrigger asChild>
+                           <Button variant="ghost" size="icon" className="h-8 w-8">
+                             <MoreVertical className="h-4 w-4" />
+                           </Button>
+                         </DropdownMenuTrigger>
+                         <DropdownMenuContent align="end">
+                           {isSuperAdmin && (
+                             <DropdownMenuItem onClick={() => openRoleDialog(member)}>
+                               <Shield className="mr-2 h-4 w-4" /> Alterar papel
+                             </DropdownMenuItem>
+                           )}
+                           <DropdownMenuItem onClick={() => openAssign(member)}>
+                             <Pencil className="mr-2 h-4 w-4" /> {memberRole === "client" ? "Vincular ao cliente" : t("assignClients")}
+                           </DropdownMenuItem>
+                           {isSuperAdmin && (
+                             <DropdownMenuItem onClick={() => handleDeleteMember(member)} className="text-destructive">
+                               <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                             </DropdownMenuItem>
+                           )}
+                         </DropdownMenuContent>
+                       </DropdownMenu>
+                     </div>
+                   </div>
+                   {memberClients.length > 0 && (
+                     <div className="mt-3 flex flex-wrap gap-1.5">
+                       {memberClients.map(c => (
+                         <span key={c.id} className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
+                           {c.logo_url && <img src={c.logo_url} className="h-3.5 w-3.5 rounded-full object-contain" alt="" />}
+                           {c.name}
+                         </span>
+                       ))}
+                     </div>
+                   )}
+                   {memberClients.length === 0 && memberRole !== "super_admin" && (
+                     <p className="mt-2 text-xs text-muted-foreground italic">{t("noClientsAssigned")}</p>
+                   )}
+                 </div>
               );
             })}
           </div>
