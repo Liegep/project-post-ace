@@ -308,11 +308,42 @@ const AdminDashboard = () => {
   };
 
   const fetchFeedbacks = async () => {
+    if (!currentUserId) return;
+
+    // Get allowed client IDs (owned + assigned + shared)
+    const { data: assignments } = await supabase
+      .from("user_client_assignments")
+      .select("client_id")
+      .eq("user_id", currentUserId);
+    const assignedIds = (assignments || []).map((a: any) => a.client_id);
+
+    const { data: ownedClients } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("owner_id", currentUserId);
+    const ownedIds = (ownedClients || []).map((c: any) => c.id);
+
+    let sharedIds: string[] = [];
+    if (isSuperAdmin) {
+      const { data: sharedClients } = await supabase
+        .from("clients")
+        .select("id")
+        .eq("shared", true);
+      sharedIds = (sharedClients || []).map((c: any) => c.id);
+    }
+
+    const allowedIds = [...new Set([...assignedIds, ...ownedIds, ...sharedIds])];
+    if (allowedIds.length === 0) {
+      setFeedbacks([]);
+      return;
+    }
+
     // Fetch posts where client gave feedback (label != pendente)
     const { data: posts } = await supabase
       .from("posts")
       .select("id, title, client_label, client_id, updated_at, deadline, image_url, media_urls")
       .neq("client_label", "pendente")
+      .in("client_id", allowedIds)
       .order("updated_at", { ascending: false });
 
     if (!posts || posts.length === 0) {
