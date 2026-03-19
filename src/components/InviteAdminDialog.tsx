@@ -89,7 +89,7 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
           body: {
             email,
             role,
-            client_ids: role === "team_member" ? Array.from(selectedClientIds) : [],
+            client_ids: (role === "admin" || role === "colaborador") ? Array.from(selectedClientIds) : [],
           },
         }
       );
