@@ -97,6 +97,7 @@ interface TodayPost {
 const AdminDashboard = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
+  const { role, userId: currentUserId, isSuperAdmin, isAdmin } = useUserRole();
   const [clients, setClients] = useState<Client[]>([]);
   const [feedbacks, setFeedbacks] = useState<FeedbackNotification[]>([]);
   const [unarchiveNotifs, setUnarchiveNotifs] = useState<UnarchiveNotification[]>([]);
