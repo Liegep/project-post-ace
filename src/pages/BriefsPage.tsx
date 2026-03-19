@@ -340,16 +340,17 @@ const BriefsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
+        <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 md:gap-3 px-3 md:px-4">
+          <MobileNav title="Pautas" />
+          <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/admin")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-bold">Pautas</h1>
+          <div className="flex items-center gap-2 min-w-0">
+            <FileText className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
+            <h1 className="text-base md:text-lg font-bold truncate">Pautas</h1>
           </div>
           <div className="ml-auto flex items-center gap-2">
             <LanguageSelector />
