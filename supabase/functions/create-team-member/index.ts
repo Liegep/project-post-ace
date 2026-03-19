@@ -102,13 +102,13 @@ Deno.serve(async (req) => {
 
     // Assign admin (carteira) role
     await supabaseAdmin.from("user_roles").insert({
-      user_id: newUser.user.id,
+      user_id: targetUserId,
       role: "admin",
     });
 
     // Create profile
-    await supabaseAdmin.from("profiles").insert({
-      id: newUser.user.id,
+    await supabaseAdmin.from("profiles").upsert({
+      id: targetUserId,
       full_name,
       email,
       role: "admin",
@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
     // Assign clients if provided
     if (client_ids && Array.isArray(client_ids) && client_ids.length > 0) {
       const assignments = client_ids.map((client_id: string) => ({
-        user_id: newUser.user.id,
+        user_id: targetUserId,
         client_id,
         assigned_by: userId,
       }));
@@ -125,7 +125,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, user_id: newUser.user.id }),
+      JSON.stringify({ success: true, user_id: targetUserId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
