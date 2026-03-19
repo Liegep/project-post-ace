@@ -1190,18 +1190,32 @@ const AdminDashboard = () => {
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     )}
-                    {/* Share with super admin button (for admin de carteira) */}
-                    {!isSuperAdmin && client.owner_id === currentUserId && !client.shared && (
+                    {/* Share button - for client owners */}
+                    {(isSuperAdmin || client.owner_id === currentUserId) && (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={async (e) => {
                           e.stopPropagation();
-                          await supabase.from("clients").update({ shared: true } as any).eq("id", client.id);
-                          setClients(prev => prev.map(c => c.id === client.id ? { ...c, shared: true } : c));
-                          toast({ title: "Cliente compartilhado", description: "O Super Admin agora pode visualizar este cliente." });
+                          setShareClientId(client.id);
+                          // Fetch all admin/colaborador users to share with
+                          const { data: profiles } = await supabase.from("profiles").select("id, full_name, email");
+                          const { data: roles } = await supabase.from("user_roles").select("user_id, role");
+                          const adminUsers = (profiles || []).filter(p => {
+                            const userRole = (roles || []).find((r: any) => r.user_id === p.id);
+                            return userRole && ["super_admin", "admin", "colaborador"].includes(userRole.role) && p.id !== currentUserId;
+                          });
+                          setAllAdmins(adminUsers);
+                          // Fetch existing assignments for this client
+                          const { data: existingAssignments } = await supabase
+                            .from("user_client_assignments")
+                            .select("user_id, client_id")
+                            .eq("client_id", client.id);
+                          const assigned = new Set((existingAssignments || []).map((a: any) => a.user_id));
+                          setShareSelectedUsers(assigned);
+                          setShareDialogOpen(true);
                         }}
-                        title="Compartilhar com Super Admin"
+                        title="Compartilhar cliente"
                       >
                         <Share2 className="h-3.5 w-3.5" />
                       </Button>
