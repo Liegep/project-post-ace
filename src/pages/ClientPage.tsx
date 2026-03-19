@@ -131,29 +131,29 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               <p className="text-sm text-muted-foreground">{t("clientSubtitle")}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setPasswordOpen(true)}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <KeyRound className="mr-1.5 h-4 w-4" />
-              Alterar senha
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={async () => {
-                await supabase.auth.signOut();
-                window.location.href = "/login";
-              }}
-              className="text-muted-foreground hover:text-destructive"
-            >
-              <LogOut className="mr-1.5 h-4 w-4" />
-              Sair
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-muted-foreground">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setPasswordOpen(true)}>
+                <KeyRound className="mr-2 h-4 w-4" />
+                Alterar senha
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  window.location.href = "/login";
+                }}
+                className="text-destructive focus:text-destructive"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sair
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
             <DialogContent className="sm:max-w-md">
