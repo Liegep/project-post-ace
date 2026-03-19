@@ -649,13 +649,26 @@ const AdminDashboard = () => {
             <p className="text-sm text-muted-foreground">{t("selectOrCreateClient")}</p>
           </div>
           <div className="flex items-center gap-3">
+            {role && (
+              <span className={cn(
+                "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                isSuperAdmin ? "bg-amber-500/15 text-amber-600" : "bg-blue-500/15 text-blue-600"
+              )}>
+                <Shield className="h-3 w-3" />
+                {isSuperAdmin ? "Super Admin" : role === "admin" ? "Admin" : "Colaborador"}
+              </span>
+            )}
             <LanguageSelector />
-            <Button variant="outline" size="sm" onClick={() => navigate("/team-management")}>
-              <Users className="mr-1 h-4 w-4" /> {t("team")}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => navigate("/social")}>
-              <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
-            </Button>
+            {isSuperAdmin && (
+              <Button variant="outline" size="sm" onClick={() => navigate("/team-management")}>
+                <Users className="mr-1 h-4 w-4" /> {t("team")}
+              </Button>
+            )}
+            {isSuperAdmin && (
+              <Button variant="outline" size="sm" onClick={() => navigate("/social")}>
+                <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
+              </Button>
+            )}
             <Button variant="ghost" size="icon" onClick={() => navigate("/ideas")} title="Ideias de Pauta">
               <Lightbulb className="h-5 w-5" />
             </Button>
@@ -665,9 +678,11 @@ const AdminDashboard = () => {
             <Button variant="ghost" size="icon" onClick={() => navigate("/briefs")} title="Pautas">
               <FileText className="h-5 w-5" />
             </Button>
-            <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Plus className="mr-2 h-4 w-4" /> {t("newClient")}
-            </Button>
+            {isSuperAdmin && (
+              <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
+                <Plus className="mr-2 h-4 w-4" /> {t("newClient")}
+              </Button>
+            )}
             <UserProfileMenu />
           </div>
         </div>
