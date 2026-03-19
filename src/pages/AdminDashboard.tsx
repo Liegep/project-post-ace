@@ -1028,74 +1028,82 @@ const AdminDashboard = () => {
                   <div
                     key={fb.postId}
                     onClick={() => navigate(`/admin/${fb.clientSlug}`)}
-                    className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5 cursor-pointer hover:bg-muted transition-colors"
+                    className="rounded-lg bg-muted/50 px-3 py-2.5 cursor-pointer hover:bg-muted transition-colors"
                   >
-                    {fb.clientLogo ? (
-                      <img src={fb.clientLogo} alt={fb.clientName} className="h-7 w-7 rounded-full object-contain border shrink-0" />
-                    ) : (
-                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted border shrink-0">
-                        <span className="text-xs font-bold text-muted-foreground">{fb.clientName.charAt(0).toUpperCase()}</span>
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <HoverCard openDelay={200} closeDelay={100}>
-                        <HoverCardTrigger asChild>
-                          <p className="text-sm font-medium text-foreground truncate cursor-pointer hover:underline">{fb.postTitle}</p>
-                        </HoverCardTrigger>
-                        <HoverCardContent side="top" className="w-72 p-2" onClick={(e) => e.stopPropagation()}>
-                          {(() => {
-                            const previewUrls = fb.mediaUrls.length > 0 ? fb.mediaUrls : fb.imageUrl ? [fb.imageUrl] : [];
-                            return previewUrls.length > 0 ? (
-                              <div className="space-y-2">
-                                <p className="text-xs font-semibold text-foreground truncate">{fb.postTitle}</p>
-                                <div className={cn("grid gap-1", previewUrls.length > 1 ? "grid-cols-2" : "grid-cols-1")}>
-                                  {previewUrls.slice(0, 4).map((url, i) => (
-                                    <img key={i} src={url} alt={`${fb.postTitle} ${i + 1}`} className="w-full rounded-md object-cover aspect-square" />
-                                  ))}
+                    <div className="flex items-center gap-3">
+                      {fb.clientLogo ? (
+                        <img src={fb.clientLogo} alt={fb.clientName} className="h-7 w-7 rounded-full object-contain border shrink-0" />
+                      ) : (
+                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted border shrink-0">
+                          <span className="text-xs font-bold text-muted-foreground">{fb.clientName.charAt(0).toUpperCase()}</span>
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <HoverCard openDelay={200} closeDelay={100}>
+                          <HoverCardTrigger asChild>
+                            <p className="text-sm font-medium text-foreground truncate cursor-pointer hover:underline">{fb.postTitle}</p>
+                          </HoverCardTrigger>
+                          <HoverCardContent side="top" className="w-72 p-2" onClick={(e) => e.stopPropagation()}>
+                            {(() => {
+                              const previewUrls = fb.mediaUrls.length > 0 ? fb.mediaUrls : fb.imageUrl ? [fb.imageUrl] : [];
+                              return previewUrls.length > 0 ? (
+                                <div className="space-y-2">
+                                  <p className="text-xs font-semibold text-foreground truncate">{fb.postTitle}</p>
+                                  <div className={cn("grid gap-1", previewUrls.length > 1 ? "grid-cols-2" : "grid-cols-1")}>
+                                    {previewUrls.slice(0, 4).map((url, i) => (
+                                      <img key={i} src={url} alt={`${fb.postTitle} ${i + 1}`} className="w-full rounded-md object-cover aspect-square" />
+                                    ))}
+                                  </div>
+                                  {previewUrls.length > 4 && (
+                                    <p className="text-[10px] text-muted-foreground text-center">+{previewUrls.length - 4} mais</p>
+                                  )}
                                 </div>
-                                {previewUrls.length > 4 && (
-                                  <p className="text-[10px] text-muted-foreground text-center">+{previewUrls.length - 4} mais</p>
-                                )}
-                              </div>
-                            ) : (
-                              <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
-                                Sem mídia
-                              </div>
-                            );
-                          })()}
-                        </HoverCardContent>
-                      </HoverCard>
-                      <p className="text-xs text-muted-foreground">{fb.clientName}</p>
+                              ) : (
+                                <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
+                                  Sem mídia
+                                </div>
+                              );
+                            })()}
+                          </HoverCardContent>
+                        </HoverCard>
+                        <p className="text-xs text-muted-foreground">{fb.clientName}</p>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground shrink-0 hidden sm:inline">
+                        {new Date(fb.updatedAt).toLocaleDateString("pt-BR")}
+                      </span>
                     </div>
-                    {labelConfig && (
-                      <span className={`shrink-0 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
-                        {labelConfig.label}
+                    <div className="flex items-center gap-1.5 mt-2 ml-10 flex-wrap">
+                      {labelConfig && (
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
+                          {labelConfig.label}
+                        </span>
+                      )}
+                      {fb.deadline && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2 py-0.5 text-[10px] font-semibold text-blue-600">
+                          <CalendarClock className="h-3 w-3" />
+                          {new Date(fb.deadline).toLocaleDateString("pt-BR")}
+                        </span>
+                      )}
+                      <span className="text-[10px] text-muted-foreground sm:hidden">
+                        {new Date(fb.updatedAt).toLocaleDateString("pt-BR")}
                       </span>
-                    )}
-                    {fb.deadline && (
-                      <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-2 py-0.5 text-[10px] font-semibold text-blue-600">
-                        <CalendarClock className="h-3 w-3" />
-                        {new Date(fb.deadline).toLocaleDateString("pt-BR")}
-                      </span>
-                    )}
-                    <span className="text-[10px] text-muted-foreground shrink-0">
-                      {new Date(fb.updatedAt).toLocaleDateString("pt-BR")}
-                    </span>
-                    <button
-                      onClick={(e) => markAsAgendado(fb, e)}
-                      className="shrink-0 inline-flex items-center rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-purple-700 transition-colors"
-                      title="Marcar como Agendado"
-                    >
-                      <CalendarClock className="h-3 w-3 mr-0.5" />
-                      Agendado
-                    </button>
-                    <button
-                      onClick={(e) => dismissFeedback(fb.postId, e)}
-                      className="shrink-0 rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-                      title="Dispensar"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
+                      <div className="flex-1" />
+                      <button
+                        onClick={(e) => markAsAgendado(fb, e)}
+                        className="inline-flex items-center rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-purple-700 transition-colors"
+                        title="Marcar como Agendado"
+                      >
+                        <CalendarClock className="h-3 w-3 mr-0.5" />
+                        Agendado
+                      </button>
+                      <button
+                        onClick={(e) => dismissFeedback(fb.postId, e)}
+                        className="rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                        title="Dispensar"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
                 );
               })}
