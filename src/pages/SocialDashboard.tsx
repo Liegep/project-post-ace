@@ -212,7 +212,7 @@ export default function SocialDashboard() {
         )}
 
         {/* Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-3">
           {[
             { label: "Total", value: metrics.total, color: "text-foreground" },
             { label: "Rascunhos", value: metrics.draft, color: "text-muted-foreground" },
