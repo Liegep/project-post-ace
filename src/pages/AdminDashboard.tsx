@@ -1182,106 +1182,104 @@ const AdminDashboard = () => {
                 .map((client) => (
                 <div
                   key={client.id}
-                  className="group relative flex flex-col rounded-xl border bg-card p-5 transition-shadow hover:shadow-lg"
+                  className="group relative flex flex-col rounded-xl border bg-card p-5 transition-all hover:shadow-lg hover:border-primary/20"
                 >
-                  {/* Owner/Shared badges */}
-                  <div className="absolute top-2 right-2 flex items-center gap-1">
+                  {/* Top badges row */}
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                    {/* Client type badge */}
+                    {(() => {
+                      const typeConfig = CLIENT_TYPE_CONFIG[client.client_type] || CLIENT_TYPE_CONFIG.standard;
+                      return (
+                        <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold", typeConfig.color)}>
+                          {typeConfig.label}
+                        </span>
+                      );
+                    })()}
                     {client.owner_id === currentUserId && (
                       <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-amber-600" title="Você é o dono">
-                        <Shield className="h-2.5 w-2.5" /> Dono
+                        <Shield className="h-2.5 w-2.5" />
                       </span>
                     )}
-                    {client.shared ? (
+                    {client.shared && (
                       <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600" title="Compartilhado">
                         <Share2 className="h-2.5 w-2.5" />
-                      </span>
-                    ) : client.owner_id && client.owner_id !== currentUserId ? null : (
-                      <span className="inline-flex items-center gap-0.5 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground" title="Privado">
-                        <Lock className="h-2.5 w-2.5" />
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-3 mb-3">
+                  {/* Client info */}
+                  <div className="flex items-center gap-3 mb-4">
                     {client.logo_url ? (
-                      <img src={client.logo_url} alt={client.name} className="h-12 w-12 rounded-lg object-contain border" />
+                      <img src={client.logo_url} alt={client.name} className="h-12 w-12 rounded-xl object-contain border bg-background" />
                     ) : (
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/20 bg-muted">
                         <span className="text-lg font-bold text-muted-foreground">
                           {client.name.charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <h3 className="font-semibold text-foreground truncate">{client.name}</h3>
-                        <div className="flex items-center gap-0.5 shrink-0">
-                          {client.instagram_url && (
-                            <a href={client.instagram_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-pink-500 transition-colors" title="Instagram">
-                              <Instagram className="h-3.5 w-3.5" />
-                            </a>
-                          )}
-                          {client.facebook_url && (
-                            <a href={client.facebook_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-blue-600 transition-colors" title="Facebook">
-                              <Facebook className="h-3.5 w-3.5" />
-                            </a>
-                          )}
-                          {client.tiktok_url && (
-                            <a href={client.tiktok_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors" title="TikTok">
-                              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 3.76.92V6.69Z"/></svg>
-                            </a>
-                          )}
-                          {client.youtube_url && (
-                            <a href={client.youtube_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-red-500 transition-colors" title="YouTube">
-                              <Youtube className="h-3.5 w-3.5" />
-                            </a>
-                          )}
-                          {client.linkedin_url && (
-                            <a href={client.linkedin_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-blue-700 transition-colors" title="LinkedIn">
-                              <Linkedin className="h-3.5 w-3.5" />
-                            </a>
-                          )}
-                          {client.twitter_url && (
-                            <a href={client.twitter_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors" title="X (Twitter)">
-                              <Twitter className="h-3.5 w-3.5" />
-                            </a>
-                          )}
-                          {client.website_url && (
-                            <a href={client.website_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-primary transition-colors" title="Website">
-                              <Globe className="h-3.5 w-3.5" />
-                            </a>
-                          )}
-                        </div>
+                      <h3 className="font-semibold text-foreground truncate text-base">{client.name}</h3>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <span className="text-xs text-muted-foreground">
+                          {LOCALE_FLAGS[client.locale as Locale]} {LOCALE_LABELS[client.locale as Locale]}
+                        </span>
+                        {clientUsersMap[client.id] && clientUsersMap[client.id].length > 0 && (
+                          <span className="inline-flex items-center gap-0.5 text-[10px] text-muted-foreground ml-1" title={`${clientUsersMap[client.id].length} acesso(s)`}>
+                            <User className="h-3 w-3" />
+                            {clientUsersMap[client.id].length}
+                          </span>
+                        )}
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {LOCALE_FLAGS[client.locale as Locale]} {LOCALE_LABELS[client.locale as Locale]}
-                      </p>
                     </div>
                   </div>
 
-                  <div className="mb-4 flex items-center gap-1.5 rounded-md bg-muted px-2.5 py-1.5 text-xs text-muted-foreground">
-                    <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                    <span className="truncate">{baseUrl}/client/{client.slug}</span>
+                  {/* Social links row */}
+                  <div className="flex items-center gap-1 mb-3">
+                    {client.instagram_url && (
+                      <a href={client.instagram_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded-md p-1 text-muted-foreground hover:text-pink-500 hover:bg-pink-500/10 transition-colors" title="Instagram">
+                        <Instagram className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    {client.facebook_url && (
+                      <a href={client.facebook_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded-md p-1 text-muted-foreground hover:text-blue-600 hover:bg-blue-600/10 transition-colors" title="Facebook">
+                        <Facebook className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    {client.tiktok_url && (
+                      <a href={client.tiktok_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title="TikTok">
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 3.76.92V6.69Z"/></svg>
+                      </a>
+                    )}
+                    {client.youtube_url && (
+                      <a href={client.youtube_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded-md p-1 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 transition-colors" title="YouTube">
+                        <Youtube className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    {client.linkedin_url && (
+                      <a href={client.linkedin_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded-md p-1 text-muted-foreground hover:text-blue-700 hover:bg-blue-700/10 transition-colors" title="LinkedIn">
+                        <Linkedin className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    {client.twitter_url && (
+                      <a href={client.twitter_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title="X (Twitter)">
+                        <Twitter className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    {client.website_url && (
+                      <a href={client.website_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded-md p-1 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors" title="Website">
+                        <Globe className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    <div className="flex-1" />
                     <button
                       onClick={(e) => { e.stopPropagation(); copyClientUrl(client.slug); }}
-                      className="ml-auto flex-shrink-0 rounded p-0.5 hover:bg-background"
+                      className="rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                      title="Copiar link do portal"
                     >
-                      <Copy className="h-3 w-3" />
+                      <Copy className="h-3.5 w-3.5" />
                     </button>
                   </div>
-
-                  {/* Client user accounts */}
-                  {clientUsersMap[client.id] && clientUsersMap[client.id].length > 0 && (
-                    <div className="mb-3 space-y-1">
-                      {clientUsersMap[client.id].map(cu => (
-                        <div key={cu.userId} className="flex items-center gap-2 rounded-md bg-muted/50 px-2.5 py-1.5 text-xs">
-                          <User className="h-3 w-3 text-muted-foreground shrink-0" />
-                          <span className="text-muted-foreground truncate">{cu.fullName || cu.email}</span>
-                          <span className="text-muted-foreground/60 truncate ml-auto text-[10px]">{cu.email}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
 
                   <div className="mt-auto flex gap-2">
                     <Button
