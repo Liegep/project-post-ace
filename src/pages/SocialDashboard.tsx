@@ -220,10 +220,10 @@ export default function SocialDashboard() {
             { label: "Publicados", value: metrics.published, color: "text-success" },
             { label: "Erros", value: metrics.errors, color: "text-destructive" },
           ].map((m) => (
-            <Card key={m.label}>
-              <CardContent className="p-4 text-center">
-                <p className={`text-2xl font-bold ${m.color}`}>{m.value}</p>
-                <p className="text-xs text-muted-foreground">{m.label}</p>
+            <Card key={m.label} className={m.label === "Total" || m.label === "Erros" ? "col-span-1" : ""}>
+              <CardContent className="p-3 md:p-4 text-center">
+                <p className={`text-lg md:text-2xl font-bold ${m.color}`}>{m.value}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground">{m.label}</p>
               </CardContent>
             </Card>
           ))}
