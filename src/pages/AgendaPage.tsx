@@ -441,6 +441,7 @@ const AppointmentCard = ({ appointment: apt, onToggle, onCancel, onDelete }: {
   onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
 }) => {
+  const [detailOpen, setDetailOpen] = useState(false);
   const now = new Date();
   const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
   const isOverdue = !apt.completed && !apt.cancelled && isBefore(aptDateTime, now);
@@ -457,94 +458,169 @@ const AppointmentCard = ({ appointment: apt, onToggle, onCancel, onDelete }: {
           : "bg-white dark:bg-card hover:bg-muted/50 border border-transparent";
 
   return (
-    <div className={cn(
-      "group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-all",
-      rowBg
-    )}>
-      {/* Complete button */}
-      <button
-        onClick={() => onToggle(apt.id, !apt.completed)}
+    <>
+      <div
+        onClick={() => setDetailOpen(true)}
         className={cn(
-          "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all",
-          apt.completed
-            ? "bg-emerald-500 border-emerald-500 text-white"
-            : apt.cancelled
-              ? "border-muted-foreground/30"
-              : isOverdue
-                ? "border-destructive hover:bg-destructive/10"
-                : "border-muted-foreground/40 hover:border-primary hover:bg-primary/10"
+          "group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-all cursor-pointer",
+          rowBg
         )}
       >
-        {apt.completed && <Check className="h-3 w-3" />}
-      </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggle(apt.id, !apt.completed); }}
+          className={cn(
+            "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all",
+            apt.completed
+              ? "bg-emerald-500 border-emerald-500 text-white"
+              : apt.cancelled
+                ? "border-muted-foreground/30"
+                : isOverdue
+                  ? "border-destructive hover:bg-destructive/10"
+                  : "border-muted-foreground/40 hover:border-primary hover:bg-primary/10"
+          )}
+        >
+          {apt.completed && <Check className="h-3 w-3" />}
+        </button>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className={cn(
-            "text-sm font-medium",
-            apt.completed ? "line-through text-emerald-700 dark:text-emerald-400" : apt.cancelled ? "line-through text-red-500 dark:text-red-400" : "text-foreground"
-          )}>
-            {apt.title}
-          </span>
-          {apt.category && (
-            <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", getCategoryStyle(apt.category))}>
-              {apt.category}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className={cn(
+              "text-sm font-medium",
+              apt.completed ? "line-through text-emerald-700 dark:text-emerald-400" : apt.cancelled ? "line-through text-red-500 dark:text-red-400" : "text-foreground"
+            )}>
+              {apt.title}
             </span>
-          )}
-          {isOverdue && !apt.completed && !apt.cancelled && (
-            <Badge variant="outline" className="text-[10px] border-destructive/30 text-destructive bg-destructive/10">
-              Atrasado
-            </Badge>
-          )}
-          {apt.completed && (
-            <Badge variant="outline" className="text-[10px] border-emerald-400/50 text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400">
-              Concluído
-            </Badge>
-          )}
-          {apt.cancelled && (
-            <Badge variant="outline" className="text-[10px] border-red-400/50 text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400">
-              Cancelado
-            </Badge>
+            {apt.category && (
+              <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", getCategoryStyle(apt.category))}>
+                {apt.category}
+              </span>
+            )}
+            {isOverdue && !apt.completed && !apt.cancelled && (
+              <Badge variant="outline" className="text-[10px] border-destructive/30 text-destructive bg-destructive/10">
+                Atrasado
+              </Badge>
+            )}
+            {apt.completed && (
+              <Badge variant="outline" className="text-[10px] border-emerald-400/50 text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400">
+                Concluído
+              </Badge>
+            )}
+            {apt.cancelled && (
+              <Badge variant="outline" className="text-[10px] border-red-400/50 text-red-600 bg-red-100 dark:bg-red-900/30 dark:text-red-400">
+                Cancelado
+              </Badge>
+            )}
+          </div>
+          {apt.description && (
+            <p className={cn("text-xs mt-0.5 line-clamp-1", apt.completed || apt.cancelled ? "text-muted-foreground/60 line-through" : "text-muted-foreground")}>
+              {apt.description}
+            </p>
           )}
         </div>
-        {apt.description && (
-          <p className={cn("text-xs mt-0.5", apt.completed || apt.cancelled ? "text-muted-foreground/60 line-through" : "text-muted-foreground")}>
-            {apt.description}
-          </p>
-        )}
+
+        <div className="flex items-center gap-2 shrink-0">
+          <span className={cn(
+            "flex items-center gap-1 text-xs font-mono",
+            apt.completed ? "text-emerald-600/60 dark:text-emerald-400/60" : apt.cancelled ? "text-red-500/60" : isOverdue ? "text-destructive" : "text-muted-foreground"
+          )}>
+            <Clock className="h-3 w-3" />
+            {apt.appointmentTime}
+          </span>
+          <button
+            onClick={(e) => { e.stopPropagation(); onCancel(apt.id, !apt.cancelled); }}
+            className={cn(
+              "rounded-full p-1 transition-all",
+              apt.cancelled
+                ? "text-red-500 opacity-100"
+                : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+            )}
+            title={apt.cancelled ? "Desfazer cancelamento" : "Cancelar"}
+          >
+            <Ban className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onDelete(apt.id); }}
+            className="opacity-0 group-hover:opacity-100 rounded-full p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
 
-      {/* Time + actions */}
-      <div className="flex items-center gap-2 shrink-0">
-        <span className={cn(
-          "flex items-center gap-1 text-xs font-mono",
-          apt.completed ? "text-emerald-600/60 dark:text-emerald-400/60" : apt.cancelled ? "text-red-500/60" : isOverdue ? "text-destructive" : "text-muted-foreground"
-        )}>
-          <Clock className="h-3 w-3" />
-          {apt.appointmentTime}
-        </span>
-        {/* Cancel button */}
-        <button
-          onClick={() => onCancel(apt.id, !apt.cancelled)}
-          className={cn(
-            "rounded-full p-1 transition-all",
-            apt.cancelled
-              ? "text-red-500 opacity-100"
-              : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
-          )}
-          title={apt.cancelled ? "Desfazer cancelamento" : "Cancelar"}
-        >
-          <Ban className="h-3.5 w-3.5" />
-        </button>
-        <button
-          onClick={() => onDelete(apt.id)}
-          className="opacity-0 group-hover:opacity-100 rounded-full p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </button>
-      </div>
-    </div>
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarDays className="h-5 w-5 text-primary" />
+              {apt.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 pt-1">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <CalendarIcon className="h-4 w-4" />
+                <span>{format(new Date(apt.appointmentDate + "T12:00:00"), "dd/MM/yyyy")}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                <span>{apt.appointmentTime}</span>
+              </div>
+              {apt.category && (
+                <Badge variant="outline" className={cn("text-xs", getCategoryStyle(apt.category))}>
+                  {apt.category}
+                </Badge>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              {apt.completed && (
+                <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  Concluído
+                </Badge>
+              )}
+              {apt.cancelled && (
+                <Badge className="bg-red-100 text-red-600 border-red-300 dark:bg-red-900/30 dark:text-red-400">
+                  Cancelado
+                </Badge>
+              )}
+              {isOverdue && !apt.completed && !apt.cancelled && (
+                <Badge className="bg-destructive/10 text-destructive border-destructive/30">
+                  Atrasado
+                </Badge>
+              )}
+            </div>
+
+            <div className="rounded-lg bg-muted/50 p-3">
+              <p className="text-sm font-medium text-muted-foreground mb-1">Descrição</p>
+              <p className="text-sm text-foreground whitespace-pre-wrap">
+                {apt.description || "Sem descrição adicional."}
+              </p>
+            </div>
+
+            <div className="flex gap-2 pt-1">
+              <Button
+                size="sm"
+                variant={apt.completed ? "outline" : "default"}
+                className={cn("flex-1 gap-1.5", !apt.completed && "bg-emerald-600 hover:bg-emerald-700 text-white")}
+                onClick={() => { onToggle(apt.id, !apt.completed); setDetailOpen(false); }}
+              >
+                <Check className="h-4 w-4" />
+                {apt.completed ? "Desmarcar" : "Concluir"}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1 gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={() => { onCancel(apt.id, !apt.cancelled); setDetailOpen(false); }}
+              >
+                <Ban className="h-4 w-4" />
+                {apt.cancelled ? "Reativar" : "Cancelar"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

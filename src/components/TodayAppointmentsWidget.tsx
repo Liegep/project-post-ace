@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Check, Clock, CalendarDays } from "lucide-react";
 import { format } from "date-fns";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 
 interface TodayAppt {
   id: string;
@@ -26,9 +28,10 @@ export const TodayAppointmentsWidget = () => {
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState<TodayAppt[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAppt, setSelectedAppt] = useState<TodayAppt | null>(null);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchData = async () => {
       const today = format(new Date(), "yyyy-MM-dd");
       const { data } = await supabase
         .from("appointments")
@@ -48,13 +51,16 @@ export const TodayAppointmentsWidget = () => {
       );
       setLoading(false);
     };
-    fetch();
+    fetchData();
   }, []);
 
   const toggleComplete = async (id: string, completed: boolean) => {
     setAppointments(prev =>
       prev.map(a => (a.id === id ? { ...a, completed } : a))
     );
+    if (selectedAppt?.id === id) {
+      setSelectedAppt(prev => prev ? { ...prev, completed } : null);
+    }
     await supabase.from("appointments").update({
       completed,
       completed_at: completed ? new Date().toISOString() : null,
@@ -66,78 +72,113 @@ export const TodayAppointmentsWidget = () => {
   const pending = appointments.filter(a => !a.completed).length;
 
   return (
-    <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
-            <CalendarDays className="h-4 w-4 text-primary" />
+    <>
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
+              <CalendarDays className="h-4 w-4 text-primary" />
+            </div>
+            <h2 className="font-semibold text-foreground">Agenda de hoje</h2>
+            {pending > 0 && (
+              <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs font-semibold text-primary">
+                {pending} pendente{pending !== 1 ? "s" : ""}
+              </span>
+            )}
           </div>
-          <h2 className="font-semibold text-foreground">Agenda de hoje</h2>
-          {pending > 0 && (
-            <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs font-semibold text-primary">
-              {pending} pendente{pending !== 1 ? "s" : ""}
-            </span>
-          )}
+          <button
+            onClick={() => navigate("/agenda")}
+            className="text-xs font-medium text-primary hover:underline"
+          >
+            Ver agenda completa →
+          </button>
         </div>
-        <button
-          onClick={() => navigate("/agenda")}
-          className="text-xs font-medium text-primary hover:underline"
-        >
-          Ver agenda completa →
-        </button>
-      </div>
-      <div className="space-y-1.5 max-h-56 overflow-y-auto">
-        {appointments.map(apt => {
-          const now = new Date();
-          const aptTime = new Date(`${format(now, "yyyy-MM-dd")}T${apt.time}`);
-          const isOverdue = !apt.completed && aptTime < now;
-          const catStyle = CATEGORY_COLORS[apt.category.toLowerCase()] || CATEGORY_COLORS[""];
+        <div className="space-y-1.5 max-h-56 overflow-y-auto">
+          {appointments.map(apt => {
+            const now = new Date();
+            const aptTime = new Date(`${format(now, "yyyy-MM-dd")}T${apt.time}`);
+            const isOverdue = !apt.completed && aptTime < now;
+            const catStyle = CATEGORY_COLORS[apt.category.toLowerCase()] || CATEGORY_COLORS[""];
 
-          return (
-            <div
-              key={apt.id}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors",
-                apt.completed ? "bg-success/5 opacity-60" : isOverdue ? "bg-destructive/5" : "bg-muted/50 hover:bg-muted"
-              )}
-            >
-              <button
-                onClick={() => toggleComplete(apt.id, !apt.completed)}
+            return (
+              <div
+                key={apt.id}
+                onClick={() => setSelectedAppt(apt)}
                 className={cn(
-                  "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all",
-                  apt.completed
-                    ? "bg-success border-success text-white"
-                    : isOverdue
-                      ? "border-destructive hover:bg-destructive/10"
-                      : "border-muted-foreground/40 hover:border-primary"
+                  "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors cursor-pointer",
+                  apt.completed ? "bg-success/5 opacity-60" : isOverdue ? "bg-destructive/5" : "bg-muted/50 hover:bg-muted"
                 )}
               >
-                {apt.completed && <Check className="h-3 w-3" />}
-              </button>
-              <div className="flex-1 min-w-0">
-                <span className={cn(
-                  "text-sm font-medium",
-                  apt.completed ? "line-through text-muted-foreground" : "text-foreground"
-                )}>
-                  {apt.title}
-                </span>
-                {apt.category && (
-                  <span className={cn("ml-2 rounded-full px-2 py-0.5 text-[10px] font-medium", catStyle)}>
-                    {apt.category}
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleComplete(apt.id, !apt.completed); }}
+                  className={cn(
+                    "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all",
+                    apt.completed
+                      ? "bg-success border-success text-white"
+                      : isOverdue
+                        ? "border-destructive hover:bg-destructive/10"
+                        : "border-muted-foreground/40 hover:border-primary"
+                  )}
+                >
+                  {apt.completed && <Check className="h-3 w-3" />}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <span className={cn(
+                    "text-sm font-medium",
+                    apt.completed ? "line-through text-muted-foreground" : "text-foreground"
+                  )}>
+                    {apt.title}
                   </span>
+                  {apt.category && (
+                    <span className={cn("ml-2 rounded-full px-2 py-0.5 text-[10px] font-medium", catStyle)}>
+                      {apt.category}
+                    </span>
+                  )}
+                </div>
+                <span className={cn(
+                  "flex items-center gap-1 text-xs font-mono shrink-0",
+                  apt.completed ? "text-muted-foreground/50" : isOverdue ? "text-destructive" : "text-muted-foreground"
+                )}>
+                  <Clock className="h-3 w-3" />
+                  {apt.time}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <Dialog open={!!selectedAppt} onOpenChange={(open) => !open && setSelectedAppt(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarDays className="h-5 w-5 text-primary" />
+              {selectedAppt?.title}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedAppt && (
+            <div className="space-y-3 pt-1">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="h-4 w-4" />
+                <span>Hoje às {selectedAppt.time}</span>
+                {selectedAppt.category && (
+                  <Badge variant="outline" className={cn("text-xs", CATEGORY_COLORS[selectedAppt.category.toLowerCase()] || "")}>
+                    {selectedAppt.category}
+                  </Badge>
                 )}
               </div>
-              <span className={cn(
-                "flex items-center gap-1 text-xs font-mono shrink-0",
-                apt.completed ? "text-muted-foreground/50" : isOverdue ? "text-destructive" : "text-muted-foreground"
-              )}>
-                <Clock className="h-3 w-3" />
-                {apt.time}
-              </span>
+              {selectedAppt.completed && (
+                <Badge className="bg-success/20 text-success border-success/30">Concluído</Badge>
+              )}
+              <div className="rounded-lg bg-muted/50 p-3">
+                <p className="text-sm text-foreground whitespace-pre-wrap">
+                  {selectedAppt.description || "Sem descrição adicional."}
+                </p>
+              </div>
             </div>
-          );
-        })}
-      </div>
-    </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
