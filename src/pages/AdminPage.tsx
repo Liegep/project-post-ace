@@ -499,6 +499,10 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const editColumnInputRef = useRef<HTMLInputElement>(null);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
 
+  // Notes panel state
+  const [notesCount, setNotesCount] = useState(0);
+  const [notesOpen, setNotesOpen] = useState(false);
+
   // Selection mode state
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
