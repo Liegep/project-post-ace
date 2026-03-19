@@ -340,7 +340,11 @@ const TeamManagementPage = () => {
                         </Button>
                       )}
                       <Button variant="outline" size="sm" onClick={() => openAssign(member)}>
-                        <Pencil className="mr-1 h-3.5 w-3.5" /> {t("assignClients")}
+                        {memberRole === "client" ? (
+                          <><Link2 className="mr-1 h-3.5 w-3.5" /> Vincular ao cliente</>
+                        ) : (
+                          <><Pencil className="mr-1 h-3.5 w-3.5" /> {t("assignClients")}</>
+                        )}
                       </Button>
                       {isSuperAdmin && (
                         <Button variant="outline" size="sm" onClick={() => handleDeleteMember(member)} className="text-destructive hover:text-destructive">
