@@ -175,6 +175,19 @@ type TranslationKeys = {
   trackingActive: string;
   trackingCreated: string;
   trackingCreatedDesc: string;
+  // Client Notes
+  clientNotes: string;
+  newNote: string;
+  noNotes: string;
+  noteTitle: string;
+  noteContent: string;
+  noteColor: string;
+  noteAddLink: string;
+  noteAddMedia: string;
+  noteSelectFile: string;
+  createNote: string;
+  noteCreated: string;
+  noteDeleted: string;
   // Trello
   syncWithTrello: string;
   trelloBoardId: string;
@@ -368,6 +381,18 @@ const pt: TranslationKeys = {
   trackingActive: "Acompanhamento ativo",
   trackingCreated: "Acompanhamento criado!",
   trackingCreatedDesc: "A coluna de acompanhamento foi adicionada ao quadro.",
+  clientNotes: "Recados",
+  newNote: "Novo Recado",
+  noNotes: "Nenhum recado ainda. Crie o primeiro!",
+  noteTitle: "Título",
+  noteContent: "Conteúdo do recado...",
+  noteColor: "Cor",
+  noteAddLink: "Adicionar link",
+  noteAddMedia: "Anexar mídia",
+  noteSelectFile: "Selecionar arquivo",
+  createNote: "Criar Recado",
+  noteCreated: "Recado criado!",
+  noteDeleted: "Recado excluído",
   syncWithTrello: "Sincronizar com Trello",
   trelloBoardId: "Board ID do Trello",
   trelloBoardIdPlaceholder: "Ex: abc123def456",
@@ -553,6 +578,18 @@ const en: TranslationKeys = {
   trackingActive: "Tracking active",
   trackingCreated: "Tracking created!",
   trackingCreatedDesc: "The tracking column was added to the board.",
+  clientNotes: "Notes",
+  newNote: "New Note",
+  noNotes: "No notes yet. Create the first one!",
+  noteTitle: "Title",
+  noteContent: "Note content...",
+  noteColor: "Color",
+  noteAddLink: "Add link",
+  noteAddMedia: "Attach media",
+  noteSelectFile: "Select file",
+  createNote: "Create Note",
+  noteCreated: "Note created!",
+  noteDeleted: "Note deleted",
   syncWithTrello: "Sync with Trello",
   trelloBoardId: "Trello Board ID",
   trelloBoardIdPlaceholder: "E.g.: abc123def456",
@@ -738,6 +775,18 @@ const it: TranslationKeys = {
   trackingActive: "Monitoraggio attivo",
   trackingCreated: "Monitoraggio creato!",
   trackingCreatedDesc: "La colonna di monitoraggio è stata aggiunta alla bacheca.",
+  clientNotes: "Note",
+  newNote: "Nuova Nota",
+  noNotes: "Nessuna nota ancora. Crea la prima!",
+  noteTitle: "Titolo",
+  noteContent: "Contenuto della nota...",
+  noteColor: "Colore",
+  noteAddLink: "Aggiungi link",
+  noteAddMedia: "Allega media",
+  noteSelectFile: "Seleziona file",
+  createNote: "Crea Nota",
+  noteCreated: "Nota creata!",
+  noteDeleted: "Nota eliminata",
   syncWithTrello: "Sincronizza con Trello",
   trelloBoardId: "Board ID di Trello",
   trelloBoardIdPlaceholder: "Es: abc123def456",
@@ -923,6 +972,18 @@ const es: TranslationKeys = {
   trackingActive: "Seguimiento activo",
   trackingCreated: "¡Seguimiento creado!",
   trackingCreatedDesc: "La columna de seguimiento fue añadida al tablero.",
+  clientNotes: "Notas",
+  newNote: "Nueva Nota",
+  noNotes: "Aún no hay notas. ¡Crea la primera!",
+  noteTitle: "Título",
+  noteContent: "Contenido de la nota...",
+  noteColor: "Color",
+  noteAddLink: "Agregar enlace",
+  noteAddMedia: "Adjuntar media",
+  noteSelectFile: "Seleccionar archivo",
+  createNote: "Crear Nota",
+  noteCreated: "¡Nota creada!",
+  noteDeleted: "Nota eliminada",
   syncWithTrello: "Sincronizar con Trello",
   trelloBoardId: "Board ID de Trello",
   trelloBoardIdPlaceholder: "Ej: abc123def456",
@@ -1108,6 +1169,18 @@ const sv: TranslationKeys = {
   trackingActive: "Spårning aktiv",
   trackingCreated: "Spårning skapad!",
   trackingCreatedDesc: "Spårningskolumnen lades till på tavlan.",
+  clientNotes: "Anteckningar",
+  newNote: "Ny Anteckning",
+  noNotes: "Inga anteckningar ännu. Skapa den första!",
+  noteTitle: "Titel",
+  noteContent: "Anteckningens innehåll...",
+  noteColor: "Färg",
+  noteAddLink: "Lägg till länk",
+  noteAddMedia: "Bifoga media",
+  noteSelectFile: "Välj fil",
+  createNote: "Skapa Anteckning",
+  noteCreated: "Anteckning skapad!",
+  noteDeleted: "Anteckning raderad",
   syncWithTrello: "Synkronisera med Trello",
   trelloBoardId: "Trello Board ID",
   trelloBoardIdPlaceholder: "T.ex.: abc123def456",
