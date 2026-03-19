@@ -469,17 +469,50 @@ const TeamManagementPage = () => {
       <Dialog open={assignOpen} onOpenChange={setAssignOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{t("assignClientsTo")} {selectedMember?.full_name}</DialogTitle>
+            <DialogTitle>
+              {selectedMember && getUserRole(selectedMember.id) === "client"
+                ? `Vincular ${selectedMember?.full_name} ao cliente`
+                : `${t("assignClientsTo")} ${selectedMember?.full_name}`
+              }
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="max-h-64 overflow-y-auto space-y-2 rounded-lg border p-3">
-              {clients.map(c => (
-                <label key={c.id} className="flex items-center gap-2 cursor-pointer">
-                  <Checkbox checked={selectedClientIds.has(c.id)} onCheckedChange={() => toggleSelectedClient(c.id)} />
-                  <span className="text-sm">{c.name}</span>
-                </label>
-              ))}
-            </div>
+            {selectedMember && getUserRole(selectedMember.id) === "client" ? (
+              /* Single client select for client role */
+              <div>
+                <Label className="text-sm text-muted-foreground mb-2 block">
+                  Usuários com papel "Cliente" podem ser vinculados a apenas 1 cliente.
+                </Label>
+                <Select
+                  value={Array.from(selectedClientIds)[0] || ""}
+                  onValueChange={(val) => setSelectedClientIds(new Set(val ? [val] : []))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecionar cliente..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {clients.map(c => (
+                      <SelectItem key={c.id} value={c.id}>
+                        <span className="flex items-center gap-2">
+                          {c.logo_url && <img src={c.logo_url} className="h-4 w-4 rounded-full object-contain" alt="" />}
+                          {c.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              /* Multi-select for admin/colaborador */
+              <div className="max-h-64 overflow-y-auto space-y-2 rounded-lg border p-3">
+                {clients.map(c => (
+                  <label key={c.id} className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox checked={selectedClientIds.has(c.id)} onCheckedChange={() => toggleSelectedClient(c.id)} />
+                    <span className="text-sm">{c.name}</span>
+                  </label>
+                ))}
+              </div>
+            )}
             <Button onClick={handleSaveAssignments} disabled={saving} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
               {saving ? t("saving") : t("save")}
             </Button>
