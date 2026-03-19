@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Plus, ArrowLeft, Trash2, MoreVertical, GripVertical, Pencil } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import UserProfileMenu from "@/components/UserProfileMenu";
+import { MobileNav } from "@/components/MobileNav";
 
 interface IdeaColumn {
   id: string;
