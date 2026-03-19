@@ -510,6 +510,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   // Notes panel state
   const [notesCount, setNotesCount] = useState(0);
   const [notesOpen, setNotesOpen] = useState(false);
+  const [linksCount, setLinksCount] = useState(0);
 
   // Selection mode state
   const [selectionMode, setSelectionMode] = useState(false);
