@@ -97,7 +97,13 @@ const TeamManagementPage = () => {
     return found?.role || "sem papel";
   };
 
-  const filteredMembers = members.filter(m => {
+  // Filter out client-role users - they are managed within each client's page
+  const internalMembers = members.filter(m => {
+    const role = getUserRole(m.id);
+    return role !== "client";
+  });
+
+  const filteredMembers = internalMembers.filter(m => {
     if (roleFilter === "all") return true;
     return getUserRole(m.id) === roleFilter;
   });
