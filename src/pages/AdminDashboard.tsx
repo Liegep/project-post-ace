@@ -1257,7 +1257,19 @@ const AdminDashboard = () => {
                     </button>
                   </div>
 
-                  <div className="mt-auto flex gap-2">
+                  {/* Client user accounts */}
+                  {clientUsersMap[client.id] && clientUsersMap[client.id].length > 0 && (
+                    <div className="mb-3 space-y-1">
+                      {clientUsersMap[client.id].map(cu => (
+                        <div key={cu.userId} className="flex items-center gap-2 rounded-md bg-muted/50 px-2.5 py-1.5 text-xs">
+                          <User className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span className="text-muted-foreground truncate">{cu.fullName || cu.email}</span>
+                          <span className="text-muted-foreground/60 truncate ml-auto text-[10px]">{cu.email}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                     <Button
                       variant="default"
                       size="sm"
