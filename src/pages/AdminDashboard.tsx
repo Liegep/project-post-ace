@@ -565,14 +565,24 @@ const AdminDashboard = () => {
           ...socialFields,
         } as any).eq("id", editingClient.id);
       } else {
+        const { data: { session } } = await supabase.auth.getSession();
         const { data: newClient } = await supabase.from("clients").insert({
           name,
           slug,
           locale,
           logo_url: logoUrl,
+          owner_id: session?.user?.id || null,
           ...socialFields,
         } as any).select().single();
         clientId = (newClient as any)?.id;
+        
+        // Auto-assign client to creator if not super_admin
+        if (clientId && session?.user && !isSuperAdmin) {
+          await supabase.from("user_client_assignments").insert({
+            user_id: session.user.id,
+            client_id: clientId,
+          } as any);
+        }
       }
 
       // Create or update client user login
