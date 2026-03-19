@@ -1270,6 +1270,7 @@ const AdminDashboard = () => {
                     </div>
                   )}
 
+                  <div className="mt-auto flex gap-2">
                     <Button
                       variant="default"
                       size="sm"
