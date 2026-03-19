@@ -84,14 +84,28 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center gap-4">
-          {clientData.logo_url && (
-            <img src={clientData.logo_url} alt="Logo" className="h-16 w-16 rounded-lg object-contain" />
-          )}
-          <div>
-            <h1 className="text-4xl font-extrabold text-foreground">{clientData.name}</h1>
-            <p className="text-sm text-muted-foreground">{t("clientSubtitle")}</p>
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            {clientData.logo_url && (
+              <img src={clientData.logo_url} alt="Logo" className="h-16 w-16 rounded-lg object-contain" />
+            )}
+            <div>
+              <h1 className="text-4xl font-extrabold text-foreground">{clientData.name}</h1>
+              <p className="text-sm text-muted-foreground">{t("clientSubtitle")}</p>
+            </div>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={async () => {
+              await supabase.auth.signOut();
+              window.location.href = "/login";
+            }}
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <LogOut className="mr-1.5 h-4 w-4" />
+            Sair
+          </Button>
         </div>
       </header>
 
