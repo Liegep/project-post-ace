@@ -1376,6 +1376,93 @@ const AdminDashboard = () => {
       <InviteAdminDialog open={inviteOpen} onOpenChange={setInviteOpen} />
       <PostDetailDialog post={viewPost} open={viewPostOpen} onOpenChange={setViewPostOpen} tags={DEFAULT_TAGS} t={t} />
 
+      {/* Share Client Dialog */}
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Share2 className="h-5 w-5" />
+              Compartilhar Cliente
+            </DialogTitle>
+            <DialogDescription>
+              Selecione os usuários que terão acesso a este cliente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {allAdmins.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">Nenhum outro usuário disponível para compartilhar.</p>
+            ) : (
+              <div className="max-h-64 overflow-y-auto space-y-2 rounded-lg border p-3">
+                {allAdmins.map(admin => (
+                  <label key={admin.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={shareSelectedUsers.has(admin.id)}
+                      onChange={() => {
+                        setShareSelectedUsers(prev => {
+                          const next = new Set(prev);
+                          if (next.has(admin.id)) next.delete(admin.id);
+                          else next.add(admin.id);
+                          return next;
+                        });
+                      }}
+                      className="rounded border-border"
+                    />
+                    <div>
+                      <p className="text-sm font-medium">{admin.full_name}</p>
+                      <p className="text-xs text-muted-foreground">{admin.email}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
+            <Button
+              className="w-full"
+              disabled={saving}
+              onClick={async () => {
+                if (!shareClientId) return;
+                setSaving(true);
+                try {
+                  // Delete existing non-owner assignments
+                  await supabase.from("user_client_assignments").delete()
+                    .eq("client_id", shareClientId)
+                    .neq("user_id", currentUserId || "");
+                  
+                  // Insert new assignments
+                  if (shareSelectedUsers.size > 0) {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    const newAssignments = Array.from(shareSelectedUsers)
+                      .filter(uid => uid !== currentUserId)
+                      .map(uid => ({
+                        user_id: uid,
+                        client_id: shareClientId,
+                        assigned_by: session?.user?.id || null,
+                      }));
+                    if (newAssignments.length > 0) {
+                      await supabase.from("user_client_assignments").insert(newAssignments as any);
+                    }
+                  }
+
+                  // Mark as shared if others have access
+                  const isShared = shareSelectedUsers.size > 0;
+                  await supabase.from("clients").update({ shared: isShared } as any).eq("id", shareClientId);
+                  setClients(prev => prev.map(c => c.id === shareClientId ? { ...c, shared: isShared } : c));
+
+                  toast({ title: "Compartilhamento atualizado" });
+                  setShareDialogOpen(false);
+                } catch (err: any) {
+                  toast({ title: "Erro", description: err.message, variant: "destructive" });
+                } finally {
+                  setSaving(false);
+                }
+              }}
+            >
+              {saving ? "Salvando..." : "Salvar compartilhamento"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 };
