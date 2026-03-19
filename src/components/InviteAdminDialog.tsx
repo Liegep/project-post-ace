@@ -153,18 +153,6 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
             <div className="mt-2 flex gap-2">
               <button
                 type="button"
-                onClick={() => setRole("team_member")}
-                className={`flex-1 flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
-                  role === "team_member"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-background text-muted-foreground hover:bg-muted"
-                }`}
-              >
-                <Users className="h-4 w-4" />
-                {t("teamMember")}
-              </button>
-              <button
-                type="button"
                 onClick={() => setRole("admin")}
                 className={`flex-1 flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
                   role === "admin"
@@ -172,14 +160,38 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
                     : "border-border bg-background text-muted-foreground hover:bg-muted"
                 }`}
               >
-                <Shield className="h-4 w-4" />
+                <Users className="h-4 w-4" />
                 Admin
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("colaborador")}
+                className={`flex-1 flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
+                  role === "colaborador"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                <Users className="h-4 w-4" />
+                Colaborador
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole("super_admin")}
+                className={`flex-1 flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
+                  role === "super_admin"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                <Shield className="h-4 w-4" />
+                Super Admin
               </button>
             </div>
           </div>
 
-          {/* Client assignment for team members */}
-          {role === "team_member" && clients.length > 0 && (
+          {/* Client assignment for admin/colaborador */}
+          {(role === "admin" || role === "colaborador") && clients.length > 0 && (
             <div>
               <Label>{t("assignClients")}</Label>
               <div className="mt-2 max-h-40 overflow-y-auto space-y-2 rounded-lg border p-3">
