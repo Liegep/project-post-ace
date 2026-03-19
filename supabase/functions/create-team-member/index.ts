@@ -63,7 +63,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create user
+    // Create user (or reuse existing orphaned auth user)
+    let targetUserId: string;
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
@@ -71,21 +72,43 @@ Deno.serve(async (req) => {
     });
 
     if (createError) {
-      return new Response(JSON.stringify({ error: createError.message }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      // If user already exists, find and reuse them
+      if (createError.message.includes("already been registered")) {
+        const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
+        const existingUser = users?.find((u: any) => u.email === email);
+        if (!existingUser) {
+          return new Response(JSON.stringify({ error: "User exists but could not be found" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        // Update password
+        await supabaseAdmin.auth.admin.updateUserById(existingUser.id, { password, email_confirm: true });
+        targetUserId = existingUser.id;
+
+        // Clean up old data
+        await supabaseAdmin.from("user_roles").delete().eq("user_id", targetUserId);
+        await supabaseAdmin.from("user_client_assignments").delete().eq("user_id", targetUserId);
+        await supabaseAdmin.from("profiles").delete().eq("id", targetUserId);
+      } else {
+        return new Response(JSON.stringify({ error: createError.message }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } else {
+      targetUserId = newUser.user.id;
     }
 
     // Assign admin (carteira) role
     await supabaseAdmin.from("user_roles").insert({
-      user_id: newUser.user.id,
+      user_id: targetUserId,
       role: "admin",
     });
 
     // Create profile
-    await supabaseAdmin.from("profiles").insert({
-      id: newUser.user.id,
+    await supabaseAdmin.from("profiles").upsert({
+      id: targetUserId,
       full_name,
       email,
       role: "admin",
@@ -94,7 +117,7 @@ Deno.serve(async (req) => {
     // Assign clients if provided
     if (client_ids && Array.isArray(client_ids) && client_ids.length > 0) {
       const assignments = client_ids.map((client_id: string) => ({
-        user_id: newUser.user.id,
+        user_id: targetUserId,
         client_id,
         assigned_by: userId,
       }));
@@ -102,7 +125,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, user_id: newUser.user.id }),
+      JSON.stringify({ success: true, user_id: targetUserId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
