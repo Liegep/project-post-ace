@@ -99,6 +99,7 @@ const AgendaPage = () => {
       description: formDesc.trim(),
       appointmentTime: formTime,
       category: formCategory,
+      tagId: formTagId,
     };
 
     if (formRepeat === "none") {
