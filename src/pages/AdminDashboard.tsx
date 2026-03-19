@@ -591,6 +591,7 @@ const AdminDashboard = () => {
     setClientEmail("");
     setClientPassword("");
     setExistingClientUser(null);
+    setClientType("standard");
     setDialogOpen(true);
   };
 
