@@ -41,6 +41,7 @@ interface ClientNote {
 
 interface ClientNotesProps {
   clientId: string;
+  onCountChange?: (count: number) => void;
 }
 
 export const ClientNotes = ({ clientId }: ClientNotesProps) => {
