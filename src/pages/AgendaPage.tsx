@@ -238,6 +238,11 @@ const AgendaPage = () => {
               </Badge>
             </div>
 
+            <Button variant="outline" size="sm" onClick={() => setTagDialogOpen(true)} className="gap-1.5">
+              <Tag className="h-4 w-4" />
+              <span className="hidden sm:inline">Etiquetas</span>
+            </Button>
+
             <Button onClick={() => openCreateForDate()} className="bg-accent text-accent-foreground hover:bg-accent/90 gap-1.5">
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Novo compromisso</span>
