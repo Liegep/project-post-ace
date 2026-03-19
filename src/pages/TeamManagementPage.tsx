@@ -97,7 +97,13 @@ const TeamManagementPage = () => {
     return found?.role || "sem papel";
   };
 
-  const filteredMembers = members.filter(m => {
+  // Filter out client-role users - they are managed within each client's page
+  const internalMembers = members.filter(m => {
+    const role = getUserRole(m.id);
+    return role !== "client";
+  });
+
+  const filteredMembers = internalMembers.filter(m => {
     if (roleFilter === "all") return true;
     return getUserRole(m.id) === roleFilter;
   });
@@ -279,7 +285,6 @@ const TeamManagementPage = () => {
             { value: "super_admin", label: "Super Admin" },
             { value: "admin", label: "Admin" },
             { value: "colaborador", label: "Colaborador" },
-            { value: "client", label: "Cliente" },
           ].map(f => (
             <button
               key={f.value}
@@ -293,8 +298,8 @@ const TeamManagementPage = () => {
               {f.label}
               <span className="ml-1.5 text-xs opacity-70">
                 ({f.value === "all" 
-                  ? members.length 
-                  : members.filter(m => getUserRole(m.id) === f.value).length
+                  ? internalMembers.length 
+                  : internalMembers.filter(m => getUserRole(m.id) === f.value).length
                 })
               </span>
             </button>

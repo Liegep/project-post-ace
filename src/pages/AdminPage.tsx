@@ -14,10 +14,11 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus } from "lucide-react";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { ClientNotes } from "@/components/ClientNotes";
 import { ClientLinksPanel } from "@/components/ClientLinksPanel";
+import ClientAccessPanel from "@/components/ClientAccessPanel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -801,6 +802,24 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 </SheetHeader>
                 <div className="mt-6">
                   <ClientLinksPanel clientId={clientData.id} onCountChange={setLinksCount} />
+                </div>
+              </SheetContent>
+            </Sheet>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" title="Acesso do cliente">
+                  <UserPlus className="h-4 w-4 text-green-500" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-[380px] sm:w-[440px] overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle className="flex items-center gap-2">
+                    <UserPlus className="h-5 w-5 text-green-500" />
+                    Acesso do Cliente
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="mt-6">
+                  <ClientAccessPanel clientId={clientData.id} clientName={clientData.name} />
                 </div>
               </SheetContent>
             </Sheet>
