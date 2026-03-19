@@ -130,6 +130,11 @@ const AdminDashboard = () => {
   const [clientEmail, setClientEmail] = useState("");
   const [clientPassword, setClientPassword] = useState("");
   const [existingClientUser, setExistingClientUser] = useState<ClientUser | null>(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareClientId, setShareClientId] = useState<string | null>(null);
+  const [allAdmins, setAllAdmins] = useState<{ id: string; full_name: string; email: string }[]>([]);
+  const [shareSelectedUsers, setShareSelectedUsers] = useState<Set<string>>(new Set());
+  const [clientAssignments, setClientAssignments] = useState<{ user_id: string; client_id: string }[]>([]);
 
   const fetchStatusNotifs = async () => {
     const { data } = await supabase
@@ -139,7 +144,6 @@ const AdminDashboard = () => {
       .eq("read", false)
       .order("created_at", { ascending: false });
 
-    // Deduplicate by postId - keep only the latest notification per post
     const allNotifs = (data || []).map((n: any) => ({
       id: n.id,
       title: n.title,
@@ -677,12 +681,12 @@ const AdminDashboard = () => {
               </span>
             )}
             <LanguageSelector />
-            {isSuperAdmin && (
+            {isAdmin && (
               <Button variant="outline" size="sm" onClick={() => navigate("/team-management")}>
                 <Users className="mr-1 h-4 w-4" /> {t("team")}
               </Button>
             )}
-            {isSuperAdmin && (
+            {isAdmin && (
               <Button variant="outline" size="sm" onClick={() => navigate("/social")}>
                 <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
               </Button>
@@ -696,7 +700,7 @@ const AdminDashboard = () => {
             <Button variant="ghost" size="icon" onClick={() => navigate("/briefs")} title="Pautas">
               <FileText className="h-5 w-5" />
             </Button>
-            {isSuperAdmin && (
+            {isAdmin && (
               <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Plus className="mr-2 h-4 w-4" /> {t("newClient")}
               </Button>
@@ -1186,18 +1190,32 @@ const AdminDashboard = () => {
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     )}
-                    {/* Share with super admin button (for admin de carteira) */}
-                    {!isSuperAdmin && client.owner_id === currentUserId && !client.shared && (
+                    {/* Share button - for client owners */}
+                    {(isSuperAdmin || client.owner_id === currentUserId) && (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={async (e) => {
                           e.stopPropagation();
-                          await supabase.from("clients").update({ shared: true } as any).eq("id", client.id);
-                          setClients(prev => prev.map(c => c.id === client.id ? { ...c, shared: true } : c));
-                          toast({ title: "Cliente compartilhado", description: "O Super Admin agora pode visualizar este cliente." });
+                          setShareClientId(client.id);
+                          // Fetch all admin/colaborador users to share with
+                          const { data: profiles } = await supabase.from("profiles").select("id, full_name, email");
+                          const { data: roles } = await supabase.from("user_roles").select("user_id, role");
+                          const adminUsers = (profiles || []).filter(p => {
+                            const userRole = (roles || []).find((r: any) => r.user_id === p.id);
+                            return userRole && ["super_admin", "admin", "colaborador"].includes(userRole.role) && p.id !== currentUserId;
+                          });
+                          setAllAdmins(adminUsers);
+                          // Fetch existing assignments for this client
+                          const { data: existingAssignments } = await supabase
+                            .from("user_client_assignments")
+                            .select("user_id, client_id")
+                            .eq("client_id", client.id);
+                          const assigned = new Set((existingAssignments || []).map((a: any) => a.user_id));
+                          setShareSelectedUsers(assigned);
+                          setShareDialogOpen(true);
                         }}
-                        title="Compartilhar com Super Admin"
+                        title="Compartilhar cliente"
                       >
                         <Share2 className="h-3.5 w-3.5" />
                       </Button>
@@ -1357,6 +1375,93 @@ const AdminDashboard = () => {
 
       <InviteAdminDialog open={inviteOpen} onOpenChange={setInviteOpen} />
       <PostDetailDialog post={viewPost} open={viewPostOpen} onOpenChange={setViewPostOpen} tags={DEFAULT_TAGS} t={t} />
+
+      {/* Share Client Dialog */}
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Share2 className="h-5 w-5" />
+              Compartilhar Cliente
+            </DialogTitle>
+            <DialogDescription>
+              Selecione os usuários que terão acesso a este cliente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {allAdmins.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">Nenhum outro usuário disponível para compartilhar.</p>
+            ) : (
+              <div className="max-h-64 overflow-y-auto space-y-2 rounded-lg border p-3">
+                {allAdmins.map(admin => (
+                  <label key={admin.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={shareSelectedUsers.has(admin.id)}
+                      onChange={() => {
+                        setShareSelectedUsers(prev => {
+                          const next = new Set(prev);
+                          if (next.has(admin.id)) next.delete(admin.id);
+                          else next.add(admin.id);
+                          return next;
+                        });
+                      }}
+                      className="rounded border-border"
+                    />
+                    <div>
+                      <p className="text-sm font-medium">{admin.full_name}</p>
+                      <p className="text-xs text-muted-foreground">{admin.email}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
+            <Button
+              className="w-full"
+              disabled={saving}
+              onClick={async () => {
+                if (!shareClientId) return;
+                setSaving(true);
+                try {
+                  // Delete existing non-owner assignments
+                  await supabase.from("user_client_assignments").delete()
+                    .eq("client_id", shareClientId)
+                    .neq("user_id", currentUserId || "");
+                  
+                  // Insert new assignments
+                  if (shareSelectedUsers.size > 0) {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    const newAssignments = Array.from(shareSelectedUsers)
+                      .filter(uid => uid !== currentUserId)
+                      .map(uid => ({
+                        user_id: uid,
+                        client_id: shareClientId,
+                        assigned_by: session?.user?.id || null,
+                      }));
+                    if (newAssignments.length > 0) {
+                      await supabase.from("user_client_assignments").insert(newAssignments as any);
+                    }
+                  }
+
+                  // Mark as shared if others have access
+                  const isShared = shareSelectedUsers.size > 0;
+                  await supabase.from("clients").update({ shared: isShared } as any).eq("id", shareClientId);
+                  setClients(prev => prev.map(c => c.id === shareClientId ? { ...c, shared: isShared } : c));
+
+                  toast({ title: "Compartilhamento atualizado" });
+                  setShareDialogOpen(false);
+                } catch (err: any) {
+                  toast({ title: "Erro", description: err.message, variant: "destructive" });
+                } finally {
+                  setSaving(false);
+                }
+              }}
+            >
+              {saving ? "Salvando..." : "Salvar compartilhamento"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
