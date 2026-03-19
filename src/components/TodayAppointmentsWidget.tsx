@@ -58,6 +58,9 @@ export const TodayAppointmentsWidget = () => {
     setAppointments(prev =>
       prev.map(a => (a.id === id ? { ...a, completed } : a))
     );
+    if (selectedAppt?.id === id) {
+      setSelectedAppt(prev => prev ? { ...prev, completed } : null);
+    }
     await supabase.from("appointments").update({
       completed,
       completed_at: completed ? new Date().toISOString() : null,
