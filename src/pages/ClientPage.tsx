@@ -11,7 +11,7 @@ import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound } from "lucide-react";
+import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound, Menu } from "lucide-react";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
