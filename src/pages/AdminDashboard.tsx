@@ -160,6 +160,19 @@ const AdminDashboard = () => {
   };
 
 
+  // Notification sound ref
+  const notificationAudioRef = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    notificationAudioRef.current = new Audio("/notification.wav");
+  }, []);
+
+  const playNotificationSound = () => {
+    if (notificationAudioRef.current) {
+      notificationAudioRef.current.currentTime = 0;
+      notificationAudioRef.current.play().catch(() => {});
+    }
+  };
+
   useEffect(() => {
     fetchClients();
     fetchFeedbacks();
@@ -167,6 +180,31 @@ const AdminDashboard = () => {
     fetchClientCreatedNotifs();
     fetchTodayPosts();
     fetchStatusNotifs();
+
+    // Realtime: listen for new client feedback (client_label changes)
+    const channel = supabase
+      .channel("feedback-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "posts",
+        },
+        (payload) => {
+          const newLabel = (payload.new as any).client_label;
+          const oldLabel = (payload.old as any).client_label;
+          if (newLabel && newLabel !== "pendente" && newLabel !== oldLabel) {
+            playNotificationSound();
+            fetchFeedbacks();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchTodayPosts = async () => {
