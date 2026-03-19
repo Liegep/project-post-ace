@@ -328,6 +328,44 @@ export type Database = {
           },
         ]
       }
+      client_links: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          position: number
+          section_title: string
+          title: string
+          url: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          position?: number
+          section_title?: string
+          title?: string
+          url?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          position?: number
+          section_title?: string
+          title?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_links_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_notes: {
         Row: {
           attachments: Json
