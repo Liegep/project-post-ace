@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { Check, Clock, CalendarDays } from "lucide-react";
+import { Check, Clock, CalendarDays, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface TodayAppt {
   id: string;
@@ -31,41 +34,49 @@ const CATEGORY_COLORS: Record<string, string> = {
   urgente: "bg-destructive/20 text-destructive",
 };
 
+const CATEGORIES = ["reunião", "tarefa", "pessoal", "urgente"];
+
 export const TodayAppointmentsWidget = () => {
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState<TodayAppt[]>([]);
   const [tags, setTags] = useState<ApptTag[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedAppt, setSelectedAppt] = useState<TodayAppt | null>(null);
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newTime, setNewTime] = useState("09:00");
+  const [newCategory, setNewCategory] = useState("");
+  const [newTagId, setNewTagId] = useState<string | null>(null);
+  const [newDesc, setNewDesc] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const today = format(new Date(), "yyyy-MM-dd");
-      const [{ data: apptData }, { data: tagData }] = await Promise.all([
-        supabase
-          .from("appointments")
-          .select("id, title, description, appointment_time, category, completed, tag_id")
-          .eq("appointment_date", today)
-          .order("appointment_time", { ascending: true }),
-        supabase.from("appointment_tags" as any).select("*").order("name"),
-      ]);
+  const fetchToday = async () => {
+    const today = format(new Date(), "yyyy-MM-dd");
+    const [{ data: apptData }, { data: tagData }] = await Promise.all([
+      supabase
+        .from("appointments")
+        .select("id, title, description, appointment_time, category, completed, tag_id")
+        .eq("appointment_date", today)
+        .order("appointment_time", { ascending: true }),
+      supabase.from("appointment_tags" as any).select("*").order("name"),
+    ]);
 
-      setAppointments(
-        (apptData || []).map((r: any) => ({
-          id: r.id,
-          title: r.title,
-          description: r.description || "",
-          time: r.appointment_time?.slice(0, 5) || "09:00",
-          category: r.category || "",
-          completed: r.completed,
-          tagId: r.tag_id || null,
-        }))
-      );
-      setTags((tagData || []).map((t: any) => ({ id: t.id, name: t.name, color: t.color })));
-      setLoading(false);
-    };
-    fetchData();
-  }, []);
+    setAppointments(
+      (apptData || []).map((r: any) => ({
+        id: r.id,
+        title: r.title,
+        description: r.description || "",
+        time: r.appointment_time?.slice(0, 5) || "09:00",
+        category: r.category || "",
+        completed: r.completed,
+        tagId: r.tag_id || null,
+      }))
+    );
+    setTags((tagData || []).map((t: any) => ({ id: t.id, name: t.name, color: t.color })));
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchToday(); }, []);
 
   const toggleComplete = async (id: string, completed: boolean) => {
     setAppointments(prev =>
@@ -80,10 +91,35 @@ export const TodayAppointmentsWidget = () => {
     } as any).eq("id", id);
   };
 
-  if (loading || appointments.length === 0) return null;
+  const handleQuickAdd = async () => {
+    if (!newTitle.trim()) return;
+    setSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setSaving(false); return; }
+    const today = format(new Date(), "yyyy-MM-dd");
+    await supabase.from("appointments").insert({
+      user_id: user.id,
+      title: newTitle.trim(),
+      description: newDesc.trim(),
+      appointment_date: today,
+      appointment_time: newTime,
+      category: newCategory,
+      tag_id: newTagId,
+    } as any);
+    setNewTitle("");
+    setNewDesc("");
+    setNewTime("09:00");
+    setNewCategory("");
+    setNewTagId(null);
+    setShowQuickAdd(false);
+    setSaving(false);
+    await fetchToday();
+  };
 
   const pending = appointments.filter(a => !a.completed).length;
   const getTag = (tagId: string | null) => tagId ? tags.find(t => t.id === tagId) : null;
+
+  if (loading) return null;
 
   return (
     <>
@@ -100,77 +136,141 @@ export const TodayAppointmentsWidget = () => {
               </span>
             )}
           </div>
-          <button
-            onClick={() => navigate("/agenda")}
-            className="text-xs font-medium text-primary hover:underline"
-          >
-            Ver agenda completa →
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowQuickAdd(!showQuickAdd)}
+              className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              title="Novo compromisso"
+            >
+              {showQuickAdd ? <X className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+            </button>
+            <button
+              onClick={() => navigate("/agenda")}
+              className="text-xs font-medium text-primary hover:underline"
+            >
+              Ver agenda completa →
+            </button>
+          </div>
         </div>
-        <div className="space-y-1.5 max-h-56 overflow-y-auto">
-          {appointments.map(apt => {
-            const now = new Date();
-            const aptTime = new Date(`${format(now, "yyyy-MM-dd")}T${apt.time}`);
-            const isOverdue = !apt.completed && aptTime < now;
-            const catStyle = CATEGORY_COLORS[apt.category.toLowerCase()] || CATEGORY_COLORS[""];
-            const aptTag = getTag(apt.tagId);
-            const useTagColor = !apt.completed && !isOverdue && aptTag;
 
-            return (
-              <div
-                key={apt.id}
-                onClick={() => setSelectedAppt(apt)}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors cursor-pointer",
-                  apt.completed ? "bg-success/5 opacity-60" : isOverdue ? "bg-destructive/5" : useTagColor ? "" : "bg-muted/50 hover:bg-muted"
-                )}
-                style={useTagColor ? { backgroundColor: aptTag!.color + "20" } : undefined}
+        {showQuickAdd && (
+          <div className="mb-3 rounded-lg border border-border bg-muted/30 p-3 space-y-2">
+            <Input
+              placeholder="Título do compromisso"
+              value={newTitle}
+              onChange={e => setNewTitle(e.target.value)}
+              className="h-8 text-sm"
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <Input
+                type="time"
+                value={newTime}
+                onChange={e => setNewTime(e.target.value)}
+                className="h-8 text-sm w-28"
+              />
+              <select
+                value={newCategory}
+                onChange={e => setNewCategory(e.target.value)}
+                className="h-8 text-sm rounded-md border border-input bg-background px-2 flex-1"
               >
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggleComplete(apt.id, !apt.completed); }}
-                  className={cn(
-                    "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all",
-                    apt.completed
-                      ? "bg-success border-success text-white"
-                      : isOverdue
-                        ? "border-destructive hover:bg-destructive/10"
-                        : "border-muted-foreground/40 hover:border-primary"
-                  )}
+                <option value="">Categoria</option>
+                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+              {tags.length > 0 && (
+                <select
+                  value={newTagId || ""}
+                  onChange={e => setNewTagId(e.target.value || null)}
+                  className="h-8 text-sm rounded-md border border-input bg-background px-2 flex-1"
                 >
-                  {apt.completed && <Check className="h-3 w-3" />}
-                </button>
-                <div className="flex-1 min-w-0">
+                  <option value="">Etiqueta</option>
+                  {tags.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                </select>
+              )}
+            </div>
+            <Textarea
+              placeholder="Descrição (opcional)"
+              value={newDesc}
+              onChange={e => setNewDesc(e.target.value)}
+              className="text-sm min-h-[50px] resize-none"
+              rows={2}
+            />
+            <div className="flex justify-end">
+              <Button size="sm" onClick={handleQuickAdd} disabled={saving || !newTitle.trim()}>
+                {saving ? "Salvando..." : "Adicionar"}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {appointments.length === 0 && !showQuickAdd ? (
+          <p className="text-sm text-muted-foreground text-center py-3">Nenhum compromisso hoje.</p>
+        ) : (
+          <div className="space-y-1.5 max-h-56 overflow-y-auto">
+            {appointments.map(apt => {
+              const now = new Date();
+              const aptTime = new Date(`${format(now, "yyyy-MM-dd")}T${apt.time}`);
+              const isOverdue = !apt.completed && aptTime < now;
+              const catStyle = CATEGORY_COLORS[apt.category.toLowerCase()] || CATEGORY_COLORS[""];
+              const aptTag = getTag(apt.tagId);
+              const useTagColor = !apt.completed && !isOverdue && aptTag;
+
+              return (
+                <div
+                  key={apt.id}
+                  onClick={() => setSelectedAppt(apt)}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors cursor-pointer",
+                    apt.completed ? "bg-success/5 opacity-60" : isOverdue ? "bg-destructive/5" : useTagColor ? "" : "bg-muted/50 hover:bg-muted"
+                  )}
+                  style={useTagColor ? { backgroundColor: aptTag!.color + "20" } : undefined}
+                >
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleComplete(apt.id, !apt.completed); }}
+                    className={cn(
+                      "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all",
+                      apt.completed
+                        ? "bg-success border-success text-white"
+                        : isOverdue
+                          ? "border-destructive hover:bg-destructive/10"
+                          : "border-muted-foreground/40 hover:border-primary"
+                    )}
+                  >
+                    {apt.completed && <Check className="h-3 w-3" />}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <span className={cn(
+                      "text-sm font-medium",
+                      apt.completed ? "line-through text-muted-foreground" : "text-foreground"
+                    )}>
+                      {apt.title}
+                    </span>
+                    {apt.category && (
+                      <span className={cn("ml-2 rounded-full px-2 py-0.5 text-[10px] font-medium", catStyle)}>
+                        {apt.category}
+                      </span>
+                    )}
+                    {aptTag && !apt.completed && (
+                      <span
+                        className="ml-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                        style={{ backgroundColor: aptTag.color + "30", color: aptTag.color }}
+                      >
+                        {aptTag.name}
+                      </span>
+                    )}
+                  </div>
                   <span className={cn(
-                    "text-sm font-medium",
-                    apt.completed ? "line-through text-muted-foreground" : "text-foreground"
+                    "flex items-center gap-1 text-xs font-mono shrink-0",
+                    apt.completed ? "text-muted-foreground/50" : isOverdue ? "text-destructive" : "text-muted-foreground"
                   )}>
-                    {apt.title}
+                    <Clock className="h-3 w-3" />
+                    {apt.time}
                   </span>
-                  {apt.category && (
-                    <span className={cn("ml-2 rounded-full px-2 py-0.5 text-[10px] font-medium", catStyle)}>
-                      {apt.category}
-                    </span>
-                  )}
-                  {aptTag && !apt.completed && (
-                    <span
-                      className="ml-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
-                      style={{ backgroundColor: aptTag.color + "30", color: aptTag.color }}
-                    >
-                      {aptTag.name}
-                    </span>
-                  )}
                 </div>
-                <span className={cn(
-                  "flex items-center gap-1 text-xs font-mono shrink-0",
-                  apt.completed ? "text-muted-foreground/50" : isOverdue ? "text-destructive" : "text-muted-foreground"
-                )}>
-                  <Clock className="h-3 w-3" />
-                  {apt.time}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <Dialog open={!!selectedAppt} onOpenChange={(open) => !open && setSelectedAppt(null)}>
