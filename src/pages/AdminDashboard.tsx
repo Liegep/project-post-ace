@@ -774,13 +774,20 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card px-6 py-4">
+      <header className="border-b bg-card px-4 md:px-6 py-3 md:py-4">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">ContentFlow</h1>
-            <p className="text-sm text-muted-foreground">{t("selectOrCreateClient")}</p>
-          </div>
           <div className="flex items-center gap-3">
+            {/* Mobile hamburger */}
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(true)}>
+              <Menu className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold text-foreground">ContentFlow</h1>
+              <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">{t("selectOrCreateClient")}</p>
+            </div>
+          </div>
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-3">
             {role && (
               <span className={cn(
                 "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
@@ -817,10 +824,73 @@ const AdminDashboard = () => {
             )}
             <UserProfileMenu />
           </div>
+          {/* Mobile: only essential actions */}
+          <div className="flex md:hidden items-center gap-1">
+            {isAdmin && (
+              <Button size="icon" variant="ghost" onClick={openCreate}>
+                <Plus className="h-5 w-5" />
+              </Button>
+            )}
+            <UserProfileMenu />
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl p-6 space-y-6">
+      {/* Mobile drawer menu */}
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent side="left" className="w-72 p-0">
+          <SheetHeader className="border-b px-5 py-4">
+            <SheetTitle className="text-left text-lg font-bold">ContentFlow</SheetTitle>
+          </SheetHeader>
+          <div className="flex flex-col py-2">
+            {role && (
+              <div className="px-5 py-2">
+                <span className={cn(
+                  "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                  isSuperAdmin ? "bg-amber-500/15 text-amber-600" : "bg-blue-500/15 text-blue-600"
+                )}>
+                  <Shield className="h-3 w-3" />
+                  {isSuperAdmin ? "Super Admin" : role === "admin" ? "Admin" : "Colaborador"}
+                </span>
+              </div>
+            )}
+            <nav className="flex flex-col">
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/admin"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                <LayoutDashboard className="h-4 w-4 text-muted-foreground" /> Dashboard
+              </button>
+              {isAdmin && (
+                <button onClick={() => { setMobileMenuOpen(false); openCreate(); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                  <Plus className="h-4 w-4 text-muted-foreground" /> Novo Cliente
+                </button>
+              )}
+              {isAdmin && (
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/team-management"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                  <Users className="h-4 w-4 text-muted-foreground" /> {t("team")}
+                </button>
+              )}
+              {isAdmin && (
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/social"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                  <CalendarClock className="h-4 w-4 text-muted-foreground" /> {t("social")}
+                </button>
+              )}
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/ideas"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                <Lightbulb className="h-4 w-4 text-muted-foreground" /> Ideias de Pauta
+              </button>
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/calendar"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                <Calendar className="h-4 w-4 text-muted-foreground" /> Calendário
+              </button>
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/briefs"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                <FileText className="h-4 w-4 text-muted-foreground" /> Pautas
+              </button>
+            </nav>
+            <div className="border-t mt-2 pt-2 px-5">
+              <LanguageSelector />
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <main className="mx-auto max-w-5xl px-4 md:px-6 py-4 md:py-6 space-y-4 md:space-y-6">
         {/* Today's appointments */}
         <TodayAppointmentsWidget />
 
