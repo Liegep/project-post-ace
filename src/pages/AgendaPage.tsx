@@ -38,12 +38,15 @@ const getCategoryStyle = (cat: string) => CATEGORY_COLORS[cat.toLowerCase()] || 
 const AgendaPage = () => {
   const navigate = useNavigate();
   const { t } = useI18n();
-  const { appointments, loading, createAppointment, createBatch, toggleComplete, toggleCancelled, deleteAppointment } = useAppointments();
+  const { appointments, tags, loading, createAppointment, createBatch, toggleComplete, toggleCancelled, deleteAppointment, createTag, deleteTag } = useAppointments();
 
   const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [tagDialogOpen, setTagDialogOpen] = useState(false);
+  const [newTagName, setNewTagName] = useState("");
+  const [newTagColor, setNewTagColor] = useState("#3b82f6");
 
   // Form state
   const [formTitle, setFormTitle] = useState("");
@@ -51,6 +54,7 @@ const AgendaPage = () => {
   const [formDate, setFormDate] = useState<Date>(new Date());
   const [formTime, setFormTime] = useState("09:00");
   const [formCategory, setFormCategory] = useState("");
+  const [formTagId, setFormTagId] = useState<string | null>(null);
   const [formRepeat, setFormRepeat] = useState<RepeatMode>("none");
   const [saving, setSaving] = useState(false);
 
