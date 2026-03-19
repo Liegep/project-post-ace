@@ -94,6 +94,10 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
   const sortByDate = (list: typeof posts) =>
     [...list].sort((a, b) => {
+      // Posts with "alterado" tag go first
+      const aAlterado = a.tags.includes("alterado") ? 1 : 0;
+      const bAlterado = b.tags.includes("alterado") ? 1 : 0;
+      if (aAlterado !== bAlterado) return bAlterado - aAlterado;
       const dateA = a.deadline ? new Date(a.deadline).getTime() : 0;
       const dateB = b.deadline ? new Date(b.deadline).getTime() : 0;
       return dateA - dateB;
