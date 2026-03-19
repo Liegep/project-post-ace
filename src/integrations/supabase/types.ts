@@ -384,7 +384,9 @@ export type Database = {
           locale: string
           logo_url: string
           name: string
+          owner_id: string | null
           posting_period: string
+          shared: boolean
           show_archived_to_client: boolean
           slug: string
           tiktok_url: string
@@ -407,7 +409,9 @@ export type Database = {
           locale?: string
           logo_url?: string
           name: string
+          owner_id?: string | null
           posting_period?: string
+          shared?: boolean
           show_archived_to_client?: boolean
           slug: string
           tiktok_url?: string
@@ -430,7 +434,9 @@ export type Database = {
           locale?: string
           logo_url?: string
           name?: string
+          owner_id?: string | null
           posting_period?: string
+          shared?: boolean
           show_archived_to_client?: boolean
           slug?: string
           tiktok_url?: string
@@ -1310,6 +1316,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role:
