@@ -313,6 +313,46 @@ const AdminDashboard = () => {
     setLoading(false);
   };
 
+  const fetchClientUsers = async () => {
+    // Get all client role users
+    const { data: clientRoles } = await supabase
+      .from("user_roles")
+      .select("user_id")
+      .eq("role", "client");
+    
+    if (!clientRoles || clientRoles.length === 0) {
+      setClientUsersMap({});
+      return;
+    }
+
+    const clientUserIds = clientRoles.map(r => r.user_id);
+
+    // Get their assignments
+    const { data: assignments } = await supabase
+      .from("user_client_assignments")
+      .select("user_id, client_id")
+      .in("user_id", clientUserIds);
+
+    // Get their profiles
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, full_name, email")
+      .in("id", clientUserIds);
+
+    const profileMap: Record<string, { full_name: string; email: string }> = {};
+    (profiles || []).forEach(p => { profileMap[p.id] = { full_name: p.full_name, email: p.email }; });
+
+    const map: ClientUserMap = {};
+    (assignments || []).forEach(a => {
+      if (!map[a.client_id]) map[a.client_id] = [];
+      const profile = profileMap[a.user_id];
+      if (profile) {
+        map[a.client_id].push({ userId: a.user_id, email: profile.email, fullName: profile.full_name });
+      }
+    });
+    setClientUsersMap(map);
+  };
+
   const fetchFeedbacks = async () => {
     if (!currentUserId) return;
 
