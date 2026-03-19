@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const role = invitation.role || "admin";
+    const role = invitation.role || "super_admin";
     const clientIds: string[] = invitation.client_ids || [];
 
     // Create user via admin API
