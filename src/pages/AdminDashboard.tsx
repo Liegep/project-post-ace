@@ -266,20 +266,38 @@ const AdminDashboard = () => {
   const fetchClients = async () => {
     setLoading(true);
     
-    if (isSuperAdmin) {
-      // Super admin sees all clients
-      const { data } = await supabase.from("clients").select("*").order("created_at", { ascending: false });
-      setClients((data as Client[]) || []);
-    } else if (currentUserId) {
-      // Admin de carteira and colaborador see only assigned clients
+    if (currentUserId) {
+      // Get assigned clients
       const { data: assignments } = await supabase
         .from("user_client_assignments")
         .select("client_id")
         .eq("user_id", currentUserId);
       
-      const clientIds = (assignments || []).map((a: any) => a.client_id);
-      if (clientIds.length > 0) {
-        const { data } = await supabase.from("clients").select("*").in("id", clientIds).order("created_at", { ascending: false });
+      const assignedIds = (assignments || []).map((a: any) => a.client_id);
+
+      // Get owned clients
+      const { data: ownedClients } = await supabase
+        .from("clients")
+        .select("*")
+        .eq("owner_id", currentUserId);
+      
+      const ownedIds = (ownedClients || []).map((c: any) => c.id);
+
+      // For super_admin, also get shared clients
+      let sharedClients: Client[] = [];
+      if (isSuperAdmin) {
+        const { data } = await supabase
+          .from("clients")
+          .select("*")
+          .eq("shared", true);
+        sharedClients = (data as Client[]) || [];
+      }
+
+      // Merge all unique client IDs
+      const allIds = [...new Set([...assignedIds, ...ownedIds, ...sharedClients.map(c => c.id)])];
+      
+      if (allIds.length > 0) {
+        const { data } = await supabase.from("clients").select("*").in("id", allIds).order("created_at", { ascending: false });
         setClients((data as Client[]) || []);
       } else {
         setClients([]);
