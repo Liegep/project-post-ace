@@ -37,10 +37,10 @@ const App = () => (
             <Route path="/" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminDashboard /></AuthGuard>} />
             <Route path="/admin" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminDashboard /></AuthGuard>} />
             <Route path="/admin/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminPage /></AuthGuard>} />
-            <Route path="/social" element={<AuthGuard allowedRoles={["super_admin"]}><SocialDashboard /></AuthGuard>} />
+            <Route path="/social" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><SocialDashboard /></AuthGuard>} />
             <Route path="/social/callback" element={<SocialCallbackPage />} />
             <Route path="/team" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><TeamDashboard /></AuthGuard>} />
-            <Route path="/team-management" element={<AuthGuard allowedRoles={["super_admin"]}><TeamManagementPage /></AuthGuard>} />
+            <Route path="/team-management" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><TeamManagementPage /></AuthGuard>} />
             <Route path="/agenda" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AgendaPage /></AuthGuard>} />
             <Route path="/ideas" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><IdeasPage /></AuthGuard>} />
             <Route path="/calendar" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CalendarPage /></AuthGuard>} />
