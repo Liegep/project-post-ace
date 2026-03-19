@@ -359,49 +359,49 @@ const BriefsPage = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl p-4 space-y-4">
+      <main className="mx-auto max-w-7xl p-3 md:p-4 space-y-4">
         {/* Actions + search */}
-        <div className="flex flex-wrap items-center gap-3">
-          <Button onClick={openCreate} className="gap-1.5">
-            <Plus className="h-4 w-4" /> Nova Pauta
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+          <Button onClick={openCreate} size="sm" className="gap-1.5">
+            <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Nova Pauta</span><span className="sm:hidden">Nova</span>
           </Button>
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <div className="relative flex-1 min-w-[140px] max-w-sm">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar pautas..."
+              placeholder="Buscar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 h-8 md:h-9 text-sm"
             />
           </div>
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
+        <div className="flex flex-wrap items-center gap-1.5 md:gap-2 overflow-x-auto">
+          <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
           <Select value={filterClient} onValueChange={setFilterClient}>
-            <SelectTrigger className="w-[160px] h-8 text-xs"><SelectValue placeholder="Cliente" /></SelectTrigger>
+            <SelectTrigger className="w-[120px] md:w-[160px] h-7 md:h-8 text-[11px] md:text-xs"><SelectValue placeholder="Cliente" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os clientes</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
               {clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-[170px] h-8 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
+            <SelectTrigger className="w-[120px] md:w-[170px] h-7 md:h-8 text-[11px] md:text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os status</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
               {Object.entries(STATUS_CONFIG).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue placeholder="Tipo" /></SelectTrigger>
+            <SelectTrigger className="hidden sm:flex w-[140px] h-7 md:h-8 text-[11px] md:text-xs"><SelectValue placeholder="Tipo" /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos os tipos</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
               {CONTENT_TYPES.map((ct) => <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={filterAssigned} onValueChange={setFilterAssigned}>
-            <SelectTrigger className="w-[160px] h-8 text-xs"><SelectValue placeholder="Responsável" /></SelectTrigger>
+            <SelectTrigger className="hidden sm:flex w-[160px] h-7 md:h-8 text-[11px] md:text-xs"><SelectValue placeholder="Responsável" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
               {teamMembers.map((m) => <SelectItem key={m.id} value={m.id}>{m.full_name || m.email}</SelectItem>)}
