@@ -677,12 +677,12 @@ const AdminDashboard = () => {
               </span>
             )}
             <LanguageSelector />
-            {isSuperAdmin && (
+            {isAdmin && (
               <Button variant="outline" size="sm" onClick={() => navigate("/team-management")}>
                 <Users className="mr-1 h-4 w-4" /> {t("team")}
               </Button>
             )}
-            {isSuperAdmin && (
+            {isAdmin && (
               <Button variant="outline" size="sm" onClick={() => navigate("/social")}>
                 <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
               </Button>
@@ -696,7 +696,7 @@ const AdminDashboard = () => {
             <Button variant="ghost" size="icon" onClick={() => navigate("/briefs")} title="Pautas">
               <FileText className="h-5 w-5" />
             </Button>
-            {isSuperAdmin && (
+            {isAdmin && (
               <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Plus className="mr-2 h-4 w-4" /> {t("newClient")}
               </Button>
