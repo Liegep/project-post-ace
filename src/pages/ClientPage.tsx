@@ -83,14 +83,18 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+      <header className="border-b bg-card px-4 py-5 sm:px-6 sm:py-6">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-4 sm:flex-row sm:justify-between">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
             {clientData.logo_url && (
-              <img src={clientData.logo_url} alt="Logo" className="h-16 w-16 rounded-lg object-contain" />
+              <img
+                src={clientData.logo_url}
+                alt="Logo"
+                className="h-20 w-20 rounded-xl object-contain shadow-sm border border-border sm:h-24 sm:w-24"
+              />
             )}
-            <div>
-              <h1 className="text-4xl font-extrabold text-foreground">{clientData.name}</h1>
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl font-extrabold text-foreground sm:text-4xl">{clientData.name}</h1>
               <p className="text-sm text-muted-foreground">{t("clientSubtitle")}</p>
             </div>
           </div>
