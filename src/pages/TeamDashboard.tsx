@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Textarea } from "@/components/ui/textarea";
 import { LABEL_CONFIG } from "@/types/post";
 import { CalendarClock, Bell, MessageCircle, Clock, CheckCircle, AlertCircle, FileText, X, CalendarDays, Instagram, Facebook, Youtube, Linkedin, Twitter, Globe } from "lucide-react";
+import { MobileNav } from "@/components/MobileNav";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { toast } from "@/hooks/use-toast";
 import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
