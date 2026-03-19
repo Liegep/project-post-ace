@@ -785,9 +785,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="relative">
                   <LinkIcon className="h-4 w-4 text-blue-500" />
-                  {[clientData.instagram_url, clientData.facebook_url, clientData.tiktok_url, clientData.youtube_url, clientData.linkedin_url, clientData.twitter_url, clientData.website_url].filter(Boolean).length > 0 && (
+                  {linksCount > 0 && (
                     <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
-                      {[clientData.instagram_url, clientData.facebook_url, clientData.tiktok_url, clientData.youtube_url, clientData.linkedin_url, clientData.twitter_url, clientData.website_url].filter(Boolean).length}
+                      {linksCount}
                     </span>
                   )}
                 </Button>
@@ -799,41 +799,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     Links do Cliente
                   </SheetTitle>
                 </SheetHeader>
-                <div className="mt-6 space-y-3">
-                  {[
-                    { label: "Instagram", url: clientData.instagram_url, icon: "📸" },
-                    { label: "Facebook", url: clientData.facebook_url, icon: "📘" },
-                    { label: "TikTok", url: clientData.tiktok_url, icon: "🎵" },
-                    { label: "YouTube", url: clientData.youtube_url, icon: "▶️" },
-                    { label: "LinkedIn", url: clientData.linkedin_url, icon: "💼" },
-                    { label: "X / Twitter", url: clientData.twitter_url, icon: "🐦" },
-                    { label: "Website", url: clientData.website_url, icon: "🌐" },
-                  ].map(({ label, url, icon }) =>
-                    url ? (
-                      <a
-                        key={label}
-                        href={url.startsWith("http") ? url : `https://${url}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 rounded-lg border p-3 hover:bg-muted/50 transition-colors group"
-                      >
-                        <span className="text-xl">{icon}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium">{label}</p>
-                          <p className="text-xs text-muted-foreground truncate">{url}</p>
-                        </div>
-                        <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </a>
-                    ) : (
-                      <div key={label} className="flex items-center gap-3 rounded-lg border border-dashed p-3 opacity-40">
-                        <span className="text-xl">{icon}</span>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{label}</p>
-                          <p className="text-xs text-muted-foreground italic">Não configurado</p>
-                        </div>
-                      </div>
-                    )
-                  )}
+                <div className="mt-6">
+                  <ClientLinksPanel clientId={clientData.id} onCountChange={setLinksCount} />
                 </div>
               </SheetContent>
             </Sheet>
