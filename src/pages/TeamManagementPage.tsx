@@ -280,7 +280,7 @@ const TeamManagementPage = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl p-6">
+      <main className="mx-auto max-w-5xl p-4 md:p-6">
         {/* Role filter */}
         <div className="mb-6 flex flex-wrap gap-2">
           {[
