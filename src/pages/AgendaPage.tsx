@@ -700,6 +700,15 @@ const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete 
                   {apt.category}
                 </Badge>
               )}
+              {aptTag && (
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                  style={{ backgroundColor: aptTag.color + "20", color: aptTag.color, borderColor: aptTag.color + "50" }}
+                >
+                  {aptTag.name}
+                </Badge>
+              )}
             </div>
 
             <div className="flex gap-2">
