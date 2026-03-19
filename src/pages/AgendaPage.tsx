@@ -259,6 +259,7 @@ const AgendaPage = () => {
           <MonthView
             currentDate={currentDate}
             appointmentsByDate={appointmentsByDate}
+            tags={tags}
             onDayClick={(d) => { setCurrentDate(d); setViewMode("day"); }}
             onCreateClick={(d) => openCreateForDate(d)}
           />
@@ -269,6 +270,7 @@ const AgendaPage = () => {
               : eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: 1 }), end: endOfWeek(currentDate, { weekStartsOn: 1 }) })
             }
             appointmentsByDate={appointmentsByDate}
+            tags={tags}
             onToggle={toggleComplete}
             onCancel={toggleCancelled}
             onDelete={deleteAppointment}
