@@ -11,11 +11,15 @@ import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Archive, LayoutGrid, RotateCcw, Plus, LogOut } from "lucide-react";
+import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound } from "lucide-react";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface ClientData {
   id: string;
@@ -43,6 +47,34 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [createOpen, setCreateOpen] = useState(false);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
   const [detailPost, setDetailPost] = useState<Post | null>(null);
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [savingPassword, setSavingPassword] = useState(false);
+
+  const handleChangePassword = async () => {
+    if (newPassword.length < 6) {
+      toast.error("A nova senha deve ter pelo menos 6 caracteres");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error("As senhas não coincidem");
+      return;
+    }
+    setSavingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setSavingPassword(false);
+    if (error) {
+      toast.error("Erro ao alterar senha: " + error.message);
+    } else {
+      toast.success("Senha alterada com sucesso!");
+      setPasswordOpen(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    }
+  };
 
   const readyPosts = posts.filter((p) => p.status.includes("pronto"));
 
@@ -98,18 +130,66 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               <p className="text-sm text-muted-foreground">{t("clientSubtitle")}</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={async () => {
-              await supabase.auth.signOut();
-              window.location.href = "/login";
-            }}
-            className="text-muted-foreground hover:text-destructive"
-          >
-            <LogOut className="mr-1.5 h-4 w-4" />
-            Sair
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPasswordOpen(true)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <KeyRound className="mr-1.5 h-4 w-4" />
+              Alterar senha
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                window.location.href = "/login";
+              }}
+              className="text-muted-foreground hover:text-destructive"
+            >
+              <LogOut className="mr-1.5 h-4 w-4" />
+              Sair
+            </Button>
+          </div>
+
+          <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Alterar senha</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-2">
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">Nova senha</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Mínimo 6 caracteres"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirmar nova senha</Label>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repita a nova senha"
+                  />
+                </div>
+                <Button
+                  onClick={handleChangePassword}
+                  disabled={savingPassword}
+                  className="w-full"
+                >
+                  {savingPassword ? "Salvando..." : "Alterar senha"}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
 
