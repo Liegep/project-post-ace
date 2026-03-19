@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,10 +9,10 @@ import { SocialPostCard } from "@/components/social/SocialPostCard";
 import { SocialPostDialog } from "@/components/social/SocialPostDialog";
 import { SocialCalendar, type ScheduledKanbanPost } from "@/components/social/SocialCalendar";
 import { MetaConnectPanel } from "@/components/social/MetaConnectPanel";
+import { MobileNav } from "@/components/MobileNav";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Plus, CalendarDays, List, ArrowLeft, Facebook, Instagram, Settings, FileText, CheckCircle, Clock, Send, AlertTriangle, LogOut } from "lucide-react";
-import { useEffect } from "react";
 
 interface Client {
   id: string;
