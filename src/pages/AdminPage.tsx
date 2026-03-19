@@ -749,6 +749,29 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             <Button onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newPost")}
             </Button>
+            <Sheet open={notesOpen} onOpenChange={setNotesOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="relative">
+                  <StickyNote className="h-4 w-4 text-amber-500" />
+                  {notesCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+                      {notesCount}
+                    </span>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle className="flex items-center gap-2">
+                    <StickyNote className="h-5 w-5 text-amber-500" />
+                    {t("clientNotes")}
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">
+                  <ClientNotes clientId={clientData.id} onCountChange={setNotesCount} />
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>
