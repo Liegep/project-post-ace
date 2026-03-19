@@ -413,6 +413,66 @@ const AgendaPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Tag Manager Dialog */}
+      <Dialog open={tagDialogOpen} onOpenChange={setTagDialogOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Tag className="h-5 w-5 text-primary" />
+              Gerenciar Etiquetas
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Nome da etiqueta"
+                value={newTagName}
+                onChange={e => setNewTagName(e.target.value)}
+                className="flex-1"
+              />
+              <input
+                type="color"
+                value={newTagColor}
+                onChange={e => setNewTagColor(e.target.value)}
+                className="h-10 w-10 rounded border cursor-pointer"
+              />
+              <Button
+                size="sm"
+                disabled={!newTagName.trim()}
+                onClick={async () => {
+                  await createTag(newTagName.trim(), newTagColor);
+                  setNewTagName("");
+                  setNewTagColor("#3b82f6");
+                }}
+                className="bg-accent text-accent-foreground"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            {tags.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">Nenhuma etiqueta criada ainda.</p>
+            ) : (
+              <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                {tags.map(tag => (
+                  <div key={tag.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ backgroundColor: tag.color + "20" }}>
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full" style={{ backgroundColor: tag.color }} />
+                      <span className="text-sm font-medium" style={{ color: tag.color }}>{tag.name}</span>
+                    </div>
+                    <button
+                      onClick={() => deleteTag(tag.id)}
+                      className="rounded-full p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
