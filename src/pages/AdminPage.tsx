@@ -904,7 +904,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     }}
                   />
                 )}
-                <ClientNotes clientId={clientData.id} />
+                
               </div>
             ) : (
               <div className="space-y-3">
