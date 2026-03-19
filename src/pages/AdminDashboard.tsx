@@ -35,6 +35,8 @@ interface Client {
   linkedin_url: string;
   twitter_url: string;
   website_url: string;
+  owner_id: string | null;
+  shared: boolean;
 }
 
 interface ClientUser {
