@@ -151,6 +151,7 @@ const AdminDashboard = () => {
   const [shareSelectedUsers, setShareSelectedUsers] = useState<Set<string>>(new Set());
   const [clientAssignments, setClientAssignments] = useState<{ user_id: string; client_id: string }[]>([]);
   const [clientUsersMap, setClientUsersMap] = useState<ClientUserMap>({});
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const fetchStatusNotifs = async () => {
     const { data } = await supabase
