@@ -230,13 +230,13 @@ export default function SocialDashboard() {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-wrap gap-3 items-center">
-          <div className="flex gap-1 bg-muted rounded-lg p-1">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2 md:gap-3 items-start sm:items-center overflow-x-auto">
+          <div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto max-w-full">
             {STATUS_FILTERS.map((f) => (
               <button
                 key={f.value}
                 onClick={() => setStatusFilter(f.value)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-medium rounded-md transition-colors whitespace-nowrap ${
                   statusFilter === f.value ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -247,21 +247,21 @@ export default function SocialDashboard() {
           <div className="flex gap-1 bg-muted rounded-lg p-1">
             <button
               onClick={() => setPlatformFilter("all")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${platformFilter === "all" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+              className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-medium rounded-md transition-colors ${platformFilter === "all" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
               Todos
             </button>
             <button
               onClick={() => setPlatformFilter("facebook")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors flex items-center gap-1 ${platformFilter === "facebook" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+              className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-medium rounded-md transition-colors flex items-center gap-1 ${platformFilter === "facebook" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
-              <Facebook className="h-3 w-3" /> Facebook
+              <Facebook className="h-3 w-3" /> <span className="hidden sm:inline">Facebook</span>
             </button>
             <button
               onClick={() => setPlatformFilter("instagram")}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors flex items-center gap-1 ${platformFilter === "instagram" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+              className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-medium rounded-md transition-colors flex items-center gap-1 ${platformFilter === "instagram" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
-              <Instagram className="h-3 w-3" /> Instagram
+              <Instagram className="h-3 w-3" /> <span className="hidden sm:inline">Instagram</span>
             </button>
           </div>
         </div>
