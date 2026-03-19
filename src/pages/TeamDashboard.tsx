@@ -260,16 +260,19 @@ const TeamDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              {t("hello")}, {userName || t("teamMember")} 👋
-            </h1>
-            <p className="text-sm text-muted-foreground">{t("yourClients")}: {clients.length}</p>
+      <header className="border-b bg-card px-4 py-3 md:px-6 md:py-4">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-2">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <MobileNav title="Equipe" />
+            <div className="min-w-0">
+              <h1 className="text-lg md:text-2xl font-bold text-foreground truncate">
+                {t("hello")}, {userName || t("teamMember")} 👋
+              </h1>
+              <p className="text-xs md:text-sm text-muted-foreground">{t("yourClients")}: {clients.length}</p>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => navigate("/briefs")}>
+          <div className="flex items-center gap-1.5 md:gap-3 shrink-0">
+            <Button variant="outline" size="sm" className="gap-1.5 hidden sm:flex" onClick={() => navigate("/briefs")}>
               <FileText className="h-4 w-4" /> Pautas
             </Button>
             <LanguageSelector />
