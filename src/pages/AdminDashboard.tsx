@@ -1009,113 +1009,186 @@ const AdminDashboard = () => {
             </div>
             <h2 className="text-xl font-semibold text-foreground">{t("noClientsYet")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{t("createFirstClient")}</p>
-            <Button onClick={openCreate} className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
-              <Plus className="mr-2 h-4 w-4" /> {t("createClient")}
-            </Button>
+            {isSuperAdmin && (
+              <Button onClick={openCreate} className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
+                <Plus className="mr-2 h-4 w-4" /> {t("createClient")}
+              </Button>
+            )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {clients.map((client) => (
-              <div
-                key={client.id}
-                className="group relative flex flex-col rounded-xl border bg-card p-5 transition-shadow hover:shadow-lg"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  {client.logo_url ? (
-                    <img src={client.logo_url} alt={client.name} className="h-12 w-12 rounded-lg object-contain border" />
-                  ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted">
-                      <span className="text-lg font-bold text-muted-foreground">
-                        {client.name.charAt(0).toUpperCase()}
+          <>
+            {/* Filter tabs for super admin */}
+            {isSuperAdmin && (
+              <div className="flex items-center gap-2 mb-4">
+                <button
+                  onClick={() => setClientFilter("all")}
+                  className={cn("rounded-full px-3 py-1 text-xs font-medium transition-colors", clientFilter === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80")}
+                >
+                  Todos ({clients.length})
+                </button>
+                <button
+                  onClick={() => setClientFilter("mine")}
+                  className={cn("rounded-full px-3 py-1 text-xs font-medium transition-colors", clientFilter === "mine" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80")}
+                >
+                  Meus ({clients.filter(c => c.owner_id === currentUserId).length})
+                </button>
+                <button
+                  onClick={() => setClientFilter("shared")}
+                  className={cn("rounded-full px-3 py-1 text-xs font-medium transition-colors", clientFilter === "shared" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80")}
+                >
+                  <Share2 className="inline h-3 w-3 mr-1" />
+                  Compartilhados ({clients.filter(c => c.shared).length})
+                </button>
+              </div>
+            )}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {clients
+                .filter(c => {
+                  if (!isSuperAdmin || clientFilter === "all") return true;
+                  if (clientFilter === "mine") return c.owner_id === currentUserId;
+                  if (clientFilter === "shared") return c.shared;
+                  return true;
+                })
+                .map((client) => (
+                <div
+                  key={client.id}
+                  className="group relative flex flex-col rounded-xl border bg-card p-5 transition-shadow hover:shadow-lg"
+                >
+                  {/* Owner/Shared badges */}
+                  <div className="absolute top-2 right-2 flex items-center gap-1">
+                    {client.owner_id === currentUserId && (
+                      <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-amber-600" title="Você é o dono">
+                        <Shield className="h-2.5 w-2.5" /> Dono
                       </span>
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <h3 className="font-semibold text-foreground truncate">{client.name}</h3>
-                      <div className="flex items-center gap-0.5 shrink-0">
-                        {client.instagram_url && (
-                          <a href={client.instagram_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-pink-500 transition-colors" title="Instagram">
-                            <Instagram className="h-3.5 w-3.5" />
-                          </a>
-                        )}
-                        {client.facebook_url && (
-                          <a href={client.facebook_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-blue-600 transition-colors" title="Facebook">
-                            <Facebook className="h-3.5 w-3.5" />
-                          </a>
-                        )}
-                        {client.tiktok_url && (
-                          <a href={client.tiktok_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors" title="TikTok">
-                            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 3.76.92V6.69Z"/></svg>
-                          </a>
-                        )}
-                        {client.youtube_url && (
-                          <a href={client.youtube_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-red-500 transition-colors" title="YouTube">
-                            <Youtube className="h-3.5 w-3.5" />
-                          </a>
-                        )}
-                        {client.linkedin_url && (
-                          <a href={client.linkedin_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-blue-700 transition-colors" title="LinkedIn">
-                            <Linkedin className="h-3.5 w-3.5" />
-                          </a>
-                        )}
-                        {client.twitter_url && (
-                          <a href={client.twitter_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors" title="X (Twitter)">
-                            <Twitter className="h-3.5 w-3.5" />
-                          </a>
-                        )}
-                        {client.website_url && (
-                          <a href={client.website_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-primary transition-colors" title="Website">
-                            <Globe className="h-3.5 w-3.5" />
-                          </a>
-                        )}
+                    )}
+                    {client.shared ? (
+                      <span className="inline-flex items-center gap-0.5 rounded-full bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600" title="Compartilhado">
+                        <Share2 className="h-2.5 w-2.5" />
+                      </span>
+                    ) : client.owner_id && client.owner_id !== currentUserId ? null : (
+                      <span className="inline-flex items-center gap-0.5 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold text-muted-foreground" title="Privado">
+                        <Lock className="h-2.5 w-2.5" />
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3 mb-3">
+                    {client.logo_url ? (
+                      <img src={client.logo_url} alt={client.name} className="h-12 w-12 rounded-lg object-contain border" />
+                    ) : (
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 bg-muted">
+                        <span className="text-lg font-bold text-muted-foreground">
+                          {client.name.charAt(0).toUpperCase()}
+                        </span>
                       </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="font-semibold text-foreground truncate">{client.name}</h3>
+                        <div className="flex items-center gap-0.5 shrink-0">
+                          {client.instagram_url && (
+                            <a href={client.instagram_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-pink-500 transition-colors" title="Instagram">
+                              <Instagram className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                          {client.facebook_url && (
+                            <a href={client.facebook_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-blue-600 transition-colors" title="Facebook">
+                              <Facebook className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                          {client.tiktok_url && (
+                            <a href={client.tiktok_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors" title="TikTok">
+                              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.34-6.34V8.75a8.18 8.18 0 0 0 3.76.92V6.69Z"/></svg>
+                            </a>
+                          )}
+                          {client.youtube_url && (
+                            <a href={client.youtube_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-red-500 transition-colors" title="YouTube">
+                              <Youtube className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                          {client.linkedin_url && (
+                            <a href={client.linkedin_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-blue-700 transition-colors" title="LinkedIn">
+                              <Linkedin className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                          {client.twitter_url && (
+                            <a href={client.twitter_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-foreground transition-colors" title="X (Twitter)">
+                              <Twitter className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                          {client.website_url && (
+                            <a href={client.website_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="rounded p-0.5 text-muted-foreground hover:text-primary transition-colors" title="Website">
+                              <Globe className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {LOCALE_FLAGS[client.locale as Locale]} {LOCALE_LABELS[client.locale as Locale]}
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      {LOCALE_FLAGS[client.locale as Locale]} {LOCALE_LABELS[client.locale as Locale]}
-                    </p>
+                  </div>
+
+                  <div className="mb-4 flex items-center gap-1.5 rounded-md bg-muted px-2.5 py-1.5 text-xs text-muted-foreground">
+                    <ExternalLink className="h-3 w-3 flex-shrink-0" />
+                    <span className="truncate">{baseUrl}/client/{client.slug}</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); copyClientUrl(client.slug); }}
+                      className="ml-auto flex-shrink-0 rounded p-0.5 hover:bg-background"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </button>
+                  </div>
+
+                  <div className="mt-auto flex gap-2">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => navigate(`/admin/${client.slug}`)}
+                    >
+                      {t("manage")}
+                    </Button>
+                    {(isSuperAdmin || client.owner_id === currentUserId) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openEdit(client)}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                    {isSuperAdmin && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(client.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                    {/* Share with super admin button (for admin de carteira) */}
+                    {!isSuperAdmin && client.owner_id === currentUserId && !client.shared && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          await supabase.from("clients").update({ shared: true } as any).eq("id", client.id);
+                          setClients(prev => prev.map(c => c.id === client.id ? { ...c, shared: true } : c));
+                          toast({ title: "Cliente compartilhado", description: "O Super Admin agora pode visualizar este cliente." });
+                        }}
+                        title="Compartilhar com Super Admin"
+                      >
+                        <Share2 className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                   </div>
                 </div>
-
-                <div className="mb-4 flex items-center gap-1.5 rounded-md bg-muted px-2.5 py-1.5 text-xs text-muted-foreground">
-                  <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                  <span className="truncate">{baseUrl}/client/{client.slug}</span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); copyClientUrl(client.slug); }}
-                    className="ml-auto flex-shrink-0 rounded p-0.5 hover:bg-background"
-                  >
-                    <Copy className="h-3 w-3" />
-                  </button>
-                </div>
-
-                <div className="mt-auto flex gap-2">
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => navigate(`/admin/${client.slug}`)}
-                  >
-                    {t("manage")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => openEdit(client)}
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(client.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
       </main>
 
