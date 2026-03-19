@@ -87,8 +87,8 @@ Deno.serve(async (req) => {
       role,
     });
 
-    // Assign clients for team members
-    if (role === "team_member" && clientIds.length > 0) {
+    // Assign clients for admin de carteira and colaboradores
+    if ((role === "admin" || role === "colaborador") && clientIds.length > 0) {
       const assignments = clientIds.map((client_id: string) => ({
         user_id: newUser.user.id,
         client_id,
