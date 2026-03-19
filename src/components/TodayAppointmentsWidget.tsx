@@ -14,6 +14,13 @@ interface TodayAppt {
   time: string;
   category: string;
   completed: boolean;
+  tagId: string | null;
+}
+
+interface ApptTag {
+  id: string;
+  name: string;
+  color: string;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -27,28 +34,34 @@ const CATEGORY_COLORS: Record<string, string> = {
 export const TodayAppointmentsWidget = () => {
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState<TodayAppt[]>([]);
+  const [tags, setTags] = useState<ApptTag[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedAppt, setSelectedAppt] = useState<TodayAppt | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const today = format(new Date(), "yyyy-MM-dd");
-      const { data } = await supabase
-        .from("appointments")
-        .select("id, title, description, appointment_time, category, completed")
-        .eq("appointment_date", today)
-        .order("appointment_time", { ascending: true });
+      const [{ data: apptData }, { data: tagData }] = await Promise.all([
+        supabase
+          .from("appointments")
+          .select("id, title, description, appointment_time, category, completed, tag_id")
+          .eq("appointment_date", today)
+          .order("appointment_time", { ascending: true }),
+        supabase.from("appointment_tags" as any).select("*").order("name"),
+      ]);
 
       setAppointments(
-        (data || []).map((r: any) => ({
+        (apptData || []).map((r: any) => ({
           id: r.id,
           title: r.title,
           description: r.description || "",
           time: r.appointment_time?.slice(0, 5) || "09:00",
           category: r.category || "",
           completed: r.completed,
+          tagId: r.tag_id || null,
         }))
       );
+      setTags((tagData || []).map((t: any) => ({ id: t.id, name: t.name, color: t.color })));
       setLoading(false);
     };
     fetchData();
@@ -70,6 +83,7 @@ export const TodayAppointmentsWidget = () => {
   if (loading || appointments.length === 0) return null;
 
   const pending = appointments.filter(a => !a.completed).length;
+  const getTag = (tagId: string | null) => tagId ? tags.find(t => t.id === tagId) : null;
 
   return (
     <>
@@ -99,6 +113,8 @@ export const TodayAppointmentsWidget = () => {
             const aptTime = new Date(`${format(now, "yyyy-MM-dd")}T${apt.time}`);
             const isOverdue = !apt.completed && aptTime < now;
             const catStyle = CATEGORY_COLORS[apt.category.toLowerCase()] || CATEGORY_COLORS[""];
+            const aptTag = getTag(apt.tagId);
+            const useTagColor = !apt.completed && !isOverdue && aptTag;
 
             return (
               <div
@@ -106,8 +122,9 @@ export const TodayAppointmentsWidget = () => {
                 onClick={() => setSelectedAppt(apt)}
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 transition-colors cursor-pointer",
-                  apt.completed ? "bg-success/5 opacity-60" : isOverdue ? "bg-destructive/5" : "bg-muted/50 hover:bg-muted"
+                  apt.completed ? "bg-success/5 opacity-60" : isOverdue ? "bg-destructive/5" : useTagColor ? "" : "bg-muted/50 hover:bg-muted"
                 )}
+                style={useTagColor ? { backgroundColor: aptTag!.color + "20" } : undefined}
               >
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleComplete(apt.id, !apt.completed); }}
@@ -134,6 +151,14 @@ export const TodayAppointmentsWidget = () => {
                       {apt.category}
                     </span>
                   )}
+                  {aptTag && !apt.completed && (
+                    <span
+                      className="ml-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                      style={{ backgroundColor: aptTag.color + "30", color: aptTag.color }}
+                    >
+                      {aptTag.name}
+                    </span>
+                  )}
                 </div>
                 <span className={cn(
                   "flex items-center gap-1 text-xs font-mono shrink-0",
@@ -156,27 +181,39 @@ export const TodayAppointmentsWidget = () => {
               {selectedAppt?.title}
             </DialogTitle>
           </DialogHeader>
-          {selectedAppt && (
-            <div className="space-y-3 pt-1">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span>Hoje às {selectedAppt.time}</span>
-                {selectedAppt.category && (
-                  <Badge variant="outline" className={cn("text-xs", CATEGORY_COLORS[selectedAppt.category.toLowerCase()] || "")}>
-                    {selectedAppt.category}
-                  </Badge>
+          {selectedAppt && (() => {
+            const aptTag = getTag(selectedAppt.tagId);
+            return (
+              <div className="space-y-3 pt-1">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span>Hoje às {selectedAppt.time}</span>
+                  {selectedAppt.category && (
+                    <Badge variant="outline" className={cn("text-xs", CATEGORY_COLORS[selectedAppt.category.toLowerCase()] || "")}>
+                      {selectedAppt.category}
+                    </Badge>
+                  )}
+                  {aptTag && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs"
+                      style={{ backgroundColor: aptTag.color + "20", color: aptTag.color, borderColor: aptTag.color + "50" }}
+                    >
+                      {aptTag.name}
+                    </Badge>
+                  )}
+                </div>
+                {selectedAppt.completed && (
+                  <Badge className="bg-success/20 text-success border-success/30">Concluído</Badge>
                 )}
+                <div className="rounded-lg bg-muted/50 p-3">
+                  <p className="text-sm text-foreground whitespace-pre-wrap">
+                    {selectedAppt.description || "Sem descrição adicional."}
+                  </p>
+                </div>
               </div>
-              {selectedAppt.completed && (
-                <Badge className="bg-success/20 text-success border-success/30">Concluído</Badge>
-              )}
-              <div className="rounded-lg bg-muted/50 p-3">
-                <p className="text-sm text-foreground whitespace-pre-wrap">
-                  {selectedAppt.description || "Sem descrição adicional."}
-                </p>
-              </div>
-            </div>
-          )}
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </>
