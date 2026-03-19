@@ -10,6 +10,7 @@ import {
   ArrowLeft, ChevronLeft, ChevronRight, Plus, Check, Clock,
   CalendarDays, LayoutGrid, List, Columns3
 } from "lucide-react";
+import { MobileNav } from "@/components/MobileNav";
 import {
   format, startOfMonth, endOfMonth, eachDayOfInterval, getDay,
   addMonths, subMonths, addWeeks, subWeeks, addDays, subDays,
