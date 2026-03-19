@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import ClientBriefs from "@/components/ClientBriefs";
+import { UpcomingPostsWidget } from "@/components/UpcomingPostsWidget";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { PostsProvider, usePosts } from "@/context/PostsContext";
