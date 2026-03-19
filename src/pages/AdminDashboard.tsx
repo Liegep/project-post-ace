@@ -691,6 +691,7 @@ const AdminDashboard = () => {
           locale,
           logo_url: logoUrl,
           owner_id: session?.user?.id || null,
+          client_type: clientType,
           ...socialFields,
         } as any).select().single();
         clientId = (newClient as any)?.id;
