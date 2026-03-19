@@ -14,10 +14,11 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote } from "lucide-react";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { ClientNotes } from "@/components/ClientNotes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
@@ -498,6 +499,10 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const editColumnInputRef = useRef<HTMLInputElement>(null);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
 
+  // Notes panel state
+  const [notesCount, setNotesCount] = useState(0);
+  const [notesOpen, setNotesOpen] = useState(false);
+
   // Selection mode state
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
@@ -744,6 +749,29 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             <Button onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newPost")}
             </Button>
+            <Sheet open={notesOpen} onOpenChange={setNotesOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="relative">
+                  <StickyNote className="h-4 w-4 text-amber-500" />
+                  {notesCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+                      {notesCount}
+                    </span>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle className="flex items-center gap-2">
+                    <StickyNote className="h-5 w-5 text-amber-500" />
+                    {t("clientNotes")}
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">
+                  <ClientNotes clientId={clientData.id} onCountChange={setNotesCount} />
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>
@@ -899,7 +927,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     }}
                   />
                 )}
-                <ClientNotes clientId={clientData.id} />
+                
               </div>
             ) : (
               <div className="space-y-3">

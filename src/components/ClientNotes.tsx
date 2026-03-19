@@ -41,9 +41,10 @@ interface ClientNote {
 
 interface ClientNotesProps {
   clientId: string;
+  onCountChange?: (count: number) => void;
 }
 
-export const ClientNotes = ({ clientId }: ClientNotesProps) => {
+export const ClientNotes = ({ clientId, onCountChange }: ClientNotesProps) => {
   const { t } = useI18n();
   const [notes, setNotes] = useState<ClientNote[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
@@ -84,6 +85,7 @@ export const ClientNotes = ({ clientId }: ClientNotesProps) => {
       }))
     );
     setLoading(false);
+    onCountChange?.((data as any[]).length);
   };
 
   useEffect(() => {
@@ -153,17 +155,17 @@ export const ClientNotes = ({ clientId }: ClientNotesProps) => {
 
   const handleDelete = async (noteId: string) => {
     await supabase.from("client_notes" as any).delete().eq("id", noteId);
-    setNotes((prev) => prev.filter((n) => n.id !== noteId));
+    setNotes((prev) => {
+      const updated = prev.filter((n) => n.id !== noteId);
+      onCountChange?.(updated.length);
+      return updated;
+    });
     toast({ title: t("noteDeleted") });
   };
 
   return (
-    <div className="mt-8">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <StickyNote className="h-5 w-5 text-amber-500" />
-          <h2 className="text-lg font-bold">{t("clientNotes")}</h2>
-        </div>
+    <div>
+      <div className="flex items-center justify-end mb-4">
         <Button size="sm" onClick={() => setCreateOpen(true)} className="gap-1.5">
           <Plus className="h-4 w-4" />
           {t("newNote")}
@@ -177,7 +179,7 @@ export const ClientNotes = ({ clientId }: ClientNotesProps) => {
       ) : notes.length === 0 ? (
         <p className="text-sm text-muted-foreground text-center py-6">{t("noNotes")}</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           {notes.map((note) => (
             <div
               key={note.id}
