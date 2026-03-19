@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, Globe, CheckCircle2, Shield, Share2, Lock } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, Globe, CheckCircle2, Shield, Share2, Lock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { LABEL_CONFIG, Post, PostStatus, ClientLabel, STATUS_CONFIG, Tag, DEFAULT_TAGS } from "@/types/post";
@@ -42,6 +42,11 @@ interface Client {
 interface ClientUser {
   userId: string;
   email: string;
+  fullName?: string;
+}
+
+interface ClientUserMap {
+  [clientId: string]: ClientUser[];
 }
 
 interface FeedbackNotification {
@@ -135,6 +140,7 @@ const AdminDashboard = () => {
   const [allAdmins, setAllAdmins] = useState<{ id: string; full_name: string; email: string }[]>([]);
   const [shareSelectedUsers, setShareSelectedUsers] = useState<Set<string>>(new Set());
   const [clientAssignments, setClientAssignments] = useState<{ user_id: string; client_id: string }[]>([]);
+  const [clientUsersMap, setClientUsersMap] = useState<ClientUserMap>({});
 
   const fetchStatusNotifs = async () => {
     const { data } = await supabase
@@ -184,7 +190,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (role === null && currentUserId === null) return; // still loading
-    fetchClients();
+    fetchClients().then(() => fetchClientUsers());
     fetchFeedbacks();
     fetchUnarchiveNotifs();
     fetchClientCreatedNotifs();
@@ -305,6 +311,46 @@ const AdminDashboard = () => {
     }
     
     setLoading(false);
+  };
+
+  const fetchClientUsers = async () => {
+    // Get all client role users
+    const { data: clientRoles } = await supabase
+      .from("user_roles")
+      .select("user_id")
+      .eq("role", "client");
+    
+    if (!clientRoles || clientRoles.length === 0) {
+      setClientUsersMap({});
+      return;
+    }
+
+    const clientUserIds = clientRoles.map(r => r.user_id);
+
+    // Get their assignments
+    const { data: assignments } = await supabase
+      .from("user_client_assignments")
+      .select("user_id, client_id")
+      .in("user_id", clientUserIds);
+
+    // Get their profiles
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, full_name, email")
+      .in("id", clientUserIds);
+
+    const profileMap: Record<string, { full_name: string; email: string }> = {};
+    (profiles || []).forEach(p => { profileMap[p.id] = { full_name: p.full_name, email: p.email }; });
+
+    const map: ClientUserMap = {};
+    (assignments || []).forEach(a => {
+      if (!map[a.client_id]) map[a.client_id] = [];
+      const profile = profileMap[a.user_id];
+      if (profile) {
+        map[a.client_id].push({ userId: a.user_id, email: profile.email, fullName: profile.full_name });
+      }
+    });
+    setClientUsersMap(map);
   };
 
   const fetchFeedbacks = async () => {
@@ -689,7 +735,7 @@ const AdminDashboard = () => {
       }
 
       setDialogOpen(false);
-      fetchClients();
+      fetchClients().then(() => fetchClientUsers());
     } catch (err) {
       console.error(err);
     } finally {
@@ -751,7 +797,7 @@ const AdminDashboard = () => {
             </Button>
             {isAdmin && (
               <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <Plus className="mr-2 h-4 w-4" /> {t("newClient")}
+                <Plus className="mr-2 h-4 w-4" /> Clientes
               </Button>
             )}
             <UserProfileMenu />
@@ -1210,6 +1256,19 @@ const AdminDashboard = () => {
                       <Copy className="h-3 w-3" />
                     </button>
                   </div>
+
+                  {/* Client user accounts */}
+                  {clientUsersMap[client.id] && clientUsersMap[client.id].length > 0 && (
+                    <div className="mb-3 space-y-1">
+                      {clientUsersMap[client.id].map(cu => (
+                        <div key={cu.userId} className="flex items-center gap-2 rounded-md bg-muted/50 px-2.5 py-1.5 text-xs">
+                          <User className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span className="text-muted-foreground truncate">{cu.fullName || cu.email}</span>
+                          <span className="text-muted-foreground/60 truncate ml-auto text-[10px]">{cu.email}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   <div className="mt-auto flex gap-2">
                     <Button
