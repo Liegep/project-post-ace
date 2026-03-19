@@ -680,6 +680,7 @@ const AdminDashboard = () => {
           slug,
           locale,
           logo_url: logoUrl,
+          client_type: clientType,
           ...socialFields,
         } as any).eq("id", editingClient.id);
       } else {
