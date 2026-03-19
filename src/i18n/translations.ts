@@ -175,6 +175,19 @@ type TranslationKeys = {
   trackingActive: string;
   trackingCreated: string;
   trackingCreatedDesc: string;
+  // Client Notes
+  clientNotes: string;
+  newNote: string;
+  noNotes: string;
+  noteTitle: string;
+  noteContent: string;
+  noteColor: string;
+  noteAddLink: string;
+  noteAddMedia: string;
+  noteSelectFile: string;
+  createNote: string;
+  noteCreated: string;
+  noteDeleted: string;
   // Trello
   syncWithTrello: string;
   trelloBoardId: string;
