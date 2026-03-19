@@ -155,7 +155,11 @@ export const ClientNotes = ({ clientId, onCountChange }: ClientNotesProps) => {
 
   const handleDelete = async (noteId: string) => {
     await supabase.from("client_notes" as any).delete().eq("id", noteId);
-    setNotes((prev) => prev.filter((n) => n.id !== noteId));
+    setNotes((prev) => {
+      const updated = prev.filter((n) => n.id !== noteId);
+      onCountChange?.(updated.length);
+      return updated;
+    });
     toast({ title: t("noteDeleted") });
   };
 
