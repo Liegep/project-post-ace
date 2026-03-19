@@ -18,6 +18,7 @@ import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVerti
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { ClientNotes } from "@/components/ClientNotes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
