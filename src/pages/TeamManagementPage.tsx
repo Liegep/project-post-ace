@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { ArrowLeft, Plus, Users, Pencil, Trash2, Shield, UserCheck, Eye } from "lucide-react";
+import { ArrowLeft, Plus, Users, Pencil, Trash2, Shield, UserCheck, Eye, Link2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
