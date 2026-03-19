@@ -270,7 +270,7 @@ const IdeasPage = () => {
         })}
 
         {/* Add column */}
-        <div className="flex-shrink-0 w-72">
+        <div className="flex-shrink-0 w-64 md:w-72">
           {addingCol ? (
             <div className="bg-muted rounded-lg p-3 space-y-2">
               <Input

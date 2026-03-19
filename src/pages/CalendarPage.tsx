@@ -388,16 +388,17 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
-      <header className="border-b bg-card px-4 py-3 sticky top-0 z-40">
-        <div className="mx-auto max-w-7xl flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+      <header className="border-b bg-card px-3 py-2.5 md:px-4 md:py-3 sticky top-0 z-40">
+        <div className="mx-auto max-w-7xl flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2 md:gap-3">
+            <MobileNav title="Calendário" />
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <CalendarDays className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-bold text-foreground">Calendário de Posts</h1>
+            <CalendarDays className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
+            <h1 className="text-sm md:text-lg font-bold text-foreground truncate">Calendário</h1>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
