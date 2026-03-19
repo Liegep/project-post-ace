@@ -257,23 +257,24 @@ const TeamManagementPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+      <header className="border-b bg-card px-4 py-3 md:px-6 md:py-4">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-2">
+          <div className="flex items-center gap-2 md:gap-3 min-w-0">
+            <MobileNav title="Equipe" />
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-                <Users className="h-6 w-6" /> {t("teamManagement")}
+            <div className="min-w-0">
+              <h1 className="text-lg md:text-2xl font-bold text-foreground flex items-center gap-2 truncate">
+                <Users className="h-5 w-5 md:h-6 md:w-6 shrink-0" /> {t("teamManagement")}
               </h1>
-              <p className="text-sm text-muted-foreground">{t("manageTeamMembers")}</p>
+              <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">{t("manageTeamMembers")}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 shrink-0">
             <LanguageSelector />
-            <Button onClick={() => setCreateOpen(true)} className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <Plus className="mr-2 h-4 w-4" /> {t("newMember")}
+            <Button onClick={() => setCreateOpen(true)} size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <Plus className="h-4 w-4 md:mr-2" /> <span className="hidden md:inline">{t("newMember")}</span>
             </Button>
           </div>
         </div>
