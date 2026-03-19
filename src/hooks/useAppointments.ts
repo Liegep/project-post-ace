@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+export interface AppointmentTag {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export interface Appointment {
   id: string;
   userId: string;
@@ -14,6 +20,7 @@ export interface Appointment {
   cancelled: boolean;
   cancelledAt: Date | null;
   createdAt: Date;
+  tagId: string | null;
 }
 
 interface CreateAppointment {
@@ -22,11 +29,23 @@ interface CreateAppointment {
   appointmentDate: string;
   appointmentTime: string;
   category?: string;
+  tagId?: string | null;
 }
 
 export function useAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [tags, setTags] = useState<AppointmentTag[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const fetchTags = useCallback(async () => {
+    const { data } = await supabase
+      .from("appointment_tags" as any)
+      .select("*")
+      .order("name");
+    if (data) {
+      setTags((data as any[]).map(t => ({ id: t.id, name: t.name, color: t.color })));
+    }
+  }, []);
 
   const fetchAppointments = useCallback(async () => {
     setLoading(true);
@@ -53,12 +72,16 @@ export function useAppointments() {
         cancelled: r.cancelled || false,
         cancelledAt: r.cancelled_at ? new Date(r.cancelled_at) : null,
         createdAt: new Date(r.created_at),
+        tagId: r.tag_id || null,
       })));
     }
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetchAppointments(); }, [fetchAppointments]);
+  useEffect(() => {
+    fetchAppointments();
+    fetchTags();
+  }, [fetchAppointments, fetchTags]);
 
   const createAppointment = useCallback(async (input: CreateAppointment) => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -71,6 +94,7 @@ export function useAppointments() {
       appointment_date: input.appointmentDate,
       appointment_time: input.appointmentTime,
       category: input.category || "",
+      tag_id: input.tagId || null,
     } as any);
 
     if (!error) await fetchAppointments();
@@ -88,6 +112,7 @@ export function useAppointments() {
       appointment_date: input.appointmentDate,
       appointment_time: input.appointmentTime,
       category: input.category || "",
+      tag_id: input.tagId || null,
     }));
 
     const { error } = await supabase.from("appointments").insert(rows as any);
@@ -129,10 +154,43 @@ export function useAppointments() {
     if (updates.appointmentDate !== undefined) dbUpdates.appointment_date = updates.appointmentDate;
     if (updates.appointmentTime !== undefined) dbUpdates.appointment_time = updates.appointmentTime;
     if (updates.category !== undefined) dbUpdates.category = updates.category;
+    if (updates.tagId !== undefined) dbUpdates.tag_id = updates.tagId;
     
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
     await supabase.from("appointments").update(dbUpdates).eq("id", id);
   }, []);
 
-  return { appointments, loading, createAppointment, createBatch, toggleComplete, toggleCancelled, deleteAppointment, updateAppointment, refetch: fetchAppointments };
+  // Tag CRUD
+  const createTag = useCallback(async (name: string, color: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return null;
+
+    const { data, error } = await supabase.from("appointment_tags" as any).insert({
+      user_id: session.user.id,
+      name,
+      color,
+    } as any).select().single();
+
+    if (!error && data) {
+      const tag = { id: (data as any).id, name: (data as any).name, color: (data as any).color };
+      setTags(prev => [...prev, tag].sort((a, b) => a.name.localeCompare(b.name)));
+      return tag;
+    }
+    return null;
+  }, []);
+
+  const deleteTag = useCallback(async (id: string) => {
+    setTags(prev => prev.filter(t => t.id !== id));
+    // Clear tag from appointments that use it
+    setAppointments(prev => prev.map(a => a.tagId === id ? { ...a, tagId: null } : a));
+    await supabase.from("appointment_tags" as any).delete().eq("id", id);
+  }, []);
+
+  return {
+    appointments, tags, loading,
+    createAppointment, createBatch, toggleComplete, toggleCancelled,
+    deleteAppointment, updateAppointment,
+    createTag, deleteTag,
+    refetch: fetchAppointments,
+  };
 }

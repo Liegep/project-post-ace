@@ -119,6 +119,30 @@ export type Database = {
         }
         Relationships: []
       }
+      appointment_tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           appointment_date: string
@@ -131,6 +155,7 @@ export type Database = {
           created_at: string
           description: string
           id: string
+          tag_id: string | null
           title: string
           updated_at: string
           user_id: string
@@ -146,6 +171,7 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          tag_id?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -161,11 +187,20 @@ export type Database = {
           created_at?: string
           description?: string
           id?: string
+          tag_id?: string | null
           title?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "appointments_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_tags"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       brief_attachments: {
         Row: {

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/i18n/I18nContext";
-import { useAppointments, Appointment } from "@/hooks/useAppointments";
+import { useAppointments, Appointment, AppointmentTag } from "@/hooks/useAppointments";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import {
   Plus, ChevronLeft, ChevronRight, CalendarIcon, Check, Clock,
-  Trash2, ArrowLeft, CalendarDays, CalendarRange, Calendar as CalendarLucide, XCircle, Ban
+  Trash2, ArrowLeft, CalendarDays, CalendarRange, Calendar as CalendarLucide, XCircle, Ban, Tag, X
 } from "lucide-react";
 import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, addMonths, subMonths, addWeeks, subWeeks, getDaysInMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -38,12 +38,15 @@ const getCategoryStyle = (cat: string) => CATEGORY_COLORS[cat.toLowerCase()] || 
 const AgendaPage = () => {
   const navigate = useNavigate();
   const { t } = useI18n();
-  const { appointments, loading, createAppointment, createBatch, toggleComplete, toggleCancelled, deleteAppointment } = useAppointments();
+  const { appointments, tags, loading, createAppointment, createBatch, toggleComplete, toggleCancelled, deleteAppointment, createTag, deleteTag } = useAppointments();
 
   const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [tagDialogOpen, setTagDialogOpen] = useState(false);
+  const [newTagName, setNewTagName] = useState("");
+  const [newTagColor, setNewTagColor] = useState("#3b82f6");
 
   // Form state
   const [formTitle, setFormTitle] = useState("");
@@ -51,6 +54,7 @@ const AgendaPage = () => {
   const [formDate, setFormDate] = useState<Date>(new Date());
   const [formTime, setFormTime] = useState("09:00");
   const [formCategory, setFormCategory] = useState("");
+  const [formTagId, setFormTagId] = useState<string | null>(null);
   const [formRepeat, setFormRepeat] = useState<RepeatMode>("none");
   const [saving, setSaving] = useState(false);
 
@@ -95,6 +99,7 @@ const AgendaPage = () => {
       description: formDesc.trim(),
       appointmentTime: formTime,
       category: formCategory,
+      tagId: formTagId,
     };
 
     if (formRepeat === "none") {
@@ -130,6 +135,7 @@ const AgendaPage = () => {
     setFormDate(new Date());
     setFormTime("09:00");
     setFormCategory("");
+    setFormTagId(null);
     setFormRepeat("none");
   };
 
@@ -139,6 +145,7 @@ const AgendaPage = () => {
     setFormDesc("");
     setFormTime("09:00");
     setFormCategory("");
+    setFormTagId(null);
     setFormRepeat("none");
     setDialogOpen(true);
   };
@@ -231,6 +238,11 @@ const AgendaPage = () => {
               </Badge>
             </div>
 
+            <Button variant="outline" size="sm" onClick={() => setTagDialogOpen(true)} className="gap-1.5">
+              <Tag className="h-4 w-4" />
+              <span className="hidden sm:inline">Etiquetas</span>
+            </Button>
+
             <Button onClick={() => openCreateForDate()} className="bg-accent text-accent-foreground hover:bg-accent/90 gap-1.5">
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Novo compromisso</span>
@@ -247,6 +259,7 @@ const AgendaPage = () => {
           <MonthView
             currentDate={currentDate}
             appointmentsByDate={appointmentsByDate}
+            tags={tags}
             onDayClick={(d) => { setCurrentDate(d); setViewMode("day"); }}
             onCreateClick={(d) => openCreateForDate(d)}
           />
@@ -257,6 +270,7 @@ const AgendaPage = () => {
               : eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: 1 }), end: endOfWeek(currentDate, { weekStartsOn: 1 }) })
             }
             appointmentsByDate={appointmentsByDate}
+            tags={tags}
             onToggle={toggleComplete}
             onCancel={toggleCancelled}
             onDelete={deleteAppointment}
@@ -324,6 +338,43 @@ const AgendaPage = () => {
                 </button>
               ))}
             </div>
+            {/* Tag selector */}
+            {tags.length > 0 && (
+              <div className="space-y-1.5">
+                <span className="text-xs font-medium text-muted-foreground">Etiqueta</span>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    onClick={() => setFormTagId(null)}
+                    className={cn(
+                      "rounded-full px-3 py-1 text-xs font-medium border transition-all",
+                      formTagId === null
+                        ? "ring-2 ring-primary ring-offset-1 bg-muted text-foreground"
+                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    Nenhuma
+                  </button>
+                  {tags.map(tag => (
+                    <button
+                      key={tag.id}
+                      onClick={() => setFormTagId(tag.id)}
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs font-medium border transition-all",
+                        formTagId === tag.id ? "ring-2 ring-offset-1" : "opacity-70 hover:opacity-100"
+                      )}
+                      style={{
+                        backgroundColor: tag.color + "30",
+                        color: tag.color,
+                        borderColor: tag.color + "60",
+                        ...(formTagId === tag.id ? { ringColor: tag.color } : {}),
+                      }}
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             {/* Repeat options */}
             <div className="space-y-1.5">
               <span className="text-xs font-medium text-muted-foreground">Repetir</span>
@@ -362,6 +413,66 @@ const AgendaPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Tag Manager Dialog */}
+      <Dialog open={tagDialogOpen} onOpenChange={setTagDialogOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Tag className="h-5 w-5 text-primary" />
+              Gerenciar Etiquetas
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Nome da etiqueta"
+                value={newTagName}
+                onChange={e => setNewTagName(e.target.value)}
+                className="flex-1"
+              />
+              <input
+                type="color"
+                value={newTagColor}
+                onChange={e => setNewTagColor(e.target.value)}
+                className="h-10 w-10 rounded border cursor-pointer"
+              />
+              <Button
+                size="sm"
+                disabled={!newTagName.trim()}
+                onClick={async () => {
+                  await createTag(newTagName.trim(), newTagColor);
+                  setNewTagName("");
+                  setNewTagColor("#3b82f6");
+                }}
+                className="bg-accent text-accent-foreground"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            {tags.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">Nenhuma etiqueta criada ainda.</p>
+            ) : (
+              <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                {tags.map(tag => (
+                  <div key={tag.id} className="flex items-center justify-between rounded-lg px-3 py-2" style={{ backgroundColor: tag.color + "20" }}>
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 rounded-full" style={{ backgroundColor: tag.color }} />
+                      <span className="text-sm font-medium" style={{ color: tag.color }}>{tag.name}</span>
+                    </div>
+                    <button
+                      onClick={() => deleteTag(tag.id)}
+                      className="rounded-full p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -371,13 +482,14 @@ const AgendaPage = () => {
 interface DayListViewProps {
   dates: Date[];
   appointmentsByDate: Record<string, Appointment[]>;
+  tags: AppointmentTag[];
   onToggle: (id: string, completed: boolean) => void;
   onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
   onCreateClick: (date: Date) => void;
 }
 
-const DayListView = ({ dates, appointmentsByDate, onToggle, onCancel, onDelete, onCreateClick }: DayListViewProps) => {
+const DayListView = ({ dates, appointmentsByDate, tags, onToggle, onCancel, onDelete, onCreateClick }: DayListViewProps) => {
   return (
     <div className="space-y-4">
       {dates.map(date => {
@@ -421,7 +533,7 @@ const DayListView = ({ dates, appointmentsByDate, onToggle, onCancel, onDelete, 
               ) : (
                 <div className="space-y-1.5">
                   {dayAppointments.map(apt => (
-                    <AppointmentCard key={apt.id} appointment={apt} onToggle={onToggle} onCancel={onCancel} onDelete={onDelete} />
+                    <AppointmentCard key={apt.id} appointment={apt} tags={tags} onToggle={onToggle} onCancel={onCancel} onDelete={onDelete} />
                   ))}
                 </div>
               )}
@@ -435,13 +547,15 @@ const DayListView = ({ dates, appointmentsByDate, onToggle, onCancel, onDelete, 
 
 // ── Appointment Card ────────────────────────────────────────────────────────────
 
-const AppointmentCard = ({ appointment: apt, onToggle, onCancel, onDelete }: {
+const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete }: {
   appointment: Appointment;
+  tags: AppointmentTag[];
   onToggle: (id: string, completed: boolean) => void;
   onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
 }) => {
   const [detailOpen, setDetailOpen] = useState(false);
+  const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
   const now = new Date();
   const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
   const isOverdue = !apt.completed && !apt.cancelled && isBefore(aptDateTime, now);
@@ -455,7 +569,14 @@ const AppointmentCard = ({ appointment: apt, onToggle, onCancel, onDelete }: {
         ? "bg-blue-100 dark:bg-blue-950/40 border border-blue-400 dark:border-blue-800"
         : isOverdue
           ? "bg-destructive/5 border border-destructive/20"
-          : "bg-white dark:bg-card hover:bg-muted/50 border border-transparent";
+          : aptTag
+            ? "border"
+            : "bg-white dark:bg-card hover:bg-muted/50 border border-transparent";
+
+  const tagStyle = (!apt.completed && !apt.cancelled && !isLastPost && !isOverdue && aptTag) ? {
+    backgroundColor: aptTag.color + "20",
+    borderColor: aptTag.color + "50",
+  } : undefined;
 
   return (
     <>
@@ -465,6 +586,7 @@ const AppointmentCard = ({ appointment: apt, onToggle, onCancel, onDelete }: {
           "group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-all cursor-pointer",
           rowBg
         )}
+        style={tagStyle}
       >
         <button
           onClick={(e) => { e.stopPropagation(); onToggle(apt.id, !apt.completed); }}
@@ -493,6 +615,14 @@ const AppointmentCard = ({ appointment: apt, onToggle, onCancel, onDelete }: {
             {apt.category && (
               <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", getCategoryStyle(apt.category))}>
                 {apt.category}
+              </span>
+            )}
+            {aptTag && (
+              <span
+                className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                style={{ backgroundColor: aptTag.color + "30", color: aptTag.color }}
+              >
+                {aptTag.name}
               </span>
             )}
             {isOverdue && !apt.completed && !apt.cancelled && (
@@ -570,6 +700,15 @@ const AppointmentCard = ({ appointment: apt, onToggle, onCancel, onDelete }: {
                   {apt.category}
                 </Badge>
               )}
+              {aptTag && (
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                  style={{ backgroundColor: aptTag.color + "20", color: aptTag.color, borderColor: aptTag.color + "50" }}
+                >
+                  {aptTag.name}
+                </Badge>
+              )}
             </div>
 
             <div className="flex gap-2">
@@ -629,11 +768,12 @@ const AppointmentCard = ({ appointment: apt, onToggle, onCancel, onDelete }: {
 interface MonthViewProps {
   currentDate: Date;
   appointmentsByDate: Record<string, Appointment[]>;
+  tags: AppointmentTag[];
   onDayClick: (date: Date) => void;
   onCreateClick: (date: Date) => void;
 }
 
-const MonthView = ({ currentDate, appointmentsByDate, onDayClick, onCreateClick }: MonthViewProps) => {
+const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreateClick }: MonthViewProps) => {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
@@ -690,6 +830,8 @@ const MonthView = ({ currentDate, appointmentsByDate, onDayClick, onCreateClick 
                 <div className="mt-1 space-y-0.5">
                   {dayApts.slice(0, 3).map(apt => {
                     const isLastPost = apt.category.toLowerCase() === "último post";
+                    const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
+                    const useTagColor = !apt.completed && !apt.cancelled && !isLastPost && aptTag;
                     return (
                       <div
                         key={apt.id}
@@ -701,8 +843,11 @@ const MonthView = ({ currentDate, appointmentsByDate, onDayClick, onCreateClick 
                               ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 line-through"
                               : isLastPost
                                 ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                                : getCategoryStyle(apt.category)
+                                : useTagColor
+                                  ? ""
+                                  : getCategoryStyle(apt.category)
                         )}
+                        style={useTagColor ? { backgroundColor: aptTag!.color + "25", color: aptTag!.color } : undefined}
                       >
                         <span className="font-mono mr-1">{apt.appointmentTime}</span>
                         {apt.title}
