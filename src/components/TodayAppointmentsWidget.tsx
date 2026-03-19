@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { Check, Clock, CalendarDays } from "lucide-react";
+import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
 
 interface TodayAppt {
   id: string;
@@ -31,7 +31,7 @@ export const TodayAppointmentsWidget = () => {
   const [selectedAppt, setSelectedAppt] = useState<TodayAppt | null>(null);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchData = async () => {
       const today = format(new Date(), "yyyy-MM-dd");
       const { data } = await supabase
         .from("appointments")
@@ -51,7 +51,7 @@ export const TodayAppointmentsWidget = () => {
       );
       setLoading(false);
     };
-    fetch();
+    fetchData();
   }, []);
 
   const toggleComplete = async (id: string, completed: boolean) => {
@@ -73,34 +73,35 @@ export const TodayAppointmentsWidget = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
-            <CalendarDays className="h-4 w-4 text-primary" />
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
+              <CalendarDays className="h-4 w-4 text-primary" />
+            </div>
+            <h2 className="font-semibold text-foreground">Agenda de hoje</h2>
+            {pending > 0 && (
+              <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs font-semibold text-primary">
+                {pending} pendente{pending !== 1 ? "s" : ""}
+              </span>
+            )}
           </div>
-          <h2 className="font-semibold text-foreground">Agenda de hoje</h2>
-          {pending > 0 && (
-            <span className="rounded-full bg-primary/20 px-2 py-0.5 text-xs font-semibold text-primary">
-              {pending} pendente{pending !== 1 ? "s" : ""}
-            </span>
-          )}
+          <button
+            onClick={() => navigate("/agenda")}
+            className="text-xs font-medium text-primary hover:underline"
+          >
+            Ver agenda completa →
+          </button>
         </div>
-        <button
-          onClick={() => navigate("/agenda")}
-          className="text-xs font-medium text-primary hover:underline"
-        >
-          Ver agenda completa →
-        </button>
-      </div>
-      <div className="space-y-1.5 max-h-56 overflow-y-auto">
-        {appointments.map(apt => {
-          const now = new Date();
-          const aptTime = new Date(`${format(now, "yyyy-MM-dd")}T${apt.time}`);
-          const isOverdue = !apt.completed && aptTime < now;
-          const catStyle = CATEGORY_COLORS[apt.category.toLowerCase()] || CATEGORY_COLORS[""];
+        <div className="space-y-1.5 max-h-56 overflow-y-auto">
+          {appointments.map(apt => {
+            const now = new Date();
+            const aptTime = new Date(`${format(now, "yyyy-MM-dd")}T${apt.time}`);
+            const isOverdue = !apt.completed && aptTime < now;
+            const catStyle = CATEGORY_COLORS[apt.category.toLowerCase()] || CATEGORY_COLORS[""];
 
-          return (
-            <div
+            return (
+              <div
                 key={apt.id}
                 onClick={() => setSelectedAppt(apt)}
                 className={cn(
@@ -147,7 +148,6 @@ export const TodayAppointmentsWidget = () => {
         </div>
       </div>
 
-      {/* Detail Dialog */}
       <Dialog open={!!selectedAppt} onOpenChange={(open) => !open && setSelectedAppt(null)}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
