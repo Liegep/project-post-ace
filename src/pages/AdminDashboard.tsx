@@ -120,6 +120,7 @@ const AdminDashboard = () => {
   const [viewPost, setViewPost] = useState<Post | null>(null);
   const [viewPostOpen, setViewPostOpen] = useState(false);
   const [clientFilter, setClientFilter] = useState<"all" | "mine" | "shared">("all");
+  const [instagramUrl, setInstagramUrl] = useState("");
   const [facebookUrl, setFacebookUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
