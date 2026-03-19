@@ -28,6 +28,7 @@ export const TodayAppointmentsWidget = () => {
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState<TodayAppt[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAppt, setSelectedAppt] = useState<TodayAppt | null>(null);
 
   useEffect(() => {
     const fetch = async () => {
