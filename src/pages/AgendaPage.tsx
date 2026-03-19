@@ -482,13 +482,14 @@ const AgendaPage = () => {
 interface DayListViewProps {
   dates: Date[];
   appointmentsByDate: Record<string, Appointment[]>;
+  tags: AppointmentTag[];
   onToggle: (id: string, completed: boolean) => void;
   onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
   onCreateClick: (date: Date) => void;
 }
 
-const DayListView = ({ dates, appointmentsByDate, onToggle, onCancel, onDelete, onCreateClick }: DayListViewProps) => {
+const DayListView = ({ dates, appointmentsByDate, tags, onToggle, onCancel, onDelete, onCreateClick }: DayListViewProps) => {
   return (
     <div className="space-y-4">
       {dates.map(date => {
