@@ -609,6 +609,7 @@ const AdminDashboard = () => {
     setLinkedinUrl(client.linkedin_url || "");
     setTwitterUrl(client.twitter_url || "");
     setWebsiteUrl(client.website_url || "");
+    setClientType(client.client_type || "standard");
     setClientPassword("");
 
     // Load existing client user
