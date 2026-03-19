@@ -135,6 +135,7 @@ const AgendaPage = () => {
     setFormDate(new Date());
     setFormTime("09:00");
     setFormCategory("");
+    setFormTagId(null);
     setFormRepeat("none");
   };
 
@@ -144,6 +145,7 @@ const AgendaPage = () => {
     setFormDesc("");
     setFormTime("09:00");
     setFormCategory("");
+    setFormTagId(null);
     setFormRepeat("none");
     setDialogOpen(true);
   };
