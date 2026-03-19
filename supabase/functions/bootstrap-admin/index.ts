@@ -54,10 +54,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Assign admin role
+    // Assign super_admin role
     await supabaseAdmin.from("user_roles").insert({
       user_id: newUser.user.id,
-      role: "admin",
+      role: "super_admin",
     });
 
     return new Response(
