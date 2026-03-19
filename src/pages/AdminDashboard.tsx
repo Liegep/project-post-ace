@@ -42,6 +42,11 @@ interface Client {
 interface ClientUser {
   userId: string;
   email: string;
+  fullName?: string;
+}
+
+interface ClientUserMap {
+  [clientId: string]: ClientUser[];
 }
 
 interface FeedbackNotification {
