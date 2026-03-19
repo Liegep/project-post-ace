@@ -172,11 +172,18 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
     }
   };
 
+  const hasAlteradoTag = post.tags.includes("alterado");
+
   return (
     <Card
-      className={`overflow-hidden transition-shadow hover:shadow-md ${isAdmin ? "cursor-pointer" : ""} ${selectionMode && isSelected ? "ring-2 ring-accent shadow-lg" : ""}`}
+      className={`overflow-hidden transition-shadow hover:shadow-md ${isAdmin ? "cursor-pointer" : ""} ${selectionMode && isSelected ? "ring-2 ring-accent shadow-lg" : ""} ${!isAdmin && hasAlteradoTag ? "ring-2 ring-warning" : ""}`}
       onClick={handleCardClick}
     >
+      {!isAdmin && hasAlteradoTag && (
+        <div className="bg-warning px-3 py-1.5 text-center text-xs font-bold text-warning-foreground">
+          ✏️ {t("tagAltered") || "Alterado"} — {t("readComment") || "Verifique as alterações"}
+        </div>
+      )}
       <div className={`p-4 ${isCompact ? "pb-2" : "pb-2"}`}>
         <div className="flex items-start gap-2">
           {selectionMode && (
