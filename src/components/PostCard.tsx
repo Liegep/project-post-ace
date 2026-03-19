@@ -322,7 +322,14 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
 
         <div onClick={(e) => e.stopPropagation()}>
           {isAdmin ? (
-            <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
+            <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => {
+              const addedAlterado = tagIds.includes("alterado") && !post.tags.includes("alterado");
+              const updates: Partial<Post> = { tags: tagIds };
+              if (addedAlterado && post.clientLabel === "alteracao_solicitada") {
+                updates.clientLabel = "pendente";
+              }
+              updatePost(post.id, updates);
+            }} />
           ) : (
             <TagDisplay tagIds={post.tags} tags={tags} />
           )}
