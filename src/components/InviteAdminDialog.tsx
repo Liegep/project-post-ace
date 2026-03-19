@@ -38,7 +38,7 @@ interface InviteAdminDialogProps {
 const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
   const { t } = useI18n();
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"admin" | "team_member">("team_member");
+  const [role, setRole] = useState<"super_admin" | "admin" | "colaborador">("admin");
   const [selectedClientIds, setSelectedClientIds] = useState<Set<string>>(new Set());
   const [sending, setSending] = useState(false);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
