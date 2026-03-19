@@ -105,7 +105,7 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
 
       toast({ title: t("inviteCreated"), description: `${t("invite")} ${email}` });
       setEmail("");
-      setRole("team_member");
+      setRole("admin");
       setSelectedClientIds(new Set());
       fetchInvitations();
     } catch {
