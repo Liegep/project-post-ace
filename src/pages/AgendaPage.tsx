@@ -569,7 +569,14 @@ const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete 
         ? "bg-blue-100 dark:bg-blue-950/40 border border-blue-400 dark:border-blue-800"
         : isOverdue
           ? "bg-destructive/5 border border-destructive/20"
-          : "bg-white dark:bg-card hover:bg-muted/50 border border-transparent";
+          : aptTag
+            ? "border"
+            : "bg-white dark:bg-card hover:bg-muted/50 border border-transparent";
+
+  const tagStyle = (!apt.completed && !apt.cancelled && !isLastPost && !isOverdue && aptTag) ? {
+    backgroundColor: aptTag.color + "20",
+    borderColor: aptTag.color + "50",
+  } : undefined;
 
   return (
     <>
@@ -579,6 +586,7 @@ const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete 
           "group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-all cursor-pointer",
           rowBg
         )}
+        style={tagStyle}
       >
         <button
           onClick={(e) => { e.stopPropagation(); onToggle(apt.id, !apt.completed); }}
