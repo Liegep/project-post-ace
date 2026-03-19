@@ -617,6 +617,14 @@ const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete 
                 {apt.category}
               </span>
             )}
+            {aptTag && (
+              <span
+                className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                style={{ backgroundColor: aptTag.color + "30", color: aptTag.color }}
+              >
+                {aptTag.name}
+              </span>
+            )}
             {isOverdue && !apt.completed && !apt.cancelled && (
               <Badge variant="outline" className="text-[10px] border-destructive/30 text-destructive bg-destructive/10">
                 Atrasado
