@@ -163,6 +163,11 @@ const AdminDashboard = () => {
     await supabase.from("admin_notifications").update({ read: true } as any).eq("id", id);
     setStatusNotifs((prev) => prev.filter((n) => n.id !== id));
   };
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareClientId, setShareClientId] = useState<string | null>(null);
+  const [allAdmins, setAllAdmins] = useState<{ id: string; full_name: string; email: string }[]>([]);
+  const [shareSelectedUsers, setShareSelectedUsers] = useState<Set<string>>(new Set());
+  const [clientAssignments, setClientAssignments] = useState<{ user_id: string; client_id: string }[]>([]);
 
 
   // Notification sound ref
