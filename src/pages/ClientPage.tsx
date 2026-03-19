@@ -130,18 +130,66 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               <p className="text-sm text-muted-foreground">{t("clientSubtitle")}</p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={async () => {
-              await supabase.auth.signOut();
-              window.location.href = "/login";
-            }}
-            className="text-muted-foreground hover:text-destructive"
-          >
-            <LogOut className="mr-1.5 h-4 w-4" />
-            Sair
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPasswordOpen(true)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <KeyRound className="mr-1.5 h-4 w-4" />
+              Alterar senha
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                window.location.href = "/login";
+              }}
+              className="text-muted-foreground hover:text-destructive"
+            >
+              <LogOut className="mr-1.5 h-4 w-4" />
+              Sair
+            </Button>
+          </div>
+
+          <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Alterar senha</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-2">
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">Nova senha</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Mínimo 6 caracteres"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirmar nova senha</Label>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repita a nova senha"
+                  />
+                </div>
+                <Button
+                  onClick={handleChangePassword}
+                  disabled={savingPassword}
+                  className="w-full"
+                >
+                  {savingPassword ? "Salvando..." : "Alterar senha"}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
 
