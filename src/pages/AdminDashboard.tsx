@@ -1436,7 +1436,7 @@ const AdminDashboard = () => {
 
       {/* Create / Edit Client Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingClient ? t("editClient") : t("newClient")}</DialogTitle>
           </DialogHeader>
