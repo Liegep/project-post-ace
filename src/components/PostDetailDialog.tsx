@@ -2,8 +2,10 @@ import { Post, STATUS_CONFIG, LABEL_CONFIG, Tag, TAG_TRANSLATION_KEYS, PostStatu
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, History } from "lucide-react";
 import { useState } from "react";
+import { useActivityLogs } from "@/hooks/useActivityLogs";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
 
 interface PostDetailDialogProps {
   post: Post | null;
@@ -33,6 +35,8 @@ const LABEL_KEYS: Record<ClientLabel, string> = {
 
 export const PostDetailDialog = ({ post, open, onOpenChange, tags, t }: PostDetailDialogProps) => {
   const [mediaIndex, setMediaIndex] = useState(0);
+  const [showHistory, setShowHistory] = useState(false);
+  const activityLogs = useActivityLogs({ itemId: post?.id || "", enabled: open && showHistory && !!post });
 
   if (!post) return null;
 
@@ -49,8 +53,8 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t }: PostDeta
     .filter(Boolean) as Tag[];
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) setMediaIndex(0); }}>
-      <DialogContent className="max-w-2xl p-0 overflow-hidden gap-0">
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setMediaIndex(0); setShowHistory(false); } }}>
+      <DialogContent className="max-w-2xl p-0 overflow-hidden gap-0 max-h-[90vh] overflow-y-auto">
         {/* Media area */}
         {hasMedia && (
           <div className="relative w-full bg-black" style={{ aspectRatio: "4/5", maxHeight: "70vh" }}>
@@ -129,6 +133,28 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t }: PostDeta
 
           {post.caption && (
             <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{post.caption}</p>
+          )}
+
+          {/* Activity History Toggle */}
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors pt-2"
+          >
+            <History className="h-3.5 w-3.5" />
+            {showHistory ? "Ocultar histórico" : "Ver histórico de atividades"}
+          </button>
+
+          {showHistory && (
+            <div className="border-t pt-3 mt-2">
+              <ActivityTimeline
+                logs={activityLogs.logs}
+                loading={activityLogs.loading}
+                hasMore={activityLogs.hasMore}
+                onLoadMore={activityLogs.loadMore}
+                showClientName={false}
+                compact
+              />
+            </div>
           )}
         </div>
       </DialogContent>
