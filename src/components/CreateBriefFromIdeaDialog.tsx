@@ -160,6 +160,15 @@ export function CreateBriefFromIdeaDialog({
             <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
           </div>
 
+          {/* Similarity check */}
+          <BriefSimilarityPanel
+            clientId={selectedClient}
+            title={title}
+            description={description}
+            onApplyTitle={(t) => setTitle(t)}
+            onDiscard={() => onOpenChange(false)}
+          />
+
           <div>
             <Label className="text-xs">Data planejada (opcional)</Label>
             <Popover>
