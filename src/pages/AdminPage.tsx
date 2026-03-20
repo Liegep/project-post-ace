@@ -510,6 +510,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const editColumnInputRef = useRef<HTMLInputElement>(null);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
 
+  const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
   // Notes panel state
   const [notesCount, setNotesCount] = useState(0);
   const [notesOpen, setNotesOpen] = useState(false);
