@@ -529,6 +529,48 @@ export type Database = {
           },
         ]
       }
+      commemorative_dates: {
+        Row: {
+          category: string
+          country: string
+          country_code: string
+          country_color: string
+          created_at: string
+          date_day: number
+          date_month: number
+          description: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          country: string
+          country_code?: string
+          country_color?: string
+          created_at?: string
+          date_day: number
+          date_month: number
+          description?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          country?: string
+          country_code?: string
+          country_color?: string
+          created_at?: string
+          date_day?: number
+          date_month?: number
+          description?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           author: string
