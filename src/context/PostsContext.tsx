@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { Post, PostStatus, ClientLabel, Comment, Tag, MediaType, Column } from "@/types/post";
 import { supabase } from "@/integrations/supabase/client";
 import { pushToTrello } from "@/lib/trelloPush";
+import { logActivity } from "@/lib/activityLogger";
 
 interface PostsContextType {
   clientId: string;
@@ -193,6 +194,16 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     const { data, error } = await supabase.from("posts").insert(insertData as any).select().single();
     if (data && !error) {
       setPosts((prev) => [dbPostToPost(data, []), ...prev]);
+      // Get client name for log
+      const { data: cl } = await supabase.from("clients").select("name").eq("id", clientId).maybeSingle();
+      logActivity({
+        action: "post_created",
+        itemType: "post",
+        itemId: data.id,
+        itemTitle: post.title,
+        clientId,
+        clientName: (cl as any)?.name || "",
+      });
     }
     return !error;
   }, [clientId]);
@@ -237,6 +248,18 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status, ...(newColumnId ? { columnId: newColumnId } : {}) } : p)));
     await supabase.from("posts").update(updates).eq("id", id);
     pushToTrello(id, "update");
+
+    // Log status change
+    const { data: cl } = await supabase.from("clients").select("name").eq("id", clientId).maybeSingle();
+    logActivity({
+      action: "post_status_changed",
+      itemType: "post",
+      itemId: id,
+      itemTitle: post?.title || "",
+      clientId,
+      clientName: (cl as any)?.name || "",
+      metadata: { newStatus: status },
+    });
 
     // Notify admins when status includes "pronto" or "finalizado"
     if (status.some(s => ["pronto", "finalizado"].includes(s))) {
@@ -303,9 +326,24 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     const dbUpdates: Record<string, any> = { client_label: label };
     if (newColumnId) dbUpdates.column_id = newColumnId;
 
+    const post = posts.find(p => p.id === id);
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, clientLabel: label, ...(newColumnId ? { columnId: newColumnId } : {}) } : p)));
     await supabase.from("posts").update(dbUpdates).eq("id", id);
-  }, [clientId]);
+
+    // Log approval or change request
+    const action = label === "aprovado" ? "post_approved" : label === "alteracao_solicitada" ? "post_change_requested" : null;
+    if (action) {
+      const { data: cl } = await supabase.from("clients").select("name").eq("id", clientId).maybeSingle();
+      logActivity({
+        action,
+        itemType: "post",
+        itemId: id,
+        itemTitle: post?.title || "",
+        clientId,
+        clientName: (cl as any)?.name || "",
+      });
+    }
+  }, [clientId, posts]);
 
   const addComment = useCallback(async (postId: string, author: string, text: string) => {
     const { data, error } = await supabase.from("comments").insert({
@@ -316,8 +354,18 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (data && !error) {
       const comment: Comment = { id: data.id, postId: data.post_id, author: data.author, text: data.text, createdAt: new Date(data.created_at) };
       setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, comments: [...p.comments, comment] } : p)));
+      const post = posts.find(p => p.id === postId);
+      const { data: cl } = await supabase.from("clients").select("name").eq("id", clientId).maybeSingle();
+      logActivity({
+        action: "post_commented",
+        itemType: "post",
+        itemId: postId,
+        itemTitle: post?.title || "",
+        clientId,
+        clientName: (cl as any)?.name || "",
+      });
     }
-  }, []);
+  }, [posts, clientId]);
 
   const deletePost = useCallback(async (id: string) => {
     setPosts((prev) => prev.filter((p) => p.id !== id));
@@ -447,6 +495,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, [clientId]);
 
   const unarchivePost = useCallback(async (id: string, columnId?: string | null, clientInitiated?: boolean) => {
+    const post = [...posts, ...posts].find(p => p.id === id); // check active+archived
     const updates: Partial<Post> = { archived: false, archivedAt: null, status: ["pronto"] as PostStatus[] };
     if (columnId !== undefined) updates.columnId = columnId;
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
@@ -454,7 +503,16 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (columnId !== undefined) dbUpdates.column_id = columnId;
     if (clientInitiated) dbUpdates.client_unarchived_at = new Date().toISOString();
     await supabase.from("posts").update(dbUpdates as any).eq("id", id);
-  }, []);
+    const { data: cl } = await supabase.from("clients").select("name").eq("id", clientId).maybeSingle();
+    logActivity({
+      action: "post_unarchived",
+      itemType: "post",
+      itemId: id,
+      itemTitle: post?.title || "",
+      clientId,
+      clientName: (cl as any)?.name || "",
+    });
+  }, [posts, clientId]);
 
   const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus[]) => {
     const updates: Record<string, any> = { status };
