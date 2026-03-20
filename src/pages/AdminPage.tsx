@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { supabase } from "@/integrations/supabase/client";
 import { PostsProvider, usePosts } from "@/context/PostsContext";
 import { Post, PostStatus, STATUS_CONFIG } from "@/types/post";
@@ -14,7 +16,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2 } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2, History } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { ClientNotes } from "@/components/ClientNotes";
@@ -495,7 +497,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const [view, setView] = useState<"kanban" | "list">("kanban");
-  const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
+  const [activeTab, setActiveTab] = useState<"board" | "archived" | "activity">("board");
   const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [editingPeriod, setEditingPeriod] = useState(false);
