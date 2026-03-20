@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +8,8 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Receipt, CalendarDays, DollarSign, Repeat, Pause, Play } from "lucide-react";
+import { Receipt, CalendarDays, DollarSign, Repeat, Pause, Play, Coins } from "lucide-react";
+import { CURRENCIES, getCurrency } from "@/lib/currency";
 
 const BILLING_TYPES = [
   { value: "manual", label: "Manual / Avulso", desc: "Faturas criadas manualmente" },
@@ -24,6 +24,7 @@ interface BillingConfig {
   billing_description: string;
   billing_due_day: number;
   billing_start_date: string | null;
+  billing_currency: string;
 }
 
 export function ClientBillingConfig({ clientId }: { clientId: string }) {
@@ -34,6 +35,7 @@ export function ClientBillingConfig({ clientId }: { clientId: string }) {
     billing_description: "",
     billing_due_day: 10,
     billing_start_date: null,
+    billing_currency: "BRL",
   });
   const [loading, setLoading] = useState(true);
 
@@ -41,7 +43,7 @@ export function ClientBillingConfig({ clientId }: { clientId: string }) {
     const load = async () => {
       const { data } = await supabase
         .from("clients")
-        .select("billing_type, billing_recurrence_active, billing_monthly_amount, billing_description, billing_due_day, billing_start_date")
+        .select("billing_type, billing_recurrence_active, billing_monthly_amount, billing_description, billing_due_day, billing_start_date, billing_currency")
         .eq("id", clientId)
         .single();
       if (data) setConfig(data as any);
@@ -67,6 +69,7 @@ export function ClientBillingConfig({ clientId }: { clientId: string }) {
   }
 
   const isRecurring = config.billing_type === "recurring";
+  const cur = getCurrency(config.billing_currency);
 
   return (
     <div className="space-y-4">
@@ -100,6 +103,29 @@ export function ClientBillingConfig({ clientId }: { clientId: string }) {
         <p className="text-[11px] text-muted-foreground">
           {BILLING_TYPES.find((bt) => bt.value === config.billing_type)?.desc}
         </p>
+      </div>
+
+      {/* Currency */}
+      <div className="space-y-1.5">
+        <Label className="text-xs flex items-center gap-1.5">
+          <Coins className="h-3 w-3" />
+          Moeda
+        </Label>
+        <Select
+          value={config.billing_currency}
+          onValueChange={(v) => save({ billing_currency: v })}
+        >
+          <SelectTrigger className="h-9 text-sm">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {CURRENCIES.map((c) => (
+              <SelectItem key={c.value} value={c.value}>
+                {c.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Recurring config */}
@@ -137,7 +163,7 @@ export function ClientBillingConfig({ clientId }: { clientId: string }) {
             <div className="space-y-1.5">
               <Label className="text-xs flex items-center gap-1.5">
                 <DollarSign className="h-3 w-3" />
-                Valor mensal (R$)
+                Valor mensal ({cur.symbol})
               </Label>
               <Input
                 type="number"
