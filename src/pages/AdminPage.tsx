@@ -492,6 +492,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     posts, archivedPosts, columns, tags, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn, toggleColumnVisibility,
     movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, reorderColumns,
+    clientId: ctxClientId,
   } = usePosts();
   const { t } = useI18n();
   const isMobile = useIsMobile();
@@ -544,7 +545,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   }, [searchParams, posts]);
 
   // Activity logs for this client
-  const activityLogs = useActivityLogs({ clientId, enabled: activeTab === "activity" });
+  const activityLogs = useActivityLogs({ clientId: ctxClientId, enabled: activeTab === "activity" });
 
     const toggleShowArchivedToClient = async (checked: boolean) => {
     await supabase.from("clients").update({ show_archived_to_client: checked } as any).eq("id", clientData.id);
