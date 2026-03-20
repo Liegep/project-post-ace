@@ -834,6 +834,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 </div>
               </SheetContent>
             </Sheet>
+            <Button variant="outline" size="icon" onClick={() => setSettingsDrawerOpen(true)} title="Configurações">
+              <Settings2 className="h-4 w-4" />
+            </Button>
           </div>
 
           {/* Mobile actions */}
