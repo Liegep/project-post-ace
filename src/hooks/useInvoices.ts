@@ -20,7 +20,7 @@ export interface Invoice {
   paid_at: string | null;
   payment_method: string;
   client_visible: boolean;
-  clients?: { name: string; logo_url: string; slug: string };
+  clients?: { name: string; logo_url: string; slug: string; billing_currency: string };
 }
 
 export interface InvoiceItem {
@@ -55,7 +55,7 @@ export function useInvoices(clientId?: string) {
     setLoading(true);
     let query = supabase
       .from("invoices")
-      .select("*, clients(name, logo_url, slug)")
+      .select("*, clients(name, logo_url, slug, billing_currency)")
       .order("created_at", { ascending: false });
 
     if (clientId) {
