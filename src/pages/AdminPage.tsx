@@ -1200,7 +1200,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               </div>
             )}
           </>
-        ) : (
+        ) : activeTab === "archived" ? (
           <ArchivedView
             archivedPosts={archivedPosts}
             unarchivePost={unarchivePost}
@@ -1210,6 +1210,17 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             onToggleSelect={toggleSelect}
             t={t}
           />
+        ) : (
+          <div className="mx-auto max-w-2xl">
+            <ActivityTimeline
+              logs={activityLogs.logs}
+              loading={activityLogs.loading}
+              hasMore={activityLogs.hasMore}
+              onLoadMore={activityLogs.loadMore}
+              showFilters
+              showClientName={false}
+            />
+          </div>
         )}
       </main>
 
