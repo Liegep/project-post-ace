@@ -226,6 +226,42 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           </div>
         )}
 
+        {/* Client Reports */}
+        {reports.length > 0 && (
+          <div className="mb-8">
+            <div className="rounded-xl border bg-card p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                    <FileBarChart className="h-4 w-4 text-primary" />
+                  </div>
+                  <h2 className="font-semibold text-foreground">Relatórios de Mídias</h2>
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                    {reports.length}
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {reports.map((report) => (
+                  <div
+                    key={report.id}
+                    onClick={() => navigate(`/reports/${report.id}`)}
+                    className="flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3 cursor-pointer hover:bg-muted transition-colors"
+                  >
+                    <div>
+                      <p className="font-medium text-sm text-foreground">{report.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {format(new Date(report.period_start), "dd/MM/yyyy")} — {format(new Date(report.period_end), "dd/MM/yyyy")}
+                      </p>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Upcoming Posts Widget */}
         <div className="mb-8">
           <UpcomingPostsWidget posts={[...posts, ...archivedPosts]} />
