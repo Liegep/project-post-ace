@@ -1379,7 +1379,7 @@ const AdminDashboard = () => {
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
                     )}
-                    {isSuperAdmin && (
+                    {(isSuperAdmin || client.owner_id === currentUserId) && (
                       <Button
                         variant="outline"
                         size="sm"
