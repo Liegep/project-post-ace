@@ -789,15 +789,6 @@ const AdminDashboard = () => {
           </div>
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-3">
-            {role && (
-              <span className={cn(
-                "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
-                isSuperAdmin ? "bg-amber-500/15 text-amber-600" : "bg-blue-500/15 text-blue-600"
-              )}>
-                <Shield className="h-3 w-3" />
-                {isSuperAdmin ? "Super Admin" : role === "admin" ? "Admin" : "Colaborador"}
-              </span>
-            )}
             <LanguageSelector />
             {isAdmin && (
               <Button variant="outline" size="sm" onClick={() => navigate("/team-management")}>

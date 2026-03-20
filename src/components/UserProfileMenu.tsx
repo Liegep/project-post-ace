@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,10 +22,12 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
-import { User, KeyRound, LogOut, Camera, CalendarDays } from "lucide-react";
+import { User, KeyRound, LogOut, Camera, CalendarDays, Shield } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const UserProfileMenu = () => {
   const { t } = useI18n();
+  const { role, isSuperAdmin } = useUserRole();
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -150,6 +153,15 @@ const UserProfileMenu = () => {
             <span className="text-sm font-medium text-foreground max-w-[120px] truncate hidden sm:block">
               {displayName}
             </span>
+            {role && (
+              <span className={cn(
+                "hidden sm:inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                isSuperAdmin ? "bg-amber-500/15 text-amber-600" : role === "admin" ? "bg-blue-500/15 text-blue-600" : "bg-emerald-500/15 text-emerald-600"
+              )}>
+                <Shield className="h-2.5 w-2.5" />
+                {isSuperAdmin ? "Super Admin" : role === "admin" ? "Admin" : "Colaborador"}
+              </span>
+            )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
