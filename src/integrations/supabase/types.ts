@@ -812,6 +812,163 @@ export type Database = {
           },
         ]
       }
+      invoice_attachments: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_url: string
+          id: string
+          invoice_id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          invoice_id: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          invoice_id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_attachments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_items: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          invoice_id: string
+          name: string
+          notes: string
+          post_id: string | null
+          quantity: number
+          service_date: string
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          invoice_id: string
+          name?: string
+          notes?: string
+          post_id?: string | null
+          quantity?: number
+          service_date?: string
+          total_price?: number
+          unit_price?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          invoice_id?: string
+          name?: string
+          notes?: string
+          post_id?: string | null
+          quantity?: number
+          service_date?: string
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_by: string | null
+          discount: number
+          due_date: string
+          id: string
+          invoice_number: number
+          issue_date: string
+          notes: string
+          period_end: string | null
+          period_start: string | null
+          status: Database["public"]["Enums"]["invoice_status"]
+          surcharge: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          discount?: number
+          due_date?: string
+          id?: string
+          invoice_number?: number
+          issue_date?: string
+          notes?: string
+          period_end?: string | null
+          period_start?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          surcharge?: number
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          discount?: number
+          due_date?: string
+          id?: string
+          invoice_number?: number
+          issue_date?: string
+          notes?: string
+          period_end?: string | null
+          period_start?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          surcharge?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meta_accounts: {
         Row: {
           access_token: string
@@ -1599,6 +1756,7 @@ export type Database = {
         | "approved"
         | "scheduled"
         | "published"
+      invoice_status: "open" | "paid" | "overdue" | "cancelled"
       social_post_status:
         | "draft"
         | "pending_approval"
@@ -1757,6 +1915,7 @@ export const Constants = {
         "scheduled",
         "published",
       ],
+      invoice_status: ["open", "paid", "overdue", "cancelled"],
       social_post_status: [
         "draft",
         "pending_approval",
