@@ -23,6 +23,7 @@ import {
   Filter, Search, Pencil, MessageCircle, Paperclip, FileText, Trash2
 } from "lucide-react";
 import { MobileNav } from "@/components/MobileNav";
+import { BriefSimilarityPanel } from "@/components/BriefSimilarityPanel";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 type BriefStatus = "draft" | "internal" | "pending_approval" | "approved" | "rejected" | "published";
