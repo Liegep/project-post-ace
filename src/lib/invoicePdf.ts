@@ -1,5 +1,6 @@
 import { Invoice, InvoiceItem } from "@/hooks/useInvoices";
 import { format } from "date-fns";
+import { formatCurrency } from "@/lib/currency";
 
 const STATUS_LABELS: Record<string, string> = {
   open: "Aberta",
@@ -12,11 +13,13 @@ export function generateInvoicePDF(
   invoice: Invoice,
   items: InvoiceItem[],
   total: number,
-  subtotal: number
+  subtotal: number,
+  currencyCode?: string
 ) {
   const clientName = invoice.clients?.name || "Cliente";
   const discount = Number(invoice.discount || 0);
   const surcharge = Number(invoice.surcharge || 0);
+  const fmt = (v: number) => formatCurrency(v, currencyCode);
 
   const html = `
 <!DOCTYPE html>
@@ -95,18 +98,18 @@ export function generateInvoicePDF(
           <td>${item.category}</td>
           <td>${format(new Date(item.service_date), "dd/MM/yyyy")}</td>
           <td class="text-right">${item.quantity}</td>
-          <td class="text-right">R$ ${Number(item.unit_price).toFixed(2)}</td>
-          <td class="text-right">R$ ${Number(item.total_price).toFixed(2)}</td>
+          <td class="text-right">${fmt(Number(item.unit_price))}</td>
+          <td class="text-right">${fmt(Number(item.total_price))}</td>
         </tr>
       `).join("")}
     </tbody>
   </table>
 
   <div class="totals">
-    <div class="row"><span>Subtotal</span><span>R$ ${subtotal.toFixed(2)}</span></div>
-    ${discount > 0 ? `<div class="row" style="color:#059669"><span>Desconto</span><span>- R$ ${discount.toFixed(2)}</span></div>` : ""}
-    ${surcharge > 0 ? `<div class="row" style="color:#d97706"><span>Acréscimo</span><span>+ R$ ${surcharge.toFixed(2)}</span></div>` : ""}
-    <div class="row total"><span>Total</span><span>R$ ${total.toFixed(2)}</span></div>
+    <div class="row"><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
+    ${discount > 0 ? `<div class="row" style="color:#059669"><span>Desconto</span><span>- ${fmt(discount)}</span></div>` : ""}
+    ${surcharge > 0 ? `<div class="row" style="color:#d97706"><span>Acréscimo</span><span>+ ${fmt(surcharge)}</span></div>` : ""}
+    <div class="row total"><span>Total</span><span>${fmt(total)}</span></div>
   </div>
 
   ${invoice.notes ? `
