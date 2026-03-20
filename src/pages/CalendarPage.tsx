@@ -2,13 +2,15 @@ import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useCalendarPosts, CalendarPost, CalendarPostStatus, STATUS_CONFIG } from "@/hooks/useCalendarPosts";
+import { useCommemorativeDates, CATEGORY_LABELS } from "@/hooks/useCommemorativeDates";
 import { CalendarPostDialog } from "@/components/calendar/CalendarPostDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import {
   ArrowLeft, ChevronLeft, ChevronRight, Plus, Check, Clock,
-  CalendarDays, LayoutGrid, List, Columns3
+  CalendarDays, LayoutGrid, List, Columns3, CalendarHeart
 } from "lucide-react";
 import { MobileNav } from "@/components/MobileNav";
 import {
