@@ -148,7 +148,12 @@ const BillingPage = () => {
     });
   }, [invoices]);
 
+  // Filter invoices to only show those belonging to the user's assigned clients
+  const userClientIds = useMemo(() => new Set(clients.map(c => c.id)), [clients]);
+  
   const filtered = invoices.filter(inv => {
+    // Only show invoices for clients assigned to this user
+    if (userClientIds.size > 0 && !userClientIds.has(inv.client_id)) return false;
     if (filterClient !== "all" && inv.client_id !== filterClient) return false;
     if (filterStatus !== "all" && inv.status !== filterStatus) return false;
     if (filterMonth !== "all") {
@@ -171,13 +176,18 @@ const BillingPage = () => {
   };
 
   // Financial summary
+  // Only count invoices for user's assigned clients in summary
+  const userInvoices = useMemo(() => 
+    invoices.filter(inv => userClientIds.size === 0 || userClientIds.has(inv.client_id)),
+    [invoices, userClientIds]
+  );
   const financialSummary = useMemo(() => {
-    const totalBilled = invoices.reduce((sum, i) => sum + getTotal(i), 0);
-    const totalReceived = invoices.filter(i => i.status === "paid").reduce((sum, i) => sum + getTotal(i), 0);
-    const totalPending = invoices.filter(i => i.status === "open" || i.status === "overdue").reduce((sum, i) => sum + getTotal(i), 0);
-    const totalOverdue = invoices.filter(i => i.status === "overdue").reduce((sum, i) => sum + getTotal(i), 0);
+    const totalBilled = userInvoices.reduce((sum, i) => sum + getTotal(i), 0);
+    const totalReceived = userInvoices.filter(i => i.status === "paid").reduce((sum, i) => sum + getTotal(i), 0);
+    const totalPending = userInvoices.filter(i => i.status === "open" || i.status === "overdue").reduce((sum, i) => sum + getTotal(i), 0);
+    const totalOverdue = userInvoices.filter(i => i.status === "overdue").reduce((sum, i) => sum + getTotal(i), 0);
     return { totalBilled, totalReceived, totalPending, totalOverdue };
-  }, [invoices, invoiceTotals]);
+  }, [userInvoices, invoiceTotals]);
 
   return (
     <div className="min-h-screen bg-background">
