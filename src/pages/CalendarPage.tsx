@@ -33,6 +33,7 @@ const HOURS = Array.from({ length: 24 }, (_, i) => i);
 export default function CalendarPage() {
   const navigate = useNavigate();
   const { posts, loading, createPost, updatePost, deletePost } = useCalendarPosts();
+  const { getDatesByMonthDay, countries, selectedCountries, toggleCountry, setSelectedCountries } = useCommemorativeDates();
   const [clients, setClients] = useState<Client[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("month");
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -42,6 +43,7 @@ export default function CalendarPage() {
   const [editingPost, setEditingPost] = useState<CalendarPost | null>(null);
   const [defaultDate, setDefaultDate] = useState<string>("");
   const [detailPost, setDetailPost] = useState<CalendarPost | null>(null);
+  const [showCommemorativeFilter, setShowCommemorativeFilter] = useState(false);
 
   useEffect(() => {
     supabase.from("clients").select("id, name").order("name").then(({ data }) => {
