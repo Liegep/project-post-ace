@@ -49,7 +49,7 @@ const CATEGORIES = [
 ];
 
 const PAYMENT_METHODS = [
-  { value: "", label: "Nenhum" },
+  { value: "none", label: "Nenhum" },
   { value: "Pix", label: "Pix" },
   { value: "PayPal", label: "PayPal" },
   { value: "Transferência", label: "Transferência" },
@@ -90,7 +90,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
   const [invSurcharge, setInvSurcharge] = useState(String(invoice.surcharge || 0));
   const [invNotes, setInvNotes] = useState(invoice.notes || "");
   const [invDueDate, setInvDueDate] = useState(invoice.due_date);
-  const [invPaymentMethod, setInvPaymentMethod] = useState(invoice.payment_method || "");
+  const [invPaymentMethod, setInvPaymentMethod] = useState(invoice.payment_method || "none");
   const [invClientVisible, setInvClientVisible] = useState(invoice.client_visible !== false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -102,7 +102,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     setInvSurcharge(String(invoice.surcharge || 0));
     setInvNotes(invoice.notes || "");
     setInvDueDate(invoice.due_date);
-    setInvPaymentMethod(invoice.payment_method || "");
+    setInvPaymentMethod(invoice.payment_method || "none");
     setInvClientVisible(invoice.client_visible !== false);
   }, [invoice]);
 
@@ -192,7 +192,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         surcharge: Number(invSurcharge) || 0,
         notes: invNotes,
         due_date: invDueDate,
-        payment_method: invPaymentMethod,
+        payment_method: invPaymentMethod === "none" ? "" : invPaymentMethod,
         client_visible: invClientVisible,
       } as any);
       toast({ title: "Fatura atualizada" });
@@ -215,7 +215,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     await updateInvoice(invoice.id, {
       status: "paid",
       paid_at: new Date().toISOString(),
-      payment_method: method || invPaymentMethod || "",
+      payment_method: method || (invPaymentMethod === "none" ? "" : invPaymentMethod) || "",
     } as any);
     setInvStatus("paid");
     toast({ title: "Fatura marcada como paga" });
