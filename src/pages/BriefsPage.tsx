@@ -23,6 +23,7 @@ import {
   Filter, Search, Pencil, MessageCircle, Paperclip, FileText, Trash2
 } from "lucide-react";
 import { MobileNav } from "@/components/MobileNav";
+import { BriefSimilarityPanel } from "@/components/BriefSimilarityPanel";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 type BriefStatus = "draft" | "internal" | "pending_approval" | "approved" | "rejected" | "published";
@@ -575,6 +576,15 @@ const BriefsPage = () => {
               <Textarea value={formDescription} onChange={(e) => setFormDescription(e.target.value)} placeholder="Descreva o conteúdo..." rows={3} />
             </div>
 
+            {/* Similarity check panel */}
+            <BriefSimilarityPanel
+              clientId={formClientId}
+              title={formTitle}
+              description={formDescription}
+              excludeBriefId={editingBrief?.id}
+              onApplyTitle={(t) => setFormTitle(t)}
+              onDiscard={() => { setDialogOpen(false); resetForm(); }}
+            />
             <div className="space-y-1.5">
               <Label>Legenda</Label>
               <Textarea value={formCaption} onChange={(e) => setFormCaption(e.target.value)} placeholder="Legenda do post..." rows={3} />

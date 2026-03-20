@@ -12,6 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { FileText, CalendarIcon, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { BriefSimilarityPanel } from "@/components/BriefSimilarityPanel";
 
 interface Props {
   open: boolean;
@@ -158,6 +159,15 @@ export function CreateBriefFromIdeaDialog({
             <Label className="text-xs">Descrição</Label>
             <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
           </div>
+
+          {/* Similarity check */}
+          <BriefSimilarityPanel
+            clientId={selectedClient}
+            title={title}
+            description={description}
+            onApplyTitle={(t) => setTitle(t)}
+            onDiscard={() => onOpenChange(false)}
+          />
 
           <div>
             <Label className="text-xs">Data planejada (opcional)</Label>
