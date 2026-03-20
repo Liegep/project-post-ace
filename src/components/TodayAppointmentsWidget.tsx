@@ -52,6 +52,9 @@ export const TodayAppointmentsWidget = () => {
   const [newCategory, setNewCategory] = useState("");
   const [newTagId, setNewTagId] = useState<string | null>(null);
   const [newDesc, setNewDesc] = useState("");
+  const [newRepeat, setNewRepeat] = useState<"none" | "daily" | "weekly" | "weekdays">("none");
+  const [newRepeatEnd, setNewRepeatEnd] = useState<Date | undefined>(undefined);
+  const [newRepeatEndOpen, setNewRepeatEndOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>();
