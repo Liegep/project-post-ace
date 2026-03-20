@@ -150,6 +150,7 @@ export default function CommemorativeDatesPage() {
   const sortedMonths = Object.keys(grouped).map(Number).sort((a, b) => a - b);
 
   return (
+    <TooltipProvider>
     <div className="min-h-screen bg-background overflow-x-hidden">
       <header className="border-b bg-card px-4 py-3 md:px-6 md:py-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
