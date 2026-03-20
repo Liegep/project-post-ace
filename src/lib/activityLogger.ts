@@ -90,6 +90,9 @@ export const ACTION_LABELS: Record<ActivityAction, string> = {
   social_post_created: "criou post social",
   social_post_published: "publicou post social",
   social_post_scheduled: "agendou post social",
+  report_created: "criou relatório",
+  report_updated: "atualizou relatório",
+  report_published: "publicou relatório",
 };
 
 export const ACTION_ICONS: Record<ActivityAction, string> = {
@@ -114,4 +117,7 @@ export const ACTION_ICONS: Record<ActivityAction, string> = {
   social_post_created: "Share2",
   social_post_published: "Globe",
   social_post_scheduled: "CalendarClock",
+  report_created: "FileText",
+  report_updated: "Pencil",
+  report_published: "Globe",
 };
