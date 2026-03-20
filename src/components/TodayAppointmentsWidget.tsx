@@ -2,14 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { Check, Clock, CalendarDays, Plus, X, Trash2, CalendarClock } from "lucide-react";
-import { format } from "date-fns";
+import { Check, Clock, CalendarDays, Plus, X, Trash2, CalendarClock, Repeat, CalendarIcon } from "lucide-react";
+import { format, addDays, eachDayOfInterval, isBefore } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface TodayAppt {
@@ -51,6 +52,9 @@ export const TodayAppointmentsWidget = () => {
   const [newCategory, setNewCategory] = useState("");
   const [newTagId, setNewTagId] = useState<string | null>(null);
   const [newDesc, setNewDesc] = useState("");
+  const [newRepeat, setNewRepeat] = useState<"none" | "daily" | "weekly" | "weekdays">("none");
+  const [newRepeatEnd, setNewRepeatEnd] = useState<Date | undefined>(undefined);
+  const [newRepeatEndOpen, setNewRepeatEndOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>();
@@ -100,12 +104,31 @@ export const TodayAppointmentsWidget = () => {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
-    const today = format(new Date(), "yyyy-MM-dd");
-    await supabase.from("appointments").insert({
-      user_id: user.id, title: newTitle.trim(), description: newDesc.trim(),
-      appointment_date: today, appointment_time: newTime, category: newCategory, tag_id: newTagId,
-    } as any);
+    const today = new Date();
+
+    if (newRepeat === "none") {
+      await supabase.from("appointments").insert({
+        user_id: user.id, title: newTitle.trim(), description: newDesc.trim(),
+        appointment_date: format(today, "yyyy-MM-dd"), appointment_time: newTime, category: newCategory, tag_id: newTagId,
+      } as any);
+    } else {
+      const endDate = newRepeatEnd || addDays(today, 30);
+      const allDays = eachDayOfInterval({ start: today, end: endDate });
+      let dates: Date[] = [];
+      if (newRepeat === "daily") dates = allDays;
+      else if (newRepeat === "weekly") dates = allDays.filter(d => d.getDay() === today.getDay());
+      else if (newRepeat === "weekdays") dates = allDays.filter(d => d.getDay() >= 1 && d.getDay() <= 5);
+      if (dates.length === 0) dates = [today];
+
+      const rows = dates.map(d => ({
+        user_id: user.id, title: newTitle.trim(), description: newDesc.trim(),
+        appointment_date: format(d, "yyyy-MM-dd"), appointment_time: newTime, category: newCategory, tag_id: newTagId,
+      }));
+      await supabase.from("appointments").insert(rows as any);
+    }
+
     setNewTitle(""); setNewDesc(""); setNewTime("09:00"); setNewCategory(""); setNewTagId(null);
+    setNewRepeat("none"); setNewRepeatEnd(undefined);
     setShowQuickAdd(false); setSaving(false);
     await fetchToday();
   };
@@ -187,9 +210,50 @@ export const TodayAppointmentsWidget = () => {
               )}
             </div>
             <Textarea placeholder="Descrição (opcional)" value={newDesc} onChange={e => setNewDesc(e.target.value)} className="text-sm min-h-[50px] resize-none" rows={2} />
+            {/* Repeat */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <Repeat className="h-3 w-3 text-muted-foreground" />
+              {(["none", "daily", "weekly", "weekdays"] as const).map(mode => (
+                <button
+                  key={mode}
+                  onClick={() => setNewRepeat(mode)}
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[10px] font-medium border transition-all",
+                    newRepeat === mode
+                      ? "bg-primary/10 text-primary border-primary/30"
+                      : "bg-muted/50 text-muted-foreground border-border hover:bg-muted"
+                  )}
+                >
+                  {{ none: "Único", daily: "Diário", weekly: "Semanal", weekdays: "Seg-Sex" }[mode]}
+                </button>
+              ))}
+            </div>
+            {newRepeat !== "none" && (
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-muted-foreground">Até:</span>
+                <Popover open={newRepeatEndOpen} onOpenChange={setNewRepeatEndOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1 font-normal">
+                      <CalendarIcon className="h-3 w-3" />
+                      {newRepeatEnd ? format(newRepeatEnd, "dd/MM/yyyy") : "Escolher data"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={newRepeatEnd}
+                      onSelect={(d) => { if (d) { setNewRepeatEnd(d); setNewRepeatEndOpen(false); } }}
+                      disabled={(d) => isBefore(d, new Date())}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
             <div className="flex justify-end">
               <Button size="sm" onClick={handleQuickAdd} disabled={saving || !newTitle.trim()}>
-                {saving ? "Salvando..." : "Adicionar"}
+                {saving ? "Salvando..." : newRepeat !== "none" ? "Criar repetidos" : "Adicionar"}
               </Button>
             </div>
           </div>

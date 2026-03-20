@@ -20,8 +20,7 @@ import {
 import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, addMonths, subMonths, addWeeks, subWeeks, getDaysInMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-type RepeatMode = "none" | "week" | "month";
-
+type RepeatMode = "none" | "daily" | "weekly" | "weekdays" | "custom_days";
 type ViewMode = "day" | "week" | "month";
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -56,6 +55,9 @@ const AgendaPage = () => {
   const [formCategory, setFormCategory] = useState("");
   const [formTagId, setFormTagId] = useState<string | null>(null);
   const [formRepeat, setFormRepeat] = useState<RepeatMode>("none");
+  const [formRepeatEnd, setFormRepeatEnd] = useState<Date | undefined>(undefined);
+  const [formRepeatEndOpen, setFormRepeatEndOpen] = useState(false);
+  const [formCustomDays, setFormCustomDays] = useState<number[]>([]); // 0=Sun...6=Sat
   const [saving, setSaving] = useState(false);
 
   const navigateDate = (dir: number) => {
@@ -108,17 +110,24 @@ const AgendaPage = () => {
         appointmentDate: format(formDate, "yyyy-MM-dd"),
       });
     } else {
-      // Generate dates for the repeat period
+      // Build date list based on repeat mode
+      const endDate = formRepeatEnd || addDays(formDate, 30); // default 30 days if no end set
+      const allDays = eachDayOfInterval({ start: formDate, end: endDate });
+
       let dates: Date[] = [];
-      if (formRepeat === "week") {
-        const weekStart = startOfWeek(formDate, { weekStartsOn: 1 });
-        const weekEnd = endOfWeek(formDate, { weekStartsOn: 1 });
-        dates = eachDayOfInterval({ start: weekStart, end: weekEnd });
-      } else {
-        const monthStart = startOfMonth(formDate);
-        const monthEnd = endOfMonth(formDate);
-        dates = eachDayOfInterval({ start: monthStart, end: monthEnd });
+      if (formRepeat === "daily") {
+        dates = allDays;
+      } else if (formRepeat === "weekly") {
+        // Same weekday as formDate
+        const targetDay = formDate.getDay();
+        dates = allDays.filter(d => d.getDay() === targetDay);
+      } else if (formRepeat === "weekdays") {
+        dates = allDays.filter(d => d.getDay() >= 1 && d.getDay() <= 5);
+      } else if (formRepeat === "custom_days") {
+        dates = allDays.filter(d => formCustomDays.includes(d.getDay()));
       }
+
+      if (dates.length === 0) dates = [formDate];
 
       const inputs = dates.map(d => ({
         ...baseInput,
@@ -137,6 +146,8 @@ const AgendaPage = () => {
     setFormCategory("");
     setFormTagId(null);
     setFormRepeat("none");
+    setFormRepeatEnd(undefined);
+    setFormCustomDays([]);
   };
 
   const openCreateForDate = (date?: Date) => {
@@ -147,6 +158,8 @@ const AgendaPage = () => {
     setFormCategory("");
     setFormTagId(null);
     setFormRepeat("none");
+    setFormRepeatEnd(undefined);
+    setFormCustomDays([]);
     setDialogOpen(true);
   };
 
@@ -376,13 +389,15 @@ const AgendaPage = () => {
               </div>
             )}
             {/* Repeat options */}
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <span className="text-xs font-medium text-muted-foreground">Repetir</span>
-              <div className="flex gap-1.5">
+              <div className="flex flex-wrap gap-1.5">
                 {([
                   { mode: "none" as RepeatMode, label: "Não repetir" },
-                  { mode: "week" as RepeatMode, label: "Semana toda" },
-                  { mode: "month" as RepeatMode, label: "Mês todo" },
+                  { mode: "daily" as RepeatMode, label: "Todo dia" },
+                  { mode: "weekly" as RepeatMode, label: "Semanal" },
+                  { mode: "weekdays" as RepeatMode, label: "Seg-Sex" },
+                  { mode: "custom_days" as RepeatMode, label: "Dias específicos" },
                 ]).map(({ mode, label }) => (
                   <button
                     key={mode}
@@ -398,17 +413,71 @@ const AgendaPage = () => {
                   </button>
                 ))}
               </div>
+
+              {/* Custom days selector */}
+              {formRepeat === "custom_days" && (
+                <div className="flex flex-wrap gap-1">
+                  {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((day, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setFormCustomDays(prev =>
+                        prev.includes(i) ? prev.filter(d => d !== i) : [...prev, i]
+                      )}
+                      className={cn(
+                        "rounded-full w-9 h-7 text-[10px] font-medium border transition-all",
+                        formCustomDays.includes(i)
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted border-border"
+                      )}
+                    >
+                      {day}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* End date picker */}
+              {formRepeat !== "none" && (
+                <div className="space-y-1">
+                  <span className="text-[11px] text-muted-foreground">Repetir até:</span>
+                  <Popover open={formRepeatEndOpen} onOpenChange={setFormRepeatEndOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-full justify-start text-left font-normal text-xs h-8">
+                        <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                        {formRepeatEnd ? format(formRepeatEnd, "dd/MM/yyyy") : "Escolher data final"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formRepeatEnd}
+                        onSelect={(d) => { if (d) { setFormRepeatEnd(d); setFormRepeatEndOpen(false); } }}
+                        disabled={(d) => isBefore(d, formDate)}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
+
               {formRepeat !== "none" && (
                 <p className="text-[11px] text-muted-foreground">
-                  {formRepeat === "week"
-                    ? `Será criado para cada dia da semana de ${format(startOfWeek(formDate, { weekStartsOn: 1 }), "dd/MM")} a ${format(endOfWeek(formDate, { weekStartsOn: 1 }), "dd/MM")}`
-                    : `Será criado para cada dia do mês de ${format(startOfMonth(formDate), "MMMM", { locale: ptBR })} (${getDaysInMonth(formDate)} dias)`
-                  }
+                  {(() => {
+                    const endDate = formRepeatEnd || addDays(formDate, 30);
+                    const allDays = eachDayOfInterval({ start: formDate, end: endDate });
+                    let count = 0;
+                    if (formRepeat === "daily") count = allDays.length;
+                    else if (formRepeat === "weekly") count = allDays.filter(d => d.getDay() === formDate.getDay()).length;
+                    else if (formRepeat === "weekdays") count = allDays.filter(d => d.getDay() >= 1 && d.getDay() <= 5).length;
+                    else if (formRepeat === "custom_days") count = allDays.filter(d => formCustomDays.includes(d.getDay())).length;
+                    return `${count} compromisso${count !== 1 ? "s" : ""} serão criados (${format(formDate, "dd/MM")} → ${format(endDate, "dd/MM")})`;
+                  })()}
                 </p>
               )}
             </div>
             <Button onClick={handleCreate} disabled={saving || !formTitle.trim()} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              {saving ? "Salvando..." : formRepeat !== "none" ? `Criar para ${formRepeat === "week" ? "a semana" : "o mês"} todo` : "Criar compromisso"}
+              {saving ? "Salvando..." : formRepeat !== "none" ? "Criar compromissos" : "Criar compromisso"}
             </Button>
           </div>
         </DialogContent>
