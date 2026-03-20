@@ -15,6 +15,7 @@ import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { logActivity } from "@/lib/activityLogger";
 import { cn } from "@/lib/utils";
 import { LABEL_CONFIG, Post, PostStatus, ClientLabel, STATUS_CONFIG, Tag, DEFAULT_TAGS } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
@@ -751,6 +752,15 @@ const AdminDashboard = () => {
       }
 
       setDialogOpen(false);
+      // Log client creation/update
+      logActivity({
+        action: editingClient ? "client_updated" : "client_created",
+        itemType: "client",
+        itemId: clientId || "",
+        itemTitle: name,
+        clientId: clientId || undefined,
+        clientName: name,
+      });
       fetchClients().then(() => fetchClientUsers());
     } catch (err) {
       console.error(err);
