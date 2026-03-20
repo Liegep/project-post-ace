@@ -477,6 +477,7 @@ export type Database = {
           posting_period: string
           shared: boolean
           show_archived_to_client: boolean
+          show_invoices_to_client: boolean
           slug: string
           tiktok_url: string
           tracking_enabled: boolean
@@ -503,6 +504,7 @@ export type Database = {
           posting_period?: string
           shared?: boolean
           show_archived_to_client?: boolean
+          show_invoices_to_client?: boolean
           slug: string
           tiktok_url?: string
           tracking_enabled?: boolean
@@ -529,6 +531,7 @@ export type Database = {
           posting_period?: string
           shared?: boolean
           show_archived_to_client?: boolean
+          show_invoices_to_client?: boolean
           slug?: string
           tiktok_url?: string
           tracking_enabled?: boolean
@@ -910,6 +913,7 @@ export type Database = {
       invoices: {
         Row: {
           client_id: string
+          client_visible: boolean
           created_at: string
           created_by: string | null
           discount: number
@@ -929,6 +933,7 @@ export type Database = {
         }
         Insert: {
           client_id: string
+          client_visible?: boolean
           created_at?: string
           created_by?: string | null
           discount?: number
@@ -948,6 +953,7 @@ export type Database = {
         }
         Update: {
           client_id?: string
+          client_visible?: boolean
           created_at?: string
           created_by?: string | null
           discount?: number

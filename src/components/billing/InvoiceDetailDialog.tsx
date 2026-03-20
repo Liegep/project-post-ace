@@ -22,10 +22,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import {
-  Plus, Trash2, Pencil, Download, Upload, FileText, Eye,
-  CheckCircle2, AlertCircle, XCircle, Clock, Paperclip, X
+  Plus, Trash2, Pencil, Download, Upload, FileText, Eye, EyeOff,
+  CheckCircle2, AlertCircle, XCircle, Clock, Paperclip, X, Link2
 } from "lucide-react";
 import { format } from "date-fns";
 import { generateInvoicePDF } from "@/lib/invoicePdf";
@@ -45,6 +46,17 @@ const CATEGORIES = [
   { value: "capa", label: "Capa" },
   { value: "design", label: "Design" },
   { value: "outro", label: "Outro" },
+];
+
+const PAYMENT_METHODS = [
+  { value: "", label: "Nenhum" },
+  { value: "Pix", label: "Pix" },
+  { value: "PayPal", label: "PayPal" },
+  { value: "Transferência", label: "Transferência" },
+  { value: "Boleto", label: "Boleto" },
+  { value: "Cartão", label: "Cartão" },
+  { value: "Dinheiro", label: "Dinheiro" },
+  { value: "Outro", label: "Outro" },
 ];
 
 interface Props {
@@ -78,7 +90,8 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
   const [invSurcharge, setInvSurcharge] = useState(String(invoice.surcharge || 0));
   const [invNotes, setInvNotes] = useState(invoice.notes || "");
   const [invDueDate, setInvDueDate] = useState(invoice.due_date);
-  const [invPaymentMethod, setInvPaymentMethod] = useState((invoice as any).payment_method || "");
+  const [invPaymentMethod, setInvPaymentMethod] = useState(invoice.payment_method || "");
+  const [invClientVisible, setInvClientVisible] = useState(invoice.client_visible !== false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -89,7 +102,8 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     setInvSurcharge(String(invoice.surcharge || 0));
     setInvNotes(invoice.notes || "");
     setInvDueDate(invoice.due_date);
-    setInvPaymentMethod((invoice as any).payment_method || "");
+    setInvPaymentMethod(invoice.payment_method || "");
+    setInvClientVisible(invoice.client_visible !== false);
   }, [invoice]);
 
   const subtotal = items.reduce((sum, i) => sum + Number(i.total_price || 0), 0);
@@ -179,6 +193,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         notes: invNotes,
         due_date: invDueDate,
         payment_method: invPaymentMethod,
+        client_visible: invClientVisible,
       } as any);
       toast({ title: "Fatura atualizada" });
       setEditingInvoice(false);
@@ -193,6 +208,27 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     await deleteInvoice(invoice.id);
     toast({ title: "Fatura excluída" });
     onOpenChange(false);
+    onUpdate();
+  };
+
+  const handleMarkPaid = async (method?: string) => {
+    await updateInvoice(invoice.id, {
+      status: "paid",
+      paid_at: new Date().toISOString(),
+      payment_method: method || invPaymentMethod || "",
+    } as any);
+    setInvStatus("paid");
+    toast({ title: "Fatura marcada como paga" });
+    onUpdate();
+  };
+
+  const handleRevertOpen = async () => {
+    await updateInvoice(invoice.id, {
+      status: "open",
+      paid_at: null,
+    } as any);
+    setInvStatus("open");
+    toast({ title: "Fatura reaberta" });
     onUpdate();
   };
 
@@ -231,7 +267,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     generateInvoicePDF(invoice, items, total, subtotal);
   };
 
-  const cfg = STATUS_CONFIG[invoice.status];
+  const cfg = STATUS_CONFIG[invStatus] || STATUS_CONFIG[invoice.status];
   const Icon = cfg.icon;
 
   return (
@@ -259,32 +295,21 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
           )}
           <span>Emissão: {format(new Date(invoice.issue_date), "dd/MM/yyyy")}</span>
           <span>Venc: {format(new Date(invoice.due_date), "dd/MM/yyyy")}</span>
+          {!invClientVisible && (
+            <Badge variant="outline" className="text-[10px] gap-0.5">
+              <EyeOff className="h-2.5 w-2.5" /> Interno
+            </Badge>
+          )}
         </div>
 
         {/* Actions */}
         <div className="flex flex-wrap gap-2">
-          {invoice.status !== "paid" ? (
-            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={async () => {
-              await updateInvoice(invoice.id, { 
-                status: "paid", 
-                paid_at: new Date().toISOString(),
-              } as any);
-              setInvStatus("paid");
-              toast({ title: "Fatura marcada como paga" });
-              onUpdate();
-            }}>
+          {invStatus !== "paid" ? (
+            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleMarkPaid()}>
               <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Marcar como Paga
             </Button>
           ) : (
-            <Button size="sm" variant="outline" onClick={async () => {
-              await updateInvoice(invoice.id, { 
-                status: "open", 
-                paid_at: null,
-              } as any);
-              setInvStatus("open");
-              toast({ title: "Fatura reaberta" });
-              onUpdate();
-            }}>
+            <Button size="sm" variant="outline" onClick={handleRevertOpen}>
               <Clock className="h-3.5 w-3.5 mr-1" /> Reverter para Aberta
             </Button>
           )}
@@ -300,11 +325,11 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         </div>
 
         {/* Payment info */}
-        {invoice.status === "paid" && (invoice as any).paid_at && (
+        {invStatus === "paid" && invoice.paid_at && (
           <div className="flex items-center gap-2 text-sm bg-emerald-500/10 text-emerald-600 rounded-lg px-3 py-2">
             <CheckCircle2 className="h-4 w-4" />
-            <span>Paga em {format(new Date((invoice as any).paid_at), "dd/MM/yyyy")}</span>
-            {(invoice as any).payment_method && <span>• {(invoice as any).payment_method}</span>}
+            <span>Paga em {format(new Date(invoice.paid_at), "dd/MM/yyyy")}</span>
+            {invoice.payment_method && <span>• {invoice.payment_method}</span>}
           </div>
         )}
 
@@ -348,15 +373,16 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
               <Select value={invPaymentMethod} onValueChange={setInvPaymentMethod}>
                 <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
-                  <SelectItem value="Pix">Pix</SelectItem>
-                  <SelectItem value="Transferência">Transferência</SelectItem>
-                  <SelectItem value="Boleto">Boleto</SelectItem>
-                  <SelectItem value="Cartão">Cartão</SelectItem>
-                  <SelectItem value="Dinheiro">Dinheiro</SelectItem>
-                  <SelectItem value="Outro">Outro</SelectItem>
+                  {PAYMENT_METHODS.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-center justify-between py-1">
+              <div>
+                <Label className="text-xs">Visível para o cliente</Label>
+                <p className="text-[10px] text-muted-foreground">Se desativado, fica apenas interno</p>
+              </div>
+              <Switch checked={invClientVisible} onCheckedChange={setInvClientVisible} />
             </div>
             <Button size="sm" onClick={handleSaveInvoice}>Salvar alterações</Button>
           </div>
@@ -387,6 +413,15 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
                       <Badge variant="secondary" className="text-[10px] shrink-0">
                         {CATEGORIES.find(c => c.value === item.category)?.label || item.category}
                       </Badge>
+                      {item.post_id ? (
+                        <Badge variant="outline" className="text-[9px] shrink-0 gap-0.5">
+                          <Link2 className="h-2.5 w-2.5" /> Post
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-[9px] shrink-0 gap-0.5 bg-muted/50">
+                          Manual
+                        </Badge>
+                      )}
                     </div>
                     {item.description && <p className="text-xs text-muted-foreground truncate">{item.description}</p>}
                   </div>

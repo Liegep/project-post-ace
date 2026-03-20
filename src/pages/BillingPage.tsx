@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useInvoices, Invoice, createInvoice, updateInvoice, deleteInvoice } from "@/hooks/useInvoices";
@@ -11,8 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Search, ArrowLeft, FileText, DollarSign, AlertCircle, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Plus, Search, ArrowLeft, FileText, DollarSign, AlertCircle, CheckCircle2, XCircle, Clock, TrendingUp, Eye, EyeOff } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import InvoiceDetailDialog from "@/components/billing/InvoiceDetailDialog";
@@ -53,6 +54,7 @@ const BillingPage = () => {
   const [formIssueDate, setFormIssueDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [formDueDate, setFormDueDate] = useState("");
   const [formNotes, setFormNotes] = useState("");
+  const [formClientVisible, setFormClientVisible] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -87,6 +89,7 @@ const BillingPage = () => {
         due_date: formDueDate || formIssueDate,
         notes: formNotes,
         created_by: userId || undefined,
+        client_visible: formClientVisible,
       });
       toast({ title: "Fatura criada com sucesso" });
       setCreateOpen(false);
@@ -107,6 +110,7 @@ const BillingPage = () => {
     setFormIssueDate(format(new Date(), "yyyy-MM-dd"));
     setFormDueDate("");
     setFormNotes("");
+    setFormClientVisible(true);
   };
 
   // Compute totals per invoice from items
@@ -165,6 +169,15 @@ const BillingPage = () => {
     return subtotal - Number(inv.discount || 0) + Number(inv.surcharge || 0);
   };
 
+  // Financial summary
+  const financialSummary = useMemo(() => {
+    const totalBilled = invoices.reduce((sum, i) => sum + getTotal(i), 0);
+    const totalReceived = invoices.filter(i => i.status === "paid").reduce((sum, i) => sum + getTotal(i), 0);
+    const totalPending = invoices.filter(i => i.status === "open" || i.status === "overdue").reduce((sum, i) => sum + getTotal(i), 0);
+    const totalOverdue = invoices.filter(i => i.status === "overdue").reduce((sum, i) => sum + getTotal(i), 0);
+    return { totalBilled, totalReceived, totalPending, totalOverdue };
+  }, [invoices, invoiceTotals]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -184,6 +197,46 @@ const BillingPage = () => {
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-6 space-y-4">
+        {/* Financial Summary */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Card className="p-3 border-l-4 border-l-primary">
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <span className="text-xs font-medium text-muted-foreground">Total Faturado</span>
+            </div>
+            <p className="text-lg font-bold">
+              R$ {financialSummary.totalBilled.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </p>
+          </Card>
+          <Card className="p-3 border-l-4 border-l-emerald-500">
+            <div className="flex items-center gap-2 mb-1">
+              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              <span className="text-xs font-medium text-muted-foreground">Total Recebido</span>
+            </div>
+            <p className="text-lg font-bold text-emerald-600">
+              R$ {financialSummary.totalReceived.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </p>
+          </Card>
+          <Card className="p-3 border-l-4 border-l-amber-500">
+            <div className="flex items-center gap-2 mb-1">
+              <Clock className="h-4 w-4 text-amber-500" />
+              <span className="text-xs font-medium text-muted-foreground">Total Pendente</span>
+            </div>
+            <p className="text-lg font-bold text-amber-600">
+              R$ {financialSummary.totalPending.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </p>
+          </Card>
+          <Card className="p-3 border-l-4 border-l-red-500">
+            <div className="flex items-center gap-2 mb-1">
+              <AlertCircle className="h-4 w-4 text-red-500" />
+              <span className="text-xs font-medium text-muted-foreground">Total Atrasado</span>
+            </div>
+            <p className="text-lg font-bold text-red-600">
+              R$ {financialSummary.totalOverdue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </p>
+          </Card>
+        </div>
+
         {/* Filters */}
         <div className="flex flex-wrap gap-2">
           <div className="relative flex-1 min-w-[200px]">
@@ -225,23 +278,23 @@ const BillingPage = () => {
           </Select>
         </div>
 
-        {/* Summary cards */}
+        {/* Status quick filter cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {(["open", "paid", "overdue", "cancelled"] as const).map(status => {
             const cfg = STATUS_CONFIG[status];
             const Icon = cfg.icon;
             const count = invoices.filter(i => i.status === status).length;
-            const total = invoices.filter(i => i.status === status).reduce((sum, i) => sum + getTotal(i), 0);
             return (
-              <Card key={status} className="p-3 cursor-pointer hover:shadow-md transition-shadow" onClick={() => setFilterStatus(status === filterStatus ? "all" : status)}>
-                <div className="flex items-center gap-2 mb-1">
+              <Card 
+                key={status} 
+                className={`p-3 cursor-pointer hover:shadow-md transition-shadow ${filterStatus === status ? "ring-2 ring-primary" : ""}`} 
+                onClick={() => setFilterStatus(status === filterStatus ? "all" : status)}
+              >
+                <div className="flex items-center gap-2">
                   <Icon className="h-4 w-4" />
                   <span className="text-xs font-medium">{cfg.label}</span>
+                  <span className="ml-auto text-lg font-bold">{count}</span>
                 </div>
-                <p className="text-lg font-bold">{count}</p>
-                <p className="text-xs text-muted-foreground">
-                  R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                </p>
               </Card>
             );
           })}
@@ -264,6 +317,7 @@ const BillingPage = () => {
               const cfg = STATUS_CONFIG[inv.status];
               const Icon = cfg.icon;
               const total = getTotal(inv);
+              const isVisible = (inv as any).client_visible !== false;
               return (
                 <Card
                   key={inv.id}
@@ -284,6 +338,11 @@ const BillingPage = () => {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-xs text-muted-foreground font-mono">#{inv.invoice_number}</span>
                         <h3 className="text-sm font-semibold truncate">{inv.title || "Sem título"}</h3>
+                        {!isVisible && (
+                          <Badge variant="outline" className="text-[9px] gap-0.5">
+                            <EyeOff className="h-2.5 w-2.5" /> Interno
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                         <span>{inv.clients?.name}</span>
@@ -355,6 +414,13 @@ const BillingPage = () => {
             <div>
               <Label className="text-xs">Observações</Label>
               <Textarea value={formNotes} onChange={e => setFormNotes(e.target.value)} rows={2} placeholder="Condições de pagamento, resumo..." />
+            </div>
+            <div className="flex items-center justify-between py-1">
+              <div>
+                <Label className="text-xs">Visível para o cliente</Label>
+                <p className="text-[10px] text-muted-foreground">Se desativado, a fatura fica apenas interna</p>
+              </div>
+              <Switch checked={formClientVisible} onCheckedChange={setFormClientVisible} />
             </div>
             <Button onClick={handleCreate} disabled={saving || !formClientId || !formTitle} className="w-full">
               {saving ? "Criando..." : "Criar Fatura"}

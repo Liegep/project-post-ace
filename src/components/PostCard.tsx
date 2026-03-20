@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud, DollarSign } from "lucide-react";
+import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud, DollarSign, Check } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { PostTrackingLabels } from "@/components/PostTrackingLabels";
 import { format } from "date-fns";
@@ -19,8 +19,9 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEn
 import { SortableContext, useSortable, horizontalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { supabase } from "@/integrations/supabase/client";
-import { isPostInvoiced, createInvoiceItem } from "@/hooks/useInvoices";
+import { isPostInvoiced, invoicePostAuto, getPostInvoiceItem, deleteInvoiceItem } from "@/hooks/useInvoices";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 
 const CaptionText = ({ text, t }: { text: string; t: (key: keyof typeof import("@/i18n/translations").translations.pt) => string }) => {
@@ -134,12 +135,9 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
   const [captionDraft, setCaptionDraft] = useState(post.caption);
 
   // Invoice state
-  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
-  const [availableInvoices, setAvailableInvoices] = useState<{ id: string; title: string; invoice_number: number }[]>([]);
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
-  const [alreadyInvoiced, setAlreadyInvoiced] = useState(false);
+  const [invoiceStatus, setInvoiceStatus] = useState<"loading" | "not_invoiced" | "invoiced">("loading");
   const [invoicing, setInvoicing] = useState(false);
-  const [creatingInvoice, setCreatingInvoice] = useState(false);
+  const [uninvoicing, setUninvoicing] = useState(false);
 
   const baseMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
   const allMedia = localMediaOrder || baseMedia;
@@ -148,93 +146,55 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
-  const getMonthLabel = () => {
-    const now = new Date();
-    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-    return `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
-  };
+  // Check invoice status on mount
+  useEffect(() => {
+    if (!isAdmin) return;
+    let cancelled = false;
+    isPostInvoiced(post.id).then(invoiced => {
+      if (!cancelled) setInvoiceStatus(invoiced ? "invoiced" : "not_invoiced");
+    });
+    return () => { cancelled = true; };
+  }, [post.id, isAdmin]);
 
-  const handleOpenInvoiceDialog = async (e: React.MouseEvent) => {
+  const handleQuickInvoice = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const invoiced = await isPostInvoiced(post.id);
-    if (invoiced) {
-      setAlreadyInvoiced(true);
-      setInvoiceDialogOpen(true);
+    if (!clientId || invoicing) return;
+    
+    if (invoiceStatus === "invoiced") {
+      // Un-invoice
+      setUninvoicing(true);
+      try {
+        const item = await getPostInvoiceItem(post.id);
+        if (item) {
+          await deleteInvoiceItem(item.id);
+          setInvoiceStatus("not_invoiced");
+          toast({ title: "Post removido da fatura" });
+        }
+      } catch (err: any) {
+        toast({ title: "Erro", description: err.message, variant: "destructive" });
+      } finally {
+        setUninvoicing(false);
+      }
       return;
     }
-    setAlreadyInvoiced(false);
-    if (clientId) {
-      const { data } = await supabase
-        .from("invoices")
-        .select("id, title, invoice_number")
-        .eq("client_id", clientId)
-        .eq("status", "open")
-        .order("created_at", { ascending: false });
-      setAvailableInvoices((data as any[]) || []);
-      if ((data || []).length > 0) setSelectedInvoiceId((data as any[])[0].id);
-      else setSelectedInvoiceId("");
-    }
-    setInvoiceDialogOpen(true);
-  };
 
-  const handleCreateInvoiceAndAdd = async () => {
-    if (!clientId) return;
-    setCreatingInvoice(true);
-    try {
-      const now = new Date();
-      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      const dueDate = new Date(now.getFullYear(), now.getMonth() + 1, 10);
-
-      const { data: inv, error } = await supabase.from("invoices").insert({
-        client_id: clientId,
-        title: getMonthLabel(),
-        period_start: format(firstDay, "yyyy-MM-dd"),
-        period_end: format(lastDay, "yyyy-MM-dd"),
-        issue_date: format(now, "yyyy-MM-dd"),
-        due_date: format(dueDate, "yyyy-MM-dd"),
-      } as any).select().single();
-      if (error) throw error;
-
-      await createInvoiceItem({
-        invoice_id: (inv as any).id,
-        post_id: post.id,
-        name: post.title,
-        description: post.caption?.substring(0, 200) || "",
-        category: post.mediaType === "video" ? "reels" : "post",
-        service_date: format(now, "yyyy-MM-dd"),
-        quantity: 1,
-        unit_price: 0,
-        total_price: 0,
-      });
-      toast({ title: `Fatura "${getMonthLabel()}" criada e post adicionado` });
-      setInvoiceDialogOpen(false);
-    } catch (err: any) {
-      toast({ title: "Erro", description: err.message, variant: "destructive" });
-    } finally {
-      setCreatingInvoice(false);
-    }
-  };
-
-  const handleInvoicePost = async () => {
-    if (!selectedInvoiceId) return;
     setInvoicing(true);
     try {
-      await createInvoiceItem({
-        invoice_id: selectedInvoiceId,
-        post_id: post.id,
-        name: post.title,
-        description: post.caption?.substring(0, 200) || "",
-        category: post.mediaType === "video" ? "reels" : "post",
-        service_date: format(new Date(), "yyyy-MM-dd"),
-        quantity: 1,
-        unit_price: 0,
-        total_price: 0,
+      const result = await invoicePostAuto(clientId, {
+        id: post.id,
+        title: post.title,
+        caption: post.caption,
+        mediaType: post.mediaType,
       });
-      toast({ title: "Post adicionado à fatura" });
-      setInvoiceDialogOpen(false);
+      setInvoiceStatus("invoiced");
+      toast({ title: `Adicionado à fatura "${result.invoiceTitle}"` });
     } catch (err: any) {
-      toast({ title: "Erro", description: err.message, variant: "destructive" });
+      if (err.message === "ALREADY_INVOICED") {
+        setInvoiceStatus("invoiced");
+        toast({ title: "Este post já está faturado" });
+      } else {
+        toast({ title: "Erro ao faturar", description: err.message, variant: "destructive" });
+      }
     } finally {
       setInvoicing(false);
     }
@@ -299,13 +259,20 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
             </div>
           )}
           <h3 className={`font-bold leading-snug text-foreground ${isCompact ? "text-sm" : "text-lg"} flex-1`}>{post.title}</h3>
-          {post.trelloCardId && (
-            <span title="Sincronizado com Trello" className="shrink-0 mt-0.5">
-              <svg className="h-4 w-4 text-[#0079BF]" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M21 3H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM10.5 17a1.5 1.5 0 0 1-1.5-1.5V7a1.5 1.5 0 0 1 3 0v8.5a1.5 1.5 0 0 1-1.5 1.5zm5-3a1.5 1.5 0 0 1-1.5-1.5V7a1.5 1.5 0 0 1 3 0v6.5a1.5 1.5 0 0 1-1.5 1.5z"/>
-              </svg>
-            </span>
-          )}
+          <div className="flex items-center gap-1 shrink-0">
+            {isAdmin && invoiceStatus === "invoiced" && (
+              <Badge variant="outline" className="text-[9px] bg-emerald-500/10 text-emerald-600 border-emerald-500/30 px-1.5 py-0">
+                <Check className="h-2.5 w-2.5 mr-0.5" />Faturado
+              </Badge>
+            )}
+            {post.trelloCardId && (
+              <span title="Sincronizado com Trello">
+                <svg className="h-4 w-4 text-[#0079BF]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21 3H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM10.5 17a1.5 1.5 0 0 1-1.5-1.5V7a1.5 1.5 0 0 1 3 0v8.5a1.5 1.5 0 0 1-1.5 1.5zm5-3a1.5 1.5 0 0 1-1.5-1.5V7a1.5 1.5 0 0 1 3 0v6.5a1.5 1.5 0 0 1-1.5 1.5z"/>
+                </svg>
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -542,11 +509,19 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
             <TooltipProvider delayDuration={300}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={handleOpenInvoiceDialog} className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
-                    <DollarSign className="h-4 w-4" />
+                  <Button 
+                    variant={invoiceStatus === "invoiced" ? "default" : "ghost"} 
+                    size="icon" 
+                    onClick={handleQuickInvoice} 
+                    disabled={invoicing || uninvoicing || invoiceStatus === "loading"}
+                    className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"} ${invoiceStatus === "invoiced" ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
+                  >
+                    {invoiceStatus === "invoiced" ? <Check className="h-4 w-4" /> : <DollarSign className="h-4 w-4" />}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Faturar</TooltipContent>
+                <TooltipContent>
+                  {invoiceStatus === "invoiced" ? "Desfazer faturamento" : "Faturar"}
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
             <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
@@ -554,62 +529,6 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
             </Button>
           </div>
         )}
-
-        {/* Invoice dialog */}
-        <Dialog open={invoiceDialogOpen} onOpenChange={setInvoiceDialogOpen}>
-          <DialogContent className="sm:max-w-sm" onClick={(e) => e.stopPropagation()}>
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" /> Faturar Post
-              </DialogTitle>
-            </DialogHeader>
-            {alreadyInvoiced ? (
-              <div className="text-center py-4">
-                <p className="text-sm text-muted-foreground">Este post já está em uma fatura.</p>
-                <Button variant="outline" className="mt-3" onClick={() => setInvoiceDialogOpen(false)}>Fechar</Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {availableInvoices.length > 0 && (
-                  <div>
-                    <label className="text-xs font-medium">Fatura existente:</label>
-                    <Select value={selectedInvoiceId} onValueChange={setSelectedInvoiceId}>
-                      <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                      <SelectContent>
-                        {availableInvoices.map(inv => (
-                          <SelectItem key={inv.id} value={inv.id}>#{inv.invoice_number} — {inv.title}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button onClick={handleInvoicePost} disabled={invoicing || !selectedInvoiceId} className="w-full mt-2">
-                      {invoicing ? "Adicionando..." : "Adicionar à fatura"}
-                    </Button>
-                  </div>
-                )}
-                {availableInvoices.length > 0 && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <div className="flex-1 border-t" /><span>ou</span><div className="flex-1 border-t" />
-                  </div>
-                )}
-                <div>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    {availableInvoices.length === 0 
-                      ? "Nenhuma fatura aberta para este cliente." 
-                      : "Criar nova fatura mensal:"}
-                  </p>
-                  <Button 
-                    variant={availableInvoices.length === 0 ? "default" : "outline"} 
-                    onClick={handleCreateInvoiceAndAdd} 
-                    disabled={creatingInvoice} 
-                    className="w-full"
-                  >
-                    {creatingInvoice ? "Criando..." : `Criar "${getMonthLabel()}" e adicionar`}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
 
         {!isAdmin && !hideFeedback && (
           <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
