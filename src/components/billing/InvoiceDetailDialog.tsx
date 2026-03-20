@@ -109,6 +109,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
 
   const subtotal = items.reduce((sum, i) => sum + Number(i.total_price || 0), 0);
   const total = subtotal - Number(invDiscount || 0) + Number(invSurcharge || 0);
+  const cur = invoice.clients?.billing_currency;
 
   const resetItemForm = () => {
     setItemName("");
@@ -265,7 +266,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
   };
 
   const handleDownloadPDF = () => {
-    generateInvoicePDF(invoice, items, total, subtotal);
+    generateInvoicePDF(invoice, items, total, subtotal, cur);
   };
 
   const cfg = STATUS_CONFIG[invStatus] || STATUS_CONFIG[invoice.status];
@@ -357,11 +358,11 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label className="text-xs">Desconto (R$)</Label>
+                <Label className="text-xs">Desconto</Label>
                 <Input type="number" value={invDiscount} onChange={e => setInvDiscount(e.target.value)} />
               </div>
               <div>
-                <Label className="text-xs">Acréscimo (R$)</Label>
+                <Label className="text-xs">Acréscimo</Label>
                 <Input type="number" value={invSurcharge} onChange={e => setInvSurcharge(e.target.value)} />
               </div>
             </div>
@@ -426,9 +427,9 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
                     </div>
                     {item.description && <p className="text-xs text-muted-foreground truncate">{item.description}</p>}
                   </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-xs text-muted-foreground">{item.quantity}x R$ {Number(item.unit_price).toFixed(2)}</span>
-                    <p className="font-semibold text-sm">R$ {Number(item.total_price).toFixed(2)}</p>
+                   <div className="text-right shrink-0">
+                    <span className="text-xs text-muted-foreground">{item.quantity}x {formatCurrency(Number(item.unit_price), cur)}</span>
+                    <p className="font-semibold text-sm">{formatCurrency(Number(item.total_price), cur)}</p>
                   </div>
                   <div className="flex gap-1 shrink-0">
                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleEditItem(item)}>
@@ -500,24 +501,24 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         <div className="space-y-1 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Subtotal</span>
-            <span>R$ {subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+            <span>{formatCurrency(subtotal, cur)}</span>
           </div>
           {Number(invDiscount) > 0 && (
             <div className="flex justify-between text-emerald-600">
               <span>Desconto</span>
-              <span>- R$ {Number(invDiscount).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+              <span>- {formatCurrency(Number(invDiscount), cur)}</span>
             </div>
           )}
           {Number(invSurcharge) > 0 && (
             <div className="flex justify-between text-amber-600">
               <span>Acréscimo</span>
-              <span>+ R$ {Number(invSurcharge).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+              <span>+ {formatCurrency(Number(invSurcharge), cur)}</span>
             </div>
           )}
           <Separator />
           <div className="flex justify-between font-bold text-base">
             <span>Total</span>
-            <span>R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+            <span>{formatCurrency(total, cur)}</span>
           </div>
         </div>
 
