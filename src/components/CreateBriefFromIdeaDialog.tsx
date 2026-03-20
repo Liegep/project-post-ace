@@ -12,6 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { FileText, CalendarIcon, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { BriefSimilarityPanel } from "@/components/BriefSimilarityPanel";
 
 interface Props {
   open: boolean;
