@@ -4,8 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { Receipt, CheckCircle2, AlertCircle, Clock, XCircle, ChevronRight, FileText, Download } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Receipt, CheckCircle2, AlertCircle, Clock, XCircle,
+  ChevronRight, FileText, Download, History
+} from "lucide-react";
 import { format } from "date-fns";
 import { generateInvoicePDF } from "@/lib/invoicePdf";
 
@@ -16,6 +21,9 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }>
   cancelled: { label: "Cancelada", color: "bg-muted text-muted-foreground", icon: XCircle },
 };
 
+const MAX_RECENT = 3;
+
+/* ── Invoice Detail (inside dialog) ── */
 function InvoiceDetail({ invoice }: { invoice: Invoice }) {
   const { items, loading } = useInvoiceItems(invoice.id);
 
@@ -72,7 +80,6 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
 
       <Separator />
 
-      {/* Items */}
       {loading ? (
         <p className="text-sm text-muted-foreground py-2">Carregando itens...</p>
       ) : items.length === 0 ? (
@@ -124,7 +131,6 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
         </div>
       )}
 
-      {/* Download PDF Button */}
       {!loading && items.length > 0 && (
         <>
           <Separator />
@@ -138,11 +144,58 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
   );
 }
 
+/* ── Compact invoice row (for recent cards & history list) ── */
+function InvoiceRow({
+  invoice,
+  onSelect,
+  compact = false,
+}: {
+  invoice: Invoice;
+  onSelect: (inv: Invoice) => void;
+  compact?: boolean;
+}) {
+  const cfg = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.open;
+  const Icon = cfg.icon;
+
+  return (
+    <button
+      onClick={() => onSelect(invoice)}
+      className="w-full flex items-center justify-between rounded-lg border bg-card p-3 hover:bg-accent/50 transition-colors text-left"
+    >
+      <div className="flex items-center gap-3 min-w-0">
+        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-foreground truncate">
+            {invoice.title || `Fatura #${invoice.invoice_number}`}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Vencimento: {format(new Date(invoice.due_date), "dd/MM/yyyy")}
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
+        <Badge variant="secondary" className={`${cfg.color} text-xs`}>
+          <Icon className="h-3 w-3 mr-1" />
+          {cfg.label}
+        </Badge>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </div>
+    </button>
+  );
+}
+
+/* ── Main Panel ── */
 export function ClientInvoicesPanel({ clientId }: { clientId: string }) {
   const { invoices, loading } = useInvoices(clientId);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const visibleInvoices = invoices.filter((inv) => inv.client_visible !== false);
+
+  // Split into recent (first 3) and older
+  const recentInvoices = visibleInvoices.slice(0, MAX_RECENT);
+  const olderInvoices = visibleInvoices.slice(MAX_RECENT);
+  const hasOlder = olderInvoices.length > 0;
 
   if (loading) {
     return (
@@ -154,7 +207,10 @@ export function ClientInvoicesPanel({ clientId }: { clientId: string }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Carregando faturas...</p>
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <p className="text-sm text-muted-foreground">Carregando faturas...</p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -165,46 +221,72 @@ export function ClientInvoicesPanel({ clientId }: { clientId: string }) {
   return (
     <>
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Receipt className="h-5 w-5" />
-            Faturas
-          </CardTitle>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Receipt className="h-5 w-5" />
+              Faturas
+            </CardTitle>
+            {hasOlder && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setHistoryOpen(true)}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                <History className="h-3.5 w-3.5 mr-1.5" />
+                Ver histórico ({olderInvoices.length})
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-2">
-          {visibleInvoices.map((inv) => {
-            const cfg = STATUS_CONFIG[inv.status] || STATUS_CONFIG.open;
-            const Icon = cfg.icon;
-            return (
-              <button
-                key={inv.id}
-                onClick={() => setSelectedInvoice(inv)}
-                className="w-full flex items-center justify-between rounded-lg border bg-card p-3 hover:bg-accent/50 transition-colors text-left"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">
-                      {inv.title || `Fatura #${inv.invoice_number}`}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Vencimento: {format(new Date(inv.due_date), "dd/MM/yyyy")}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <Badge variant="secondary" className={`${cfg.color} text-xs`}>
-                    <Icon className="h-3 w-3 mr-1" />
-                    {cfg.label}
-                  </Badge>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </button>
-            );
-          })}
+          {recentInvoices.map((inv) => (
+            <InvoiceRow key={inv.id} invoice={inv} onSelect={setSelectedInvoice} />
+          ))}
+
+          {hasOlder && (
+            <button
+              onClick={() => setHistoryOpen(true)}
+              className="w-full rounded-lg border border-dashed p-3 text-center text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+            >
+              <History className="h-4 w-4 inline mr-1.5 -mt-0.5" />
+              Faturas anteriores ({olderInvoices.length})
+            </button>
+          )}
         </CardContent>
       </Card>
 
+      {/* History Sheet (drawer on mobile, side panel on desktop) */}
+      <Sheet open={historyOpen} onOpenChange={setHistoryOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-md p-0">
+          <SheetHeader className="px-6 pt-6 pb-4 border-b">
+            <SheetTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              Histórico de faturas
+            </SheetTitle>
+            <SheetDescription>
+              {visibleInvoices.length} fatura{visibleInvoices.length !== 1 ? "s" : ""} no total
+            </SheetDescription>
+          </SheetHeader>
+          <ScrollArea className="h-[calc(100vh-120px)]">
+            <div className="space-y-2 p-4">
+              {visibleInvoices.map((inv) => (
+                <InvoiceRow
+                  key={inv.id}
+                  invoice={inv}
+                  onSelect={(inv) => {
+                    setSelectedInvoice(inv);
+                    setHistoryOpen(false);
+                  }}
+                />
+              ))}
+            </div>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
+
+      {/* Invoice Detail Dialog */}
       <Dialog open={!!selectedInvoice} onOpenChange={(v) => { if (!v) setSelectedInvoice(null); }}>
         <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
           <DialogHeader>
