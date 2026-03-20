@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { ClientBillingConfig } from "@/components/billing/ClientBillingConfig";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { supabase } from "@/integrations/supabase/client";
 import { PostsProvider, usePosts } from "@/context/PostsContext";
@@ -998,6 +999,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   </div>
                 </>
               )}
+            </div>
+
+            {/* Billing Config */}
+            <div className="px-5 py-4 border-t">
+              <ClientBillingConfig clientId={clientData.id} />
             </div>
 
             {/* Language */}
