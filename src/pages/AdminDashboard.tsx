@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { LABEL_CONFIG, Post, PostStatus, ClientLabel, STATUS_CONFIG, Tag, DEFAULT_TAGS } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
 import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
+import { CommemorativeDatesWidget } from "@/components/CommemorativeDatesWidget";
 import { PostDetailDialog } from "@/components/PostDetailDialog";
 
 const CLIENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
