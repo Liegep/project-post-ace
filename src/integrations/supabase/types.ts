@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          client_id: string | null
+          client_name: string
+          created_at: string
+          id: string
+          item_id: string | null
+          item_title: string
+          item_type: string
+          metadata: Json | null
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          action: string
+          client_id?: string | null
+          client_name?: string
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          item_title?: string
+          item_type: string
+          metadata?: Json | null
+          user_id: string
+          user_name?: string
+        }
+        Update: {
+          action?: string
+          client_id?: string | null
+          client_name?: string
+          created_at?: string
+          id?: string
+          item_id?: string | null
+          item_title?: string
+          item_type?: string
+          metadata?: Json | null
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_logs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_invitations: {
         Row: {
           accepted_at: string | null
