@@ -19,6 +19,7 @@ export interface Invoice {
   updated_at: string;
   paid_at: string | null;
   payment_method: string;
+  client_visible: boolean;
   clients?: { name: string; logo_url: string; slug: string };
 }
 
@@ -120,6 +121,7 @@ export async function createInvoice(data: {
   due_date: string;
   notes?: string;
   created_by?: string;
+  client_visible?: boolean;
 }) {
   const { data: inv, error } = await supabase.from("invoices").insert(data as any).select().single();
   if (error) throw error;
@@ -185,4 +187,80 @@ export async function isPostInvoiced(postId: string): Promise<boolean> {
     .eq("post_id", postId)
     .limit(1);
   return (data || []).length > 0;
+}
+
+// Get the invoice item for a post (to allow un-invoicing)
+export async function getPostInvoiceItem(postId: string): Promise<{ id: string; invoice_id: string } | null> {
+  const { data } = await supabase
+    .from("invoice_items")
+    .select("id, invoice_id")
+    .eq("post_id", postId)
+    .limit(1);
+  return (data || [])[0] || null;
+}
+
+// Auto-create or find open invoice for a client and add post
+export async function invoicePostAuto(clientId: string, post: {
+  id: string;
+  title: string;
+  caption?: string;
+  mediaType?: string;
+}) {
+  // Check duplicate
+  const already = await isPostInvoiced(post.id);
+  if (already) throw new Error("ALREADY_INVOICED");
+
+  // Find open invoice for this client
+  const { data: openInvoices } = await supabase
+    .from("invoices")
+    .select("id, title, invoice_number")
+    .eq("client_id", clientId)
+    .eq("status", "open")
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  let invoiceId: string;
+  let invoiceTitle: string;
+
+  if (openInvoices && openInvoices.length > 0) {
+    // Use the most recent open invoice
+    invoiceId = openInvoices[0].id;
+    invoiceTitle = openInvoices[0].title;
+  } else {
+    // Auto-create monthly invoice
+    const now = new Date();
+    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const title = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const dueDate = new Date(now.getFullYear(), now.getMonth() + 1, 10);
+
+    const { data: inv, error } = await supabase.from("invoices").insert({
+      client_id: clientId,
+      title,
+      period_start: firstDay.toISOString().split("T")[0],
+      period_end: lastDay.toISOString().split("T")[0],
+      issue_date: now.toISOString().split("T")[0],
+      due_date: dueDate.toISOString().split("T")[0],
+    } as any).select().single();
+    if (error) throw error;
+    invoiceId = (inv as any).id;
+    invoiceTitle = title;
+  }
+
+  // Add item
+  const category = post.mediaType === "video" ? "reels" : "post";
+  await createInvoiceItem({
+    invoice_id: invoiceId,
+    post_id: post.id,
+    name: post.title,
+    description: post.caption?.substring(0, 200) || "",
+    category,
+    service_date: new Date().toISOString().split("T")[0],
+    quantity: 1,
+    unit_price: 0,
+    total_price: 0,
+  });
+
+  return { invoiceId, invoiceTitle };
 }
