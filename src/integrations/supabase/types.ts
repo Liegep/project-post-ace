@@ -718,6 +718,9 @@ export type Database = {
       ideas: {
         Row: {
           column_id: string
+          converted_at: string | null
+          converted_brief_id: string | null
+          converted_to_brief: boolean
           created_at: string
           description: string
           id: string
@@ -727,6 +730,9 @@ export type Database = {
         }
         Insert: {
           column_id: string
+          converted_at?: string | null
+          converted_brief_id?: string | null
+          converted_to_brief?: boolean
           created_at?: string
           description?: string
           id?: string
@@ -736,6 +742,9 @@ export type Database = {
         }
         Update: {
           column_id?: string
+          converted_at?: string | null
+          converted_brief_id?: string | null
+          converted_to_brief?: boolean
           created_at?: string
           description?: string
           id?: string

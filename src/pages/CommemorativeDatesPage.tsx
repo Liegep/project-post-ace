@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { MobileNav } from "@/components/MobileNav";
 import { useUserRole } from "@/hooks/useUserRole";
-import { UseDateAsBriefDialog } from "@/components/UseDateAsBriefDialog";
+import { CreateBriefFromIdeaDialog } from "@/components/CreateBriefFromIdeaDialog";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 const MONTH_NAMES = [
@@ -425,13 +425,12 @@ export default function CommemorativeDatesPage() {
       </AlertDialog>
 
       {briefDate && (
-        <UseDateAsBriefDialog
+        <CreateBriefFromIdeaDialog
           open={!!briefDate}
           onOpenChange={(open) => { if (!open) setBriefDate(null); }}
-          dateName={briefDate.name}
-          dateMonth={briefDate.date_month}
-          dateDay={briefDate.date_day}
-          dateDescription={briefDate.description}
+          title={briefDate.name}
+          description={briefDate.description || `Conteúdo inspirado na data comemorativa: ${briefDate.name} (${briefDate.date_day}/${briefDate.date_month})`}
+          plannedDate={new Date(new Date().getFullYear(), briefDate.date_month - 1, briefDate.date_day)}
         />
       )}
     </div>

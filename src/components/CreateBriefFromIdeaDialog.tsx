@@ -6,16 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/hooks/use-toast";
-import { FileText } from "lucide-react";
+import { FileText, CalendarIcon, AlertTriangle } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  dateName: string;
-  dateMonth: number;
-  dateDay: number;
-  dateDescription?: string;
+  title: string;
+  description?: string;
+  plannedDate?: Date | null;
+  alreadyConverted?: boolean;
+  onCreated?: (briefId: string) => void;
 }
 
 interface ClientOption {
@@ -23,21 +28,31 @@ interface ClientOption {
   name: string;
 }
 
-export function UseDateAsBriefDialog({ open, onOpenChange, dateName, dateMonth, dateDay, dateDescription }: Props) {
+export function CreateBriefFromIdeaDialog({
+  open,
+  onOpenChange,
+  title: initialTitle,
+  description: initialDescription,
+  plannedDate: initialDate,
+  alreadyConverted,
+  onCreated,
+}: Props) {
   const [clients, setClients] = useState<ClientOption[]>([]);
   const [selectedClient, setSelectedClient] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [plannedDate, setPlannedDate] = useState<Date | undefined>(undefined);
   const [saving, setSaving] = useState(false);
   const [loadingClients, setLoadingClients] = useState(false);
 
   useEffect(() => {
     if (!open) return;
-    setTitle(dateName);
-    setDescription(dateDescription || `Conteúdo inspirado na data comemorativa: ${dateName} (${dateDay}/${dateMonth})`);
+    setTitle(initialTitle);
+    setDescription(initialDescription || "");
+    setPlannedDate(initialDate || undefined);
     setSelectedClient("");
     loadClients();
-  }, [open, dateName, dateMonth, dateDay, dateDescription]);
+  }, [open, initialTitle, initialDescription, initialDate]);
 
   const loadClients = async () => {
     setLoadingClients(true);
@@ -71,22 +86,26 @@ export function UseDateAsBriefDialog({ open, onOpenChange, dateName, dateMonth, 
     setSaving(true);
 
     const { data: { user } } = await supabase.auth.getUser();
-    const currentYear = new Date().getFullYear();
-    const plannedDate = `${currentYear}-${String(dateMonth).padStart(2, "0")}-${String(dateDay).padStart(2, "0")}`;
 
-    const { error } = await supabase.from("content_briefs").insert({
+    const payload: any = {
       client_id: selectedClient,
       title: title.trim(),
       description: description.trim(),
-      planned_date: plannedDate,
-      status: "draft",
+      status: "draft" as const,
       created_by: user?.id || null,
-    });
+    };
+
+    if (plannedDate) {
+      payload.planned_date = format(plannedDate, "yyyy-MM-dd");
+    }
+
+    const { data, error } = await supabase.from("content_briefs").insert(payload).select("id").single();
 
     if (error) {
       toast({ title: "Erro ao criar pauta", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Pauta criada!", description: `"${title.trim()}" foi adicionada como pauta.` });
+      toast({ title: "Pauta criada!", description: `"${title.trim()}" foi adicionada como rascunho.` });
+      onCreated?.(data.id);
       onOpenChange(false);
     }
     setSaving(false);
@@ -98,12 +117,22 @@ export function UseDateAsBriefDialog({ open, onOpenChange, dateName, dateMonth, 
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-4 w-4 text-primary" />
-            Usar como Pauta
+            Criar Pauta
           </DialogTitle>
         </DialogHeader>
+
+        {alreadyConverted && (
+          <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30 p-3">
+            <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700 dark:text-amber-300">
+              Essa ideia já foi usada para criar uma pauta anteriormente. Você pode criar novamente se desejar.
+            </p>
+          </div>
+        )}
+
         <div className="space-y-3">
           <div>
-            <Label className="text-xs">Cliente</Label>
+            <Label className="text-xs">Cliente *</Label>
             {loadingClients ? (
               <div className="h-9 rounded-md border bg-muted animate-pulse" />
             ) : clients.length === 0 ? (
@@ -119,17 +148,44 @@ export function UseDateAsBriefDialog({ open, onOpenChange, dateName, dateMonth, 
               </Select>
             )}
           </div>
+
           <div>
             <Label className="text-xs">Título da pauta</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
+
           <div>
             <Label className="text-xs">Descrição</Label>
             <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
           </div>
-          <p className="text-[10px] text-muted-foreground">
-            Data planejada: {dateDay}/{dateMonth}/{new Date().getFullYear()}
-          </p>
+
+          <div>
+            <Label className="text-xs">Data planejada (opcional)</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !plannedDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {plannedDate ? format(plannedDate, "dd/MM/yyyy") : "Escolher data"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={plannedDate}
+                  onSelect={setPlannedDate}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
           <Button
             onClick={handleCreate}
             disabled={!selectedClient || !title.trim() || saving}
