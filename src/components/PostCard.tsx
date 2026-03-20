@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Post, PostStatus, ClientLabel, STATUS_CONFIG, LABEL_CONFIG } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud } from "lucide-react";
+import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud, DollarSign } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { PostTrackingLabels } from "@/components/PostTrackingLabels";
 import { format } from "date-fns";
@@ -18,6 +18,10 @@ import { ptBR } from "date-fns/locale";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, horizontalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { supabase } from "@/integrations/supabase/client";
+import { isPostInvoiced, createInvoiceItem } from "@/hooks/useInvoices";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
 
 const CaptionText = ({ text, t }: { text: string; t: (key: keyof typeof import("@/i18n/translations").translations.pt) => string }) => {
   const [expanded, setExpanded] = useState(false);
@@ -129,12 +133,67 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
   const [editingCaption, setEditingCaption] = useState(false);
   const [captionDraft, setCaptionDraft] = useState(post.caption);
 
+  // Invoice state
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [availableInvoices, setAvailableInvoices] = useState<{ id: string; title: string; invoice_number: number }[]>([]);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
+  const [alreadyInvoiced, setAlreadyInvoiced] = useState(false);
+  const [invoicing, setInvoicing] = useState(false);
+
   const baseMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
   const allMedia = localMediaOrder || baseMedia;
 
   const thumbSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
+
+  const handleOpenInvoiceDialog = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Check if already invoiced
+    const invoiced = await isPostInvoiced(post.id);
+    if (invoiced) {
+      setAlreadyInvoiced(true);
+      setInvoiceDialogOpen(true);
+      return;
+    }
+    setAlreadyInvoiced(false);
+    // Fetch open invoices for this client
+    if (clientId) {
+      const { data } = await supabase
+        .from("invoices")
+        .select("id, title, invoice_number")
+        .eq("client_id", clientId)
+        .eq("status", "open")
+        .order("created_at", { ascending: false });
+      setAvailableInvoices((data as any[]) || []);
+      if ((data || []).length > 0) setSelectedInvoiceId((data as any[])[0].id);
+    }
+    setInvoiceDialogOpen(true);
+  };
+
+  const handleInvoicePost = async () => {
+    if (!selectedInvoiceId) return;
+    setInvoicing(true);
+    try {
+      await createInvoiceItem({
+        invoice_id: selectedInvoiceId,
+        post_id: post.id,
+        name: post.title,
+        description: post.caption?.substring(0, 200) || "",
+        category: post.mediaType === "video" ? "reels" : "post",
+        service_date: format(new Date(), "yyyy-MM-dd"),
+        quantity: 1,
+        unit_price: 0,
+        total_price: 0,
+      });
+      toast({ title: "Post adicionado à fatura" });
+      setInvoiceDialogOpen(false);
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    } finally {
+      setInvoicing(false);
+    }
+  };
 
   const handleThumbDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -435,11 +494,62 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
                 </div>
               </PopoverContent>
             </Popover>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={handleOpenInvoiceDialog} className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
+                    <DollarSign className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Faturar</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         )}
+
+        {/* Invoice dialog */}
+        <Dialog open={invoiceDialogOpen} onOpenChange={setInvoiceDialogOpen}>
+          <DialogContent className="sm:max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5" /> Faturar Post
+              </DialogTitle>
+            </DialogHeader>
+            {alreadyInvoiced ? (
+              <div className="text-center py-4">
+                <p className="text-sm text-muted-foreground">Este post já está em uma fatura.</p>
+                <Button variant="outline" className="mt-3" onClick={() => setInvoiceDialogOpen(false)}>Fechar</Button>
+              </div>
+            ) : availableInvoices.length === 0 ? (
+              <div className="text-center py-4">
+                <p className="text-sm text-muted-foreground">Nenhuma fatura aberta para este cliente.</p>
+                <p className="text-xs text-muted-foreground mt-1">Crie uma fatura primeiro na página de Faturamento.</p>
+                <Button variant="outline" className="mt-3" onClick={() => setInvoiceDialogOpen(false)}>Fechar</Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-medium">Selecione a fatura:</label>
+                  <Select value={selectedInvoiceId} onValueChange={setSelectedInvoiceId}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {availableInvoices.map(inv => (
+                        <SelectItem key={inv.id} value={inv.id}>#{inv.invoice_number} — {inv.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <p className="text-xs text-muted-foreground">O post "{post.title}" será adicionado como item da fatura selecionada.</p>
+                <Button onClick={handleInvoicePost} disabled={invoicing || !selectedInvoiceId} className="w-full">
+                  {invoicing ? "Adicionando..." : "Adicionar à fatura"}
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {!isAdmin && !hideFeedback && (
           <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
