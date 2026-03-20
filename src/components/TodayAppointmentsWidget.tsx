@@ -162,7 +162,7 @@ export const TodayAppointmentsWidget = () => {
   const pending = appointments.filter(a => !a.completed).length;
   const getTag = (tagId: string | null) => tagId ? tags.find(t => t.id === tagId) : null;
 
-  if (loading) return null;
+  if (loading || appointments.length === 0) return null;
 
   return (
     <>

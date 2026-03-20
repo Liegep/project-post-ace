@@ -26,7 +26,7 @@ export function CommemorativeDatesWidget() {
   const [showFavPicker, setShowFavPicker] = useState(false);
   const [briefDate, setBriefDate] = useState<CommemorativeDate | null>(null);
 
-  if (loading) return null;
+  if (loading || nextWeekDates.length === 0) return null;
 
   return (
     <TooltipProvider>
