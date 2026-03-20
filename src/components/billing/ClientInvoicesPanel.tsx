@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { generateInvoicePDF } from "@/lib/invoicePdf";
+import { formatCurrency } from "@/lib/currency";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   open: { label: "Aberta", color: "bg-blue-500/15 text-blue-600", icon: Clock },
@@ -26,6 +27,7 @@ const MAX_RECENT = 3;
 /* ── Invoice Detail (inside dialog) ── */
 function InvoiceDetail({ invoice }: { invoice: Invoice }) {
   const { items, loading } = useInvoiceItems(invoice.id);
+  const cur = invoice.clients?.billing_currency;
 
   const subtotal = items.reduce((sum, it) => sum + Number(it.total_price || 0), 0);
   const discount = Number(invoice.discount || 0);
@@ -33,7 +35,7 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
   const total = subtotal - discount + surcharge;
 
   const handleDownloadPDF = () => {
-    generateInvoicePDF(invoice, items, total, subtotal);
+    generateInvoicePDF(invoice, items, total, subtotal, cur);
   };
 
   const cfg = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.open;
@@ -96,11 +98,11 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
                     <p className="text-xs text-muted-foreground truncate">{item.description}</p>
                   )}
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {item.quantity}x · R$ {Number(item.unit_price || 0).toFixed(2)}
+                    {item.quantity}x · {formatCurrency(Number(item.unit_price || 0), cur)}
                   </p>
                 </div>
                 <span className="text-sm font-semibold text-foreground ml-3">
-                  R$ {Number(item.total_price || 0).toFixed(2)}
+                  {formatCurrency(Number(item.total_price || 0), cur)}
                 </span>
               </div>
             ))}
@@ -109,23 +111,23 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
           <div className="space-y-1">
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Subtotal</span>
-              <span>R$ {subtotal.toFixed(2)}</span>
+              <span>{formatCurrency(subtotal, cur)}</span>
             </div>
             {discount > 0 && (
               <div className="flex justify-between items-center text-sm text-emerald-600">
                 <span>Desconto</span>
-                <span>- R$ {discount.toFixed(2)}</span>
+                <span>- {formatCurrency(discount, cur)}</span>
               </div>
             )}
             {surcharge > 0 && (
               <div className="flex justify-between items-center text-sm text-amber-600">
                 <span>Acréscimo</span>
-                <span>+ R$ {surcharge.toFixed(2)}</span>
+                <span>+ {formatCurrency(surcharge, cur)}</span>
               </div>
             )}
             <div className="flex justify-between items-center pt-1">
               <span className="text-sm font-semibold text-foreground">Total</span>
-              <span className="text-base font-bold text-foreground">R$ {total.toFixed(2)}</span>
+              <span className="text-base font-bold text-foreground">{formatCurrency(total, cur)}</span>
             </div>
           </div>
         </div>
@@ -148,11 +150,9 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
 function InvoiceRow({
   invoice,
   onSelect,
-  compact = false,
 }: {
   invoice: Invoice;
   onSelect: (inv: Invoice) => void;
-  compact?: boolean;
 }) {
   const cfg = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.open;
   const Icon = cfg.icon;
@@ -257,7 +257,7 @@ export function ClientInvoicesPanel({ clientId }: { clientId: string }) {
         </CardContent>
       </Card>
 
-      {/* History Sheet (drawer on mobile, side panel on desktop) */}
+      {/* History Sheet */}
       <Sheet open={historyOpen} onOpenChange={setHistoryOpen}>
         <SheetContent side="right" className="w-full sm:max-w-md p-0">
           <SheetHeader className="px-6 pt-6 pb-4 border-b">

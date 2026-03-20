@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN billing_currency text NOT NULL DEFAULT 'BRL';
