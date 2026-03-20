@@ -12,7 +12,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { logActivity } from "@/lib/activityLogger";
 import { cn } from "@/lib/utils";
@@ -893,6 +893,9 @@ const AdminDashboard = () => {
               <button onClick={() => { setMobileMenuOpen(false); navigate("/reports"); }} className={navItemClass("/reports")}>
                 <FileBarChart className={navIconClass("/reports")} /> Relatórios
               </button>
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/billing"); }} className={navItemClass("/billing")}>
+                <DollarSign className={navIconClass("/billing")} /> Faturamento
+              </button>
               <button onClick={() => { setMobileMenuOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
                 <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
               </button>
@@ -924,6 +927,9 @@ const AdminDashboard = () => {
             </button>
             <button onClick={() => { setNavDrawerOpen(false); navigate("/reports"); }} className={navItemClass("/reports")}>
               <FileBarChart className={navIconClass("/reports")} /> Relatórios
+            </button>
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/billing"); }} className={navItemClass("/billing")}>
+              <DollarSign className={navIconClass("/billing")} /> Faturamento
             </button>
             <button onClick={() => { setNavDrawerOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
               <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
