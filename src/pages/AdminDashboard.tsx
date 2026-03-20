@@ -863,8 +863,8 @@ const AdminDashboard = () => {
               </div>
             )}
             <nav className="flex flex-col">
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/admin"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                <LayoutDashboard className="h-4 w-4 text-muted-foreground" /> Dashboard
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/admin"); }} className={navItemClass("/admin")}>
+                <LayoutDashboard className={navIconClass("/admin")} /> Dashboard
               </button>
               {isAdmin && (
                 <button onClick={() => { setMobileMenuOpen(false); openCreate(); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
@@ -872,33 +872,33 @@ const AdminDashboard = () => {
                 </button>
               )}
               {isAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); navigate("/team-management"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                  <Users className="h-4 w-4 text-muted-foreground" /> {t("team")}
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/team-management"); }} className={navItemClass("/team-management")}>
+                  <Users className={navIconClass("/team-management")} /> {t("team")}
                 </button>
               )}
               {isAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); navigate("/social"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                  <CalendarClock className="h-4 w-4 text-muted-foreground" /> {t("social")}
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/social"); }} className={navItemClass("/social")}>
+                  <CalendarClock className={navIconClass("/social")} /> {t("social")}
                 </button>
               )}
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/ideas"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                <Lightbulb className="h-4 w-4 text-muted-foreground" /> Ideias de Pauta
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/ideas"); }} className={navItemClass("/ideas")}>
+                <Lightbulb className={navIconClass("/ideas")} /> Ideias de Pauta
               </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/calendar"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                <Calendar className="h-4 w-4 text-muted-foreground" /> Calendário
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/calendar"); }} className={navItemClass("/calendar")}>
+                <Calendar className={navIconClass("/calendar")} /> Calendário
               </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/briefs"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                <FileText className="h-4 w-4 text-muted-foreground" /> Pautas
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/briefs"); }} className={navItemClass("/briefs")}>
+                <FileText className={navIconClass("/briefs")} /> Pautas
               </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/reports"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                <FileBarChart className="h-4 w-4 text-muted-foreground" /> Relatórios
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/reports"); }} className={navItemClass("/reports")}>
+                <FileBarChart className={navIconClass("/reports")} /> Relatórios
               </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/commemorative-dates"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                <CalendarHeart className="h-4 w-4 text-muted-foreground" /> Datas Comemorativas
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
+                <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
               </button>
               {isAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); navigate("/activity-log"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                  <HistoryIcon className="h-4 w-4 text-muted-foreground" /> Histórico
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/activity-log"); }} className={navItemClass("/activity-log")}>
+                  <HistoryIcon className={navIconClass("/activity-log")} /> Histórico
                 </button>
               )}
             </nav>
@@ -913,24 +913,24 @@ const AdminDashboard = () => {
             <SheetTitle className="text-left text-base font-semibold">Navegação</SheetTitle>
           </SheetHeader>
           <nav className="flex flex-col py-2">
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/ideas"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-              <Lightbulb className="h-4 w-4 text-muted-foreground" /> Ideias de Pauta
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/ideas"); }} className={navItemClass("/ideas")}>
+              <Lightbulb className={navIconClass("/ideas")} /> Ideias de Pauta
             </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/calendar"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-              <Calendar className="h-4 w-4 text-muted-foreground" /> Calendário
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/calendar"); }} className={navItemClass("/calendar")}>
+              <Calendar className={navIconClass("/calendar")} /> Calendário
             </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/briefs"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-              <FileText className="h-4 w-4 text-muted-foreground" /> Pautas
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/briefs"); }} className={navItemClass("/briefs")}>
+              <FileText className={navIconClass("/briefs")} /> Pautas
             </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/reports"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-              <FileBarChart className="h-4 w-4 text-muted-foreground" /> Relatórios
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/reports"); }} className={navItemClass("/reports")}>
+              <FileBarChart className={navIconClass("/reports")} /> Relatórios
             </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/commemorative-dates"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-              <CalendarHeart className="h-4 w-4 text-muted-foreground" /> Datas Comemorativas
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
+              <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
             </button>
             {isAdmin && (
-              <button onClick={() => { setNavDrawerOpen(false); navigate("/activity-log"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                <HistoryIcon className="h-4 w-4 text-muted-foreground" /> Histórico de Atividades
+              <button onClick={() => { setNavDrawerOpen(false); navigate("/activity-log"); }} className={navItemClass("/activity-log")}>
+                <HistoryIcon className={navIconClass("/activity-log")} /> Histórico de Atividades
               </button>
             )}
           </nav>
