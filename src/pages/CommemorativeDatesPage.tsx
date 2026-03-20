@@ -9,12 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Plus, Pencil, Trash2, Search, CalendarHeart, X, Star } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Search, CalendarHeart, X, Star, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { MobileNav } from "@/components/MobileNav";
 import { useUserRole } from "@/hooks/useUserRole";
+import { UseDateAsBriefDialog } from "@/components/UseDateAsBriefDialog";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 const MONTH_NAMES = [
   "", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -51,6 +53,7 @@ export default function CommemorativeDatesPage() {
   const [editing, setEditing] = useState<CommemorativeDate | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filterMonth, setFilterMonth] = useState("all");
+  const [briefDate, setBriefDate] = useState<CommemorativeDate | null>(null);
 
   // Form state
   const [formName, setFormName] = useState("");
@@ -147,6 +150,7 @@ export default function CommemorativeDatesPage() {
   const sortedMonths = Object.keys(grouped).map(Number).sort((a, b) => a - b);
 
   return (
+    <TooltipProvider>
     <div className="min-h-screen bg-background overflow-x-hidden">
       <header className="border-b bg-card px-4 py-3 md:px-6 md:py-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
@@ -304,16 +308,26 @@ export default function CommemorativeDatesPage() {
                         )}
                       </div>
                       {/* Actions */}
-                      {isAdmin && (
-                        <div className="flex items-center gap-1 shrink-0">
-                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(d)}>
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleteId(d.id)}>
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setBriefDate(d)}>
+                              <FileText className="h-3.5 w-3.5 text-primary" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p className="text-xs">Usar como pauta</p></TooltipContent>
+                        </Tooltip>
+                        {isAdmin && (
+                          <>
+                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(d)}>
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleteId(d.id)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   ))}
               </div>
@@ -409,6 +423,18 @@ export default function CommemorativeDatesPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {briefDate && (
+        <UseDateAsBriefDialog
+          open={!!briefDate}
+          onOpenChange={(open) => { if (!open) setBriefDate(null); }}
+          dateName={briefDate.name}
+          dateMonth={briefDate.date_month}
+          dateDay={briefDate.date_day}
+          dateDescription={briefDate.description}
+        />
+      )}
     </div>
+    </TooltipProvider>
   );
 }
