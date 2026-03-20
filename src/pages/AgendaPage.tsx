@@ -20,8 +20,7 @@ import {
 import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, addMonths, subMonths, addWeeks, subWeeks, getDaysInMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
-type RepeatMode = "none" | "week" | "month";
-
+type RepeatMode = "none" | "daily" | "weekly" | "weekdays" | "custom_days";
 type ViewMode = "day" | "week" | "month";
 
 const CATEGORY_COLORS: Record<string, string> = {
