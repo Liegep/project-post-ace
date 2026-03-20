@@ -895,6 +895,9 @@ const AdminDashboard = () => {
         {/* Today's appointments */}
         <TodayAppointmentsWidget />
 
+        {/* Commemorative dates widget */}
+        <CommemorativeDatesWidget />
+
         {/* Today's posts reminder */}
         {todayPosts.length > 0 && (
           <div className="rounded-xl border border-blue-400/30 bg-blue-500/5 p-4">
