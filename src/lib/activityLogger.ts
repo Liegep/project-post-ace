@@ -21,9 +21,12 @@ export type ActivityAction =
   | "feedback_sent"
   | "social_post_created"
   | "social_post_published"
-  | "social_post_scheduled";
+  | "social_post_scheduled"
+  | "report_created"
+  | "report_updated"
+  | "report_published";
 
-export type ItemType = "post" | "brief" | "client" | "social_post" | "comment";
+export type ItemType = "post" | "brief" | "client" | "social_post" | "comment" | "report";
 
 interface LogActivityParams {
   action: ActivityAction;
@@ -87,6 +90,9 @@ export const ACTION_LABELS: Record<ActivityAction, string> = {
   social_post_created: "criou post social",
   social_post_published: "publicou post social",
   social_post_scheduled: "agendou post social",
+  report_created: "criou relatório",
+  report_updated: "atualizou relatório",
+  report_published: "publicou relatório",
 };
 
 export const ACTION_ICONS: Record<ActivityAction, string> = {
@@ -111,4 +117,7 @@ export const ACTION_ICONS: Record<ActivityAction, string> = {
   social_post_created: "Share2",
   social_post_published: "Globe",
   social_post_scheduled: "CalendarClock",
+  report_created: "FileText",
+  report_updated: "Pencil",
+  report_published: "Globe",
 };

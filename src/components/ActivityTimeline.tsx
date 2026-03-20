@@ -42,6 +42,9 @@ const ACTION_ICON_NAME: Record<ActivityAction, string> = {
   social_post_created: "Share2",
   social_post_published: "Globe",
   social_post_scheduled: "CalendarClock",
+  report_created: "FileText",
+  report_updated: "Pencil",
+  report_published: "Globe",
 };
 
 const ACTION_COLOR: Record<string, string> = {
