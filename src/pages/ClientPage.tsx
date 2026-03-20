@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import ClientBriefs from "@/components/ClientBriefs";
+import { ClientInvoicesPanel } from "@/components/billing/ClientInvoicesPanel";
 import { UpcomingPostsWidget } from "@/components/UpcomingPostsWidget";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +32,7 @@ interface ClientData {
   locale: string;
   posting_period: string;
   show_archived_to_client: boolean;
+  show_invoices_to_client: boolean;
   allow_client_edit_caption: boolean;
   allow_client_create_post: boolean;
   tracking_enabled: boolean;
