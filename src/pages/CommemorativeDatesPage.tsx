@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { MobileNav } from "@/components/MobileNav";
 import { useUserRole } from "@/hooks/useUserRole";
+import { UseDateAsBriefDialog } from "@/components/UseDateAsBriefDialog";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 const MONTH_NAMES = [
   "", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
