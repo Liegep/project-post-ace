@@ -148,7 +148,12 @@ const BillingPage = () => {
     });
   }, [invoices]);
 
+  // Filter invoices to only show those belonging to the user's assigned clients
+  const userClientIds = useMemo(() => new Set(clients.map(c => c.id)), [clients]);
+  
   const filtered = invoices.filter(inv => {
+    // Only show invoices for clients assigned to this user
+    if (userClientIds.size > 0 && !userClientIds.has(inv.client_id)) return false;
     if (filterClient !== "all" && inv.client_id !== filterClient) return false;
     if (filterStatus !== "all" && inv.status !== filterStatus) return false;
     if (filterMonth !== "all") {
