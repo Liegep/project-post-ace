@@ -21,9 +21,12 @@ export type ActivityAction =
   | "feedback_sent"
   | "social_post_created"
   | "social_post_published"
-  | "social_post_scheduled";
+  | "social_post_scheduled"
+  | "report_created"
+  | "report_updated"
+  | "report_published";
 
-export type ItemType = "post" | "brief" | "client" | "social_post" | "comment";
+export type ItemType = "post" | "brief" | "client" | "social_post" | "comment" | "report";
 
 interface LogActivityParams {
   action: ActivityAction;
