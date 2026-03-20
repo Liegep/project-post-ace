@@ -133,12 +133,67 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
   const [editingCaption, setEditingCaption] = useState(false);
   const [captionDraft, setCaptionDraft] = useState(post.caption);
 
+  // Invoice state
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [availableInvoices, setAvailableInvoices] = useState<{ id: string; title: string; invoice_number: number }[]>([]);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
+  const [alreadyInvoiced, setAlreadyInvoiced] = useState(false);
+  const [invoicing, setInvoicing] = useState(false);
+
   const baseMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
   const allMedia = localMediaOrder || baseMedia;
 
   const thumbSensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
+
+  const handleOpenInvoiceDialog = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Check if already invoiced
+    const invoiced = await isPostInvoiced(post.id);
+    if (invoiced) {
+      setAlreadyInvoiced(true);
+      setInvoiceDialogOpen(true);
+      return;
+    }
+    setAlreadyInvoiced(false);
+    // Fetch open invoices for this client
+    if (clientId) {
+      const { data } = await supabase
+        .from("invoices")
+        .select("id, title, invoice_number")
+        .eq("client_id", clientId)
+        .eq("status", "open")
+        .order("created_at", { ascending: false });
+      setAvailableInvoices((data as any[]) || []);
+      if ((data || []).length > 0) setSelectedInvoiceId((data as any[])[0].id);
+    }
+    setInvoiceDialogOpen(true);
+  };
+
+  const handleInvoicePost = async () => {
+    if (!selectedInvoiceId) return;
+    setInvoicing(true);
+    try {
+      await createInvoiceItem({
+        invoice_id: selectedInvoiceId,
+        post_id: post.id,
+        name: post.title,
+        description: post.caption?.substring(0, 200) || "",
+        category: post.mediaType === "video" ? "reels" : "post",
+        service_date: format(new Date(), "yyyy-MM-dd"),
+        quantity: 1,
+        unit_price: 0,
+        total_price: 0,
+      });
+      toast({ title: "Post adicionado à fatura" });
+      setInvoiceDialogOpen(false);
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    } finally {
+      setInvoicing(false);
+    }
+  };
 
   const handleThumbDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
