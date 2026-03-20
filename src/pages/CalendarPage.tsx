@@ -325,6 +325,7 @@ export default function CalendarPage() {
     const key = format(currentDate, "yyyy-MM-dd");
     const dayPosts = postsByDate[key] || [];
     const sortedPosts = [...dayPosts].sort((a, b) => (a.publish_time || "").localeCompare(b.publish_time || ""));
+    const commDates = getDatesByMonthDay(currentDate.getMonth() + 1, currentDate.getDate());
 
     return (
       <div className="space-y-4">
@@ -336,6 +337,38 @@ export default function CalendarPage() {
             <Plus className="mr-1 h-4 w-4" /> Novo Post
           </Button>
         </div>
+
+        {/* Commemorative dates for this day */}
+        {commDates.length > 0 && (
+          <div className="space-y-1.5">
+            {commDates.map((cd) => (
+              <div
+                key={cd.id}
+                className="flex items-center gap-3 rounded-lg border p-3"
+                style={{ borderLeftWidth: 4, borderLeftColor: cd.country_color }}
+              >
+                <CalendarHeart className="h-4 w-4 shrink-0" style={{ color: cd.country_color }} />
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm">{cd.name}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span
+                      className="text-[10px] font-semibold rounded-full px-2 py-0.5 text-white"
+                      style={{ backgroundColor: cd.country_color }}
+                    >
+                      {cd.country}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {CATEGORY_LABELS[cd.category] || cd.category}
+                    </span>
+                  </div>
+                  {cd.description && (
+                    <p className="text-xs text-muted-foreground mt-1">{cd.description}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {sortedPosts.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
