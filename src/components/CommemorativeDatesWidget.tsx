@@ -36,8 +36,9 @@ export function CommemorativeDatesWidget() {
           <CalendarHeart className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm text-foreground">Datas Comemorativas</h3>
           <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-            {upcomingDates.length}
+            {nextWeekDates.length}
           </Badge>
+          <span className="text-[10px] text-muted-foreground">próximos 7 dias</span>
         </div>
         <Button
           variant="ghost"
