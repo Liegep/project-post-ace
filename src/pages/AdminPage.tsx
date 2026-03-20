@@ -1019,23 +1019,21 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
         </SheetContent>
       </Sheet>
 
-      <main className="mx-auto max-w-full p-6">
+      <main className="mx-auto max-w-full p-4 sm:p-6">
         {/* Tab switcher */}
-        <div className="mb-6 flex items-center justify-center gap-2">
+        <div className="mb-6 flex flex-col sm:flex-row items-center justify-center gap-2">
           <div className="flex rounded-lg border bg-muted p-1">
             <button
               onClick={() => setActiveTab("board")}
               className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "board" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
               <LayoutGrid className="mr-1.5 inline h-4 w-4" /> {t("board")}
-              
             </button>
             <button
               onClick={() => setActiveTab("archived")}
               className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "archived" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
               <Archive className="mr-1.5 inline h-4 w-4" /> {t("archived")}
-              
               {archivedPosts.length > 0 && (
                 <span className="ml-1.5 rounded-full bg-muted-foreground/20 px-1.5 py-0.5 text-[10px] font-semibold">
                   {archivedPosts.length}
@@ -1043,8 +1041,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               )}
             </button>
           </div>
+          {/* Desktop-only permission toggles */}
           {activeTab === "archived" && (
-            <div className="flex items-center gap-2 ml-3">
+            <div className="hidden md:flex items-center gap-2 ml-3">
               <Switch
                 id="show-archived-client"
                 checked={showArchivedToClient}
@@ -1057,7 +1056,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </div>
           )}
           {activeTab === "board" && (
-            <div className="flex items-center gap-4 ml-3">
+            <div className="hidden md:flex items-center gap-4 ml-3">
               <div className="flex items-center gap-2">
                 <Switch
                   id="allow-client-edit-caption"
