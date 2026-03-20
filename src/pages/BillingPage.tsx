@@ -18,7 +18,6 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import InvoiceDetailDialog from "@/components/billing/InvoiceDetailDialog";
 import { formatCurrency } from "@/lib/currency";
-import InvoiceDetailDialog from "@/components/billing/InvoiceDetailDialog";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   open: { label: "Aberta", color: "bg-blue-500/15 text-blue-600 border-blue-500/30", icon: Clock },
