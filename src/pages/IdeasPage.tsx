@@ -381,32 +381,6 @@ const IdeasPage = () => {
           );
         })}
 
-        {/* Add column */}
-        <div className="flex-shrink-0 w-72 md:w-80">
-          {addingCol ? (
-            <div className="bg-muted rounded-lg p-3 space-y-2">
-              <Input
-                placeholder="Nome da coluna"
-                value={newColName}
-                onChange={(e) => setNewColName(e.target.value)}
-                autoFocus
-                onKeyDown={(e) => e.key === "Enter" && addColumn()}
-              />
-              <div className="flex gap-2">
-                <Button size="sm" onClick={addColumn}>Criar</Button>
-                <Button size="sm" variant="ghost" onClick={() => setAddingCol(false)}>Cancelar</Button>
-              </div>
-            </div>
-          ) : (
-            <Button
-              variant="outline"
-              className="w-full justify-start border-dashed h-12"
-              onClick={() => setAddingCol(true)}
-            >
-              <Plus className="h-4 w-4 mr-2" /> Nova coluna
-            </Button>
-          )}
-        </div>
       </div>
 
       {/* Add idea dialog */}
