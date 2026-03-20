@@ -178,6 +178,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         surcharge: Number(invSurcharge) || 0,
         notes: invNotes,
         due_date: invDueDate,
+        payment_method: invPaymentMethod,
       } as any);
       toast({ title: "Fatura atualizada" });
       setEditingInvoice(false);
@@ -341,6 +342,21 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
             <div>
               <Label className="text-xs">Observações</Label>
               <Textarea value={invNotes} onChange={e => setInvNotes(e.target.value)} rows={3} />
+            </div>
+            <div>
+              <Label className="text-xs">Método de pagamento</Label>
+              <Select value={invPaymentMethod} onValueChange={setInvPaymentMethod}>
+                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="Pix">Pix</SelectItem>
+                  <SelectItem value="Transferência">Transferência</SelectItem>
+                  <SelectItem value="Boleto">Boleto</SelectItem>
+                  <SelectItem value="Cartão">Cartão</SelectItem>
+                  <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                  <SelectItem value="Outro">Outro</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <Button size="sm" onClick={handleSaveInvoice}>Salvar alterações</Button>
           </div>
