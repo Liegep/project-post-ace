@@ -19,6 +19,7 @@ import AgendaPage from "./pages/AgendaPage.tsx";
 import IdeasPage from "./pages/IdeasPage.tsx";
 import CalendarPage from "./pages/CalendarPage.tsx";
 import BriefsPage from "./pages/BriefsPage.tsx";
+import CommemorativeDatesPage from "./pages/CommemorativeDatesPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
