@@ -24,6 +24,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useSocialReports, METRIC_LABELS } from "@/hooks/useSocialReports";
 
 interface ClientData {
   id: string;
