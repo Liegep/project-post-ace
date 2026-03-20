@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { supabase } from "@/integrations/supabase/client";
 import { PostsProvider, usePosts } from "@/context/PostsContext";
 import { Post, PostStatus, STATUS_CONFIG } from "@/types/post";
@@ -14,7 +16,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2 } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2, History } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { ClientNotes } from "@/components/ClientNotes";
@@ -490,12 +492,13 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     posts, archivedPosts, columns, tags, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn, toggleColumnVisibility,
     movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, reorderColumns,
+    clientId: ctxClientId,
   } = usePosts();
   const { t } = useI18n();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const [view, setView] = useState<"kanban" | "list">("kanban");
-  const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
+  const [activeTab, setActiveTab] = useState<"board" | "archived" | "activity">("board");
   const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [editingPeriod, setEditingPeriod] = useState(false);
@@ -541,6 +544,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     }
   }, [searchParams, posts]);
 
+  // Activity logs for this client
+  const activityLogs = useActivityLogs({ clientId: ctxClientId, enabled: activeTab === "activity" });
 
     const toggleShowArchivedToClient = async (checked: boolean) => {
     await supabase.from("clients").update({ show_archived_to_client: checked } as any).eq("id", clientData.id);
@@ -1040,6 +1045,12 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 </span>
               )}
             </button>
+            <button
+              onClick={() => setActiveTab("activity")}
+              className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "activity" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+            >
+              <History className="mr-1.5 inline h-4 w-4" /> Atividades
+            </button>
           </div>
           {/* Desktop-only permission toggles */}
           {activeTab === "archived" && (
@@ -1189,7 +1200,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               </div>
             )}
           </>
-        ) : (
+        ) : activeTab === "archived" ? (
           <ArchivedView
             archivedPosts={archivedPosts}
             unarchivePost={unarchivePost}
@@ -1199,6 +1210,17 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             onToggleSelect={toggleSelect}
             t={t}
           />
+        ) : (
+          <div className="mx-auto max-w-2xl">
+            <ActivityTimeline
+              logs={activityLogs.logs}
+              loading={activityLogs.loading}
+              hasMore={activityLogs.hasMore}
+              onLoadMore={activityLogs.loadMore}
+              showFilters
+              showClientName={false}
+            />
+          </div>
         )}
       </main>
 

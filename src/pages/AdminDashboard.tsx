@@ -13,8 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { logActivity } from "@/lib/activityLogger";
 import { cn } from "@/lib/utils";
 import { LABEL_CONFIG, Post, PostStatus, ClientLabel, STATUS_CONFIG, Tag, DEFAULT_TAGS } from "@/types/post";
 import InviteAdminDialog from "@/components/InviteAdminDialog";
@@ -751,6 +752,15 @@ const AdminDashboard = () => {
       }
 
       setDialogOpen(false);
+      // Log client creation/update
+      logActivity({
+        action: editingClient ? "client_updated" : "client_created",
+        itemType: "client",
+        itemId: clientId || "",
+        itemTitle: name,
+        clientId: clientId || undefined,
+        clientName: name,
+      });
       fetchClients().then(() => fetchClientUsers());
     } catch (err) {
       console.error(err);
@@ -812,6 +822,11 @@ const AdminDashboard = () => {
             <Button variant="ghost" size="icon" onClick={() => navigate("/commemorative-dates")} title="Datas Comemorativas">
               <CalendarHeart className="h-5 w-5" />
             </Button>
+            {isAdmin && (
+              <Button variant="ghost" size="icon" onClick={() => navigate("/activity-log")} title="Registro de Atividades">
+                <HistoryIcon className="h-5 w-5" />
+              </Button>
+            )}
             {isAdmin && (
               <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Plus className="mr-2 h-4 w-4" /> Clientes

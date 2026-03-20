@@ -4,7 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button";
 import {
   Menu, LayoutDashboard, Users, CalendarClock, Lightbulb,
-  Calendar, FileText, CalendarHeart, X
+  Calendar, FileText, CalendarHeart, X, History
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { path: "/calendar", label: "Calendário", icon: Calendar },
   { path: "/briefs", label: "Pautas", icon: FileText },
   { path: "/commemorative-dates", label: "Datas Comemorativas", icon: CalendarHeart },
+  { path: "/activity-log", label: "Atividades", icon: History },
 ];
 
 interface MobileNavProps {
