@@ -3,7 +3,7 @@ import { useCommemorativeDates, CATEGORY_LABELS } from "@/hooks/useCommemorative
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CalendarHeart, ChevronDown, ChevronUp, Search, X } from "lucide-react";
+import { CalendarHeart, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const MONTH_NAMES = [
