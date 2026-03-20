@@ -24,6 +24,7 @@ import ActivityLogPage from "./pages/ActivityLogPage.tsx";
 import ReportsPage from "./pages/ReportsPage.tsx";
 import CreateReportPage from "./pages/CreateReportPage.tsx";
 import ReportViewPage from "./pages/ReportViewPage.tsx";
+import BillingPage from "./pages/BillingPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const App = () => (
             <Route path="/reports" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><ReportsPage /></AuthGuard>} />
             <Route path="/reports/new" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><CreateReportPage /></AuthGuard>} />
             <Route path="/reports/:id" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ReportViewPage /></AuthGuard>} />
+            <Route path="/billing" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><BillingPage /></AuthGuard>} />
             <Route path="/client/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ClientPage /></AuthGuard>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
