@@ -494,11 +494,62 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
                 </div>
               </PopoverContent>
             </Popover>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={handleOpenInvoiceDialog} className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
+                    <DollarSign className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Faturar</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         )}
+
+        {/* Invoice dialog */}
+        <Dialog open={invoiceDialogOpen} onOpenChange={setInvoiceDialogOpen}>
+          <DialogContent className="sm:max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5" /> Faturar Post
+              </DialogTitle>
+            </DialogHeader>
+            {alreadyInvoiced ? (
+              <div className="text-center py-4">
+                <p className="text-sm text-muted-foreground">Este post já está em uma fatura.</p>
+                <Button variant="outline" className="mt-3" onClick={() => setInvoiceDialogOpen(false)}>Fechar</Button>
+              </div>
+            ) : availableInvoices.length === 0 ? (
+              <div className="text-center py-4">
+                <p className="text-sm text-muted-foreground">Nenhuma fatura aberta para este cliente.</p>
+                <p className="text-xs text-muted-foreground mt-1">Crie uma fatura primeiro na página de Faturamento.</p>
+                <Button variant="outline" className="mt-3" onClick={() => setInvoiceDialogOpen(false)}>Fechar</Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-medium">Selecione a fatura:</label>
+                  <Select value={selectedInvoiceId} onValueChange={setSelectedInvoiceId}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {availableInvoices.map(inv => (
+                        <SelectItem key={inv.id} value={inv.id}>#{inv.invoice_number} — {inv.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <p className="text-xs text-muted-foreground">O post "{post.title}" será adicionado como item da fatura selecionada.</p>
+                <Button onClick={handleInvoicePost} disabled={invoicing || !selectedInvoiceId} className="w-full">
+                  {invoicing ? "Adicionando..." : "Adicionar à fatura"}
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {!isAdmin && !hideFeedback && (
           <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
