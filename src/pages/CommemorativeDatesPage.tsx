@@ -53,6 +53,7 @@ export default function CommemorativeDatesPage() {
   const [editing, setEditing] = useState<CommemorativeDate | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filterMonth, setFilterMonth] = useState("all");
+  const [briefDate, setBriefDate] = useState<CommemorativeDate | null>(null);
 
   // Form state
   const [formName, setFormName] = useState("");
