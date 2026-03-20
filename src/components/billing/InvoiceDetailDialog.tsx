@@ -260,6 +260,31 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
 
         {/* Actions */}
         <div className="flex flex-wrap gap-2">
+          {invoice.status !== "paid" ? (
+            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={async () => {
+              await updateInvoice(invoice.id, { 
+                status: "paid", 
+                paid_at: new Date().toISOString(),
+              } as any);
+              setInvStatus("paid");
+              toast({ title: "Fatura marcada como paga" });
+              onUpdate();
+            }}>
+              <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Marcar como Paga
+            </Button>
+          ) : (
+            <Button size="sm" variant="outline" onClick={async () => {
+              await updateInvoice(invoice.id, { 
+                status: "open", 
+                paid_at: null,
+              } as any);
+              setInvStatus("open");
+              toast({ title: "Fatura reaberta" });
+              onUpdate();
+            }}>
+              <Clock className="h-3.5 w-3.5 mr-1" /> Reverter para Aberta
+            </Button>
+          )}
           <Button size="sm" variant="outline" onClick={() => setEditingInvoice(!editingInvoice)}>
             <Pencil className="h-3.5 w-3.5 mr-1" /> Editar
           </Button>
@@ -270,6 +295,15 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
             <Trash2 className="h-3.5 w-3.5 mr-1" /> Excluir
           </Button>
         </div>
+
+        {/* Payment info */}
+        {invoice.status === "paid" && (invoice as any).paid_at && (
+          <div className="flex items-center gap-2 text-sm bg-emerald-500/10 text-emerald-600 rounded-lg px-3 py-2">
+            <CheckCircle2 className="h-4 w-4" />
+            <span>Paga em {format(new Date((invoice as any).paid_at), "dd/MM/yyyy")}</span>
+            {(invoice as any).payment_method && <span>• {(invoice as any).payment_method}</span>}
+          </div>
+        )}
 
         {/* Edit invoice section */}
         {editingInvoice && (

@@ -139,6 +139,7 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
   const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
   const [alreadyInvoiced, setAlreadyInvoiced] = useState(false);
   const [invoicing, setInvoicing] = useState(false);
+  const [creatingInvoice, setCreatingInvoice] = useState(false);
 
   const baseMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
   const allMedia = localMediaOrder || baseMedia;
@@ -147,9 +148,14 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
+  const getMonthLabel = () => {
+    const now = new Date();
+    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    return `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+  };
+
   const handleOpenInvoiceDialog = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Check if already invoiced
     const invoiced = await isPostInvoiced(post.id);
     if (invoiced) {
       setAlreadyInvoiced(true);
@@ -157,7 +163,6 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
       return;
     }
     setAlreadyInvoiced(false);
-    // Fetch open invoices for this client
     if (clientId) {
       const { data } = await supabase
         .from("invoices")
@@ -167,8 +172,48 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
         .order("created_at", { ascending: false });
       setAvailableInvoices((data as any[]) || []);
       if ((data || []).length > 0) setSelectedInvoiceId((data as any[])[0].id);
+      else setSelectedInvoiceId("");
     }
     setInvoiceDialogOpen(true);
+  };
+
+  const handleCreateInvoiceAndAdd = async () => {
+    if (!clientId) return;
+    setCreatingInvoice(true);
+    try {
+      const now = new Date();
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const dueDate = new Date(now.getFullYear(), now.getMonth() + 1, 10);
+
+      const { data: inv, error } = await supabase.from("invoices").insert({
+        client_id: clientId,
+        title: getMonthLabel(),
+        period_start: format(firstDay, "yyyy-MM-dd"),
+        period_end: format(lastDay, "yyyy-MM-dd"),
+        issue_date: format(now, "yyyy-MM-dd"),
+        due_date: format(dueDate, "yyyy-MM-dd"),
+      } as any).select().single();
+      if (error) throw error;
+
+      await createInvoiceItem({
+        invoice_id: (inv as any).id,
+        post_id: post.id,
+        name: post.title,
+        description: post.caption?.substring(0, 200) || "",
+        category: post.mediaType === "video" ? "reels" : "post",
+        service_date: format(now, "yyyy-MM-dd"),
+        quantity: 1,
+        unit_price: 0,
+        total_price: 0,
+      });
+      toast({ title: `Fatura "${getMonthLabel()}" criada e post adicionado` });
+      setInvoiceDialogOpen(false);
+    } catch (err: any) {
+      toast({ title: "Erro", description: err.message, variant: "destructive" });
+    } finally {
+      setCreatingInvoice(false);
+    }
   };
 
   const handleInvoicePost = async () => {
@@ -523,29 +568,44 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
                 <p className="text-sm text-muted-foreground">Este post já está em uma fatura.</p>
                 <Button variant="outline" className="mt-3" onClick={() => setInvoiceDialogOpen(false)}>Fechar</Button>
               </div>
-            ) : availableInvoices.length === 0 ? (
-              <div className="text-center py-4">
-                <p className="text-sm text-muted-foreground">Nenhuma fatura aberta para este cliente.</p>
-                <p className="text-xs text-muted-foreground mt-1">Crie uma fatura primeiro na página de Faturamento.</p>
-                <Button variant="outline" className="mt-3" onClick={() => setInvoiceDialogOpen(false)}>Fechar</Button>
-              </div>
             ) : (
               <div className="space-y-3">
+                {availableInvoices.length > 0 && (
+                  <div>
+                    <label className="text-xs font-medium">Fatura existente:</label>
+                    <Select value={selectedInvoiceId} onValueChange={setSelectedInvoiceId}>
+                      <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                      <SelectContent>
+                        {availableInvoices.map(inv => (
+                          <SelectItem key={inv.id} value={inv.id}>#{inv.invoice_number} — {inv.title}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button onClick={handleInvoicePost} disabled={invoicing || !selectedInvoiceId} className="w-full mt-2">
+                      {invoicing ? "Adicionando..." : "Adicionar à fatura"}
+                    </Button>
+                  </div>
+                )}
+                {availableInvoices.length > 0 && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="flex-1 border-t" /><span>ou</span><div className="flex-1 border-t" />
+                  </div>
+                )}
                 <div>
-                  <label className="text-xs font-medium">Selecione a fatura:</label>
-                  <Select value={selectedInvoiceId} onValueChange={setSelectedInvoiceId}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {availableInvoices.map(inv => (
-                        <SelectItem key={inv.id} value={inv.id}>#{inv.invoice_number} — {inv.title}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {availableInvoices.length === 0 
+                      ? "Nenhuma fatura aberta para este cliente." 
+                      : "Criar nova fatura mensal:"}
+                  </p>
+                  <Button 
+                    variant={availableInvoices.length === 0 ? "default" : "outline"} 
+                    onClick={handleCreateInvoiceAndAdd} 
+                    disabled={creatingInvoice} 
+                    className="w-full"
+                  >
+                    {creatingInvoice ? "Criando..." : `Criar "${getMonthLabel()}" e adicionar`}
+                  </Button>
                 </div>
-                <p className="text-xs text-muted-foreground">O post "{post.title}" será adicionado como item da fatura selecionada.</p>
-                <Button onClick={handleInvoicePost} disabled={invoicing || !selectedInvoiceId} className="w-full">
-                  {invoicing ? "Adicionando..." : "Adicionar à fatura"}
-                </Button>
               </div>
             )}
           </DialogContent>
