@@ -543,6 +543,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     }
   }, [searchParams, posts]);
 
+  // Activity logs for this client
+  const activityLogs = useActivityLogs({ clientId, enabled: activeTab === "activity" });
 
     const toggleShowArchivedToClient = async (checked: boolean) => {
     await supabase.from("clients").update({ show_archived_to_client: checked } as any).eq("id", clientData.id);
