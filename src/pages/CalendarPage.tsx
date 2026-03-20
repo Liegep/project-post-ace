@@ -193,6 +193,7 @@ export default function CalendarPage() {
           const key = format(day, "yyyy-MM-dd");
           const dayPosts = postsByDate[key] || [];
           const today = isToday(day);
+          const commDates = getDatesByMonthDay(day.getMonth() + 1, day.getDate());
           return (
             <div
               key={key}
@@ -207,6 +208,50 @@ export default function CalendarPage() {
                   <span className="text-[10px] text-muted-foreground">{dayPosts.length}</span>
                 )}
               </div>
+              {/* Commemorative dates */}
+              {commDates.length > 0 && (
+                <div className="space-y-0.5 mb-0.5">
+                  {commDates.slice(0, 2).map((cd) => (
+                    <Popover key={cd.id}>
+                      <PopoverTrigger asChild>
+                        <button
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate flex items-center gap-1 hover:opacity-80 transition-opacity"
+                          style={{ backgroundColor: cd.country_color + "20", color: cd.country_color }}
+                        >
+                          <CalendarHeart className="h-2.5 w-2.5 shrink-0" />
+                          <span className="truncate font-medium">{cd.name}</span>
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-56 p-3" onClick={(e) => e.stopPropagation()}>
+                        <div className="space-y-1.5">
+                          <p className="font-semibold text-sm">{cd.name}</p>
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className="inline-flex items-center text-[10px] font-semibold rounded-full px-2 py-0.5 text-white"
+                              style={{ backgroundColor: cd.country_color }}
+                            >
+                              {cd.country}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {CATEGORY_LABELS[cd.category] || cd.category}
+                            </span>
+                          </div>
+                          {cd.description && (
+                            <p className="text-xs text-muted-foreground">{cd.description}</p>
+                          )}
+                          <p className="text-[10px] text-muted-foreground">
+                            {cd.date_day}/{cd.date_month}
+                          </p>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  ))}
+                  {commDates.length > 2 && (
+                    <p className="text-[9px] text-muted-foreground text-center">+{commDates.length - 2}</p>
+                  )}
+                </div>
+              )}
               <div className="space-y-0.5">
                 {dayPosts.slice(0, 3).map((p) => (
                   <PostBlock key={p.id} post={p} compact />
