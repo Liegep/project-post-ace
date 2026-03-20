@@ -423,6 +423,18 @@ export default function CommemorativeDatesPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {briefDate && (
+        <UseDateAsBriefDialog
+          open={!!briefDate}
+          onOpenChange={(open) => { if (!open) setBriefDate(null); }}
+          dateName={briefDate.name}
+          dateMonth={briefDate.date_month}
+          dateDay={briefDate.date_day}
+          dateDescription={briefDate.description}
+        />
+      )}
     </div>
+    </TooltipProvider>
   );
 }
