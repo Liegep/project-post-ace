@@ -217,6 +217,42 @@ const AdminDashboard = () => {
     }
   };
 
+  // Fetch app logo from app_settings
+  useEffect(() => {
+    const fetchAppLogo = async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "app_logo_url")
+        .maybeSingle();
+      if (data?.value) setAppLogo(data.value);
+    };
+    fetchAppLogo();
+  }, []);
+
+  const handleAppLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const ext = file.name.split(".").pop();
+    const path = `app-logo-${Date.now()}.${ext}`;
+    const { error: uploadError } = await supabase.storage.from("app-branding").upload(path, file, { upsert: true });
+    if (uploadError) {
+      toast({ title: "Erro ao enviar logo", description: uploadError.message, variant: "destructive" });
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("app-branding").getPublicUrl(path);
+    const logoUrl = urlData.publicUrl;
+    const { error: settingsError } = await supabase
+      .from("app_settings")
+      .upsert({ key: "app_logo_url", value: logoUrl, updated_at: new Date().toISOString() }, { onConflict: "key" });
+    if (settingsError) {
+      toast({ title: "Erro ao salvar configuração", description: settingsError.message, variant: "destructive" });
+      return;
+    }
+    setAppLogo(logoUrl);
+    toast({ title: "Logo atualizado com sucesso!" });
+  };
+
   useEffect(() => {
     if (role === null && currentUserId === null) return; // still loading
     fetchClients().then(() => fetchClientUsers());
