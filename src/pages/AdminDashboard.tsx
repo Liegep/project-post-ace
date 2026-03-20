@@ -844,6 +844,29 @@ const AdminDashboard = () => {
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(true)}>
               <Menu className="h-5 w-5" />
             </Button>
+            {/* App logo upload area */}
+            <input type="file" accept="image/*" ref={appLogoInputRef} className="hidden" onChange={handleAppLogoUpload} />
+            {isAdmin ? (
+              <button
+                type="button"
+                onClick={() => appLogoInputRef.current?.click()}
+                className="relative group shrink-0"
+                title="Clique para alterar o logo"
+              >
+                {appLogo ? (
+                  <img src={appLogo} alt="Logo" className="h-9 w-9 md:h-10 md:w-10 rounded-lg object-contain border bg-card" />
+                ) : (
+                  <div className="h-9 w-9 md:h-10 md:w-10 rounded-lg border border-dashed border-muted-foreground/40 bg-muted flex items-center justify-center">
+                    <ImagePlus className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="absolute inset-0 rounded-lg bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Pencil className="h-3.5 w-3.5 text-white" />
+                </div>
+              </button>
+            ) : appLogo ? (
+              <img src={appLogo} alt="Logo" className="h-9 w-9 md:h-10 md:w-10 rounded-lg object-contain border bg-card shrink-0" />
+            ) : null}
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-foreground">ContentFlow</h1>
               <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">{t("selectOrCreateClient")}</p>
