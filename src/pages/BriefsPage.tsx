@@ -132,9 +132,41 @@ const BriefsPage = () => {
 
   const loadData = async () => {
     setLoading(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setLoading(false); return; }
+
+    // Get client IDs this user owns or is assigned to
+    const [assignmentsRes, ownedRes] = await Promise.all([
+      supabase.from("user_client_assignments").select("client_id").eq("user_id", user.id),
+      supabase.from("clients").select("id").eq("owner_id", user.id),
+    ]);
+
+    const assignedIds = (assignmentsRes.data || []).map((a: any) => a.client_id);
+    const ownedIds = (ownedRes.data || []).map((c: any) => c.id);
+    const allowedClientIds = [...new Set([...assignedIds, ...ownedIds])];
+
+    // Also include shared clients
+    const { data: sharedClients } = await supabase.from("clients").select("id").eq("shared", true);
+    const sharedIds = (sharedClients || []).map((c: any) => c.id);
+    const allClientIds = [...new Set([...allowedClientIds, ...sharedIds])];
+
+    let briefsQuery = supabase.from("content_briefs").select("*, clients(name, slug, logo_url)").order("updated_at", { ascending: false });
+    
+    if (allClientIds.length > 0) {
+      briefsQuery = briefsQuery.in("client_id", allClientIds);
+    } else {
+      // No clients accessible, show nothing
+      setBriefs([]);
+      setClients([]);
+      setTeamMembers([]);
+      setLoading(false);
+      return;
+    }
+
     const [briefsRes, clientsRes, membersRes] = await Promise.all([
-      supabase.from("content_briefs").select("*, clients(name, slug, logo_url)").order("updated_at", { ascending: false }),
-      supabase.from("clients").select("id, name, slug, logo_url").order("name"),
+      briefsQuery,
+      supabase.from("clients").select("id, name, slug, logo_url").in("id", allClientIds).order("name"),
       supabase.from("profiles").select("id, full_name, email"),
     ]);
 
