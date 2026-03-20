@@ -131,6 +131,7 @@ export function useCommemorativeDates() {
     dates,
     filteredDates,
     upcomingDates,
+    nextWeekDates,
     countries,
     loading,
     selectedCountries,

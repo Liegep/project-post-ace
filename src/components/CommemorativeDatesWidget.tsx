@@ -13,7 +13,7 @@ const MONTH_NAMES = [
 
 export function CommemorativeDatesWidget() {
   const {
-    upcomingDates,
+    nextWeekDates,
     countries,
     loading,
     selectedCountries,
@@ -23,10 +23,8 @@ export function CommemorativeDatesWidget() {
     setSelectedCountries,
   } = useCommemorativeDates();
 
-  const [expanded, setExpanded] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const visibleCount = expanded ? 20 : 5;
-  const visible = upcomingDates.slice(0, visibleCount);
+  const visible = nextWeekDates;
 
   if (loading) return null;
 
