@@ -910,7 +910,10 @@ const AdminDashboard = () => {
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-72 p-0">
           <SheetHeader className="border-b px-5 py-4">
-            <SheetTitle className="text-left text-lg font-bold">ContentFlow</SheetTitle>
+            <SheetTitle className="text-left text-lg font-bold flex items-center gap-2">
+              {appLogo && <img src={appLogo} alt="Logo" className="h-7 w-7 rounded-md object-contain" />}
+              ContentFlow
+            </SheetTitle>
           </SheetHeader>
           <div className="flex flex-col py-2">
             {role && (
