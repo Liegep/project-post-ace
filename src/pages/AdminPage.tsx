@@ -1045,6 +1045,12 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 </span>
               )}
             </button>
+            <button
+              onClick={() => setActiveTab("activity")}
+              className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "activity" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+            >
+              <History className="mr-1.5 inline h-4 w-4" /> Atividades
+            </button>
           </div>
           {/* Desktop-only permission toggles */}
           {activeTab === "archived" && (
