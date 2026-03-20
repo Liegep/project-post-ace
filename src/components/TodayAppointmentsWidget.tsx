@@ -2,18 +2,21 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { Check, Clock, CalendarDays, Plus, X } from "lucide-react";
+import { Check, Clock, CalendarDays, Plus, X, Trash2, CalendarClock } from "lucide-react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface TodayAppt {
   id: string;
   title: string;
   description: string;
+  date: string;
   time: string;
   category: string;
   completed: boolean;
@@ -49,13 +52,18 @@ export const TodayAppointmentsWidget = () => {
   const [newTagId, setNewTagId] = useState<string | null>(null);
   const [newDesc, setNewDesc] = useState("");
   const [saving, setSaving] = useState(false);
+  const [rescheduleOpen, setRescheduleOpen] = useState(false);
+  const [rescheduleDate, setRescheduleDate] = useState<Date | undefined>();
+  const [rescheduleTime, setRescheduleTime] = useState("09:00");
+  const [rescheduling, setRescheduling] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchToday = async () => {
     const today = format(new Date(), "yyyy-MM-dd");
     const [{ data: apptData }, { data: tagData }] = await Promise.all([
       supabase
         .from("appointments")
-        .select("id, title, description, appointment_time, category, completed, tag_id")
+        .select("id, title, description, appointment_date, appointment_time, category, completed, tag_id")
         .eq("appointment_date", today)
         .order("appointment_time", { ascending: true }),
       supabase.from("appointment_tags" as any).select("*").order("name"),
@@ -66,6 +74,7 @@ export const TodayAppointmentsWidget = () => {
         id: r.id,
         title: r.title,
         description: r.description || "",
+        date: r.appointment_date,
         time: r.appointment_time?.slice(0, 5) || "09:00",
         category: r.category || "",
         completed: r.completed,
@@ -79,15 +88,10 @@ export const TodayAppointmentsWidget = () => {
   useEffect(() => { fetchToday(); }, []);
 
   const toggleComplete = async (id: string, completed: boolean) => {
-    setAppointments(prev =>
-      prev.map(a => (a.id === id ? { ...a, completed } : a))
-    );
-    if (selectedAppt?.id === id) {
-      setSelectedAppt(prev => prev ? { ...prev, completed } : null);
-    }
+    setAppointments(prev => prev.map(a => (a.id === id ? { ...a, completed } : a)));
+    if (selectedAppt?.id === id) setSelectedAppt(prev => prev ? { ...prev, completed } : null);
     await supabase.from("appointments").update({
-      completed,
-      completed_at: completed ? new Date().toISOString() : null,
+      completed, completed_at: completed ? new Date().toISOString() : null,
     } as any).eq("id", id);
   };
 
@@ -98,22 +102,38 @@ export const TodayAppointmentsWidget = () => {
     if (!user) { setSaving(false); return; }
     const today = format(new Date(), "yyyy-MM-dd");
     await supabase.from("appointments").insert({
-      user_id: user.id,
-      title: newTitle.trim(),
-      description: newDesc.trim(),
-      appointment_date: today,
-      appointment_time: newTime,
-      category: newCategory,
-      tag_id: newTagId,
+      user_id: user.id, title: newTitle.trim(), description: newDesc.trim(),
+      appointment_date: today, appointment_time: newTime, category: newCategory, tag_id: newTagId,
     } as any);
-    setNewTitle("");
-    setNewDesc("");
-    setNewTime("09:00");
-    setNewCategory("");
-    setNewTagId(null);
-    setShowQuickAdd(false);
-    setSaving(false);
+    setNewTitle(""); setNewDesc(""); setNewTime("09:00"); setNewCategory(""); setNewTagId(null);
+    setShowQuickAdd(false); setSaving(false);
     await fetchToday();
+  };
+
+  const handleReschedule = async () => {
+    if (!selectedAppt || !rescheduleDate) return;
+    setRescheduling(true);
+    await supabase.from("appointments").update({
+      appointment_date: format(rescheduleDate, "yyyy-MM-dd"),
+      appointment_time: rescheduleTime,
+    } as any).eq("id", selectedAppt.id);
+    setRescheduling(false); setRescheduleOpen(false); setSelectedAppt(null);
+    await fetchToday();
+  };
+
+  const handleDelete = async () => {
+    if (!selectedAppt) return;
+    setDeleting(true);
+    await supabase.from("appointments").delete().eq("id", selectedAppt.id);
+    setDeleting(false); setSelectedAppt(null);
+    await fetchToday();
+  };
+
+  const openReschedule = () => {
+    if (!selectedAppt) return;
+    setRescheduleDate(new Date(selectedAppt.date + "T12:00:00"));
+    setRescheduleTime(selectedAppt.time);
+    setRescheduleOpen(true);
   };
 
   const pending = appointments.filter(a => !a.completed).length;
@@ -144,10 +164,7 @@ export const TodayAppointmentsWidget = () => {
             >
               {showQuickAdd ? <X className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
             </button>
-            <button
-              onClick={() => navigate("/agenda")}
-              className="text-xs font-medium text-primary hover:underline"
-            >
+            <button onClick={() => navigate("/agenda")} className="text-xs font-medium text-primary hover:underline">
               Ver agenda completa →
             </button>
           </div>
@@ -155,46 +172,21 @@ export const TodayAppointmentsWidget = () => {
 
         {showQuickAdd && (
           <div className="mb-3 rounded-lg border border-border bg-muted/30 p-3 space-y-2">
-            <Input
-              placeholder="Título do compromisso"
-              value={newTitle}
-              onChange={e => setNewTitle(e.target.value)}
-              className="h-8 text-sm"
-              autoFocus
-            />
-            <div className="flex gap-2">
-              <Input
-                type="time"
-                value={newTime}
-                onChange={e => setNewTime(e.target.value)}
-                className="h-8 text-sm w-28"
-              />
-              <select
-                value={newCategory}
-                onChange={e => setNewCategory(e.target.value)}
-                className="h-8 text-sm rounded-md border border-input bg-background px-2 flex-1"
-              >
+            <Input placeholder="Título do compromisso" value={newTitle} onChange={e => setNewTitle(e.target.value)} className="h-8 text-sm" autoFocus />
+            <div className="flex gap-2 flex-wrap">
+              <Input type="time" value={newTime} onChange={e => setNewTime(e.target.value)} className="h-8 text-sm w-28" />
+              <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="h-8 text-sm rounded-md border border-input bg-background px-2 flex-1 min-w-[100px]">
                 <option value="">Categoria</option>
                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
               {tags.length > 0 && (
-                <select
-                  value={newTagId || ""}
-                  onChange={e => setNewTagId(e.target.value || null)}
-                  className="h-8 text-sm rounded-md border border-input bg-background px-2 flex-1"
-                >
+                <select value={newTagId || ""} onChange={e => setNewTagId(e.target.value || null)} className="h-8 text-sm rounded-md border border-input bg-background px-2 flex-1 min-w-[100px]">
                   <option value="">Etiqueta</option>
                   {tags.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                 </select>
               )}
             </div>
-            <Textarea
-              placeholder="Descrição (opcional)"
-              value={newDesc}
-              onChange={e => setNewDesc(e.target.value)}
-              className="text-sm min-h-[50px] resize-none"
-              rows={2}
-            />
+            <Textarea placeholder="Descrição (opcional)" value={newDesc} onChange={e => setNewDesc(e.target.value)} className="text-sm min-h-[50px] resize-none" rows={2} />
             <div className="flex justify-end">
               <Button size="sm" onClick={handleQuickAdd} disabled={saving || !newTitle.trim()}>
                 {saving ? "Salvando..." : "Adicionar"}
@@ -229,42 +221,26 @@ export const TodayAppointmentsWidget = () => {
                     onClick={(e) => { e.stopPropagation(); toggleComplete(apt.id, !apt.completed); }}
                     className={cn(
                       "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all",
-                      apt.completed
-                        ? "bg-success border-success text-white"
-                        : isOverdue
-                          ? "border-destructive hover:bg-destructive/10"
-                          : "border-muted-foreground/40 hover:border-primary"
+                      apt.completed ? "bg-success border-success text-white" : isOverdue ? "border-destructive hover:bg-destructive/10" : "border-muted-foreground/40 hover:border-primary"
                     )}
                   >
                     {apt.completed && <Check className="h-3 w-3" />}
                   </button>
                   <div className="flex-1 min-w-0">
-                    <span className={cn(
-                      "text-sm font-medium",
-                      apt.completed ? "line-through text-muted-foreground" : "text-foreground"
-                    )}>
+                    <span className={cn("text-sm font-medium", apt.completed ? "line-through text-muted-foreground" : "text-foreground")}>
                       {apt.title}
                     </span>
                     {apt.category && (
-                      <span className={cn("ml-2 rounded-full px-2 py-0.5 text-[10px] font-medium", catStyle)}>
-                        {apt.category}
-                      </span>
+                      <span className={cn("ml-2 rounded-full px-2 py-0.5 text-[10px] font-medium", catStyle)}>{apt.category}</span>
                     )}
                     {aptTag && !apt.completed && (
-                      <span
-                        className="ml-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
-                        style={{ backgroundColor: aptTag.color + "30", color: aptTag.color }}
-                      >
+                      <span className="ml-1 rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ backgroundColor: aptTag.color + "30", color: aptTag.color }}>
                         {aptTag.name}
                       </span>
                     )}
                   </div>
-                  <span className={cn(
-                    "flex items-center gap-1 text-xs font-mono shrink-0",
-                    apt.completed ? "text-muted-foreground/50" : isOverdue ? "text-destructive" : "text-muted-foreground"
-                  )}>
-                    <Clock className="h-3 w-3" />
-                    {apt.time}
+                  <span className={cn("flex items-center gap-1 text-xs font-mono shrink-0", apt.completed ? "text-muted-foreground/50" : isOverdue ? "text-destructive" : "text-muted-foreground")}>
+                    <Clock className="h-3 w-3" />{apt.time}
                   </span>
                 </div>
               );
@@ -273,7 +249,8 @@ export const TodayAppointmentsWidget = () => {
         )}
       </div>
 
-      <Dialog open={!!selectedAppt} onOpenChange={(open) => !open && setSelectedAppt(null)}>
+      {/* Detail dialog */}
+      <Dialog open={!!selectedAppt && !rescheduleOpen} onOpenChange={(open) => !open && setSelectedAppt(null)}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -285,7 +262,7 @@ export const TodayAppointmentsWidget = () => {
             const aptTag = getTag(selectedAppt.tagId);
             return (
               <div className="space-y-3 pt-1">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
                   <Clock className="h-4 w-4" />
                   <span>Hoje às {selectedAppt.time}</span>
                   {selectedAppt.category && (
@@ -294,11 +271,7 @@ export const TodayAppointmentsWidget = () => {
                     </Badge>
                   )}
                   {aptTag && (
-                    <Badge
-                      variant="outline"
-                      className="text-xs"
-                      style={{ backgroundColor: aptTag.color + "20", color: aptTag.color, borderColor: aptTag.color + "50" }}
-                    >
+                    <Badge variant="outline" className="text-xs" style={{ backgroundColor: aptTag.color + "20", color: aptTag.color, borderColor: aptTag.color + "50" }}>
                       {aptTag.name}
                     </Badge>
                   )}
@@ -311,9 +284,67 @@ export const TodayAppointmentsWidget = () => {
                     {selectedAppt.description || "Sem descrição adicional."}
                   </p>
                 </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <Button variant="outline" size="sm" className="flex-1 gap-1.5" onClick={openReschedule}>
+                    <CalendarClock className="h-3.5 w-3.5" />
+                    Reagendar
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="flex-1 gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30">
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Excluir
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Excluir compromisso</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja excluir "{selectedAppt.title}"? Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                          {deleting ? "Excluindo..." : "Excluir"}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               </div>
             );
           })()}
+        </DialogContent>
+      </Dialog>
+
+      {/* Reschedule dialog */}
+      <Dialog open={rescheduleOpen} onOpenChange={(open) => { if (!open) setRescheduleOpen(false); }}>
+        <DialogContent className="sm:max-w-xs">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              <CalendarClock className="h-5 w-5 text-primary" />
+              Reagendar compromisso
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Escolha a nova data e horário para "{selectedAppt?.title}".
+            </p>
+            <div className="flex justify-center">
+              <Calendar mode="single" selected={rescheduleDate} onSelect={setRescheduleDate} className="rounded-md border" />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-foreground">Horário:</label>
+              <Input type="time" value={rescheduleTime} onChange={e => setRescheduleTime(e.target.value)} className="h-8 text-sm w-32" />
+            </div>
+            <div className="flex gap-2 pt-1">
+              <Button variant="outline" size="sm" className="flex-1" onClick={() => setRescheduleOpen(false)}>Cancelar</Button>
+              <Button size="sm" className="flex-1" disabled={!rescheduleDate || rescheduling} onClick={handleReschedule}>
+                {rescheduling ? "Salvando..." : "Confirmar"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </>
