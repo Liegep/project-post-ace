@@ -215,6 +215,13 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           <ClientBriefs clientId={clientData.id} clientName={clientData.name} />
         </div>
 
+        {/* Client Invoices */}
+        {clientData.show_invoices_to_client && (
+          <div className="mb-8">
+            <ClientInvoicesPanel clientId={clientData.id} />
+          </div>
+        )}
+
         {/* Upcoming Posts Widget */}
         <div className="mb-8">
           <UpcomingPostsWidget posts={[...posts, ...archivedPosts]} />
