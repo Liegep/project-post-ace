@@ -97,6 +97,22 @@ export function useCommemorativeDates() {
     return sorted;
   }, [filteredDates]);
 
+  const nextWeekDates = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const today = new Date(year, now.getMonth(), now.getDate());
+    const weekEnd = new Date(today);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+
+    return filteredDates.filter((d) => {
+      const dateThisYear = new Date(year, d.date_month - 1, d.date_day);
+      return dateThisYear >= today && dateThisYear <= weekEnd;
+    }).sort((a, b) => {
+      if (a.date_month !== b.date_month) return a.date_month - b.date_month;
+      return a.date_day - b.date_day;
+    });
+  }, [filteredDates]);
+
   const getDatesByMonthDay = (month: number, day: number) => {
     return filteredDates.filter(
       (d) => d.date_month === month && d.date_day === day
@@ -115,6 +131,7 @@ export function useCommemorativeDates() {
     dates,
     filteredDates,
     upcomingDates,
+    nextWeekDates,
     countries,
     loading,
     selectedCountries,

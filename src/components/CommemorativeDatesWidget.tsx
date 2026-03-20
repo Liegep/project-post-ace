@@ -3,7 +3,7 @@ import { useCommemorativeDates, CATEGORY_LABELS } from "@/hooks/useCommemorative
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { CalendarHeart, ChevronDown, ChevronUp, Search, X } from "lucide-react";
+import { CalendarHeart, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const MONTH_NAMES = [
@@ -13,7 +13,7 @@ const MONTH_NAMES = [
 
 export function CommemorativeDatesWidget() {
   const {
-    upcomingDates,
+    nextWeekDates,
     countries,
     loading,
     selectedCountries,
@@ -23,10 +23,8 @@ export function CommemorativeDatesWidget() {
     setSelectedCountries,
   } = useCommemorativeDates();
 
-  const [expanded, setExpanded] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const visibleCount = expanded ? 20 : 5;
-  const visible = upcomingDates.slice(0, visibleCount);
+  const visible = nextWeekDates;
 
   if (loading) return null;
 
@@ -38,8 +36,9 @@ export function CommemorativeDatesWidget() {
           <CalendarHeart className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm text-foreground">Datas Comemorativas</h3>
           <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-            {upcomingDates.length}
+            {nextWeekDates.length}
           </Badge>
+          <span className="text-[10px] text-muted-foreground">próximos 7 dias</span>
         </div>
         <Button
           variant="ghost"
@@ -149,26 +148,6 @@ export function CommemorativeDatesWidget() {
       </div>
 
       {/* Expand/collapse */}
-      {upcomingDates.length > 5 && (
-        <div className="px-4 py-2 border-t">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full h-7 text-xs text-muted-foreground"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? (
-              <>
-                <ChevronUp className="h-3 w-3 mr-1" /> Mostrar menos
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-3 w-3 mr-1" /> Ver mais ({upcomingDates.length - 5} restantes)
-              </>
-            )}
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
