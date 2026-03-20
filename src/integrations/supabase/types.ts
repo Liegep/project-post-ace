@@ -1296,6 +1296,104 @@ export type Database = {
           },
         ]
       }
+      social_report_templates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          metric_fields: Json
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metric_fields?: Json
+          name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metric_fields?: Json
+          name?: string
+        }
+        Relationships: []
+      }
+      social_reports: {
+        Row: {
+          best_content: string
+          best_format: string
+          client_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          metrics: Json
+          observations: string
+          period_end: string
+          period_start: string
+          platform: string
+          previous_metrics: Json
+          recommendations: string
+          status: string
+          strategic_comment: string
+          template_id: string | null
+          title: string
+          updated_at: string
+          worst_content: string
+        }
+        Insert: {
+          best_content?: string
+          best_format?: string
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metrics?: Json
+          observations?: string
+          period_end: string
+          period_start: string
+          platform?: string
+          previous_metrics?: Json
+          recommendations?: string
+          status?: string
+          strategic_comment?: string
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+          worst_content?: string
+        }
+        Update: {
+          best_content?: string
+          best_format?: string
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          metrics?: Json
+          observations?: string
+          period_end?: string
+          period_start?: string
+          platform?: string
+          previous_metrics?: Json
+          recommendations?: string
+          status?: string
+          strategic_comment?: string
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+          worst_content?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_reports_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tags: {
         Row: {
           client_id: string | null
