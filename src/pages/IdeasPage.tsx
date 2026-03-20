@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Plus, ArrowLeft, Trash2, MoreVertical, GripVertical, Pencil } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, ArrowLeft, Trash2, MoreVertical, GripVertical, Pencil, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { MobileNav } from "@/components/MobileNav";
@@ -27,6 +28,11 @@ interface Idea {
   description: string;
   position: number;
   created_at: string;
+}
+
+interface SimpleClient {
+  id: string;
+  name: string;
 }
 
 const IdeasPage = () => {
@@ -53,6 +59,12 @@ const IdeasPage = () => {
   const [editingCol, setEditingCol] = useState<IdeaColumn | null>(null);
   const [editColName, setEditColName] = useState("");
 
+  // Convert to brief
+  const [convertingIdea, setConvertingIdea] = useState<Idea | null>(null);
+  const [clients, setClients] = useState<SimpleClient[]>([]);
+  const [selectedClientId, setSelectedClientId] = useState("");
+  const [converting, setConverting] = useState(false);
+
   useEffect(() => {
     fetchAll();
   }, []);
@@ -70,6 +82,47 @@ const IdeasPage = () => {
     setColumns((colRes.data as IdeaColumn[]) || []);
     setIdeas((ideaRes.data as Idea[]) || []);
     setLoading(false);
+  };
+
+  const fetchClients = async () => {
+    const { data } = await supabase.from("clients").select("id, name").order("name");
+    setClients((data as SimpleClient[]) || []);
+  };
+
+  const openConvertDialog = (idea: Idea) => {
+    setConvertingIdea(idea);
+    setSelectedClientId("");
+    fetchClients();
+  };
+
+  const convertToBrief = async () => {
+    if (!convertingIdea || !selectedClientId) return;
+    setConverting(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setConverting(false); return; }
+
+    const { error: briefError } = await supabase.from("content_briefs").insert({
+      client_id: selectedClientId,
+      title: convertingIdea.title,
+      description: convertingIdea.description || "",
+      status: "draft" as const,
+      created_by: user.id,
+    });
+
+    if (briefError) {
+      toast({ title: "Erro ao criar pauta", description: briefError.message, variant: "destructive" });
+      setConverting(false);
+      return;
+    }
+
+    // Delete the idea card
+    await supabase.from("ideas").delete().eq("id", convertingIdea.id);
+
+    toast({ title: "Ideia convertida em pauta!", description: "A pauta foi criada como rascunho na página de Pautas." });
+    setConvertingIdea(null);
+    setConverting(false);
+    fetchAll();
   };
 
   const addColumn = async () => {
@@ -239,11 +292,16 @@ const IdeasPage = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => openConvertDialog(idea)}>
+                                <FileText className="h-4 w-4 mr-2" /> Transformar em Pauta
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
                               {columns.filter(c => c.id !== col.id).map(targetCol => (
                                 <DropdownMenuItem key={targetCol.id} onClick={() => moveIdea(idea, targetCol.id)}>
                                   Mover para {targetCol.name}
                                 </DropdownMenuItem>
                               ))}
+                              <DropdownMenuSeparator />
                               <DropdownMenuItem className="text-destructive" onClick={() => deleteIdea(idea.id)}>
                                 <Trash2 className="h-4 w-4 mr-2" /> Excluir
                               </DropdownMenuItem>
@@ -364,6 +422,46 @@ const IdeasPage = () => {
             />
             <Button onClick={updateColumn} disabled={!editColName.trim()} className="w-full">
               Salvar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Convert to brief dialog */}
+      <Dialog open={!!convertingIdea} onOpenChange={() => setConvertingIdea(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Transformar em Pauta
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="rounded-lg border bg-muted/50 p-3">
+              <p className="font-medium text-sm text-foreground">{convertingIdea?.title}</p>
+              {convertingIdea?.description && (
+                <p className="text-xs text-muted-foreground mt-1">{convertingIdea.description}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Selecione o cliente</label>
+              <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Escolha um cliente..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {clients.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
+              onClick={convertToBrief}
+              disabled={!selectedClientId || converting}
+              className="w-full"
+            >
+              {converting ? "Convertendo..." : "Criar Pauta"}
             </Button>
           </div>
         </DialogContent>
