@@ -464,6 +464,12 @@ export type Database = {
         Row: {
           allow_client_create_post: boolean
           allow_client_edit_caption: boolean
+          billing_description: string
+          billing_due_day: number
+          billing_monthly_amount: number
+          billing_recurrence_active: boolean
+          billing_start_date: string | null
+          billing_type: string
           client_type: string
           created_at: string
           facebook_url: string
@@ -491,6 +497,12 @@ export type Database = {
         Insert: {
           allow_client_create_post?: boolean
           allow_client_edit_caption?: boolean
+          billing_description?: string
+          billing_due_day?: number
+          billing_monthly_amount?: number
+          billing_recurrence_active?: boolean
+          billing_start_date?: string | null
+          billing_type?: string
           client_type?: string
           created_at?: string
           facebook_url?: string
@@ -518,6 +530,12 @@ export type Database = {
         Update: {
           allow_client_create_post?: boolean
           allow_client_edit_caption?: boolean
+          billing_description?: string
+          billing_due_day?: number
+          billing_monthly_amount?: number
+          billing_recurrence_active?: boolean
+          billing_start_date?: string | null
+          billing_type?: string
           client_type?: string
           created_at?: string
           facebook_url?: string
