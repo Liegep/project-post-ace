@@ -1365,6 +1365,27 @@ export type Database = {
           },
         ]
       }
+      user_favorite_countries: {
+        Row: {
+          country: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
