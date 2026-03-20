@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon } from "lucide-react";
@@ -155,6 +154,7 @@ const AdminDashboard = () => {
   const [clientAssignments, setClientAssignments] = useState<{ user_id: string; client_id: string }[]>([]);
   const [clientUsersMap, setClientUsersMap] = useState<ClientUserMap>({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [navDrawerOpen, setNavDrawerOpen] = useState(false);
 
   const fetchStatusNotifs = async () => {
     const { data } = await supabase
@@ -800,7 +800,6 @@ const AdminDashboard = () => {
           </div>
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-3">
-            <LanguageSelector />
             {isAdmin && (
               <Button variant="outline" size="sm" onClick={() => navigate("/team-management")}>
                 <Users className="mr-1 h-4 w-4" /> {t("team")}
@@ -811,26 +810,9 @@ const AdminDashboard = () => {
                 <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
               </Button>
             )}
-            <Button variant="ghost" size="icon" onClick={() => navigate("/ideas")} title="Ideias de Pauta">
-              <Lightbulb className="h-5 w-5" />
+            <Button variant="ghost" size="icon" onClick={() => setNavDrawerOpen(true)} title="Menu">
+              <Menu className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/calendar")} title="Calendário de Posts">
-              <Calendar className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/briefs")} title="Pautas">
-              <FileText className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/reports")} title="Relatórios">
-              <FileBarChart className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/commemorative-dates")} title="Datas Comemorativas">
-              <CalendarHeart className="h-5 w-5" />
-            </Button>
-            {isAdmin && (
-              <Button variant="ghost" size="icon" onClick={() => navigate("/activity-log")} title="Registro de Atividades">
-                <HistoryIcon className="h-5 w-5" />
-              </Button>
-            )}
             {isAdmin && (
               <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Plus className="mr-2 h-4 w-4" /> Clientes
@@ -899,11 +881,47 @@ const AdminDashboard = () => {
               <button onClick={() => { setMobileMenuOpen(false); navigate("/reports"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
                 <FileBarChart className="h-4 w-4 text-muted-foreground" /> Relatórios
               </button>
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/commemorative-dates"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                <CalendarHeart className="h-4 w-4 text-muted-foreground" /> Datas Comemorativas
+              </button>
+              {isAdmin && (
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/activity-log"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                  <HistoryIcon className="h-4 w-4 text-muted-foreground" /> Histórico
+                </button>
+              )}
             </nav>
-            <div className="border-t mt-2 pt-2 px-5">
-              <LanguageSelector />
-            </div>
           </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop nav drawer */}
+      <Sheet open={navDrawerOpen} onOpenChange={setNavDrawerOpen}>
+        <SheetContent side="right" className="w-64 p-0">
+          <SheetHeader className="border-b px-5 py-4">
+            <SheetTitle className="text-left text-base font-semibold">Navegação</SheetTitle>
+          </SheetHeader>
+          <nav className="flex flex-col py-2">
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/ideas"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+              <Lightbulb className="h-4 w-4 text-muted-foreground" /> Ideias de Pauta
+            </button>
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/calendar"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+              <Calendar className="h-4 w-4 text-muted-foreground" /> Calendário
+            </button>
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/briefs"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+              <FileText className="h-4 w-4 text-muted-foreground" /> Pautas
+            </button>
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/reports"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+              <FileBarChart className="h-4 w-4 text-muted-foreground" /> Relatórios
+            </button>
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/commemorative-dates"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+              <CalendarHeart className="h-4 w-4 text-muted-foreground" /> Datas Comemorativas
+            </button>
+            {isAdmin && (
+              <button onClick={() => { setNavDrawerOpen(false); navigate("/activity-log"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                <HistoryIcon className="h-4 w-4 text-muted-foreground" /> Histórico de Atividades
+              </button>
+            )}
+          </nav>
         </SheetContent>
       </Sheet>
 

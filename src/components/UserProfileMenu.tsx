@@ -12,6 +12,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
@@ -22,11 +25,12 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
-import { User, KeyRound, LogOut, Camera, CalendarDays, Shield } from "lucide-react";
+import { User, KeyRound, LogOut, Camera, CalendarDays, Shield, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 
 const UserProfileMenu = () => {
-  const { t } = useI18n();
+  const { t, locale, setLocale } = useI18n();
   const { role, isSuperAdmin } = useUserRole();
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
@@ -177,6 +181,19 @@ const UserProfileMenu = () => {
             <CalendarDays className="mr-2 h-4 w-4" />
             Agenda
           </DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <Globe className="mr-2 h-4 w-4" />
+              {LOCALE_FLAGS[locale]} {LOCALE_LABELS[locale]}
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              {(Object.keys(LOCALE_LABELS) as Locale[]).map((loc) => (
+                <DropdownMenuItem key={loc} onClick={() => setLocale(loc)}>
+                  {LOCALE_FLAGS[loc]} {LOCALE_LABELS[loc]}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={async () => {
