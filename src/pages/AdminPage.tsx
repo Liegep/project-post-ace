@@ -492,6 +492,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, reorderColumns,
   } = usePosts();
   const { t } = useI18n();
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
