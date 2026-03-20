@@ -20,6 +20,7 @@ import IdeasPage from "./pages/IdeasPage.tsx";
 import CalendarPage from "./pages/CalendarPage.tsx";
 import BriefsPage from "./pages/BriefsPage.tsx";
 import CommemorativeDatesPage from "./pages/CommemorativeDatesPage.tsx";
+import ActivityLogPage from "./pages/ActivityLogPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
             <Route path="/calendar" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CalendarPage /></AuthGuard>} />
             <Route path="/briefs" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><BriefsPage /></AuthGuard>} />
             <Route path="/commemorative-dates" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CommemorativeDatesPage /></AuthGuard>} />
+            <Route path="/activity-log" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><ActivityLogPage /></AuthGuard>} />
             <Route path="/client/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ClientPage /></AuthGuard>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
