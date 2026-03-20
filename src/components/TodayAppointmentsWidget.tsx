@@ -210,9 +210,50 @@ export const TodayAppointmentsWidget = () => {
               )}
             </div>
             <Textarea placeholder="Descrição (opcional)" value={newDesc} onChange={e => setNewDesc(e.target.value)} className="text-sm min-h-[50px] resize-none" rows={2} />
+            {/* Repeat */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <Repeat className="h-3 w-3 text-muted-foreground" />
+              {(["none", "daily", "weekly", "weekdays"] as const).map(mode => (
+                <button
+                  key={mode}
+                  onClick={() => setNewRepeat(mode)}
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[10px] font-medium border transition-all",
+                    newRepeat === mode
+                      ? "bg-primary/10 text-primary border-primary/30"
+                      : "bg-muted/50 text-muted-foreground border-border hover:bg-muted"
+                  )}
+                >
+                  {{ none: "Único", daily: "Diário", weekly: "Semanal", weekdays: "Seg-Sex" }[mode]}
+                </button>
+              ))}
+            </div>
+            {newRepeat !== "none" && (
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-muted-foreground">Até:</span>
+                <Popover open={newRepeatEndOpen} onOpenChange={setNewRepeatEndOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1 font-normal">
+                      <CalendarIcon className="h-3 w-3" />
+                      {newRepeatEnd ? format(newRepeatEnd, "dd/MM/yyyy") : "Escolher data"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={newRepeatEnd}
+                      onSelect={(d) => { if (d) { setNewRepeatEnd(d); setNewRepeatEndOpen(false); } }}
+                      disabled={(d) => isBefore(d, new Date())}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
             <div className="flex justify-end">
               <Button size="sm" onClick={handleQuickAdd} disabled={saving || !newTitle.trim()}>
-                {saving ? "Salvando..." : "Adicionar"}
+                {saving ? "Salvando..." : newRepeat !== "none" ? "Criar repetidos" : "Adicionar"}
               </Button>
             </div>
           </div>
