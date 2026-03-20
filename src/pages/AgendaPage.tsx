@@ -55,6 +55,9 @@ const AgendaPage = () => {
   const [formCategory, setFormCategory] = useState("");
   const [formTagId, setFormTagId] = useState<string | null>(null);
   const [formRepeat, setFormRepeat] = useState<RepeatMode>("none");
+  const [formRepeatEnd, setFormRepeatEnd] = useState<Date | undefined>(undefined);
+  const [formRepeatEndOpen, setFormRepeatEndOpen] = useState(false);
+  const [formCustomDays, setFormCustomDays] = useState<number[]>([]); // 0=Sun...6=Sat
   const [saving, setSaving] = useState(false);
 
   const navigateDate = (dir: number) => {
