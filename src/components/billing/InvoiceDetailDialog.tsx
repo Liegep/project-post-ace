@@ -78,6 +78,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
   const [invSurcharge, setInvSurcharge] = useState(String(invoice.surcharge || 0));
   const [invNotes, setInvNotes] = useState(invoice.notes || "");
   const [invDueDate, setInvDueDate] = useState(invoice.due_date);
+  const [invPaymentMethod, setInvPaymentMethod] = useState((invoice as any).payment_method || "");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -88,6 +89,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     setInvSurcharge(String(invoice.surcharge || 0));
     setInvNotes(invoice.notes || "");
     setInvDueDate(invoice.due_date);
+    setInvPaymentMethod((invoice as any).payment_method || "");
   }, [invoice]);
 
   const subtotal = items.reduce((sum, i) => sum + Number(i.total_price || 0), 0);
