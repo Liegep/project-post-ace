@@ -154,6 +154,7 @@ const AdminDashboard = () => {
   const [clientAssignments, setClientAssignments] = useState<{ user_id: string; client_id: string }[]>([]);
   const [clientUsersMap, setClientUsersMap] = useState<ClientUserMap>({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [navDrawerOpen, setNavDrawerOpen] = useState(false);
 
   const fetchStatusNotifs = async () => {
     const { data } = await supabase
@@ -880,11 +881,47 @@ const AdminDashboard = () => {
               <button onClick={() => { setMobileMenuOpen(false); navigate("/reports"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
                 <FileBarChart className="h-4 w-4 text-muted-foreground" /> Relatórios
               </button>
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/commemorative-dates"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                <CalendarHeart className="h-4 w-4 text-muted-foreground" /> Datas Comemorativas
+              </button>
+              {isAdmin && (
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/activity-log"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                  <HistoryIcon className="h-4 w-4 text-muted-foreground" /> Histórico
+                </button>
+              )}
             </nav>
-            <div className="border-t mt-2 pt-2 px-5">
-              <LanguageSelector />
-            </div>
           </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop nav drawer */}
+      <Sheet open={navDrawerOpen} onOpenChange={setNavDrawerOpen}>
+        <SheetContent side="right" className="w-64 p-0">
+          <SheetHeader className="border-b px-5 py-4">
+            <SheetTitle className="text-left text-base font-semibold">Navegação</SheetTitle>
+          </SheetHeader>
+          <nav className="flex flex-col py-2">
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/ideas"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+              <Lightbulb className="h-4 w-4 text-muted-foreground" /> Ideias de Pauta
+            </button>
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/calendar"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+              <Calendar className="h-4 w-4 text-muted-foreground" /> Calendário
+            </button>
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/briefs"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+              <FileText className="h-4 w-4 text-muted-foreground" /> Pautas
+            </button>
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/reports"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+              <FileBarChart className="h-4 w-4 text-muted-foreground" /> Relatórios
+            </button>
+            <button onClick={() => { setNavDrawerOpen(false); navigate("/commemorative-dates"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+              <CalendarHeart className="h-4 w-4 text-muted-foreground" /> Datas Comemorativas
+            </button>
+            {isAdmin && (
+              <button onClick={() => { setNavDrawerOpen(false); navigate("/activity-log"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                <HistoryIcon className="h-4 w-4 text-muted-foreground" /> Histórico de Atividades
+              </button>
+            )}
+          </nav>
         </SheetContent>
       </Sheet>
 
