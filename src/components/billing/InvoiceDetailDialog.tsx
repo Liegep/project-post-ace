@@ -49,7 +49,7 @@ const CATEGORIES = [
 ];
 
 const PAYMENT_METHODS = [
-  { value: "", label: "Nenhum" },
+  { value: "none", label: "Nenhum" },
   { value: "Pix", label: "Pix" },
   { value: "PayPal", label: "PayPal" },
   { value: "Transferência", label: "Transferência" },
