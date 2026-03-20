@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useInvoices, useInvoiceItems, Invoice } from "@/hooks/useInvoices";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Receipt, CheckCircle2, AlertCircle, Clock, XCircle, ChevronRight, FileText } from "lucide-react";
+import { Receipt, CheckCircle2, AlertCircle, Clock, XCircle, ChevronRight, FileText, Download } from "lucide-react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { generateInvoicePDF } from "@/lib/invoicePdf";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   open: { label: "Aberta", color: "bg-blue-500/15 text-blue-600", icon: Clock },
@@ -15,40 +16,124 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }>
   cancelled: { label: "Cancelada", color: "bg-muted text-muted-foreground", icon: XCircle },
 };
 
-function InvoiceItemsList({ invoiceId }: { invoiceId: string }) {
-  const { items, loading } = useInvoiceItems(invoiceId);
+function InvoiceDetail({ invoice }: { invoice: Invoice }) {
+  const { items, loading } = useInvoiceItems(invoice.id);
 
-  if (loading) return <p className="text-sm text-muted-foreground py-2">Carregando itens...</p>;
-  if (items.length === 0) return <p className="text-sm text-muted-foreground py-2">Nenhum item nesta fatura.</p>;
+  const subtotal = items.reduce((sum, it) => sum + Number(it.total_price || 0), 0);
+  const discount = Number(invoice.discount || 0);
+  const surcharge = Number(invoice.surcharge || 0);
+  const total = subtotal - discount + surcharge;
 
-  const total = items.reduce((sum, it) => sum + Number(it.total_price || 0), 0);
+  const handleDownloadPDF = () => {
+    generateInvoicePDF(invoice, items, total, subtotal);
+  };
+
+  const cfg = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.open;
+  const Icon = cfg.icon;
 
   return (
-    <div className="space-y-3">
-      <h4 className="text-sm font-semibold text-foreground">Itens</h4>
-      <div className="space-y-2">
-        {items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between rounded-lg border bg-card p-3">
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-foreground truncate">{item.name || "Item"}</p>
-              {item.description && (
-                <p className="text-xs text-muted-foreground truncate">{item.description}</p>
-              )}
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {item.quantity}x · R$ {Number(item.unit_price || 0).toFixed(2)}
-              </p>
-            </div>
-            <span className="text-sm font-semibold text-foreground ml-3">
-              R$ {Number(item.total_price || 0).toFixed(2)}
-            </span>
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <span className="text-muted-foreground">Status</span>
+          <Badge variant="secondary" className={`${cfg.color} ml-2`}>
+            <Icon className="h-3 w-3 mr-1" />
+            {cfg.label}
+          </Badge>
+        </div>
+        <div>
+          <span className="text-muted-foreground">Emissão: </span>
+          <span className="font-medium">{format(new Date(invoice.issue_date), "dd/MM/yyyy")}</span>
+        </div>
+        <div>
+          <span className="text-muted-foreground">Vencimento: </span>
+          <span className="font-medium">{format(new Date(invoice.due_date), "dd/MM/yyyy")}</span>
+        </div>
+        {invoice.paid_at && (
+          <div>
+            <span className="text-muted-foreground">Pago em: </span>
+            <span className="font-medium">{format(new Date(invoice.paid_at), "dd/MM/yyyy")}</span>
           </div>
-        ))}
+        )}
+        {invoice.payment_method && invoice.payment_method !== "" && (
+          <div>
+            <span className="text-muted-foreground">Método: </span>
+            <span className="font-medium capitalize">{invoice.payment_method}</span>
+          </div>
+        )}
       </div>
+
+      {invoice.notes && (
+        <div>
+          <p className="text-xs text-muted-foreground mb-1">Observações</p>
+          <p className="text-sm text-foreground whitespace-pre-wrap">{invoice.notes}</p>
+        </div>
+      )}
+
       <Separator />
-      <div className="flex justify-between items-center">
-        <span className="text-sm font-semibold text-foreground">Total</span>
-        <span className="text-base font-bold text-foreground">R$ {total.toFixed(2)}</span>
-      </div>
+
+      {/* Items */}
+      {loading ? (
+        <p className="text-sm text-muted-foreground py-2">Carregando itens...</p>
+      ) : items.length === 0 ? (
+        <p className="text-sm text-muted-foreground py-2">Nenhum item nesta fatura.</p>
+      ) : (
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-foreground">Itens</h4>
+          <div className="space-y-2">
+            {items.map((item) => (
+              <div key={item.id} className="flex items-center justify-between rounded-lg border bg-card p-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-foreground truncate">{item.name || "Item"}</p>
+                  {item.description && (
+                    <p className="text-xs text-muted-foreground truncate">{item.description}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {item.quantity}x · R$ {Number(item.unit_price || 0).toFixed(2)}
+                  </p>
+                </div>
+                <span className="text-sm font-semibold text-foreground ml-3">
+                  R$ {Number(item.total_price || 0).toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </div>
+          <Separator />
+          <div className="space-y-1">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Subtotal</span>
+              <span>R$ {subtotal.toFixed(2)}</span>
+            </div>
+            {discount > 0 && (
+              <div className="flex justify-between items-center text-sm text-emerald-600">
+                <span>Desconto</span>
+                <span>- R$ {discount.toFixed(2)}</span>
+              </div>
+            )}
+            {surcharge > 0 && (
+              <div className="flex justify-between items-center text-sm text-amber-600">
+                <span>Acréscimo</span>
+                <span>+ R$ {surcharge.toFixed(2)}</span>
+              </div>
+            )}
+            <div className="flex justify-between items-center pt-1">
+              <span className="text-sm font-semibold text-foreground">Total</span>
+              <span className="text-base font-bold text-foreground">R$ {total.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Download PDF Button */}
+      {!loading && items.length > 0 && (
+        <>
+          <Separator />
+          <Button onClick={handleDownloadPDF} variant="outline" className="w-full">
+            <Download className="h-4 w-4 mr-2" />
+            Baixar fatura em PDF
+          </Button>
+        </>
+      )}
     </div>
   );
 }
@@ -57,7 +142,6 @@ export function ClientInvoicesPanel({ clientId }: { clientId: string }) {
   const { invoices, loading } = useInvoices(clientId);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
-  // Only show visible invoices (RLS already filters, but double-check)
   const visibleInvoices = invoices.filter((inv) => inv.client_visible !== false);
 
   if (loading) {
@@ -132,57 +216,7 @@ export function ClientInvoicesPanel({ clientId }: { clientId: string }) {
               Detalhes da fatura
             </DialogDescription>
           </DialogHeader>
-
-          {selectedInvoice && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Status</span>
-                  {(() => {
-                    const cfg = STATUS_CONFIG[selectedInvoice.status] || STATUS_CONFIG.open;
-                    const Icon = cfg.icon;
-                    return (
-                      <Badge variant="secondary" className={`${cfg.color} ml-2`}>
-                        <Icon className="h-3 w-3 mr-1" />
-                        {cfg.label}
-                      </Badge>
-                    );
-                  })()}
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Emissão: </span>
-                  <span className="font-medium">{format(new Date(selectedInvoice.issue_date), "dd/MM/yyyy")}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Vencimento: </span>
-                  <span className="font-medium">{format(new Date(selectedInvoice.due_date), "dd/MM/yyyy")}</span>
-                </div>
-                {selectedInvoice.paid_at && (
-                  <div>
-                    <span className="text-muted-foreground">Pago em: </span>
-                    <span className="font-medium">{format(new Date(selectedInvoice.paid_at), "dd/MM/yyyy")}</span>
-                  </div>
-                )}
-                {selectedInvoice.payment_method && selectedInvoice.payment_method !== "" && (
-                  <div>
-                    <span className="text-muted-foreground">Método: </span>
-                    <span className="font-medium capitalize">{selectedInvoice.payment_method}</span>
-                  </div>
-                )}
-              </div>
-
-              {selectedInvoice.notes && (
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Observações</p>
-                  <p className="text-sm text-foreground whitespace-pre-wrap">{selectedInvoice.notes}</p>
-                </div>
-              )}
-
-              <Separator />
-
-              <InvoiceItemsList invoiceId={selectedInvoice.id} />
-            </div>
-          )}
+          {selectedInvoice && <InvoiceDetail invoice={selectedInvoice} />}
         </DialogContent>
       </Dialog>
     </>
