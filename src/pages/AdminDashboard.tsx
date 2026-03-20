@@ -168,6 +168,8 @@ const AdminDashboard = () => {
   const [clientUsersMap, setClientUsersMap] = useState<ClientUserMap>({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navDrawerOpen, setNavDrawerOpen] = useState(false);
+  const [appLogo, setAppLogo] = useState<string | null>(null);
+  const appLogoInputRef = useRef<HTMLInputElement>(null);
 
   const fetchStatusNotifs = async () => {
     const { data } = await supabase
@@ -213,6 +215,42 @@ const AdminDashboard = () => {
       notificationAudioRef.current.currentTime = 0;
       notificationAudioRef.current.play().catch(() => {});
     }
+  };
+
+  // Fetch app logo from app_settings
+  useEffect(() => {
+    const fetchAppLogo = async () => {
+      const { data } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "app_logo_url")
+        .maybeSingle();
+      if (data?.value) setAppLogo(data.value);
+    };
+    fetchAppLogo();
+  }, []);
+
+  const handleAppLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const ext = file.name.split(".").pop();
+    const path = `app-logo-${Date.now()}.${ext}`;
+    const { error: uploadError } = await supabase.storage.from("app-branding").upload(path, file, { upsert: true });
+    if (uploadError) {
+      toast({ title: "Erro ao enviar logo", description: uploadError.message, variant: "destructive" });
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("app-branding").getPublicUrl(path);
+    const logoUrl = urlData.publicUrl;
+    const { error: settingsError } = await supabase
+      .from("app_settings")
+      .upsert({ key: "app_logo_url", value: logoUrl, updated_at: new Date().toISOString() }, { onConflict: "key" });
+    if (settingsError) {
+      toast({ title: "Erro ao salvar configuração", description: settingsError.message, variant: "destructive" });
+      return;
+    }
+    setAppLogo(logoUrl);
+    toast({ title: "Logo atualizado com sucesso!" });
   };
 
   useEffect(() => {
@@ -806,6 +844,29 @@ const AdminDashboard = () => {
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(true)}>
               <Menu className="h-5 w-5" />
             </Button>
+            {/* App logo upload area */}
+            <input type="file" accept="image/*" ref={appLogoInputRef} className="hidden" onChange={handleAppLogoUpload} />
+            {isAdmin ? (
+              <button
+                type="button"
+                onClick={() => appLogoInputRef.current?.click()}
+                className="relative group shrink-0"
+                title="Clique para alterar o logo"
+              >
+                {appLogo ? (
+                  <img src={appLogo} alt="Logo" className="h-9 w-9 md:h-10 md:w-10 rounded-lg object-contain border bg-card" />
+                ) : (
+                  <div className="h-9 w-9 md:h-10 md:w-10 rounded-lg border border-dashed border-muted-foreground/40 bg-muted flex items-center justify-center">
+                    <ImagePlus className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="absolute inset-0 rounded-lg bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Pencil className="h-3.5 w-3.5 text-white" />
+                </div>
+              </button>
+            ) : appLogo ? (
+              <img src={appLogo} alt="Logo" className="h-9 w-9 md:h-10 md:w-10 rounded-lg object-contain border bg-card shrink-0" />
+            ) : null}
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-foreground">ContentFlow</h1>
               <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">{t("selectOrCreateClient")}</p>
@@ -849,7 +910,10 @@ const AdminDashboard = () => {
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-72 p-0">
           <SheetHeader className="border-b px-5 py-4">
-            <SheetTitle className="text-left text-lg font-bold">ContentFlow</SheetTitle>
+            <SheetTitle className="text-left text-lg font-bold flex items-center gap-2">
+              {appLogo && <img src={appLogo} alt="Logo" className="h-7 w-7 rounded-md object-contain" />}
+              ContentFlow
+            </SheetTitle>
           </SheetHeader>
           <div className="flex flex-col py-2">
             {role && (

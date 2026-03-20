@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserPlus, CheckCircle } from "lucide-react";
+import { useAppLogo } from "@/hooks/useAppLogo";
 
 const AcceptInvitePage = () => {
+  const appLogo = useAppLogo();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get("token") || "";
@@ -95,6 +97,7 @@ const AcceptInvitePage = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
+          {appLogo && <img src={appLogo} alt="Logo" className="h-14 w-14 rounded-xl object-contain mx-auto mb-3" />}
           <h1 className="text-2xl font-bold text-foreground">ContentFlow</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Configure sua senha para acessar o painel
