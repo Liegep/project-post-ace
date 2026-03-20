@@ -38,9 +38,11 @@ export default function CommemorativeDatesPage() {
     selectedCountries,
     selectedCategory,
     searchQuery,
+    favoriteCountries,
     setSelectedCategory,
     setSearchQuery,
     toggleCountry,
+    toggleFavorite,
     setSelectedCountries,
     refetch,
   } = useCommemorativeDates();
