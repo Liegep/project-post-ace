@@ -6,7 +6,7 @@ import { CalendarHeart, Star, FileText } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { UseDateAsBriefDialog } from "./UseDateAsBriefDialog";
+import { CreateBriefFromIdeaDialog } from "./CreateBriefFromIdeaDialog";
 import type { CommemorativeDate } from "@/hooks/useCommemorativeDates";
 
 const MONTH_NAMES = [
@@ -127,7 +127,7 @@ export function CommemorativeDatesWidget() {
                     <FileText className="h-3.5 w-3.5 text-primary" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="left"><p className="text-xs">Usar como pauta</p></TooltipContent>
+                <TooltipContent side="left"><p className="text-xs">Criar pauta</p></TooltipContent>
               </Tooltip>
             </div>
           ))}
@@ -135,13 +135,12 @@ export function CommemorativeDatesWidget() {
       </div>
 
       {briefDate && (
-        <UseDateAsBriefDialog
+        <CreateBriefFromIdeaDialog
           open={!!briefDate}
           onOpenChange={(open) => { if (!open) setBriefDate(null); }}
-          dateName={briefDate.name}
-          dateMonth={briefDate.date_month}
-          dateDay={briefDate.date_day}
-          dateDescription={briefDate.description}
+          title={briefDate.name}
+          description={briefDate.description || `Conteúdo inspirado na data comemorativa: ${briefDate.name} (${briefDate.date_day}/${briefDate.date_month})`}
+          plannedDate={new Date(new Date().getFullYear(), briefDate.date_month - 1, briefDate.date_day)}
         />
       )}
     </TooltipProvider>
