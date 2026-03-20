@@ -78,6 +78,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
   const [invSurcharge, setInvSurcharge] = useState(String(invoice.surcharge || 0));
   const [invNotes, setInvNotes] = useState(invoice.notes || "");
   const [invDueDate, setInvDueDate] = useState(invoice.due_date);
+  const [invPaymentMethod, setInvPaymentMethod] = useState((invoice as any).payment_method || "");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -88,6 +89,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     setInvSurcharge(String(invoice.surcharge || 0));
     setInvNotes(invoice.notes || "");
     setInvDueDate(invoice.due_date);
+    setInvPaymentMethod((invoice as any).payment_method || "");
   }, [invoice]);
 
   const subtotal = items.reduce((sum, i) => sum + Number(i.total_price || 0), 0);
@@ -176,6 +178,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         surcharge: Number(invSurcharge) || 0,
         notes: invNotes,
         due_date: invDueDate,
+        payment_method: invPaymentMethod,
       } as any);
       toast({ title: "Fatura atualizada" });
       setEditingInvoice(false);
@@ -260,6 +263,31 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
 
         {/* Actions */}
         <div className="flex flex-wrap gap-2">
+          {invoice.status !== "paid" ? (
+            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={async () => {
+              await updateInvoice(invoice.id, { 
+                status: "paid", 
+                paid_at: new Date().toISOString(),
+              } as any);
+              setInvStatus("paid");
+              toast({ title: "Fatura marcada como paga" });
+              onUpdate();
+            }}>
+              <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Marcar como Paga
+            </Button>
+          ) : (
+            <Button size="sm" variant="outline" onClick={async () => {
+              await updateInvoice(invoice.id, { 
+                status: "open", 
+                paid_at: null,
+              } as any);
+              setInvStatus("open");
+              toast({ title: "Fatura reaberta" });
+              onUpdate();
+            }}>
+              <Clock className="h-3.5 w-3.5 mr-1" /> Reverter para Aberta
+            </Button>
+          )}
           <Button size="sm" variant="outline" onClick={() => setEditingInvoice(!editingInvoice)}>
             <Pencil className="h-3.5 w-3.5 mr-1" /> Editar
           </Button>
@@ -270,6 +298,15 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
             <Trash2 className="h-3.5 w-3.5 mr-1" /> Excluir
           </Button>
         </div>
+
+        {/* Payment info */}
+        {invoice.status === "paid" && (invoice as any).paid_at && (
+          <div className="flex items-center gap-2 text-sm bg-emerald-500/10 text-emerald-600 rounded-lg px-3 py-2">
+            <CheckCircle2 className="h-4 w-4" />
+            <span>Paga em {format(new Date((invoice as any).paid_at), "dd/MM/yyyy")}</span>
+            {(invoice as any).payment_method && <span>• {(invoice as any).payment_method}</span>}
+          </div>
+        )}
 
         {/* Edit invoice section */}
         {editingInvoice && (
@@ -305,6 +342,21 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
             <div>
               <Label className="text-xs">Observações</Label>
               <Textarea value={invNotes} onChange={e => setInvNotes(e.target.value)} rows={3} />
+            </div>
+            <div>
+              <Label className="text-xs">Método de pagamento</Label>
+              <Select value={invPaymentMethod} onValueChange={setInvPaymentMethod}>
+                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="Pix">Pix</SelectItem>
+                  <SelectItem value="Transferência">Transferência</SelectItem>
+                  <SelectItem value="Boleto">Boleto</SelectItem>
+                  <SelectItem value="Cartão">Cartão</SelectItem>
+                  <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                  <SelectItem value="Outro">Outro</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <Button size="sm" onClick={handleSaveInvoice}>Salvar alterações</Button>
           </div>

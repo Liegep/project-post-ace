@@ -17,6 +17,8 @@ export interface Invoice {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  paid_at: string | null;
+  payment_method: string;
   clients?: { name: string; logo_url: string; slug: string };
 }
 

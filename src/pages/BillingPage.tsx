@@ -128,6 +128,21 @@ const BillingPage = () => {
     fetchTotals();
   }, [invoices]);
 
+  // Auto-mark overdue invoices
+  useEffect(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    invoices.forEach(async (inv) => {
+      if (inv.status === "open" && inv.due_date) {
+        const due = new Date(inv.due_date);
+        due.setHours(0, 0, 0, 0);
+        if (due < today) {
+          await updateInvoice(inv.id, { status: "overdue" } as any);
+        }
+      }
+    });
+  }, [invoices]);
+
   const filtered = invoices.filter(inv => {
     if (filterClient !== "all" && inv.client_id !== filterClient) return false;
     if (filterStatus !== "all" && inv.status !== filterStatus) return false;
