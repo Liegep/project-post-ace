@@ -110,17 +110,24 @@ const AgendaPage = () => {
         appointmentDate: format(formDate, "yyyy-MM-dd"),
       });
     } else {
-      // Generate dates for the repeat period
+      // Build date list based on repeat mode
+      const endDate = formRepeatEnd || addDays(formDate, 30); // default 30 days if no end set
+      const allDays = eachDayOfInterval({ start: formDate, end: endDate });
+
       let dates: Date[] = [];
-      if (formRepeat === "week") {
-        const weekStart = startOfWeek(formDate, { weekStartsOn: 1 });
-        const weekEnd = endOfWeek(formDate, { weekStartsOn: 1 });
-        dates = eachDayOfInterval({ start: weekStart, end: weekEnd });
-      } else {
-        const monthStart = startOfMonth(formDate);
-        const monthEnd = endOfMonth(formDate);
-        dates = eachDayOfInterval({ start: monthStart, end: monthEnd });
+      if (formRepeat === "daily") {
+        dates = allDays;
+      } else if (formRepeat === "weekly") {
+        // Same weekday as formDate
+        const targetDay = formDate.getDay();
+        dates = allDays.filter(d => d.getDay() === targetDay);
+      } else if (formRepeat === "weekdays") {
+        dates = allDays.filter(d => d.getDay() >= 1 && d.getDay() <= 5);
+      } else if (formRepeat === "custom_days") {
+        dates = allDays.filter(d => formCustomDays.includes(d.getDay()));
       }
+
+      if (dates.length === 0) dates = [formDate];
 
       const inputs = dates.map(d => ({
         ...baseInput,
@@ -139,6 +146,8 @@ const AgendaPage = () => {
     setFormCategory("");
     setFormTagId(null);
     setFormRepeat("none");
+    setFormRepeatEnd(undefined);
+    setFormCustomDays([]);
   };
 
   const openCreateForDate = (date?: Date) => {
@@ -149,6 +158,8 @@ const AgendaPage = () => {
     setFormCategory("");
     setFormTagId(null);
     setFormRepeat("none");
+    setFormRepeatEnd(undefined);
+    setFormCustomDays([]);
     setDialogOpen(true);
   };
 
