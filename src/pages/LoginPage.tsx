@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogIn, ArrowLeft, Mail } from "lucide-react";
+import { useAppLogo } from "@/hooks/useAppLogo";
 
 const LoginPage = () => {
   const navigate = useNavigate();
