@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Plus, Pencil, Trash2, Search, CalendarHeart, X } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Search, CalendarHeart, X, Star } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import UserProfileMenu from "@/components/UserProfileMenu";
@@ -38,9 +38,11 @@ export default function CommemorativeDatesPage() {
     selectedCountries,
     selectedCategory,
     searchQuery,
+    favoriteCountries,
     setSelectedCategory,
     setSearchQuery,
     toggleCountry,
+    toggleFavorite,
     setSelectedCountries,
     refetch,
   } = useCommemorativeDates();
@@ -214,24 +216,35 @@ export default function CommemorativeDatesPage() {
           {/* Country filter chips */}
           <div className="flex flex-wrap gap-1.5">
             {countries.map((c) => (
-              <button
-                key={c.name}
-                onClick={() => toggleCountry(c.name)}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all border",
-                  selectedCountries.includes(c.name)
-                    ? "border-transparent text-white shadow-sm"
-                    : "border-border bg-card text-muted-foreground hover:bg-muted"
-                )}
-                style={
-                  selectedCountries.includes(c.name)
-                    ? { backgroundColor: c.color }
-                    : undefined
-                }
-              >
-                <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: c.color }} />
-                {c.name}
-              </button>
+              <div key={c.name} className="inline-flex items-center gap-0">
+                <button
+                  onClick={() => toggleFavorite(c.name)}
+                  className="p-1 hover:scale-110 transition-transform"
+                  title={c.isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                >
+                  <Star className={cn(
+                    "h-3 w-3",
+                    c.isFavorite ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40"
+                  )} />
+                </button>
+                <button
+                  onClick={() => toggleCountry(c.name)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all border",
+                    selectedCountries.includes(c.name)
+                      ? "border-transparent text-white shadow-sm"
+                      : "border-border bg-card text-muted-foreground hover:bg-muted"
+                  )}
+                  style={
+                    selectedCountries.includes(c.name)
+                      ? { backgroundColor: c.color }
+                      : undefined
+                  }
+                >
+                  <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: c.color }} />
+                  {c.name}
+                </button>
+              </div>
             ))}
             {selectedCountries.length > 0 && (
               <button

@@ -26,6 +26,8 @@ export function useCommemorativeDates() {
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [favoriteCountries, setFavoriteCountries] = useState<string[]>([]);
+  const [favoritesLoaded, setFavoritesLoaded] = useState(false);
 
   const fetchDates = async () => {
     setLoading(true);
@@ -38,8 +40,40 @@ export function useCommemorativeDates() {
     setLoading(false);
   };
 
+  const fetchFavorites = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase
+      .from("user_favorite_countries")
+      .select("country")
+      .eq("user_id", user.id);
+    const favs = (data || []).map((f: any) => f.country);
+    setFavoriteCountries(favs);
+    setFavoritesLoaded(true);
+  };
+
+  const toggleFavorite = async (country: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    if (favoriteCountries.includes(country)) {
+      await supabase
+        .from("user_favorite_countries")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("country", country);
+      setFavoriteCountries((prev) => prev.filter((c) => c !== country));
+    } else {
+      await supabase
+        .from("user_favorite_countries")
+        .insert({ user_id: user.id, country });
+      setFavoriteCountries((prev) => [...prev, country]);
+    }
+  };
+
   useEffect(() => {
     fetchDates();
+    fetchFavorites();
   }, []);
 
   const countries = useMemo(() => {
@@ -49,12 +83,20 @@ export function useCommemorativeDates() {
         map.set(d.country, { code: d.country_code, color: d.country_color });
       }
     });
-    return Array.from(map.entries()).map(([name, info]) => ({
+    const list = Array.from(map.entries()).map(([name, info]) => ({
       name,
       code: info.code,
       color: info.color,
+      isFavorite: favoriteCountries.includes(name),
     }));
-  }, [dates]);
+    // Sort: favorites first
+    list.sort((a, b) => {
+      if (a.isFavorite && !b.isFavorite) return -1;
+      if (!a.isFavorite && b.isFavorite) return 1;
+      return a.name.localeCompare(b.name);
+    });
+    return list;
+  }, [dates, favoriteCountries]);
 
   const filteredDates = useMemo(() => {
     let result = dates;
@@ -74,6 +116,14 @@ export function useCommemorativeDates() {
     }
     return result;
   }, [dates, selectedCountries, selectedCategory, searchQuery]);
+
+  // For the widget: show only favorites if set, otherwise all
+  const widgetDates = useMemo(() => {
+    if (favoriteCountries.length > 0) {
+      return dates.filter((d) => favoriteCountries.includes(d.country));
+    }
+    return dates;
+  }, [dates, favoriteCountries]);
 
   const upcomingDates = useMemo(() => {
     const now = new Date();
@@ -104,14 +154,14 @@ export function useCommemorativeDates() {
     const weekEnd = new Date(today);
     weekEnd.setDate(weekEnd.getDate() + 7);
 
-    return filteredDates.filter((d) => {
+    return widgetDates.filter((d) => {
       const dateThisYear = new Date(year, d.date_month - 1, d.date_day);
       return dateThisYear >= today && dateThisYear <= weekEnd;
     }).sort((a, b) => {
       if (a.date_month !== b.date_month) return a.date_month - b.date_month;
       return a.date_day - b.date_day;
     });
-  }, [filteredDates]);
+  }, [widgetDates]);
 
   const getDatesByMonthDay = (month: number, day: number) => {
     return filteredDates.filter(
@@ -137,10 +187,12 @@ export function useCommemorativeDates() {
     selectedCountries,
     selectedCategory,
     searchQuery,
+    favoriteCountries,
     setSelectedCountries,
     setSelectedCategory,
     setSearchQuery,
     toggleCountry,
+    toggleFavorite,
     getDatesByMonthDay,
     refetch: fetchDates,
   };
