@@ -168,6 +168,8 @@ const AdminDashboard = () => {
   const [clientUsersMap, setClientUsersMap] = useState<ClientUserMap>({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navDrawerOpen, setNavDrawerOpen] = useState(false);
+  const [appLogo, setAppLogo] = useState<string | null>(null);
+  const appLogoInputRef = useRef<HTMLInputElement>(null);
 
   const fetchStatusNotifs = async () => {
     const { data } = await supabase
