@@ -206,7 +206,7 @@ const BillingPage = () => {
               <span className="text-xs font-medium text-muted-foreground">Total Faturado</span>
             </div>
             <p className="text-lg font-bold">
-              R$ {financialSummary.totalBilled.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              {formatCurrency(financialSummary.totalBilled)}
             </p>
           </Card>
           <Card className="p-3 border-l-4 border-l-emerald-500">
@@ -215,7 +215,7 @@ const BillingPage = () => {
               <span className="text-xs font-medium text-muted-foreground">Total Recebido</span>
             </div>
             <p className="text-lg font-bold text-emerald-600">
-              R$ {financialSummary.totalReceived.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              {formatCurrency(financialSummary.totalReceived)}
             </p>
           </Card>
           <Card className="p-3 border-l-4 border-l-amber-500">
@@ -224,7 +224,7 @@ const BillingPage = () => {
               <span className="text-xs font-medium text-muted-foreground">Total Pendente</span>
             </div>
             <p className="text-lg font-bold text-amber-600">
-              R$ {financialSummary.totalPending.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              {formatCurrency(financialSummary.totalPending)}
             </p>
           </Card>
           <Card className="p-3 border-l-4 border-l-red-500">
@@ -233,7 +233,7 @@ const BillingPage = () => {
               <span className="text-xs font-medium text-muted-foreground">Total Atrasado</span>
             </div>
             <p className="text-lg font-bold text-red-600">
-              R$ {financialSummary.totalOverdue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              {formatCurrency(financialSummary.totalOverdue)}
             </p>
           </Card>
         </div>
@@ -357,7 +357,7 @@ const BillingPage = () => {
                     </div>
                     <div className="text-right shrink-0">
                       <p className="text-sm font-bold">
-                        R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                        {formatCurrency(total, inv.clients?.billing_currency)}
                       </p>
                       <Badge variant="outline" className={`text-[10px] mt-1 ${cfg.color}`}>
                         <Icon className="h-3 w-3 mr-1" />
