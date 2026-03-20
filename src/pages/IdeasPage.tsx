@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Plus, ArrowLeft, Trash2, MoreVertical, Pencil, FileText, CheckCircle2, Filter } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import UserProfileMenu from "@/components/UserProfileMenu";
@@ -225,6 +226,29 @@ const IdeasPage = () => {
           <h1 className="text-base md:text-xl font-bold text-foreground truncate">💡 Ideias de Pauta</h1>
         </div>
         <div className="flex items-center gap-2">
+          {/* Add column button in header */}
+          <Popover open={addingCol} onOpenChange={setAddingCol}>
+            <PopoverTrigger asChild>
+              <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-yellow-950 h-8 text-xs gap-1">
+                <Plus className="h-3.5 w-3.5" /> Nova coluna
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64 p-3" align="end">
+              <div className="space-y-2">
+                <Input
+                  placeholder="Nome da coluna"
+                  value={newColName}
+                  onChange={(e) => setNewColName(e.target.value)}
+                  autoFocus
+                  onKeyDown={(e) => e.key === "Enter" && addColumn()}
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={addColumn}>Criar</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setAddingCol(false)}>Cancelar</Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
           {/* Status filter */}
           <div className="flex items-center gap-1">
             <Filter className="h-3.5 w-3.5 text-muted-foreground hidden sm:block" />
@@ -357,32 +381,6 @@ const IdeasPage = () => {
           );
         })}
 
-        {/* Add column */}
-        <div className="flex-shrink-0 w-72 md:w-80">
-          {addingCol ? (
-            <div className="bg-muted rounded-lg p-3 space-y-2">
-              <Input
-                placeholder="Nome da coluna"
-                value={newColName}
-                onChange={(e) => setNewColName(e.target.value)}
-                autoFocus
-                onKeyDown={(e) => e.key === "Enter" && addColumn()}
-              />
-              <div className="flex gap-2">
-                <Button size="sm" onClick={addColumn}>Criar</Button>
-                <Button size="sm" variant="ghost" onClick={() => setAddingCol(false)}>Cancelar</Button>
-              </div>
-            </div>
-          ) : (
-            <Button
-              variant="outline"
-              className="w-full justify-start border-dashed h-12"
-              onClick={() => setAddingCol(true)}
-            >
-              <Plus className="h-4 w-4 mr-2" /> Nova coluna
-            </Button>
-          )}
-        </div>
       </div>
 
       {/* Add idea dialog */}
