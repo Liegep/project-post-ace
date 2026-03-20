@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon } from "lucide-react";
@@ -800,7 +799,6 @@ const AdminDashboard = () => {
           </div>
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-3">
-            <LanguageSelector />
             {isAdmin && (
               <Button variant="outline" size="sm" onClick={() => navigate("/team-management")}>
                 <Users className="mr-1 h-4 w-4" /> {t("team")}
@@ -811,26 +809,9 @@ const AdminDashboard = () => {
                 <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
               </Button>
             )}
-            <Button variant="ghost" size="icon" onClick={() => navigate("/ideas")} title="Ideias de Pauta">
-              <Lightbulb className="h-5 w-5" />
+            <Button variant="ghost" size="icon" onClick={() => setNavDrawerOpen(true)} title="Menu">
+              <Menu className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/calendar")} title="Calendário de Posts">
-              <Calendar className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/briefs")} title="Pautas">
-              <FileText className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/reports")} title="Relatórios">
-              <FileBarChart className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={() => navigate("/commemorative-dates")} title="Datas Comemorativas">
-              <CalendarHeart className="h-5 w-5" />
-            </Button>
-            {isAdmin && (
-              <Button variant="ghost" size="icon" onClick={() => navigate("/activity-log")} title="Registro de Atividades">
-                <HistoryIcon className="h-5 w-5" />
-              </Button>
-            )}
             {isAdmin && (
               <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Plus className="mr-2 h-4 w-4" /> Clientes
