@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { generateInvoicePDF } from "@/lib/invoicePdf";
+import { formatCurrency } from "@/lib/currency";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   open: { label: "Aberta", color: "bg-blue-500/15 text-blue-600", icon: Clock },
