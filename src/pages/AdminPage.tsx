@@ -14,7 +14,8 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2 } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { ClientNotes } from "@/components/ClientNotes";
 import { ClientLinksPanel } from "@/components/ClientLinksPanel";
@@ -491,6 +492,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, reorderColumns,
   } = usePosts();
   const { t } = useI18n();
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
@@ -508,6 +510,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const editColumnInputRef = useRef<HTMLInputElement>(null);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
 
+  const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
   // Notes panel state
   const [notesCount, setNotesCount] = useState(0);
   const [notesOpen, setNotesOpen] = useState(false);
@@ -699,18 +702,18 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card px-6 py-4">
-        <div className="mx-auto flex max-w-full items-center justify-between">
-          <div className="flex items-center gap-4">
+      <header className="border-b bg-card px-4 py-3 sm:px-6 sm:py-4">
+        <div className="mx-auto flex max-w-full items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <button
               onClick={() => navigate("/admin")}
-              className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
             <button
               onClick={() => logoInputRef.current?.click()}
-              className="group relative flex h-10 w-10 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-primary overflow-hidden transition-colors"
+              className="group relative flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/30 hover:border-primary overflow-hidden transition-colors shrink-0"
             >
               {companyLogo ? (
                 <>
@@ -720,16 +723,18 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   </div>
                 </>
               ) : (
-                <ImagePlus className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+                <ImagePlus className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
               )}
             </button>
             <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
-            <div>
-              <h1 className="text-2xl font-bold text-foreground cursor-pointer hover:text-primary transition-colors" onClick={() => window.open(`/client/${clientData.slug}`, '_blank')}>{clientData.name}</h1>
-              <p className="text-sm text-muted-foreground">{t("adminSubtitle")}</p>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold text-foreground cursor-pointer hover:text-primary transition-colors truncate" onClick={() => window.open(`/client/${clientData.slug}`, '_blank')}>{clientData.name}</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">{t("adminSubtitle")}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+
+          {/* Desktop actions */}
+          <div className="hidden md:flex items-center gap-3">
             <LanguageSelector />
             <div className="flex rounded-lg border bg-muted p-1">
               <button
@@ -824,26 +829,211 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               </SheetContent>
             </Sheet>
           </div>
+
+          {/* Mobile actions */}
+          <div className="flex md:hidden items-center gap-1.5">
+            <Button size="sm" onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90 h-8 px-2.5">
+              <Plus className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setSettingsDrawerOpen(true)}>
+              <Settings2 className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-full p-6">
+      {/* Mobile settings drawer */}
+      <Sheet open={settingsDrawerOpen} onOpenChange={setSettingsDrawerOpen}>
+        <SheetContent side="right" className="w-[300px] overflow-y-auto p-0">
+          <SheetHeader className="border-b px-5 py-4">
+            <SheetTitle className="text-left text-base">Configurações</SheetTitle>
+          </SheetHeader>
+          <div className="flex flex-col divide-y">
+            {/* View toggle */}
+            <div className="px-5 py-4">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Visualização</p>
+              <div className="flex rounded-lg border bg-muted p-1">
+                <button
+                  onClick={() => setView("kanban")}
+                  className={`flex-1 rounded-md px-3 py-1.5 text-sm transition-colors ${view === "kanban" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+                >
+                  <LayoutGrid className="h-4 w-4 mx-auto" />
+                </button>
+                <button
+                  onClick={() => setView("list")}
+                  className={`flex-1 rounded-md px-3 py-1.5 text-sm transition-colors ${view === "list" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+                >
+                  <List className="h-4 w-4 mx-auto" />
+                </button>
+              </div>
+            </div>
+
+            {/* Quick actions */}
+            <div className="px-5 py-4 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Ações</p>
+              <Button
+                variant={selectionMode ? "default" : "outline"}
+                size="sm"
+                className="w-full justify-start"
+                onClick={() => { selectionMode ? exitSelectionMode() : setSelectionMode(true); setSettingsDrawerOpen(false); }}
+              >
+                <CheckSquare className="mr-2 h-4 w-4" /> {selectionMode ? t("cancel") : t("select")}
+              </Button>
+              {!trackingEnabled && (
+                <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => { enableTracking(); setSettingsDrawerOpen(false); }}>
+                  <ClipboardList className="mr-2 h-4 w-4" /> {t("createTracking")}
+                </Button>
+              )}
+            </div>
+
+            {/* Panels: Recados, Links, Acesso */}
+            <div className="px-5 py-4 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Painéis</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start relative"
+                onClick={() => { setSettingsDrawerOpen(false); setNotesOpen(true); }}
+              >
+                <StickyNote className="mr-2 h-4 w-4 text-amber-500" />
+                Recados
+                {notesCount > 0 && (
+                  <span className="ml-auto rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    {notesCount}
+                  </span>
+                )}
+              </Button>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full justify-start relative" onClick={() => setSettingsDrawerOpen(false)}>
+                    <LinkIcon className="mr-2 h-4 w-4 text-blue-500" />
+                    Links
+                    {linksCount > 0 && (
+                      <span className="ml-auto rounded-full bg-blue-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                        {linksCount}
+                      </span>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-full sm:w-[440px] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-2">
+                      <LinkIcon className="h-5 w-5 text-blue-500" />
+                      Links do Cliente
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6">
+                    <ClientLinksPanel clientId={clientData.id} onCountChange={setLinksCount} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => setSettingsDrawerOpen(false)}>
+                    <UserPlus className="mr-2 h-4 w-4 text-green-500" />
+                    Acesso do Cliente
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-full sm:w-[440px] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-2">
+                      <UserPlus className="h-5 w-5 text-green-500" />
+                      Acesso do Cliente
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6">
+                    <ClientAccessPanel clientId={clientData.id} clientName={clientData.name} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+
+            {/* Permissions */}
+            <div className="px-5 py-4 space-y-3">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Permissões do Cliente</p>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground flex items-center gap-2">
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                  Editar legenda
+                </label>
+                <Switch checked={allowClientEditCaption} onCheckedChange={toggleAllowClientEditCaption} />
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground flex items-center gap-2">
+                  <Plus className="h-3.5 w-3.5 text-muted-foreground" />
+                  Criar posts
+                </label>
+                <Switch checked={allowClientCreatePost} onCheckedChange={toggleAllowClientCreatePost} />
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground flex items-center gap-2">
+                  <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                  Mostrar arquivados
+                </label>
+                <Switch checked={showArchivedToClient} onCheckedChange={toggleShowArchivedToClient} />
+              </div>
+              {trackingEnabled && (
+                <>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm text-foreground flex items-center gap-2">
+                      <ClipboardList className="h-3.5 w-3.5 text-muted-foreground" />
+                      Tracking ativo
+                    </label>
+                    <Switch checked={trackingEnabled} onCheckedChange={(checked) => { if (!checked) disableTracking(); }} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm text-foreground flex items-center gap-2">
+                      <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                      Tracking visível
+                    </label>
+                    <Switch checked={trackingVisibleToClient} onCheckedChange={async (visible) => {
+                      setTrackingVisibleToClient(visible);
+                      await supabase.from("clients").update({ tracking_visible_to_client: visible }).eq("id", clientData.id);
+                    }} />
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Language */}
+            <div className="px-5 py-4">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Idioma</p>
+              <LanguageSelector />
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Mobile notes sheet (opened from settings drawer) */}
+      <Sheet open={notesOpen} onOpenChange={setNotesOpen}>
+        <SheetContent className="w-full sm:w-[540px] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <StickyNote className="h-5 w-5 text-amber-500" />
+              {t("clientNotes")}
+            </SheetTitle>
+          </SheetHeader>
+          <div className="mt-4">
+            <ClientNotes clientId={clientData.id} onCountChange={setNotesCount} />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <main className="mx-auto max-w-full p-4 sm:p-6">
         {/* Tab switcher */}
-        <div className="mb-6 flex items-center justify-center gap-2">
+        <div className="mb-6 flex flex-col sm:flex-row items-center justify-center gap-2">
           <div className="flex rounded-lg border bg-muted p-1">
             <button
               onClick={() => setActiveTab("board")}
               className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "board" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
               <LayoutGrid className="mr-1.5 inline h-4 w-4" /> {t("board")}
-              
             </button>
             <button
               onClick={() => setActiveTab("archived")}
               className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "archived" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
               <Archive className="mr-1.5 inline h-4 w-4" /> {t("archived")}
-              
               {archivedPosts.length > 0 && (
                 <span className="ml-1.5 rounded-full bg-muted-foreground/20 px-1.5 py-0.5 text-[10px] font-semibold">
                   {archivedPosts.length}
@@ -851,8 +1041,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               )}
             </button>
           </div>
+          {/* Desktop-only permission toggles */}
           {activeTab === "archived" && (
-            <div className="flex items-center gap-2 ml-3">
+            <div className="hidden md:flex items-center gap-2 ml-3">
               <Switch
                 id="show-archived-client"
                 checked={showArchivedToClient}
@@ -865,7 +1056,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </div>
           )}
           {activeTab === "board" && (
-            <div className="flex items-center gap-4 ml-3">
+            <div className="hidden md:flex items-center gap-4 ml-3">
               <div className="flex items-center gap-2">
                 <Switch
                   id="allow-client-edit-caption"
