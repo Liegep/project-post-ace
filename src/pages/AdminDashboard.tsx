@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { logActivity } from "@/lib/activityLogger";
 import { cn } from "@/lib/utils";
@@ -22,6 +22,7 @@ import InviteAdminDialog from "@/components/InviteAdminDialog";
 import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
 import { CommemorativeDatesWidget } from "@/components/CommemorativeDatesWidget";
 import { PostDetailDialog } from "@/components/PostDetailDialog";
+import { RecentReportsWidget } from "@/components/RecentReportsWidget";
 
 const CLIENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
   standard: { label: "Padrão", color: "bg-muted text-muted-foreground" },
@@ -819,6 +820,9 @@ const AdminDashboard = () => {
             <Button variant="ghost" size="icon" onClick={() => navigate("/briefs")} title="Pautas">
               <FileText className="h-5 w-5" />
             </Button>
+            <Button variant="ghost" size="icon" onClick={() => navigate("/reports")} title="Relatórios">
+              <FileBarChart className="h-5 w-5" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => navigate("/commemorative-dates")} title="Datas Comemorativas">
               <CalendarHeart className="h-5 w-5" />
             </Button>
@@ -892,6 +896,9 @@ const AdminDashboard = () => {
               <button onClick={() => { setMobileMenuOpen(false); navigate("/briefs"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
                 <FileText className="h-4 w-4 text-muted-foreground" /> Pautas
               </button>
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/reports"); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                <FileBarChart className="h-4 w-4 text-muted-foreground" /> Relatórios
+              </button>
             </nav>
             <div className="border-t mt-2 pt-2 px-5">
               <LanguageSelector />
@@ -906,6 +913,9 @@ const AdminDashboard = () => {
 
         {/* Commemorative dates widget */}
         <CommemorativeDatesWidget />
+
+        {/* Recent reports widget */}
+        <RecentReportsWidget />
 
         {/* Today's posts reminder */}
         {todayPosts.length > 0 && (
