@@ -1,17 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, ArrowLeft, Trash2, MoreVertical, GripVertical, Pencil, FileText } from "lucide-react";
+import { Plus, ArrowLeft, Trash2, MoreVertical, Pencil, FileText, CheckCircle2, Filter } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { MobileNav } from "@/components/MobileNav";
+import { CreateBriefFromIdeaDialog } from "@/components/CreateBriefFromIdeaDialog";
 
 interface IdeaColumn {
   id: string;
@@ -28,18 +30,19 @@ interface Idea {
   description: string;
   position: number;
   created_at: string;
+  converted_to_brief: boolean;
+  converted_at: string | null;
+  converted_brief_id: string | null;
 }
 
-interface SimpleClient {
-  id: string;
-  name: string;
-}
+type StatusFilter = "all" | "available" | "converted";
 
 const IdeasPage = () => {
   const navigate = useNavigate();
   const [columns, setColumns] = useState<IdeaColumn[]>([]);
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   // New column
   const [newColName, setNewColName] = useState("");
@@ -61,9 +64,6 @@ const IdeasPage = () => {
 
   // Convert to brief
   const [convertingIdea, setConvertingIdea] = useState<Idea | null>(null);
-  const [clients, setClients] = useState<SimpleClient[]>([]);
-  const [selectedClientId, setSelectedClientId] = useState("");
-  const [converting, setConverting] = useState(false);
 
   useEffect(() => {
     fetchAll();
@@ -84,44 +84,25 @@ const IdeasPage = () => {
     setLoading(false);
   };
 
-  const fetchClients = async () => {
-    const { data } = await supabase.from("clients").select("id, name").order("name");
-    setClients((data as SimpleClient[]) || []);
-  };
+  const filteredIdeas = useMemo(() => {
+    if (statusFilter === "all") return ideas;
+    if (statusFilter === "converted") return ideas.filter(i => i.converted_to_brief);
+    return ideas.filter(i => !i.converted_to_brief);
+  }, [ideas, statusFilter]);
 
-  const openConvertDialog = (idea: Idea) => {
-    setConvertingIdea(idea);
-    setSelectedClientId("");
-    fetchClients();
-  };
+  const convertedCount = useMemo(() => ideas.filter(i => i.converted_to_brief).length, [ideas]);
+  const availableCount = useMemo(() => ideas.filter(i => !i.converted_to_brief).length, [ideas]);
 
-  const convertToBrief = async () => {
-    if (!convertingIdea || !selectedClientId) return;
-    setConverting(true);
+  const handleBriefCreated = async (briefId: string) => {
+    if (!convertingIdea) return;
+    // Mark idea as converted
+    await supabase.from("ideas").update({
+      converted_to_brief: true,
+      converted_at: new Date().toISOString(),
+      converted_brief_id: briefId,
+    } as any).eq("id", convertingIdea.id);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setConverting(false); return; }
-
-    const { error: briefError } = await supabase.from("content_briefs").insert({
-      client_id: selectedClientId,
-      title: convertingIdea.title,
-      description: convertingIdea.description || "",
-      status: "draft" as const,
-      created_by: user.id,
-    });
-
-    if (briefError) {
-      toast({ title: "Erro ao criar pauta", description: briefError.message, variant: "destructive" });
-      setConverting(false);
-      return;
-    }
-
-    // Delete the idea card
-    await supabase.from("ideas").delete().eq("id", convertingIdea.id);
-
-    toast({ title: "Ideia convertida em pauta!", description: "A pauta foi criada como rascunho na página de Pautas." });
     setConvertingIdea(null);
-    setConverting(false);
     fetchAll();
   };
 
@@ -243,19 +224,43 @@ const IdeasPage = () => {
           </Button>
           <h1 className="text-base md:text-xl font-bold text-foreground truncate">💡 Ideias de Pauta</h1>
         </div>
-        <UserProfileMenu />
+        <div className="flex items-center gap-2">
+          {/* Status filter */}
+          <div className="flex items-center gap-1">
+            <Filter className="h-3.5 w-3.5 text-muted-foreground hidden sm:block" />
+            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+              <SelectTrigger className="h-8 w-[140px] text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas ({ideas.length})</SelectItem>
+                <SelectItem value="available">Disponíveis ({availableCount})</SelectItem>
+                <SelectItem value="converted">Convertidas ({convertedCount})</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <UserProfileMenu />
+        </div>
       </header>
 
       {/* Board */}
       <div className="p-4 md:p-6 flex gap-4 overflow-x-auto min-h-[calc(100vh-73px)]">
         {columns.map((col) => {
-          const colIdeas = ideas.filter(i => i.column_id === col.id).sort((a, b) => a.position - b.position);
+          const colIdeas = filteredIdeas
+            .filter(i => i.column_id === col.id)
+            .sort((a, b) => a.position - b.position);
+
           return (
-            <div key={col.id} className="flex-shrink-0 w-64 md:w-72">
+            <div key={col.id} className="flex-shrink-0 w-72 md:w-80">
               <div className="bg-muted rounded-lg p-3">
                 {/* Column header */}
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-foreground text-sm">{col.name}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-foreground text-sm">{col.name}</h3>
+                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
+                      {colIdeas.length}
+                    </Badge>
+                  </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-7 w-7">
@@ -276,13 +281,27 @@ const IdeasPage = () => {
                 {/* Ideas */}
                 <div className="space-y-2 mb-3">
                   {colIdeas.map((idea) => (
-                    <Card key={idea.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                    <Card
+                      key={idea.id}
+                      className={`hover:shadow-md transition-shadow ${idea.converted_to_brief ? "border-primary/20 bg-primary/5" : ""}`}
+                    >
                       <CardContent className="p-3">
                         <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0" onClick={() => { setEditingIdea(idea); setEditTitle(idea.title); setEditDesc(idea.description); }}>
+                          <div
+                            className="flex-1 min-w-0 cursor-pointer"
+                            onClick={() => { setEditingIdea(idea); setEditTitle(idea.title); setEditDesc(idea.description); }}
+                          >
                             <p className="font-medium text-sm text-foreground truncate">{idea.title}</p>
                             {idea.description && (
                               <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{idea.description}</p>
+                            )}
+                            {idea.converted_to_brief && (
+                              <div className="flex items-center gap-1 mt-1.5">
+                                <CheckCircle2 className="h-3 w-3 text-primary" />
+                                <span className="text-[10px] font-medium text-primary">
+                                  Transformada em pauta
+                                </span>
+                              </div>
                             )}
                           </div>
                           <DropdownMenu>
@@ -292,8 +311,8 @@ const IdeasPage = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openConvertDialog(idea)}>
-                                <FileText className="h-4 w-4 mr-2" /> Transformar em Pauta
+                              <DropdownMenuItem onClick={() => { setEditingIdea(idea); setEditTitle(idea.title); setEditDesc(idea.description); }}>
+                                <Pencil className="h-4 w-4 mr-2" /> Editar
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               {columns.filter(c => c.id !== col.id).map(targetCol => (
@@ -308,6 +327,17 @@ const IdeasPage = () => {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
+
+                        {/* Criar Pauta button — always visible */}
+                        <Button
+                          variant={idea.converted_to_brief ? "outline" : "secondary"}
+                          size="sm"
+                          className="w-full mt-2 h-7 text-xs gap-1.5"
+                          onClick={() => setConvertingIdea(idea)}
+                        >
+                          <FileText className="h-3 w-3" />
+                          {idea.converted_to_brief ? "Criar pauta novamente" : "Criar pauta"}
+                        </Button>
                       </CardContent>
                     </Card>
                   ))}
@@ -328,7 +358,7 @@ const IdeasPage = () => {
         })}
 
         {/* Add column */}
-        <div className="flex-shrink-0 w-64 md:w-72">
+        <div className="flex-shrink-0 w-72 md:w-80">
           {addingCol ? (
             <div className="bg-muted rounded-lg p-3 space-y-2">
               <Input
@@ -428,44 +458,16 @@ const IdeasPage = () => {
       </Dialog>
 
       {/* Convert to brief dialog */}
-      <Dialog open={!!convertingIdea} onOpenChange={() => setConvertingIdea(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Transformar em Pauta
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="rounded-lg border bg-muted/50 p-3">
-              <p className="font-medium text-sm text-foreground">{convertingIdea?.title}</p>
-              {convertingIdea?.description && (
-                <p className="text-xs text-muted-foreground mt-1">{convertingIdea.description}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Selecione o cliente</label>
-              <Select value={selectedClientId} onValueChange={setSelectedClientId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Escolha um cliente..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map(c => (
-                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <Button
-              onClick={convertToBrief}
-              disabled={!selectedClientId || converting}
-              className="w-full"
-            >
-              {converting ? "Convertendo..." : "Criar Pauta"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {convertingIdea && (
+        <CreateBriefFromIdeaDialog
+          open={!!convertingIdea}
+          onOpenChange={(open) => { if (!open) setConvertingIdea(null); }}
+          title={convertingIdea.title}
+          description={convertingIdea.description}
+          alreadyConverted={convertingIdea.converted_to_brief}
+          onCreated={handleBriefCreated}
+        />
+      )}
     </div>
   );
 };
