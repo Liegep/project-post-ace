@@ -46,6 +46,7 @@ const App = () => (
             <Route path="/ideas" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><IdeasPage /></AuthGuard>} />
             <Route path="/calendar" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CalendarPage /></AuthGuard>} />
             <Route path="/briefs" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><BriefsPage /></AuthGuard>} />
+            <Route path="/commemorative-dates" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CommemorativeDatesPage /></AuthGuard>} />
             <Route path="/client/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ClientPage /></AuthGuard>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
