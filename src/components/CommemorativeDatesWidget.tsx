@@ -148,26 +148,6 @@ export function CommemorativeDatesWidget() {
       </div>
 
       {/* Expand/collapse */}
-      {upcomingDates.length > 5 && (
-        <div className="px-4 py-2 border-t">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full h-7 text-xs text-muted-foreground"
-            onClick={() => setExpanded(!expanded)}
-          >
-            {expanded ? (
-              <>
-                <ChevronUp className="h-3 w-3 mr-1" /> Mostrar menos
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-3 w-3 mr-1" /> Ver mais ({upcomingDates.length - 5} restantes)
-              </>
-            )}
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
