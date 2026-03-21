@@ -150,9 +150,11 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
 function InvoiceRow({
   invoice,
   onSelect,
+  isNew,
 }: {
   invoice: Invoice;
   onSelect: (inv: Invoice) => void;
+  isNew?: boolean;
 }) {
   const cfg = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.open;
   const Icon = cfg.icon;
@@ -165,9 +167,16 @@ function InvoiceRow({
       <div className="flex items-center gap-3 min-w-0">
         <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
         <div className="min-w-0">
-          <p className="text-sm font-medium text-foreground truncate">
-            {invoice.title || `Fatura #${invoice.invoice_number}`}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium text-foreground truncate">
+              {invoice.title || `Fatura #${invoice.invoice_number}`}
+            </p>
+            {isNew && (
+              <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
+                Novo
+              </span>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">
             Vencimento: {format(new Date(invoice.due_date), "dd/MM/yyyy")}
           </p>
@@ -185,7 +194,7 @@ function InvoiceRow({
 }
 
 /* ── Main Panel ── */
-export function ClientInvoicesPanel({ clientId }: { clientId: string }) {
+export function ClientInvoicesPanel({ clientId, unseenIds }: { clientId: string; unseenIds?: Set<string> }) {
   const { invoices, loading } = useInvoices(clientId);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
