@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useMyBillingPermission } from "@/hooks/useBillingPermissions";
 import { useNavigate } from "react-router-dom";
 import ClientBriefs from "@/components/ClientBriefs";
 import { ClientInvoicesPanel } from "@/components/billing/ClientInvoicesPanel";
@@ -46,6 +47,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const { posts, archivedPosts, columns, tags, postingPeriod, unarchivePost } = usePosts();
   const navigate = useNavigate();
   const { data: reports = [] } = useSocialReports(clientData.id);
+  const { permission: billingPerm, loading: billingPermLoading } = useMyBillingPermission(clientData.id);
   const locale = (clientData.locale || "pt") as Locale;
   const t = useCallback(
     (key: keyof typeof translations.pt) => translations[locale]?.[key] || translations.pt[key] || key,
@@ -231,17 +233,23 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         )}
 
         {/* News Widget - unseen invoices & reports */}
-        <ClientNewsWidget clientId={clientData.id} showInvoices={clientData.show_invoices_to_client} />
+        <ClientNewsWidget clientId={clientData.id} showInvoices={clientData.show_invoices_to_client && !!billingPerm?.can_view_invoices} />
 
         {/* Client Briefs for Approval */}
         <div className="mb-8">
           <ClientBriefs clientId={clientData.id} clientName={clientData.name} />
         </div>
 
-        {/* Client Invoices - permanent section */}
-        {clientData.show_invoices_to_client && (
+        {/* Client Invoices - permission-controlled */}
+        {clientData.show_invoices_to_client && billingPerm?.can_view_invoices && (
           <div className="mb-8">
-            <ClientInvoicesPanel clientId={clientData.id} unseenIds={seenItemIds} />
+            <ClientInvoicesPanel
+              clientId={clientData.id}
+              unseenIds={seenItemIds}
+              canDownloadInvoices={billingPerm.can_download_invoices}
+              canViewAttachments={billingPerm.can_view_attachments}
+              canDownloadAttachments={billingPerm.can_download_attachments}
+            />
           </div>
         )}
 

@@ -252,6 +252,50 @@ export type Database = {
           },
         ]
       }
+      billing_access_logs: {
+        Row: {
+          action: string
+          client_id: string
+          created_at: string
+          document_id: string | null
+          document_name: string
+          document_type: string
+          id: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          action: string
+          client_id: string
+          created_at?: string
+          document_id?: string | null
+          document_name?: string
+          document_type: string
+          id?: string
+          user_id: string
+          user_name?: string
+        }
+        Update: {
+          action?: string
+          client_id?: string
+          created_at?: string
+          document_id?: string | null
+          document_name?: string
+          document_type?: string
+          id?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_access_logs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brief_attachments: {
         Row: {
           brief_id: string
@@ -371,6 +415,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "calendar_posts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_billing_permissions: {
+        Row: {
+          can_download_attachments: boolean
+          can_download_invoices: boolean
+          can_view_attachments: boolean
+          can_view_invoices: boolean
+          client_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          can_download_attachments?: boolean
+          can_download_invoices?: boolean
+          can_view_attachments?: boolean
+          can_view_invoices?: boolean
+          client_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          can_download_attachments?: boolean
+          can_download_invoices?: boolean
+          can_view_attachments?: boolean
+          can_view_invoices?: boolean
+          client_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_billing_permissions_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"

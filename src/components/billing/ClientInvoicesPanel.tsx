@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useInvoices, useInvoiceItems, useInvoiceAttachments, Invoice } from "@/hooks/useInvoices";
+import { logBillingAccess } from "@/hooks/useBillingPermissions";
+import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +27,14 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }>
 const MAX_RECENT = 3;
 
 /* ── Invoice Detail (inside dialog) ── */
-function InvoiceDetail({ invoice }: { invoice: Invoice }) {
+interface InvoiceDetailProps {
+  invoice: Invoice;
+  canDownloadInvoices?: boolean;
+  canViewAttachments?: boolean;
+  canDownloadAttachments?: boolean;
+}
+
+function InvoiceDetail({ invoice, canDownloadInvoices = true, canViewAttachments = true, canDownloadAttachments = true }: InvoiceDetailProps) {
   const { items, loading } = useInvoiceItems(invoice.id);
   const { attachments } = useInvoiceAttachments(invoice.id);
   const cur = invoice.clients?.billing_currency;
@@ -35,8 +44,73 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
   const surcharge = Number(invoice.surcharge || 0);
   const total = subtotal - discount + surcharge;
 
-  const handleDownloadPDF = () => {
+  // Log invoice view on mount
+  useEffect(() => {
+    const logView = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", session.user.id).maybeSingle();
+      await logBillingAccess({
+        client_id: invoice.client_id,
+        user_id: session.user.id,
+        user_name: (profile as any)?.full_name || (profile as any)?.email || "",
+        action: "view_invoice",
+        document_type: "invoice",
+        document_id: invoice.id,
+        document_name: invoice.title || `Fatura #${invoice.invoice_number}`,
+      });
+    };
+    logView();
+  }, [invoice.id]);
+
+  const handleDownloadPDF = async () => {
     generateInvoicePDF(invoice, items, total, subtotal, cur);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", session.user.id).maybeSingle();
+      await logBillingAccess({
+        client_id: invoice.client_id,
+        user_id: session.user.id,
+        user_name: (profile as any)?.full_name || (profile as any)?.email || "",
+        action: "download_invoice",
+        document_type: "invoice",
+        document_id: invoice.id,
+        document_name: invoice.title || `Fatura #${invoice.invoice_number}`,
+      });
+    }
+  };
+
+  const handleViewAttachment = async (att: { id: string; file_name: string; file_url: string }) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", session.user.id).maybeSingle();
+      await logBillingAccess({
+        client_id: invoice.client_id,
+        user_id: session.user.id,
+        user_name: (profile as any)?.full_name || (profile as any)?.email || "",
+        action: "view_attachment",
+        document_type: "attachment",
+        document_id: att.id,
+        document_name: att.file_name,
+      });
+    }
+    window.open(att.file_url, "_blank");
+  };
+
+  const handleDownloadAttachment = async (att: { id: string; file_name: string; file_url: string }) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", session.user.id).maybeSingle();
+      await logBillingAccess({
+        client_id: invoice.client_id,
+        user_id: session.user.id,
+        user_name: (profile as any)?.full_name || (profile as any)?.email || "",
+        action: "download_attachment",
+        document_type: "attachment",
+        document_id: att.id,
+        document_name: att.file_name,
+      });
+    }
   };
 
   const cfg = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.open;
@@ -135,7 +209,7 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
       )}
 
       {/* Attachments (Nota Fiscal) */}
-      {attachments.length > 0 && (
+      {canViewAttachments && attachments.length > 0 && (
         <>
           <Separator />
           <div>
@@ -148,16 +222,16 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
                   <FileText className="h-4 w-4 text-primary shrink-0" />
                   <span className="flex-1 truncate">{att.file_name}</span>
                   <div className="flex gap-1 shrink-0">
-                    <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
-                      <a href={att.file_url} target="_blank" rel="noopener noreferrer">
-                        <Eye className="h-3.5 w-3.5" />
-                      </a>
+                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleViewAttachment(att)}>
+                      <Eye className="h-3.5 w-3.5" />
                     </Button>
-                    <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
-                      <a href={att.file_url} download={att.file_name}>
-                        <Download className="h-3.5 w-3.5" />
-                      </a>
-                    </Button>
+                    {canDownloadAttachments && (
+                      <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
+                        <a href={att.file_url} download={att.file_name} onClick={() => handleDownloadAttachment(att)}>
+                          <Download className="h-3.5 w-3.5" />
+                        </a>
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -166,7 +240,7 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
         </>
       )}
 
-      {!loading && items.length > 0 && (
+      {!loading && items.length > 0 && canDownloadInvoices && (
         <>
           <Separator />
           <Button onClick={handleDownloadPDF} variant="outline" className="w-full">
@@ -227,7 +301,19 @@ function InvoiceRow({
 }
 
 /* ── Main Panel ── */
-export function ClientInvoicesPanel({ clientId, unseenIds }: { clientId: string; unseenIds?: Set<string> }) {
+export function ClientInvoicesPanel({
+  clientId,
+  unseenIds,
+  canDownloadInvoices = true,
+  canViewAttachments = true,
+  canDownloadAttachments = true,
+}: {
+  clientId: string;
+  unseenIds?: Set<string>;
+  canDownloadInvoices?: boolean;
+  canViewAttachments?: boolean;
+  canDownloadAttachments?: boolean;
+}) {
   const { invoices, loading } = useInvoices(clientId);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -341,7 +427,14 @@ export function ClientInvoicesPanel({ clientId, unseenIds }: { clientId: string;
               Detalhes da fatura
             </DialogDescription>
           </DialogHeader>
-          {selectedInvoice && <InvoiceDetail invoice={selectedInvoice} />}
+          {selectedInvoice && (
+            <InvoiceDetail
+              invoice={selectedInvoice}
+              canDownloadInvoices={canDownloadInvoices}
+              canViewAttachments={canViewAttachments}
+              canDownloadAttachments={canDownloadAttachments}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </>
