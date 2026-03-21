@@ -837,11 +837,11 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card px-4 md:px-6 py-3 md:py-4">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
+      <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center gap-3">
-            {/* Mobile hamburger */}
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(true)}>
+            {/* Menu hamburger */}
+            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
               <Menu className="h-5 w-5" />
             </Button>
             {/* App logo upload area */}
