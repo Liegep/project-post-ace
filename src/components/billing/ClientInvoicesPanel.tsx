@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { startOfMonth, endOfMonth } from "date-fns";
 import { useInvoices, useInvoiceItems, useInvoiceAttachments, Invoice } from "@/hooks/useInvoices";
 import { logBillingAccess } from "@/hooks/useBillingPermissions";
 import { supabase } from "@/integrations/supabase/client";
@@ -307,18 +308,31 @@ export function ClientInvoicesPanel({
   canDownloadInvoices = true,
   canViewAttachments = true,
   canDownloadAttachments = true,
+  filterMonth,
 }: {
   clientId: string;
   unseenIds?: Set<string>;
   canDownloadInvoices?: boolean;
   canViewAttachments?: boolean;
   canDownloadAttachments?: boolean;
+  filterMonth?: Date;
 }) {
   const { invoices, loading } = useInvoices(clientId);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  const visibleInvoices = invoices.filter((inv) => inv.client_visible !== false);
+  const visibleInvoices = useMemo(() => {
+    let list = invoices.filter((inv) => inv.client_visible !== false);
+    if (filterMonth) {
+      const ms = startOfMonth(filterMonth);
+      const me = endOfMonth(filterMonth);
+      list = list.filter((inv) => {
+        const d = new Date(inv.issue_date);
+        return d >= ms && d <= me;
+      });
+    }
+    return list;
+  }, [invoices, filterMonth]);
 
   // Split into recent (first 3) and older
   const recentInvoices = visibleInvoices.slice(0, MAX_RECENT);
