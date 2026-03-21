@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Receipt, CheckCircle2, AlertCircle, Clock, XCircle,
-  ChevronRight, FileText, Download, History
+  ChevronRight, FileText, Download, History, Paperclip, Eye
 } from "lucide-react";
 import { format } from "date-fns";
 import { generateInvoicePDF } from "@/lib/invoicePdf";
