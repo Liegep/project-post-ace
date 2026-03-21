@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import UserProfileMenu from "@/components/UserProfileMenu";
+import { MobileNav } from "@/components/MobileNav";
 import {
   Plus, ChevronLeft, ChevronRight, CalendarIcon, Check, Clock,
   Trash2, ArrowLeft, CalendarDays, CalendarRange, Calendar as CalendarLucide, XCircle, Ban, Tag, X

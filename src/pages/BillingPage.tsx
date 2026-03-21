@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useInvoices, Invoice, createInvoice, updateInvoice, deleteInvoice } from "@/hooks/useInvoices";
+import { MobileNav } from "@/components/MobileNav";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
