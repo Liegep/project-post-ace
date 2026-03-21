@@ -134,6 +134,38 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
         </div>
       )}
 
+      {/* Attachments (Nota Fiscal) */}
+      {attachments.length > 0 && (
+        <>
+          <Separator />
+          <div>
+            <h4 className="text-sm font-semibold flex items-center gap-1.5 mb-2">
+              <Paperclip className="h-4 w-4" /> Nota Fiscal
+            </h4>
+            <div className="space-y-1.5">
+              {attachments.map(att => (
+                <div key={att.id} className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
+                  <FileText className="h-4 w-4 text-primary shrink-0" />
+                  <span className="flex-1 truncate">{att.file_name}</span>
+                  <div className="flex gap-1 shrink-0">
+                    <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
+                      <a href={att.file_url} target="_blank" rel="noopener noreferrer">
+                        <Eye className="h-3.5 w-3.5" />
+                      </a>
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
+                      <a href={att.file_url} download={att.file_name}>
+                        <Download className="h-3.5 w-3.5" />
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
       {!loading && items.length > 0 && (
         <>
           <Separator />
