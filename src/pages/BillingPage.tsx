@@ -183,11 +183,26 @@ const BillingPage = () => {
     [invoices, userClientIds]
   );
   const financialSummary = useMemo(() => {
-    const totalBilled = userInvoices.reduce((sum, i) => sum + getTotal(i), 0);
-    const totalReceived = userInvoices.filter(i => i.status === "paid").reduce((sum, i) => sum + getTotal(i), 0);
-    const totalPending = userInvoices.filter(i => i.status === "open" || i.status === "overdue").reduce((sum, i) => sum + getTotal(i), 0);
-    const totalOverdue = userInvoices.filter(i => i.status === "overdue").reduce((sum, i) => sum + getTotal(i), 0);
-    return { totalBilled, totalReceived, totalPending, totalOverdue };
+    const byCurrency: Record<string, { totalBilled: number; totalReceived: number; totalPending: number; totalOverdue: number }> = {};
+    const ensure = (c: string) => {
+      if (!byCurrency[c]) byCurrency[c] = { totalBilled: 0, totalReceived: 0, totalPending: 0, totalOverdue: 0 };
+    };
+    userInvoices.forEach(i => {
+      const cur = (i.clients as any)?.billing_currency || "BRL";
+      const total = getTotal(i);
+      ensure(cur);
+      byCurrency[cur].totalBilled += total;
+      if (i.status === "paid") byCurrency[cur].totalReceived += total;
+      if (i.status === "open" || i.status === "overdue") byCurrency[cur].totalPending += total;
+      if (i.status === "overdue") byCurrency[cur].totalOverdue += total;
+    });
+    // Sort: BRL first, then USD, then EUR, then others
+    const order = ["BRL", "USD", "EUR"];
+    const sorted = Object.keys(byCurrency).sort((a, b) => {
+      const ai = order.indexOf(a); const bi = order.indexOf(b);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+    return { byCurrency, currencies: sorted };
   }, [userInvoices, invoiceTotals]);
 
   return (
@@ -217,36 +232,56 @@ const BillingPage = () => {
               <TrendingUp className="h-4 w-4 text-primary" />
               <span className="text-xs font-medium text-muted-foreground">Total Faturado</span>
             </div>
-            <p className="text-lg font-bold">
-              {formatCurrency(financialSummary.totalBilled)}
-            </p>
+            <div className="space-y-0.5">
+              {financialSummary.currencies.map(cur => (
+                <p key={cur} className="text-sm font-bold">
+                  {formatCurrency(financialSummary.byCurrency[cur].totalBilled, cur)}
+                </p>
+              ))}
+              {financialSummary.currencies.length === 0 && <p className="text-lg font-bold">{formatCurrency(0)}</p>}
+            </div>
           </Card>
           <Card className="p-3 border-l-4 border-l-emerald-500">
             <div className="flex items-center gap-2 mb-1">
               <CheckCircle2 className="h-4 w-4 text-emerald-500" />
               <span className="text-xs font-medium text-muted-foreground">Total Recebido</span>
             </div>
-            <p className="text-lg font-bold text-emerald-600">
-              {formatCurrency(financialSummary.totalReceived)}
-            </p>
+            <div className="space-y-0.5">
+              {financialSummary.currencies.map(cur => (
+                <p key={cur} className="text-sm font-bold text-emerald-600">
+                  {formatCurrency(financialSummary.byCurrency[cur].totalReceived, cur)}
+                </p>
+              ))}
+              {financialSummary.currencies.length === 0 && <p className="text-lg font-bold text-emerald-600">{formatCurrency(0)}</p>}
+            </div>
           </Card>
           <Card className="p-3 border-l-4 border-l-amber-500">
             <div className="flex items-center gap-2 mb-1">
               <Clock className="h-4 w-4 text-amber-500" />
               <span className="text-xs font-medium text-muted-foreground">Total Pendente</span>
             </div>
-            <p className="text-lg font-bold text-amber-600">
-              {formatCurrency(financialSummary.totalPending)}
-            </p>
+            <div className="space-y-0.5">
+              {financialSummary.currencies.map(cur => (
+                <p key={cur} className="text-sm font-bold text-amber-600">
+                  {formatCurrency(financialSummary.byCurrency[cur].totalPending, cur)}
+                </p>
+              ))}
+              {financialSummary.currencies.length === 0 && <p className="text-lg font-bold text-amber-600">{formatCurrency(0)}</p>}
+            </div>
           </Card>
           <Card className="p-3 border-l-4 border-l-red-500">
             <div className="flex items-center gap-2 mb-1">
               <AlertCircle className="h-4 w-4 text-red-500" />
               <span className="text-xs font-medium text-muted-foreground">Total Atrasado</span>
             </div>
-            <p className="text-lg font-bold text-red-600">
-              {formatCurrency(financialSummary.totalOverdue)}
-            </p>
+            <div className="space-y-0.5">
+              {financialSummary.currencies.map(cur => (
+                <p key={cur} className="text-sm font-bold text-red-600">
+                  {formatCurrency(financialSummary.byCurrency[cur].totalOverdue, cur)}
+                </p>
+              ))}
+              {financialSummary.currencies.length === 0 && <p className="text-lg font-bold text-red-600">{formatCurrency(0)}</p>}
+            </div>
           </Card>
         </div>
 
