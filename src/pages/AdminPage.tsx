@@ -875,7 +875,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               </Sheet>
               <Sheet>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full justify-start" onClick={() => setSettingsDrawerOpen(false)}>
+                  <Button variant="outline" size="sm" className="w-full justify-start">
                     <UserPlus className="mr-2 h-4 w-4 text-green-500" />
                     Acesso do Cliente
                   </Button>
