@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useInvoices, useInvoiceItems, useInvoiceAttachments, Invoice } from "@/hooks/useInvoices";
+import { logBillingAccess } from "@/hooks/useBillingPermissions";
+import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
