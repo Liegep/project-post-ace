@@ -460,6 +460,30 @@ export type Database = {
           },
         ]
       }
+      client_seen_items: {
+        Row: {
+          id: string
+          item_id: string
+          item_type: string
+          seen_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          item_type: string
+          seen_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          item_type?: string
+          seen_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           allow_client_create_post: boolean
