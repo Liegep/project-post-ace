@@ -62,6 +62,7 @@ interface PostCardProps {
   isAdmin: boolean;
   hideFeedback?: boolean;
   allowEditCaption?: boolean;
+  allowClientDownload?: boolean;
   onStatusChange?: (status: PostStatus[]) => void;
   onDelete?: () => void;
   onEdit?: () => void;
@@ -124,7 +125,7 @@ const downloadAllFiles = async (urls: string[], postTitle: string) => {
   }
 };
 
-export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
+export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, allowClientDownload, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags, clientId } = usePosts();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
@@ -334,8 +335,8 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, onStat
               </DndContext>
             </div>
           )}
-          {/* Download buttons - only for admin/team */}
-          {isAdmin && (
+          {/* Download buttons - for admin/team or clients with permission */}
+          {(isAdmin || allowClientDownload) && (
             <div className="px-2 py-1.5 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
               <TooltipProvider delayDuration={300}>
                 <Tooltip>

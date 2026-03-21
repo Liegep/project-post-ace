@@ -18,7 +18,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2, History } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2, History, Download } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { ClientNotes } from "@/components/ClientNotes";
@@ -527,6 +527,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [showArchivedToClient, setShowArchivedToClient] = useState(clientData.show_archived_to_client);
   const [allowClientEditCaption, setAllowClientEditCaption] = useState((clientData as any).allow_client_edit_caption ?? false);
   const [allowClientCreatePost, setAllowClientCreatePost] = useState((clientData as any).allow_client_create_post ?? false);
+  const [allowClientDownload, setAllowClientDownload] = useState((clientData as any).allow_client_download ?? false);
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
   const [trackingVisibleToClient, setTrackingVisibleToClient] = useState(clientData.tracking_visible_to_client ?? false);
 
@@ -561,6 +562,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const toggleAllowClientCreatePost = async (checked: boolean) => {
     setAllowClientCreatePost(checked);
     await supabase.from("clients").update({ allow_client_create_post: checked } as any).eq("id", clientData.id);
+  };
+
+  const toggleAllowClientDownload = async (checked: boolean) => {
+    setAllowClientDownload(checked);
+    await supabase.from("clients").update({ allow_client_download: checked } as any).eq("id", clientData.id);
   };
 
   const enableTracking = async () => {
@@ -913,6 +919,13 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               </div>
               <div className="flex items-center justify-between">
                 <label className="text-sm text-foreground flex items-center gap-2">
+                  <Download className="h-3.5 w-3.5 text-muted-foreground" />
+                  Baixar conteúdo
+                </label>
+                <Switch checked={allowClientDownload} onCheckedChange={toggleAllowClientDownload} />
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground flex items-center gap-2">
                   <Eye className="h-3.5 w-3.5 text-muted-foreground" />
                   Mostrar arquivados
                 </label>
@@ -1039,6 +1052,17 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <label htmlFor="allow-client-create-post" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
                   <Plus className="h-3.5 w-3.5" />
                   {allowClientCreatePost ? t("clientCanCreatePosts") : t("clientCannotCreatePosts")}
+                </label>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="allow-client-download"
+                  checked={allowClientDownload}
+                  onCheckedChange={toggleAllowClientDownload}
+                />
+                <label htmlFor="allow-client-download" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                  <Download className="h-3.5 w-3.5" />
+                  {allowClientDownload ? "Cliente pode baixar" : "Cliente não pode baixar"}
                 </label>
               </div>
               {trackingEnabled && (

@@ -578,6 +578,7 @@ export type Database = {
       clients: {
         Row: {
           allow_client_create_post: boolean
+          allow_client_download: boolean
           allow_client_edit_caption: boolean
           billing_currency: string
           billing_description: string
@@ -612,6 +613,7 @@ export type Database = {
         }
         Insert: {
           allow_client_create_post?: boolean
+          allow_client_download?: boolean
           allow_client_edit_caption?: boolean
           billing_currency?: string
           billing_description?: string
@@ -646,6 +648,7 @@ export type Database = {
         }
         Update: {
           allow_client_create_post?: boolean
+          allow_client_download?: boolean
           allow_client_edit_caption?: boolean
           billing_currency?: string
           billing_description?: string
