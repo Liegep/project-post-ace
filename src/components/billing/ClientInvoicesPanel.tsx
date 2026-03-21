@@ -251,7 +251,7 @@ export function ClientInvoicesPanel({ clientId, unseenIds }: { clientId: string;
         </CardHeader>
         <CardContent className="space-y-2">
           {recentInvoices.map((inv) => (
-            <InvoiceRow key={inv.id} invoice={inv} onSelect={setSelectedInvoice} />
+            <InvoiceRow key={inv.id} invoice={inv} onSelect={setSelectedInvoice} isNew={unseenIds ? !unseenIds.has(`invoice:${inv.id}`) : false} />
           ))}
 
           {hasOlder && (
@@ -284,6 +284,7 @@ export function ClientInvoicesPanel({ clientId, unseenIds }: { clientId: string;
                 <InvoiceRow
                   key={inv.id}
                   invoice={inv}
+                  isNew={unseenIds ? !unseenIds.has(`invoice:${inv.id}`) : false}
                   onSelect={(inv) => {
                     setSelectedInvoice(inv);
                     setHistoryOpen(false);
