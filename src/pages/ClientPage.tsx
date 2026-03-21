@@ -39,6 +39,7 @@ interface ClientData {
   show_invoices_to_client: boolean;
   allow_client_edit_caption: boolean;
   allow_client_create_post: boolean;
+  allow_client_download: boolean;
   tracking_enabled: boolean;
   tracking_visible_to_client: boolean;
 }
@@ -426,7 +427,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                             <div className="space-y-4">
                               {sortByDate(colPosts).map((post) => (
                                 <div key={post.id} className="cursor-pointer" onClick={() => setDetailPost(post)}>
-                                  <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                                  <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
                                 </div>
                               ))}
                             </div>
@@ -442,7 +443,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                           <div className="space-y-4 rounded-xl bg-muted/30 p-4">
                             {sortByDate(entradaPosts).map((post) => (
                               <div key={post.id} className="cursor-pointer" onClick={() => setDetailPost(post)}>
-                                <PostCard post={post} isAdmin={false} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} />
+                                <PostCard post={post} isAdmin={false} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
                               </div>
                             ))}
                           </div>
@@ -454,7 +455,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             {sortByDate(readyPosts).map((post) => (
                               <div key={post.id} className="cursor-pointer" onClick={() => setDetailPost(post)}>
-                                <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} />
+                                <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
                               </div>
                             ))}
                           </div>
