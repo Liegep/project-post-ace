@@ -62,6 +62,21 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
 
+  // Track which items the client has already seen
+  const [seenItemIds, setSeenItemIds] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    const fetchSeen = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data } = await supabase
+        .from("client_seen_items")
+        .select("item_type, item_id")
+        .eq("user_id", session.user.id);
+      setSeenItemIds(new Set((data || []).map((s: any) => `${s.item_type}:${s.item_id}`)));
+    };
+    fetchSeen();
+  }, []);
+
   const handleChangePassword = async () => {
     if (newPassword.length < 6) {
       toast.error("A nova senha deve ter pelo menos 6 caracteres");
