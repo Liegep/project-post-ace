@@ -251,12 +251,49 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           </div>
         )}
 
+        {/* Month Selector */}
+        <div className="mb-6 flex items-center justify-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setSelectedMonth(prev => subMonths(prev, 1))}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <button
+            onClick={() => setSelectedMonth(new Date())}
+            className="rounded-lg bg-muted px-4 py-1.5 text-sm font-semibold text-foreground capitalize hover:bg-muted/80 transition-colors"
+          >
+            {format(selectedMonth, "MMMM yyyy", { locale: ptBR })}
+          </button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setSelectedMonth(prev => addMonths(prev, 1))}
+            disabled={isCurrentMonth}
+          >
+            <ChevronRightIcon className="h-4 w-4" />
+          </Button>
+          {!isCurrentMonth && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs ml-1"
+              onClick={() => setSelectedMonth(new Date())}
+            >
+              Mês atual
+            </Button>
+          )}
+        </div>
+
         {/* News Widget - unseen invoices & reports */}
         <ClientNewsWidget clientId={clientData.id} showInvoices={clientData.show_invoices_to_client && !!billingPerm?.can_view_invoices} />
 
         {/* Client Briefs for Approval */}
         <div className="mb-8">
-          <ClientBriefs clientId={clientData.id} clientName={clientData.name} />
+          <ClientBriefs clientId={clientData.id} clientName={clientData.name} filterMonth={selectedMonth} />
         </div>
 
         {/* Client Invoices - permission-controlled */}
@@ -268,6 +305,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               canDownloadInvoices={billingPerm.can_download_invoices}
               canViewAttachments={billingPerm.can_view_attachments}
               canDownloadAttachments={billingPerm.can_download_attachments}
+              filterMonth={selectedMonth}
             />
           </div>
         )}
