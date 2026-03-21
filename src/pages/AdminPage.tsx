@@ -946,6 +946,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               <ClientBillingConfig clientId={clientData.id} />
             </div>
 
+            {/* Billing Permissions */}
+            <div className="px-5 border-t">
+              <BillingPermissionsPanel clientId={clientData.id} />
+            </div>
+
             {/* Language */}
             <div className="px-5 py-4">
               <p className="text-xs font-medium text-muted-foreground mb-2">Idioma</p>
