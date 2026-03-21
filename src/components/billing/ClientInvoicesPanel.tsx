@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useInvoices, useInvoiceItems, Invoice } from "@/hooks/useInvoices";
+import { useInvoices, useInvoiceItems, useInvoiceAttachments, Invoice } from "@/hooks/useInvoices";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
