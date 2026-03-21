@@ -209,7 +209,7 @@ function InvoiceDetail({ invoice, canDownloadInvoices = true, canViewAttachments
       )}
 
       {/* Attachments (Nota Fiscal) */}
-      {attachments.length > 0 && (
+      {canViewAttachments && attachments.length > 0 && (
         <>
           <Separator />
           <div>
@@ -222,16 +222,16 @@ function InvoiceDetail({ invoice, canDownloadInvoices = true, canViewAttachments
                   <FileText className="h-4 w-4 text-primary shrink-0" />
                   <span className="flex-1 truncate">{att.file_name}</span>
                   <div className="flex gap-1 shrink-0">
-                    <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
-                      <a href={att.file_url} target="_blank" rel="noopener noreferrer">
-                        <Eye className="h-3.5 w-3.5" />
-                      </a>
+                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleViewAttachment(att)}>
+                      <Eye className="h-3.5 w-3.5" />
                     </Button>
-                    <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
-                      <a href={att.file_url} download={att.file_name}>
-                        <Download className="h-3.5 w-3.5" />
-                      </a>
-                    </Button>
+                    {canDownloadAttachments && (
+                      <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
+                        <a href={att.file_url} download={att.file_name} onClick={() => handleDownloadAttachment(att)}>
+                          <Download className="h-3.5 w-3.5" />
+                        </a>
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -240,7 +240,7 @@ function InvoiceDetail({ invoice, canDownloadInvoices = true, canViewAttachments
         </>
       )}
 
-      {!loading && items.length > 0 && (
+      {!loading && items.length > 0 && canDownloadInvoices && (
         <>
           <Separator />
           <Button onClick={handleDownloadPDF} variant="outline" className="w-full">
