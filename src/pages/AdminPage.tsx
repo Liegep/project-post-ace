@@ -1054,6 +1054,17 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   {allowClientCreatePost ? t("clientCanCreatePosts") : t("clientCannotCreatePosts")}
                 </label>
               </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="allow-client-download"
+                  checked={allowClientDownload}
+                  onCheckedChange={toggleAllowClientDownload}
+                />
+                <label htmlFor="allow-client-download" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
+                  <Download className="h-3.5 w-3.5" />
+                  {allowClientDownload ? "Cliente pode baixar" : "Cliente não pode baixar"}
+                </label>
+              </div>
               {trackingEnabled && (
                 <div className="flex items-center gap-2">
                   <Switch
