@@ -301,7 +301,19 @@ function InvoiceRow({
 }
 
 /* ── Main Panel ── */
-export function ClientInvoicesPanel({ clientId, unseenIds }: { clientId: string; unseenIds?: Set<string> }) {
+export function ClientInvoicesPanel({
+  clientId,
+  unseenIds,
+  canDownloadInvoices = true,
+  canViewAttachments = true,
+  canDownloadAttachments = true,
+}: {
+  clientId: string;
+  unseenIds?: Set<string>;
+  canDownloadInvoices?: boolean;
+  canViewAttachments?: boolean;
+  canDownloadAttachments?: boolean;
+}) {
   const { invoices, loading } = useInvoices(clientId);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
