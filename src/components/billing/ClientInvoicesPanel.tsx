@@ -427,7 +427,14 @@ export function ClientInvoicesPanel({
               Detalhes da fatura
             </DialogDescription>
           </DialogHeader>
-          {selectedInvoice && <InvoiceDetail invoice={selectedInvoice} />}
+          {selectedInvoice && (
+            <InvoiceDetail
+              invoice={selectedInvoice}
+              canDownloadInvoices={canDownloadInvoices}
+              canViewAttachments={canViewAttachments}
+              canDownloadAttachments={canDownloadAttachments}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </>
