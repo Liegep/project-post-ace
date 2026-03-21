@@ -321,12 +321,12 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                   </div>
                   <h2 className="font-semibold text-foreground">Relatórios de Mídias</h2>
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
-                    {reports.length}
+                    {filteredReports.length}
                   </span>
                 </div>
               </div>
               <div className="space-y-2">
-                {reports.map((report) => {
+                {filteredReports.map((report) => {
                   const isNew = !seenItemIds.has(`report:${report.id}`);
                   return (
                     <div
