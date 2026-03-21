@@ -47,6 +47,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const { posts, archivedPosts, columns, tags, postingPeriod, unarchivePost } = usePosts();
   const navigate = useNavigate();
   const { data: reports = [] } = useSocialReports(clientData.id);
+  const { permission: billingPerm, loading: billingPermLoading } = useMyBillingPermission(clientData.id);
   const locale = (clientData.locale || "pt") as Locale;
   const t = useCallback(
     (key: keyof typeof translations.pt) => translations[locale]?.[key] || translations.pt[key] || key,
