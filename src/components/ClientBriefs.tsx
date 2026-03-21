@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { startOfMonth, endOfMonth } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,9 +50,10 @@ const CONTENT_LABELS: Record<string, string> = {
 interface ClientBriefsProps {
   clientId: string;
   clientName: string;
+  filterMonth?: Date;
 }
 
-const ClientBriefs = ({ clientId, clientName }: ClientBriefsProps) => {
+const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [loading, setLoading] = useState(true);
   const [detailBrief, setDetailBrief] = useState<Brief | null>(null);
@@ -74,6 +76,16 @@ const ClientBriefs = ({ clientId, clientName }: ClientBriefsProps) => {
     if (data) setBriefs(data as Brief[]);
     setLoading(false);
   };
+
+  const filteredBriefs = useMemo(() => {
+    if (!filterMonth) return briefs;
+    const ms = startOfMonth(filterMonth);
+    const me = endOfMonth(filterMonth);
+    return briefs.filter((b) => {
+      const d = b.planned_date ? new Date(b.planned_date) : new Date(b.created_at);
+      return d >= ms && d <= me;
+    });
+  }, [briefs, filterMonth]);
 
   const openDetail = async (brief: Brief) => {
     setDetailBrief(brief);
@@ -168,21 +180,21 @@ const ClientBriefs = ({ clientId, clientName }: ClientBriefsProps) => {
   };
 
   // Sort: pending first
-  const sorted = [...briefs].sort((a, b) => {
+  const sorted = [...filteredBriefs].sort((a, b) => {
     if (a.status === "pending_approval" && b.status !== "pending_approval") return -1;
     if (b.status === "pending_approval" && a.status !== "pending_approval") return 1;
     return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
   });
 
   if (loading) return <div className="text-center py-8 text-muted-foreground text-sm">Carregando pautas...</div>;
-  if (briefs.length === 0) return null;
+  if (filteredBriefs.length === 0) return null;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <FileText className="h-5 w-5 text-primary" />
         <h2 className="text-lg font-bold">Pautas para Aprovação</h2>
-        <Badge variant="secondary" className="ml-1">{briefs.filter((b) => b.status === "pending_approval").length} pendentes</Badge>
+        <Badge variant="secondary" className="ml-1">{filteredBriefs.filter((b) => b.status === "pending_approval").length} pendentes</Badge>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
