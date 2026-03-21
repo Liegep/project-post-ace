@@ -77,6 +77,16 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
     setLoading(false);
   };
 
+  const filteredBriefs = useMemo(() => {
+    if (!filterMonth) return briefs;
+    const ms = startOfMonth(filterMonth);
+    const me = endOfMonth(filterMonth);
+    return briefs.filter((b) => {
+      const d = b.planned_date ? new Date(b.planned_date) : new Date(b.created_at);
+      return d >= ms && d <= me;
+    });
+  }, [briefs, filterMonth]);
+
   const openDetail = async (brief: Brief) => {
     setDetailBrief(brief);
     setDetailOpen(true);
