@@ -43,7 +43,7 @@ const ActivityLogPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card px-4 md:px-6 py-3">
+      <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur px-4 md:px-6 py-3">
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
