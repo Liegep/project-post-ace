@@ -13,9 +13,9 @@ import { PostDetailDialog } from "@/components/PostDetailDialog";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
-import { format } from "date-fns";
+import { format, startOfMonth, endOfMonth, addMonths, subMonths, isSameMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound, Menu, FileBarChart, ArrowRight } from "lucide-react";
+import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound, Menu, FileBarChart, ArrowRight, ChevronLeft, ChevronRight as ChevronRightIcon } from "lucide-react";
 import { ClientNewsWidget } from "@/components/ClientNewsWidget";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { Button } from "@/components/ui/button";
@@ -63,6 +63,24 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+
+  const isCurrentMonth = isSameMonth(selectedMonth, new Date());
+  const monthStart = startOfMonth(selectedMonth);
+  const monthEnd = endOfMonth(selectedMonth);
+
+  // Filter posts by selected month (using deadline or createdAt)
+  const filterByMonth = useCallback((post: Post) => {
+    const date = post.deadline || post.createdAt;
+    return date >= monthStart && date <= monthEnd;
+  }, [monthStart, monthEnd]);
+
+  // Filter reports by selected month
+  const filteredReports = reports.filter((r) => {
+    const start = new Date(r.period_start);
+    const end = new Date(r.period_end);
+    return (start <= monthEnd && end >= monthStart);
+  });
 
   // Track which items the client has already seen
   const [seenItemIds, setSeenItemIds] = useState<Set<string>>(new Set());
