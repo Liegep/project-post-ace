@@ -183,11 +183,26 @@ const BillingPage = () => {
     [invoices, userClientIds]
   );
   const financialSummary = useMemo(() => {
-    const totalBilled = userInvoices.reduce((sum, i) => sum + getTotal(i), 0);
-    const totalReceived = userInvoices.filter(i => i.status === "paid").reduce((sum, i) => sum + getTotal(i), 0);
-    const totalPending = userInvoices.filter(i => i.status === "open" || i.status === "overdue").reduce((sum, i) => sum + getTotal(i), 0);
-    const totalOverdue = userInvoices.filter(i => i.status === "overdue").reduce((sum, i) => sum + getTotal(i), 0);
-    return { totalBilled, totalReceived, totalPending, totalOverdue };
+    const byCurrency: Record<string, { totalBilled: number; totalReceived: number; totalPending: number; totalOverdue: number }> = {};
+    const ensure = (c: string) => {
+      if (!byCurrency[c]) byCurrency[c] = { totalBilled: 0, totalReceived: 0, totalPending: 0, totalOverdue: 0 };
+    };
+    userInvoices.forEach(i => {
+      const cur = (i.clients as any)?.billing_currency || "BRL";
+      const total = getTotal(i);
+      ensure(cur);
+      byCurrency[cur].totalBilled += total;
+      if (i.status === "paid") byCurrency[cur].totalReceived += total;
+      if (i.status === "open" || i.status === "overdue") byCurrency[cur].totalPending += total;
+      if (i.status === "overdue") byCurrency[cur].totalOverdue += total;
+    });
+    // Sort: BRL first, then USD, then EUR, then others
+    const order = ["BRL", "USD", "EUR"];
+    const sorted = Object.keys(byCurrency).sort((a, b) => {
+      const ai = order.indexOf(a); const bi = order.indexOf(b);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+    return { byCurrency, currencies: sorted };
   }, [userInvoices, invoiceTotals]);
 
   return (
