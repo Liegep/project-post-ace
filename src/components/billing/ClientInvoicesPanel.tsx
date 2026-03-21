@@ -27,7 +27,14 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }>
 const MAX_RECENT = 3;
 
 /* ── Invoice Detail (inside dialog) ── */
-function InvoiceDetail({ invoice }: { invoice: Invoice }) {
+interface InvoiceDetailProps {
+  invoice: Invoice;
+  canDownloadInvoices?: boolean;
+  canViewAttachments?: boolean;
+  canDownloadAttachments?: boolean;
+}
+
+function InvoiceDetail({ invoice, canDownloadInvoices = true, canViewAttachments = true, canDownloadAttachments = true }: InvoiceDetailProps) {
   const { items, loading } = useInvoiceItems(invoice.id);
   const { attachments } = useInvoiceAttachments(invoice.id);
   const cur = invoice.clients?.billing_currency;
@@ -37,8 +44,73 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
   const surcharge = Number(invoice.surcharge || 0);
   const total = subtotal - discount + surcharge;
 
-  const handleDownloadPDF = () => {
+  // Log invoice view on mount
+  useEffect(() => {
+    const logView = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", session.user.id).maybeSingle();
+      await logBillingAccess({
+        client_id: invoice.client_id,
+        user_id: session.user.id,
+        user_name: (profile as any)?.full_name || (profile as any)?.email || "",
+        action: "view_invoice",
+        document_type: "invoice",
+        document_id: invoice.id,
+        document_name: invoice.title || `Fatura #${invoice.invoice_number}`,
+      });
+    };
+    logView();
+  }, [invoice.id]);
+
+  const handleDownloadPDF = async () => {
     generateInvoicePDF(invoice, items, total, subtotal, cur);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", session.user.id).maybeSingle();
+      await logBillingAccess({
+        client_id: invoice.client_id,
+        user_id: session.user.id,
+        user_name: (profile as any)?.full_name || (profile as any)?.email || "",
+        action: "download_invoice",
+        document_type: "invoice",
+        document_id: invoice.id,
+        document_name: invoice.title || `Fatura #${invoice.invoice_number}`,
+      });
+    }
+  };
+
+  const handleViewAttachment = async (att: { id: string; file_name: string; file_url: string }) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", session.user.id).maybeSingle();
+      await logBillingAccess({
+        client_id: invoice.client_id,
+        user_id: session.user.id,
+        user_name: (profile as any)?.full_name || (profile as any)?.email || "",
+        action: "view_attachment",
+        document_type: "attachment",
+        document_id: att.id,
+        document_name: att.file_name,
+      });
+    }
+    window.open(att.file_url, "_blank");
+  };
+
+  const handleDownloadAttachment = async (att: { id: string; file_name: string; file_url: string }) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", session.user.id).maybeSingle();
+      await logBillingAccess({
+        client_id: invoice.client_id,
+        user_id: session.user.id,
+        user_name: (profile as any)?.full_name || (profile as any)?.email || "",
+        action: "download_attachment",
+        document_type: "attachment",
+        document_id: att.id,
+        document_name: att.file_name,
+      });
+    }
   };
 
   const cfg = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.open;
