@@ -49,9 +49,10 @@ const CONTENT_LABELS: Record<string, string> = {
 interface ClientBriefsProps {
   clientId: string;
   clientName: string;
+  filterMonth?: Date;
 }
 
-const ClientBriefs = ({ clientId, clientName }: ClientBriefsProps) => {
+const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) => {
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [loading, setLoading] = useState(true);
   const [detailBrief, setDetailBrief] = useState<Brief | null>(null);
