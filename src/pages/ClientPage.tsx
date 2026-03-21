@@ -240,10 +240,16 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           <ClientBriefs clientId={clientData.id} clientName={clientData.name} />
         </div>
 
-        {/* Client Invoices - permanent section */}
-        {clientData.show_invoices_to_client && (
+        {/* Client Invoices - permission-controlled */}
+        {clientData.show_invoices_to_client && billingPerm?.can_view_invoices && (
           <div className="mb-8">
-            <ClientInvoicesPanel clientId={clientData.id} unseenIds={seenItemIds} />
+            <ClientInvoicesPanel
+              clientId={clientData.id}
+              unseenIds={seenItemIds}
+              canDownloadInvoices={billingPerm.can_download_invoices}
+              canViewAttachments={billingPerm.can_view_attachments}
+              canDownloadAttachments={billingPerm.can_download_attachments}
+            />
           </div>
         )}
 
