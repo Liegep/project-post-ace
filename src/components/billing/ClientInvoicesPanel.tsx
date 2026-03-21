@@ -27,6 +27,7 @@ const MAX_RECENT = 3;
 /* ── Invoice Detail (inside dialog) ── */
 function InvoiceDetail({ invoice }: { invoice: Invoice }) {
   const { items, loading } = useInvoiceItems(invoice.id);
+  const { attachments } = useInvoiceAttachments(invoice.id);
   const cur = invoice.clients?.billing_currency;
 
   const subtotal = items.reduce((sum, it) => sum + Number(it.total_price || 0), 0);
