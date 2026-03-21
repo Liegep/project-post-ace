@@ -62,6 +62,21 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
 
+  // Track which items the client has already seen
+  const [seenItemIds, setSeenItemIds] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    const fetchSeen = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+      const { data } = await supabase
+        .from("client_seen_items")
+        .select("item_type, item_id")
+        .eq("user_id", session.user.id);
+      setSeenItemIds(new Set((data || []).map((s: any) => `${s.item_type}:${s.item_id}`)));
+    };
+    fetchSeen();
+  }, []);
+
   const handleChangePassword = async () => {
     if (newPassword.length < 6) {
       toast.error("A nova senha deve ter pelo menos 6 caracteres");
@@ -226,7 +241,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         {/* Client Invoices - permanent section */}
         {clientData.show_invoices_to_client && (
           <div className="mb-8">
-            <ClientInvoicesPanel clientId={clientData.id} />
+            <ClientInvoicesPanel clientId={clientData.id} unseenIds={seenItemIds} />
           </div>
         )}
 
@@ -246,21 +261,31 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 </div>
               </div>
               <div className="space-y-2">
-                {reports.map((report) => (
-                  <div
-                    key={report.id}
-                    onClick={() => navigate(`/reports/${report.id}`)}
-                    className="flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3 cursor-pointer hover:bg-muted transition-colors"
-                  >
-                    <div>
-                      <p className="font-medium text-sm text-foreground">{report.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(report.period_start), "dd/MM/yyyy")} — {format(new Date(report.period_end), "dd/MM/yyyy")}
-                      </p>
+                {reports.map((report) => {
+                  const isNew = !seenItemIds.has(`report:${report.id}`);
+                  return (
+                    <div
+                      key={report.id}
+                      onClick={() => navigate(`/reports/${report.id}`)}
+                      className="flex items-center justify-between rounded-lg bg-muted/50 px-4 py-3 cursor-pointer hover:bg-muted transition-colors"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm text-foreground">{report.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(report.period_start), "dd/MM/yyyy")} — {format(new Date(report.period_end), "dd/MM/yyyy")}
+                          </p>
+                        </div>
+                        {isNew && (
+                          <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold text-primary-foreground">
+                            Novo
+                          </span>
+                        )}
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
                     </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
