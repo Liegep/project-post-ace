@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useMyBillingPermission } from "@/hooks/useBillingPermissions";
 import { useNavigate } from "react-router-dom";
 import ClientBriefs from "@/components/ClientBriefs";
 import { ClientInvoicesPanel } from "@/components/billing/ClientInvoicesPanel";
