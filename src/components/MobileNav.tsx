@@ -32,7 +32,7 @@ export function MobileNav({ title, children }: MobileNavProps) {
 
   return (
     <>
-      <Button variant="ghost" size="icon" className="md:hidden shrink-0" onClick={() => setOpen(true)}>
+      <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setOpen(true)}>
         <Menu className="h-5 w-5" />
       </Button>
 
