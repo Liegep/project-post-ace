@@ -22,10 +22,30 @@ export function BillingAlertsWidget() {
 
   useEffect(() => {
     const load = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) { setLoading(false); return; }
+
+      // Get user's assigned client IDs
+      const { data: assignments } = await supabase
+        .from("user_client_assignments")
+        .select("client_id")
+        .eq("user_id", session.user.id);
+      const { data: owned } = await supabase
+        .from("clients")
+        .select("id")
+        .eq("owner_id", session.user.id);
+      const clientIds = [...new Set([
+        ...(assignments || []).map((a: any) => a.client_id),
+        ...(owned || []).map((c: any) => c.id),
+      ])];
+
+      if (clientIds.length === 0) { setLoading(false); return; }
+
       const { data } = await supabase
         .from("invoices")
         .select("id, title, due_date, status, clients(name, slug)")
         .in("status", ["open", "overdue"])
+        .in("client_id", clientIds)
         .order("due_date", { ascending: true })
         .limit(5);
 
