@@ -310,8 +310,8 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           </div>
         )}
 
-        {/* Client Reports - permanent section */}
-        {reports.length > 0 && (
+        {/* Client Reports - filtered by month */}
+        {filteredReports.length > 0 && (
           <div className="mb-8">
             <div className="rounded-xl border bg-card p-4">
               <div className="flex items-center justify-between mb-3">
