@@ -233,7 +233,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         )}
 
         {/* News Widget - unseen invoices & reports */}
-        <ClientNewsWidget clientId={clientData.id} showInvoices={clientData.show_invoices_to_client} />
+        <ClientNewsWidget clientId={clientData.id} showInvoices={clientData.show_invoices_to_client && !!billingPerm?.can_view_invoices} />
 
         {/* Client Briefs for Approval */}
         <div className="mb-8">
