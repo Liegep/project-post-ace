@@ -15,6 +15,7 @@ import { I18nProvider } from "@/i18n/I18nContext";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound, Menu, FileBarChart, ArrowRight } from "lucide-react";
+import { ClientNewsWidget } from "@/components/ClientNewsWidget";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -214,19 +215,22 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           </div>
         )}
 
+        {/* News Widget - unseen invoices & reports */}
+        <ClientNewsWidget clientId={clientData.id} showInvoices={clientData.show_invoices_to_client} />
+
         {/* Client Briefs for Approval */}
         <div className="mb-8">
           <ClientBriefs clientId={clientData.id} clientName={clientData.name} />
         </div>
 
-        {/* Client Invoices */}
+        {/* Client Invoices - permanent section */}
         {clientData.show_invoices_to_client && (
           <div className="mb-8">
             <ClientInvoicesPanel clientId={clientData.id} />
           </div>
         )}
 
-        {/* Client Reports */}
+        {/* Client Reports - permanent section */}
         {reports.length > 0 && (
           <div className="mb-8">
             <div className="rounded-xl border bg-card p-4">
