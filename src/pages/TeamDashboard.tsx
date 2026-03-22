@@ -12,6 +12,8 @@ import { MobileNav } from "@/components/MobileNav";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { toast } from "@/hooks/use-toast";
 import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
+import { TodayTasksWidget } from "@/components/TodayTasksWidget";
+import { NotificationBell } from "@/components/NotificationBell";
 
 interface AssignedClient {
   id: string;
@@ -275,6 +277,7 @@ const TeamDashboard = () => {
             <Button variant="outline" size="sm" className="gap-1.5 hidden sm:flex" onClick={() => navigate("/briefs")}>
               <FileText className="h-4 w-4" /> Pautas
             </Button>
+            <NotificationBell />
             <LanguageSelector />
             <UserProfileMenu />
           </div>
@@ -282,6 +285,7 @@ const TeamDashboard = () => {
       </header>
 
       <main className="mx-auto max-w-5xl p-4 md:p-6 space-y-4 md:space-y-6">
+        <TodayTasksWidget />
         <TodayAppointmentsWidget />
         {loading ? (
           <div className="flex justify-center py-20">
