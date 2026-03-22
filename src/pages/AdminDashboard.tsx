@@ -22,6 +22,8 @@ import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
 import { CommemorativeDatesWidget } from "@/components/CommemorativeDatesWidget";
 import { PostDetailDialog } from "@/components/PostDetailDialog";
 import { RecentReportsWidget } from "@/components/RecentReportsWidget";
+import { TodayTasksWidget } from "@/components/TodayTasksWidget";
+import { NotificationBell } from "@/components/NotificationBell";
 import { BillingAlertsWidget } from "@/components/billing/BillingAlertsWidget";
 
 const CLIENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
@@ -889,13 +891,15 @@ const AdminDashboard = () => {
             </Button>
             {isAdmin && (
               <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <Plus className="mr-2 h-4 w-4" /> Clientes
-              </Button>
+              <Plus className="mr-2 h-4 w-4" /> Clientes
+            </Button>
             )}
+            <NotificationBell />
             <UserProfileMenu />
           </div>
           {/* Mobile: only essential actions */}
           <div className="flex md:hidden items-center gap-1">
+            <NotificationBell />
             {isAdmin && (
               <Button size="icon" variant="ghost" onClick={openCreate}>
                 <Plus className="h-5 w-5" />
@@ -1009,6 +1013,9 @@ const AdminDashboard = () => {
       </Sheet>
 
       <main className="mx-auto max-w-5xl px-4 md:px-6 py-4 md:py-6 space-y-4 md:space-y-6">
+        {/* Today's tasks with deadline priority */}
+        <TodayTasksWidget />
+
         {/* Today's appointments */}
         <TodayAppointmentsWidget />
 

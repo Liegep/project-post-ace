@@ -2,7 +2,9 @@ import { useState, useMemo } from "react";
 import { Post } from "@/types/post";
 import { format, isAfter, addDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isSameWeek, isSameMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CalendarClock, CheckCircle2, Clock } from "lucide-react";
+import { CalendarClock, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
+import { getDeadlineUrgency, URGENCY_STYLES } from "@/lib/deadlineColors";
+import { cn } from "@/lib/utils";
 
 interface UpcomingPostsWidgetProps {
   posts: Post[];
@@ -100,16 +102,24 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
               {groupPosts.map((post) => {
                 const deadline = new Date(post.deadline!);
                 const posted = isPosted(deadline);
+                const urgency = getDeadlineUrgency(deadline);
+                const urgencyStyle = URGENCY_STYLES[urgency];
 
                 return (
                   <div
                     key={post.id}
-                    className={`flex items-center gap-3 rounded-lg border p-3 transition-colors ${
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg border p-3 transition-colors",
                       posted
                         ? "bg-emerald-500/5 border-emerald-500/20"
-                        : "bg-card hover:bg-muted/50"
-                    }`}
+                        : cn(urgencyStyle.bg, urgencyStyle.border, "hover:opacity-80")
+                    )}
                   >
+                    {/* Urgency dot */}
+                    {!posted && (
+                      <div className={cn("h-2.5 w-2.5 rounded-full shrink-0", urgencyStyle.dot)} />
+                    )}
+
                     {/* Media thumbnail */}
                     {post.imageUrl && (
                       <img
@@ -134,8 +144,8 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
                         Postado
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-600 shrink-0">
-                        <Clock className="h-3.5 w-3.5" />
+                      <span className={cn("flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold shrink-0", urgencyStyle.bg, urgencyStyle.text)}>
+                        {urgency === "overdue" ? <AlertTriangle className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
                         {format(deadline, "dd/MM")}
                       </span>
                     )}
