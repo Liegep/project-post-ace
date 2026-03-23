@@ -1,11 +1,14 @@
 import { Post, STATUS_CONFIG, LABEL_CONFIG, Tag, TAG_TRANSLATION_KEYS, PostStatus, ClientLabel } from "@/types/post";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, History } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
+import { toast } from "sonner";
 
 interface PostDetailDialogProps {
   post: Post | null;
@@ -13,6 +16,8 @@ interface PostDetailDialogProps {
   onOpenChange: (open: boolean) => void;
   tags: Tag[];
   t: (key: any) => string;
+  onApprove?: (postId: string) => void;
+  onRequestChange?: (postId: string, comment: string) => void;
 }
 
 const STATUS_KEYS: Record<PostStatus, string> = {
@@ -33,9 +38,11 @@ const LABEL_KEYS: Record<ClientLabel, string> = {
   de_seu_feedback: "labelGiveFeedback",
 };
 
-export const PostDetailDialog = ({ post, open, onOpenChange, tags, t }: PostDetailDialogProps) => {
+export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove, onRequestChange }: PostDetailDialogProps) => {
   const [mediaIndex, setMediaIndex] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
+  const [showChangeForm, setShowChangeForm] = useState(false);
+  const [changeComment, setChangeComment] = useState("");
   const activityLogs = useActivityLogs({ itemId: post?.id || "", enabled: open && showHistory && !!post });
 
   if (!post) return null;
@@ -53,7 +60,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t }: PostDeta
     .filter(Boolean) as Tag[];
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setMediaIndex(0); setShowHistory(false); } }}>
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setMediaIndex(0); setShowHistory(false); setShowChangeForm(false); setChangeComment(""); } }}>
       <DialogContent className="max-w-2xl p-0 overflow-hidden gap-0 max-h-[90vh] overflow-y-auto">
         {/* Media area */}
         {hasMedia && (
@@ -133,6 +140,79 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t }: PostDeta
 
           {post.caption && (
             <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{post.caption}</p>
+          )}
+
+          {/* Client action buttons */}
+          {(onApprove || onRequestChange) && post.clientLabel !== "aprovado" && (
+            <div className="border-t pt-4 mt-2 space-y-3">
+              <p className="text-sm font-medium text-foreground">O que achou deste post?</p>
+              
+              {!showChangeForm ? (
+                <div className="flex flex-wrap gap-2">
+                  {onApprove && (
+                    <Button
+                      size="sm"
+                      className="bg-success text-success-foreground hover:bg-success/90 gap-1.5"
+                      onClick={() => {
+                        onApprove(post.id);
+                        toast.success("Post aprovado com sucesso!");
+                        onOpenChange(false);
+                      }}
+                    >
+                      <CheckCircle2 className="h-4 w-4" />
+                      Aprovado pela Boss
+                    </Button>
+                  )}
+                  {onRequestChange && (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="gap-1.5"
+                      onClick={() => setShowChangeForm(true)}
+                    >
+                      <AlertTriangle className="h-4 w-4" />
+                      Solicitar Alteração
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Descreva a alteração desejada..."
+                    value={changeComment}
+                    onChange={(e) => setChangeComment(e.target.value)}
+                    className="min-h-[80px] text-sm"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      disabled={!changeComment.trim()}
+                      onClick={() => {
+                        onRequestChange!(post.id, changeComment.trim());
+                        toast.success("Alteração solicitada com sucesso!");
+                        setChangeComment("");
+                        setShowChangeForm(false);
+                        onOpenChange(false);
+                      }}
+                    >
+                      Enviar solicitação
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => { setShowChangeForm(false); setChangeComment(""); }}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {post.clientLabel === "alteracao_solicitada" && (
+                <p className="text-xs text-destructive font-medium">Alteração já solicitada para este post.</p>
+              )}
+            </div>
           )}
 
           {/* Activity History Toggle */}
