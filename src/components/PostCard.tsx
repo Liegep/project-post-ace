@@ -593,4 +593,6 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
       )}
     </Card>
   );
-};
+});
+
+PostCard.displayName = "PostCard";
