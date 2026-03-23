@@ -573,6 +573,13 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         onOpenChange={(v) => { if (!v) setDetailPost(null); }}
         tags={tags}
         t={t}
+        onApprove={(postId) => {
+          updateClientLabel(postId, "aprovado");
+        }}
+        onRequestChange={(postId, comment) => {
+          updateClientLabel(postId, "alteracao_solicitada");
+          addComment(postId, clientData.name, comment);
+        }}
       />
     </div>
   );
