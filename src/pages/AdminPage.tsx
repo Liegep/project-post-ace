@@ -859,26 +859,6 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 </SheetContent>
               </Sheet>
             </div>
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full justify-start">
-                    <UserPlus className="mr-2 h-4 w-4 text-green-500" />
-                    Acesso do Cliente
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="w-full sm:w-[440px] overflow-y-auto">
-                  <SheetHeader>
-                    <SheetTitle className="flex items-center gap-2">
-                      <UserPlus className="h-5 w-5 text-green-500" />
-                      Acesso do Cliente
-                    </SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6">
-                    <ClientAccessPanel clientId={clientData.id} clientName={clientData.name} />
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
 
             {/* Permissions */}
             <div className="px-5 py-4 space-y-3">
