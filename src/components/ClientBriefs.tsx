@@ -78,10 +78,12 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
   };
 
   const filteredBriefs = useMemo(() => {
-    if (!filterMonth) return briefs;
+    // Hide approved/published briefs from client view
+    const pending = briefs.filter((b) => b.status !== "approved" && b.status !== "published");
+    if (!filterMonth) return pending;
     const ms = startOfMonth(filterMonth);
     const me = endOfMonth(filterMonth);
-    return briefs.filter((b) => {
+    return pending.filter((b) => {
       const d = b.planned_date ? new Date(b.planned_date) : new Date(b.created_at);
       return d >= ms && d <= me;
     });
