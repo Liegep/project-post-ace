@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PostsProvider, usePosts } from "@/context/PostsContext";
 import { Post } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
+import { PostCardSkeleton } from "@/components/PostCardSkeleton";
 import { PostDetailDialog } from "@/components/PostDetailDialog";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { Locale, translations } from "@/i18n/translations";
