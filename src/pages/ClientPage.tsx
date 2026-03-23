@@ -19,7 +19,7 @@ import { format, startOfMonth, endOfMonth, addMonths, subMonths, isSameMonth } f
 import { ptBR } from "date-fns/locale";
 import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound, Menu, FileBarChart, ArrowRight, ChevronLeft, ChevronRight as ChevronRightIcon } from "lucide-react";
 import { ClientNewsWidget } from "@/components/ClientNewsWidget";
-import { TrackingPanel } from "@/components/TrackingPanel";
+import { TrackingDrawer } from "@/components/TrackingDrawer";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -416,10 +416,9 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             )}
 
 
-            <div className="flex flex-col lg:flex-row gap-6">
-              {clientData.tracking_enabled && clientData.tracking_visible_to_client && (
-                <TrackingPanel clientId={clientData.id} posts={posts} columns={columns} tags={tags} />
-              )}
+            {clientData.tracking_enabled && clientData.tracking_visible_to_client && (
+              <TrackingDrawer clientId={clientData.id} posts={posts} columns={columns} tags={tags} />
+            )}
 
               <div className="flex-1 min-w-0 space-y-8">
                 {postsLoading ? (
@@ -501,7 +500,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                   <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
                 )}
               </div>
-            </div>
           </>
         ) : (
           <div>
