@@ -75,6 +75,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const monthStart = startOfMonth(selectedMonth);
   const monthEnd = endOfMonth(selectedMonth);
 
+  // Reset visible count when month changes
+  useEffect(() => {
+    setVisibleCount(POSTS_PER_PAGE);
+  }, [selectedMonth]);
+
   // Filter posts by selected month (using deadline or createdAt)
   const filterByMonth = useCallback((post: Post) => {
     const date = post.deadline || post.createdAt;
