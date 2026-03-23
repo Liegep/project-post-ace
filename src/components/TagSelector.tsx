@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Tag, TAG_TRANSLATION_KEYS } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
 import { useI18n } from "@/i18n/I18nContext";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Check } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tags, Plus, Search, X } from "lucide-react";
 
-const useTagName = (tag: Tag) => {
-  const { t } = useI18n();
+const getTagDisplayName = (tag: Tag, t: ReturnType<typeof useI18n>["t"]) => {
   const translationKey = TAG_TRANSLATION_KEYS[tag.id];
   return translationKey ? t(translationKey) : tag.name;
 };
@@ -21,9 +21,20 @@ interface TagSelectorProps {
 export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
   const { tags, addTag } = usePosts();
   const { t } = useI18n();
-  const [createOpen, setCreateOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [newColor, setNewColor] = useState("#6366f1");
+
+  const filteredTags = useMemo(() => {
+    if (!search.trim()) return tags;
+    const q = search.toLowerCase().trim();
+    return tags.filter((tag) => {
+      const name = getTagDisplayName(tag, t).toLowerCase();
+      return name.includes(q);
+    });
+  }, [tags, search, t]);
 
   const toggleTag = (tagId: string) => {
     onChange(
@@ -35,98 +46,135 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
 
   const handleCreate = () => {
     if (!newName.trim()) return;
+    // Check for duplicates (case-insensitive)
+    const exists = tags.some(
+      (tag) => getTagDisplayName(tag, t).toLowerCase() === newName.trim().toLowerCase()
+    );
+    if (exists) return;
     const tag = addTag(newName.trim(), newColor);
     onChange([...selectedTagIds, tag.id]);
     setNewName("");
     setNewColor("#6366f1");
-    setCreateOpen(false);
+    setCreating(false);
   };
 
-  return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-1.5">
-      {tags.map((tag) => {
-          const selected = selectedTagIds.includes(tag.id);
-          const translationKey = TAG_TRANSLATION_KEYS[tag.id];
-          const displayName = translationKey ? t(translationKey) : tag.name;
-          return (
-            <button
-              key={tag.id}
-              type="button"
-              onClick={(e) => { e.stopPropagation(); toggleTag(tag.id); }}
-              className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all cursor-pointer"
-              style={{
-                backgroundColor: selected ? tag.color : "transparent",
-                border: `1.5px solid ${tag.color}`,
-                color: selected ? "#fff" : tag.color,
-                opacity: selected ? 1 : 0.6,
-              }}
-            >
-              {selected && <Check className="h-3 w-3" />}
-              {displayName}
-            </button>
-          );
-        })}
+  const removeTag = (tagId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange(selectedTagIds.filter((id) => id !== tagId));
+  };
 
-        <Popover open={createOpen} onOpenChange={setCreateOpen}>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/40 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-accent hover:text-accent"
-            >
-              <Plus className="h-3 w-3" /> {t("newTag")}
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64 space-y-3" align="start" onClick={(e) => e.stopPropagation()}>
-            <p className="text-sm font-medium text-foreground">{t("tags")}</p>
-            <div className="flex flex-wrap gap-1.5">
-              {tags.map((tag) => {
-                const selected = selectedTagIds.includes(tag.id);
-                const translationKey = TAG_TRANSLATION_KEYS[tag.id];
-                const displayName = translationKey ? t(translationKey) : tag.name;
-                return (
-                  <button
-                    key={tag.id}
-                    type="button"
-                    onClick={() => toggleTag(tag.id)}
-                    className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition-all border"
-                    style={{
-                      backgroundColor: selected ? tag.color : "transparent",
-                      borderColor: tag.color,
-                      color: selected ? "#fff" : tag.color,
-                    }}
-                  >
-                    {selected && <Check className="h-3 w-3" />}
-                    {displayName}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="border-t pt-3 space-y-2">
+  const selectedTags = tags.filter((tag) => selectedTagIds.includes(tag.id));
+
+  return (
+    <div className="flex items-center gap-1.5 flex-wrap">
+      {/* Applied tags - compact display */}
+      {selectedTags.map((tag) => (
+        <span
+          key={tag.id}
+          className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold group/tag"
+          style={{ backgroundColor: tag.color, color: "#fff" }}
+        >
+          {getTagDisplayName(tag, t)}
+          <button
+            onClick={(e) => removeTag(tag.id, e)}
+            className="opacity-0 group-hover/tag:opacity-100 transition-opacity hover:bg-white/20 rounded-full p-0 leading-none"
+          >
+            <X className="h-2.5 w-2.5" />
+          </button>
+        </span>
+      ))}
+
+      {/* Manage tags button */}
+      <Popover open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setSearch(""); setCreating(false); } }}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/30 px-2 py-0.5 text-[10px] text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+          >
+            <Tags className="h-3 w-3" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-56 p-0" align="start" onClick={(e) => e.stopPropagation()}>
+          {/* Search */}
+          <div className="p-2 border-b">
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input
-                placeholder={t("tagNamePlaceholder")}
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                className="h-8 text-sm"
+                placeholder={t("search") || "Buscar..."}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="h-8 pl-7 text-xs"
               />
-              <div className="flex items-center gap-2">
-                <label className="text-xs text-muted-foreground">{t("color")}:</label>
-                <input
-                  type="color"
-                  value={newColor}
-                  onChange={(e) => setNewColor(e.target.value)}
-                  className="h-8 w-8 cursor-pointer rounded border-0 bg-transparent p-0"
-                />
-                <span className="text-xs text-muted-foreground">{newColor}</span>
-              </div>
-              <Button size="sm" onClick={handleCreate} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-                {t("create")}
-              </Button>
             </div>
-          </PopoverContent>
-        </Popover>
-      </div>
+          </div>
+
+          {/* Tag list with checkboxes */}
+          <div className="max-h-48 overflow-y-auto p-1">
+            {filteredTags.length === 0 && (
+              <p className="text-xs text-muted-foreground text-center py-3">
+                {t("noResults") || "Nenhuma etiqueta encontrada"}
+              </p>
+            )}
+            {filteredTags.map((tag) => {
+              const isSelected = selectedTagIds.includes(tag.id);
+              return (
+                <button
+                  key={tag.id}
+                  onClick={() => toggleTag(tag.id)}
+                  className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted cursor-pointer transition-colors"
+                >
+                  <Checkbox checked={isSelected} className="h-3.5 w-3.5 pointer-events-none" />
+                  <span
+                    className="h-3 w-3 rounded-full shrink-0"
+                    style={{ backgroundColor: tag.color }}
+                  />
+                  <span className="truncate text-foreground">{getTagDisplayName(tag, t)}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Create new tag */}
+          <div className="border-t p-2">
+            {creating ? (
+              <div className="space-y-2">
+                <Input
+                  placeholder={t("tagNamePlaceholder") || "Nome da etiqueta"}
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+                  className="h-7 text-xs"
+                  autoFocus
+                />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={newColor}
+                    onChange={(e) => setNewColor(e.target.value)}
+                    className="h-6 w-6 cursor-pointer rounded border-0 bg-transparent p-0"
+                  />
+                  <span className="text-[10px] text-muted-foreground flex-1">{newColor}</span>
+                  <Button size="sm" onClick={handleCreate} className="h-6 text-[10px] px-2 bg-accent text-accent-foreground hover:bg-accent/90">
+                    {t("create") || "Criar"}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setCreating(false)} className="h-6 text-[10px] px-2">
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setCreating(true)}
+                className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                {t("newTag") || "Criar etiqueta"}
+              </button>
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };
