@@ -601,6 +601,7 @@ export type Database = {
           shared: boolean
           show_archived_to_client: boolean
           show_invoices_to_client: boolean
+          show_upcoming_posts: boolean
           slug: string
           tiktok_url: string
           tracking_enabled: boolean
@@ -636,6 +637,7 @@ export type Database = {
           shared?: boolean
           show_archived_to_client?: boolean
           show_invoices_to_client?: boolean
+          show_upcoming_posts?: boolean
           slug: string
           tiktok_url?: string
           tracking_enabled?: boolean
@@ -671,6 +673,7 @@ export type Database = {
           shared?: boolean
           show_archived_to_client?: boolean
           show_invoices_to_client?: boolean
+          show_upcoming_posts?: boolean
           slug?: string
           tiktok_url?: string
           tracking_enabled?: boolean
