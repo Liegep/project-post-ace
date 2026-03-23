@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PostsProvider, usePosts } from "@/context/PostsContext";
 import { Post } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
+import { PostCardSkeleton } from "@/components/PostCardSkeleton";
 import { PostDetailDialog } from "@/components/PostDetailDialog";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { Locale, translations } from "@/i18n/translations";
@@ -45,8 +46,10 @@ interface ClientData {
   tracking_visible_to_client: boolean;
 }
 
+const POSTS_PER_PAGE = 6;
+
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
-  const { posts, archivedPosts, columns, tags, postingPeriod, unarchivePost } = usePosts();
+  const { posts, archivedPosts, columns, tags, postingPeriod, unarchivePost, loading: postsLoading } = usePosts();
   const navigate = useNavigate();
   const { data: reports = [] } = useSocialReports(clientData.id);
   const { permission: billingPerm, loading: billingPermLoading } = useMyBillingPermission(clientData.id);
@@ -66,10 +69,16 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
 
   const isCurrentMonth = isSameMonth(selectedMonth, new Date());
   const monthStart = startOfMonth(selectedMonth);
   const monthEnd = endOfMonth(selectedMonth);
+
+  // Reset visible count when month changes
+  useEffect(() => {
+    setVisibleCount(POSTS_PER_PAGE);
+  }, [selectedMonth]);
 
   // Filter posts by selected month (using deadline or createdAt)
   const filterByMonth = useCallback((post: Post) => {
@@ -414,7 +423,13 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               )}
 
               <div className="flex-1 min-w-0 space-y-8">
-                {hasContent ? (
+                {postsLoading ? (
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <PostCardSkeleton key={i} />
+                    ))}
+                  </div>
+                ) : hasContent ? (
                   <>
                     {/* Visible columns as horizontal board */}
                     {visibleColumnPosts.length > 0 && (
@@ -427,9 +442,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                             </div>
                             <div className="space-y-4">
                               {sortByDate(colPosts).map((post) => (
-                                <div key={post.id} className="cursor-pointer" onClick={() => setDetailPost(post)}>
-                                  <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
-                                </div>
+                                <ErrorBoundary key={post.id} fallbackTitle="Erro ao exibir post">
+                                  <div className="cursor-pointer" onClick={() => setDetailPost(post)}>
+                                    <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
+                                  </div>
+                                </ErrorBoundary>
                               ))}
                             </div>
                           </div>
@@ -443,9 +460,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                           <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
                           <div className="space-y-4 rounded-xl bg-muted/30 p-4">
                             {sortByDate(entradaPosts).map((post) => (
-                              <div key={post.id} className="cursor-pointer" onClick={() => setDetailPost(post)}>
-                                <PostCard post={post} isAdmin={false} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
-                              </div>
+                              <ErrorBoundary key={post.id} fallbackTitle="Erro ao exibir post">
+                                <div className="cursor-pointer" onClick={() => setDetailPost(post)}>
+                                  <PostCard post={post} isAdmin={false} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
+                                </div>
+                              </ErrorBoundary>
                             ))}
                           </div>
                         </div>
@@ -453,13 +472,28 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
                       <div className="flex-1 min-w-0">
                         {readyPosts.length > 0 && (
-                          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {sortByDate(readyPosts).map((post) => (
-                              <div key={post.id} className="cursor-pointer" onClick={() => setDetailPost(post)}>
-                                <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
+                          <>
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                              {sortByDate(readyPosts).slice(0, visibleCount).map((post) => (
+                                <ErrorBoundary key={post.id} fallbackTitle="Erro ao exibir post">
+                                  <div className="cursor-pointer" onClick={() => setDetailPost(post)}>
+                                    <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
+                                  </div>
+                                </ErrorBoundary>
+                              ))}
+                            </div>
+                            {visibleCount < readyPosts.length && (
+                              <div className="mt-6 flex justify-center">
+                                <Button
+                                  variant="outline"
+                                  onClick={() => setVisibleCount((prev) => prev + POSTS_PER_PAGE)}
+                                  className="px-8"
+                                >
+                                  Carregar mais ({readyPosts.length - visibleCount} restantes)
+                                </Button>
                               </div>
-                            ))}
-                          </div>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
