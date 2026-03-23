@@ -3,8 +3,9 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle, Tag as TagIcon } from "lucide-react";
 import { useState } from "react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
@@ -18,6 +19,7 @@ interface PostDetailDialogProps {
   t: (key: any) => string;
   onApprove?: (postId: string) => void;
   onRequestChange?: (postId: string, comment: string) => void;
+  onUpdateLabel?: (postId: string, label: ClientLabel, comment?: string) => void;
 }
 
 const STATUS_KEYS: Record<PostStatus, string> = {
@@ -38,7 +40,7 @@ const LABEL_KEYS: Record<ClientLabel, string> = {
   de_seu_feedback: "labelGiveFeedback",
 };
 
-export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove, onRequestChange }: PostDetailDialogProps) => {
+export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove, onRequestChange, onUpdateLabel }: PostDetailDialogProps) => {
   const [mediaIndex, setMediaIndex] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
   const [showChangeForm, setShowChangeForm] = useState(false);
