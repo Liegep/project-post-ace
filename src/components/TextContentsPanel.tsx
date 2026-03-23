@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useTextContents, TextContent, TextContentType, TextContentStatus } from "@/hooks/useTextContents";
 import { TextContentCard } from "@/components/TextContentCard";
 import { TextContentDetailDialog } from "@/components/TextContentDetailDialog";
