@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useTextContents, TextContent, TextContentType, TextContentStatus } from "@/hooks/useTextContents";
 import { TextContentCard } from "@/components/TextContentCard";
 import { TextContentDetailDialog } from "@/components/TextContentDetailDialog";
@@ -51,12 +52,23 @@ export function TextContentsPanel({ clientId, clientName, isAdmin }: Props) {
   };
 
   const handleStatusChange = async (id: string, status: string) => {
+    const item = contents.find((c) => c.id === id);
     const ok = await update(id, { status: status as TextContentStatus, client_label: status === "approved" ? "aprovado" : status === "rejected" ? "alteracao_solicitada" : "pendente" });
     if (ok) {
       toast({ title: status === "approved" ? "Conteúdo aprovado!" : "Conteúdo reprovado" });
       if (detailItem?.id === id) {
         setDetailItem({ ...detailItem!, status: status as TextContentStatus });
       }
+      // Notify admins
+      const actionLabel = status === "approved" ? "aprovou" : "reprovou";
+      const title = `Conteúdo textual ${status === "approved" ? "aprovado" : "reprovado"}`;
+      const message = `${clientName || "Cliente"} ${actionLabel} o conteúdo "${item?.title || ""}"`;
+      await supabase.from("admin_notifications").insert({
+        title,
+        message,
+        type: status === "approved" ? "text_approved" : "text_rejected",
+        client_id: clientId,
+      } as any);
     }
   };
 
