@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2, History, Download } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { TrackingPanel } from "@/components/TrackingPanel";
+import { TrackingDrawer } from "@/components/TrackingDrawer";
 import { ClientNotes } from "@/components/ClientNotes";
 import { ClientLinksPanel } from "@/components/ClientLinksPanel";
 import ClientAccessPanel from "@/components/ClientAccessPanel";
@@ -1142,7 +1142,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   />
                 </div>
                 {trackingEnabled && (
-                  <TrackingPanel
+                  <TrackingDrawer
                     clientId={clientData.id}
                     posts={posts}
                     columns={columns}
