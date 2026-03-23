@@ -142,6 +142,79 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
             <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{post.caption}</p>
           )}
 
+          {/* Client action buttons */}
+          {(onApprove || onRequestChange) && post.clientLabel !== "aprovado" && (
+            <div className="border-t pt-4 mt-2 space-y-3">
+              <p className="text-sm font-medium text-foreground">O que achou deste post?</p>
+              
+              {!showChangeForm ? (
+                <div className="flex flex-wrap gap-2">
+                  {onApprove && (
+                    <Button
+                      size="sm"
+                      className="bg-success text-success-foreground hover:bg-success/90 gap-1.5"
+                      onClick={() => {
+                        onApprove(post.id);
+                        toast.success("Post aprovado com sucesso!");
+                        onOpenChange(false);
+                      }}
+                    >
+                      <CheckCircle2 className="h-4 w-4" />
+                      Aprovado pela Boss
+                    </Button>
+                  )}
+                  {onRequestChange && (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="gap-1.5"
+                      onClick={() => setShowChangeForm(true)}
+                    >
+                      <AlertTriangle className="h-4 w-4" />
+                      Solicitar Alteração
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Descreva a alteração desejada..."
+                    value={changeComment}
+                    onChange={(e) => setChangeComment(e.target.value)}
+                    className="min-h-[80px] text-sm"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      disabled={!changeComment.trim()}
+                      onClick={() => {
+                        onRequestChange!(post.id, changeComment.trim());
+                        toast.success("Alteração solicitada com sucesso!");
+                        setChangeComment("");
+                        setShowChangeForm(false);
+                        onOpenChange(false);
+                      }}
+                    >
+                      Enviar solicitação
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => { setShowChangeForm(false); setChangeComment(""); }}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {post.clientLabel === "alteracao_solicitada" && (
+                <p className="text-xs text-destructive font-medium">Alteração já solicitada para este post.</p>
+              )}
+            </div>
+          )}
+
           {/* Activity History Toggle */}
           <button
             onClick={() => setShowHistory(!showHistory)}
