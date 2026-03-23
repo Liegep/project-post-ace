@@ -943,35 +943,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
         </SheetContent>
       </Sheet>
 
-      {/* Mobile notes sheet (opened from settings drawer) */}
-      <Sheet open={notesOpen} onOpenChange={setNotesOpen}>
-        <SheetContent className="w-full sm:w-[540px] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              <StickyNote className="h-5 w-5 text-amber-500" />
-              {t("clientNotes")}
-            </SheetTitle>
-          </SheetHeader>
-          <div className="mt-4">
-            <ClientNotes clientId={clientData.id} onCountChange={setNotesCount} />
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Links sheet (opened from settings drawer) */}
-      <Sheet open={linksOpen} onOpenChange={setLinksOpen}>
-        <SheetContent className="w-full sm:w-[440px] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
-              <LinkIcon className="h-5 w-5 text-blue-500" />
-              Links do Cliente
-            </SheetTitle>
-          </SheetHeader>
-          <div className="mt-6">
-            <ClientLinksPanel clientId={clientData.id} onCountChange={setLinksCount} />
-          </div>
-        </SheetContent>
-      </Sheet>
+      {/* Right Sidebar for Notes & Links */}
+      <ClientRightSidebar clientId={clientData.id} />
 
       <main className="mx-auto max-w-full p-4 sm:p-6">
         {/* Tab switcher */}
