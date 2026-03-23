@@ -3,8 +3,9 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle, Tag as TagIcon } from "lucide-react";
 import { useState } from "react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
@@ -18,6 +19,7 @@ interface PostDetailDialogProps {
   t: (key: any) => string;
   onApprove?: (postId: string) => void;
   onRequestChange?: (postId: string, comment: string) => void;
+  onUpdateLabel?: (postId: string, label: ClientLabel, comment?: string) => void;
 }
 
 const STATUS_KEYS: Record<PostStatus, string> = {
@@ -38,7 +40,7 @@ const LABEL_KEYS: Record<ClientLabel, string> = {
   de_seu_feedback: "labelGiveFeedback",
 };
 
-export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove, onRequestChange }: PostDetailDialogProps) => {
+export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove, onRequestChange, onUpdateLabel }: PostDetailDialogProps) => {
   const [mediaIndex, setMediaIndex] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
   const [showChangeForm, setShowChangeForm] = useState(false);
@@ -215,7 +217,80 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
             </div>
           )}
 
-          {/* Activity History Toggle */}
+          {/* Admin label dropdown */}
+          {onUpdateLabel && !onApprove && (
+            <div className="border-t pt-4 mt-2 space-y-3">
+              <div className="flex items-center gap-2">
+                <TagIcon className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-foreground">Etiqueta do Cliente</span>
+              </div>
+              <Select
+                value={post.clientLabel}
+                onValueChange={(value: ClientLabel) => {
+                  if (value === "alteracao_solicitada") {
+                    setShowChangeForm(true);
+                  } else {
+                    onUpdateLabel(post.id, value);
+                    toast.success("Etiqueta atualizada!");
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pendente">
+                    <span className="flex items-center gap-2">⏳ Pendente</span>
+                  </SelectItem>
+                  <SelectItem value="aprovado">
+                    <span className="flex items-center gap-2">✅ Aprovado pela Boss</span>
+                  </SelectItem>
+                  <SelectItem value="alteracao_solicitada">
+                    <span className="flex items-center gap-2">⚠️ Solicitar Alteração</span>
+                  </SelectItem>
+                  <SelectItem value="de_seu_feedback">
+                    <span className="flex items-center gap-2">💬 Dê seu Feedback</span>
+                  </SelectItem>
+                  <SelectItem value="leia_comentario">
+                    <span className="flex items-center gap-2">📖 Leia o Comentário</span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              {showChangeForm && (
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Descreva a alteração desejada..."
+                    value={changeComment}
+                    onChange={(e) => setChangeComment(e.target.value)}
+                    className="min-h-[80px] text-sm"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      disabled={!changeComment.trim()}
+                      onClick={() => {
+                        onUpdateLabel(post.id, "alteracao_solicitada", changeComment.trim());
+                        toast.success("Alteração solicitada!");
+                        setChangeComment("");
+                        setShowChangeForm(false);
+                      }}
+                    >
+                      Enviar solicitação
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => { setShowChangeForm(false); setChangeComment(""); }}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
           <button
             onClick={() => setShowHistory(!showHistory)}
             className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors pt-2"

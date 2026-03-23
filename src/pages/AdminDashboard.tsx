@@ -1727,7 +1727,29 @@ const AdminDashboard = () => {
       </Dialog>
 
       <InviteAdminDialog open={inviteOpen} onOpenChange={setInviteOpen} />
-      <PostDetailDialog post={viewPost} open={viewPostOpen} onOpenChange={setViewPostOpen} tags={DEFAULT_TAGS} t={t} />
+      <PostDetailDialog
+        post={viewPost}
+        open={viewPostOpen}
+        onOpenChange={setViewPostOpen}
+        tags={DEFAULT_TAGS}
+        t={t}
+        onUpdateLabel={async (postId, label, comment) => {
+          try {
+            await supabase.from("posts").update({ client_label: label }).eq("id", postId);
+            if (comment) {
+              const { data: { user } } = await supabase.auth.getUser();
+              await supabase.from("comments").insert({ post_id: postId, author: user?.email || "Admin", text: comment });
+            }
+            if (viewPost && viewPost.id === postId) {
+              setViewPost({ ...viewPost, clientLabel: label });
+            }
+            toast({ title: "Etiqueta atualizada com sucesso!" });
+          } catch (err) {
+            console.error("Error updating label:", err);
+            toast({ title: "Erro ao atualizar etiqueta", variant: "destructive" });
+          }
+        }}
+      />
 
       {/* Share Client Dialog */}
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
