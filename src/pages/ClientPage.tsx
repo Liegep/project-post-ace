@@ -46,8 +46,10 @@ interface ClientData {
   tracking_visible_to_client: boolean;
 }
 
+const POSTS_PER_PAGE = 6;
+
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
-  const { posts, archivedPosts, columns, tags, postingPeriod, unarchivePost } = usePosts();
+  const { posts, archivedPosts, columns, tags, postingPeriod, unarchivePost, loading: postsLoading } = usePosts();
   const navigate = useNavigate();
   const { data: reports = [] } = useSocialReports(clientData.id);
   const { permission: billingPerm, loading: billingPermLoading } = useMyBillingPermission(clientData.id);
@@ -67,6 +69,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
 
   const isCurrentMonth = isSameMonth(selectedMonth, new Date());
   const monthStart = startOfMonth(selectedMonth);
