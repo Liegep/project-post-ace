@@ -1,9 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Trash2, GripVertical, ExternalLink, Type } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface ClientLink {
   id: string;
@@ -19,14 +35,109 @@ interface Props {
   onCountChange?: (count: number) => void;
 }
 
+function SortableItem({ link, onUpdate, onRemove }: {
+  link: ClientLink;
+  onUpdate: (id: string, field: string, value: string) => void;
+  onRemove: (id: string) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: link.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
+  if (link.section_title && !link.url) {
+    return (
+      <div ref={setNodeRef} style={style} className="flex items-center gap-2 pt-4 pb-1">
+        <button
+          {...attributes}
+          {...listeners}
+          className="shrink-0 cursor-grab active:cursor-grabbing touch-none rounded p-1 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+        <Type className="h-4 w-4 text-muted-foreground shrink-0" />
+        <input
+          className="flex-1 bg-transparent text-sm font-semibold text-foreground border-none outline-none focus:ring-0 p-0"
+          value={link.section_title}
+          onChange={(e) => onUpdate(link.id, "section_title", e.target.value)}
+          placeholder="Título da seção"
+        />
+        <button
+          onClick={() => onRemove(link.id)}
+          className="shrink-0 rounded p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-center gap-2 rounded-lg border p-3 group bg-card">
+      <button
+        {...attributes}
+        {...listeners}
+        className="shrink-0 cursor-grab active:cursor-grabbing touch-none rounded p-1 text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+      <div className="flex-1 min-w-0 space-y-1">
+        <input
+          className="w-full bg-transparent text-sm font-medium border-none outline-none focus:ring-0 p-0"
+          value={link.title}
+          onChange={(e) => onUpdate(link.id, "title", e.target.value)}
+          placeholder="Título do link"
+        />
+        <input
+          className="w-full bg-transparent text-xs text-muted-foreground border-none outline-none focus:ring-0 p-0 truncate"
+          value={link.url}
+          onChange={(e) => onUpdate(link.id, "url", e.target.value)}
+          placeholder="https://..."
+        />
+      </div>
+      {link.url && (
+        <a
+          href={link.url.startsWith("http") ? link.url : `https://${link.url}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 rounded p-1 text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ExternalLink className="h-4 w-4" />
+        </a>
+      )}
+      <button
+        onClick={() => onRemove(link.id)}
+        className="shrink-0 rounded p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
+      >
+        <Trash2 className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+}
+
 export function ClientLinksPanel({ clientId, onCountChange }: Props) {
   const [links, setLinks] = useState<ClientLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [newTitle, setNewTitle] = useState("");
   const [newUrl, setNewUrl] = useState("");
-  const [newSection, setNewSection] = useState("");
   const [addingSection, setAddingSection] = useState(false);
   const [sectionName, setSectionName] = useState("");
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  );
 
   const fetchLinks = async () => {
     const { data } = await supabase
@@ -43,6 +154,24 @@ export function ClientLinksPanel({ clientId, onCountChange }: Props) {
   useEffect(() => {
     fetchLinks();
   }, [clientId]);
+
+  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = links.findIndex(l => l.id === active.id);
+    const newIndex = links.findIndex(l => l.id === over.id);
+    const reordered = arrayMove(links, oldIndex, newIndex);
+
+    // Optimistic update
+    setLinks(reordered);
+
+    // Persist new positions
+    const updates = reordered.map((link, i) =>
+      supabase.from("client_links").update({ position: i } as any).eq("id", link.id)
+    );
+    await Promise.all(updates);
+  }, [links]);
 
   const addLink = async () => {
     if (!newTitle.trim() || !newUrl.trim()) return;
@@ -81,80 +210,20 @@ export function ClientLinksPanel({ clientId, onCountChange }: Props) {
 
   const updateLink = async (id: string, field: string, value: string) => {
     await supabase.from("client_links").update({ [field]: value } as any).eq("id", id);
-    fetchLinks();
+    setLinks(prev => prev.map(l => l.id === id ? { ...l, [field]: value } : l));
   };
 
   if (loading) return <div className="text-sm text-muted-foreground p-4">Carregando...</div>;
 
-  // Group links by sections
-  const renderItems = () => {
-    const elements: JSX.Element[] = [];
-
-    links.forEach((link) => {
-      if (link.section_title && !link.url) {
-        // Section header
-        elements.push(
-          <div key={link.id} className="flex items-center gap-2 pt-4 pb-1">
-            <Type className="h-4 w-4 text-muted-foreground" />
-            <input
-              className="flex-1 bg-transparent text-sm font-semibold text-foreground border-none outline-none focus:ring-0 p-0"
-              value={link.section_title}
-              onChange={(e) => updateLink(link.id, "section_title", e.target.value)}
-              placeholder="Título da seção"
-            />
-            <button
-              onClick={() => removeLink(link.id)}
-              className="shrink-0 rounded p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        );
-      } else {
-        // Link item
-        elements.push(
-          <div key={link.id} className="flex items-center gap-2 rounded-lg border p-3 group">
-            <div className="flex-1 min-w-0 space-y-1">
-              <input
-                className="w-full bg-transparent text-sm font-medium border-none outline-none focus:ring-0 p-0"
-                value={link.title}
-                onChange={(e) => updateLink(link.id, "title", e.target.value)}
-                placeholder="Título do link"
-              />
-              <input
-                className="w-full bg-transparent text-xs text-muted-foreground border-none outline-none focus:ring-0 p-0 truncate"
-                value={link.url}
-                onChange={(e) => updateLink(link.id, "url", e.target.value)}
-                placeholder="https://..."
-              />
-            </div>
-            {link.url && (
-              <a
-                href={link.url.startsWith("http") ? link.url : `https://${link.url}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 rounded p-1 text-muted-foreground hover:text-primary transition-colors"
-              >
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            )}
-            <button
-              onClick={() => removeLink(link.id)}
-              className="shrink-0 rounded p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        );
-      }
-    });
-
-    return elements;
-  };
-
   return (
     <div className="space-y-3">
-      {renderItems()}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={links.map(l => l.id)} strategy={verticalListSortingStrategy}>
+          {links.map(link => (
+            <SortableItem key={link.id} link={link} onUpdate={updateLink} onRemove={removeLink} />
+          ))}
+        </SortableContext>
+      </DndContext>
 
       {links.length === 0 && (
         <p className="text-sm text-muted-foreground text-center py-4">Nenhum link adicionado ainda.</p>
