@@ -836,32 +836,29 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               )}
             </div>
 
-            {/* Panels: Recados, Links, Acesso */}
+            {/* Panels: Acesso */}
             <div className="px-5 py-4 space-y-2">
               <p className="text-xs font-medium text-muted-foreground mb-2">Painéis</p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start relative"
-                onClick={() => { setSettingsDrawerOpen(false); setNotesOpen(true); }}
-              >
-                <StickyNote className="mr-2 h-4 w-4 text-amber-500" />
-                Recados
-                {notesCount > 0 && (
-                  <span className="ml-auto rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                    {notesCount}
-                  </span>
-                )}
-              </Button>
-              <Button variant="outline" size="sm" className="w-full justify-start relative" onClick={() => { setSettingsDrawerOpen(false); setLinksOpen(true); }}>
-                <LinkIcon className="mr-2 h-4 w-4 text-blue-500" />
-                Links
-                {linksCount > 0 && (
-                  <span className="ml-auto rounded-full bg-blue-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                    {linksCount}
-                  </span>
-                )}
-              </Button>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full justify-start">
+                    <UserPlus className="mr-2 h-4 w-4 text-green-500" />
+                    Acesso do Cliente
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-full sm:w-[440px] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-2">
+                      <UserPlus className="h-5 w-5 text-green-500" />
+                      Acesso do Cliente
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6">
+                    <ClientAccessPanel clientId={clientData.id} clientName={clientData.name} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="sm" className="w-full justify-start">
