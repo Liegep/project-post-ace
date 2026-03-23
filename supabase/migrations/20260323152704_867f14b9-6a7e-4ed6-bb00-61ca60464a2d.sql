@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN show_upcoming_posts boolean NOT NULL DEFAULT false;
