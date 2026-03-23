@@ -18,7 +18,8 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2, History, Download, CalendarClock } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2, History, Download, CalendarClock, FileText } from "lucide-react";
+import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
 import { ClientNotes } from "@/components/ClientNotes";
@@ -1021,6 +1022,12 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   {archivedPosts.length}
                 </span>
               )}
+            </button>
+            <button
+              onClick={() => setActiveTab("texts")}
+              className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "texts" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+            >
+              <FileText className="mr-1.5 inline h-4 w-4" /> Textos
             </button>
             <button
               onClick={() => setActiveTab("activity")}
