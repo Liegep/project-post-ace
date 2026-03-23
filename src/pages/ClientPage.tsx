@@ -49,7 +49,7 @@ interface ClientData {
 const POSTS_PER_PAGE = 6;
 
 const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
-  const { posts, archivedPosts, columns, tags, postingPeriod, unarchivePost, loading: postsLoading } = usePosts();
+  const { posts, archivedPosts, columns, tags, postingPeriod, unarchivePost, updateClientLabel, addComment, loading: postsLoading } = usePosts();
   const navigate = useNavigate();
   const { data: reports = [] } = useSocialReports(clientData.id);
   const { permission: billingPerm, loading: billingPermLoading } = useMyBillingPermission(clientData.id);
