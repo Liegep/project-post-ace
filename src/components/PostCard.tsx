@@ -126,7 +126,7 @@ const downloadAllFiles = async (urls: string[], postTitle: string) => {
   }
 };
 
-export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, allowClientDownload, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
+export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, allowClientDownload, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
   const { addComment, updateClientLabel, updatePost, tags, clientId } = usePosts();
   const { t } = useI18n();
   const [expanded, setExpanded] = useState(false);
@@ -285,9 +285,9 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, allowC
               const currentUrl = allMedia[mediaIndex] || allMedia[0];
               const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
               return isVideo ? (
-                <video src={currentUrl} className="h-full w-full object-cover" controls muted />
+                <LazyVideo src={currentUrl} className="h-full w-full object-cover" />
               ) : (
-                <img src={currentUrl} alt={post.title} className="h-full w-full object-cover" />
+                <LazyImage src={currentUrl} alt={post.title} className="h-full w-full object-cover" />
               );
             })()}
             {allMedia.length > 1 && (
