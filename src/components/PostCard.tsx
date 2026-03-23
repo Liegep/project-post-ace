@@ -317,9 +317,38 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
                 {t(STATUS_KEYS[s])}
               </span>
             ))}
-              <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}>
-                {t(LABEL_KEYS[post.clientLabel])}
-              </span>
+              {isAdmin ? (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={(e) => e.stopPropagation()}
+                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm cursor-pointer hover:ring-2 hover:ring-primary/40 transition-all ${labelConfig.color}`}
+                    >
+                      {t(LABEL_KEYS[post.clientLabel])}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-44 p-1" align="end" side="top" onClick={(e) => e.stopPropagation()}>
+                    {(Object.keys(LABEL_KEYS) as ClientLabel[]).map((key) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateClientLabel(post.id, key);
+                        }}
+                        className={`w-full text-left px-3 py-1.5 text-xs rounded hover:bg-muted transition-colors ${post.clientLabel === key ? "font-bold bg-muted" : ""}`}
+                      >
+                        {t(LABEL_KEYS[key])}
+                      </button>
+                    ))}
+                  </PopoverContent>
+                </Popover>
+              ) : (
+                <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}>
+                  {t(LABEL_KEYS[post.clientLabel])}
+                </span>
+              )}
             </div>
           </div>
           {/* Sortable thumbnail strip for admin with multiple media */}
