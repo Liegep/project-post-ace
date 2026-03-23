@@ -131,19 +131,18 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
     }
   };
 
-  const monthFilteredPosts = posts.filter(filterByMonth);
-  const readyPosts = monthFilteredPosts.filter((p) => p.status.includes("pronto"));
+  const readyPosts = posts.filter((p) => p.status.includes("pronto"));
 
   const entradaColumn = columns.find((c) => c.name.toLowerCase() === "entrada");
   const entradaPosts = entradaColumn
-    ? monthFilteredPosts.filter((p) => p.columnId === entradaColumn.id && p.status.includes("em_desenvolvimento"))
+    ? posts.filter((p) => p.columnId === entradaColumn.id && p.status.includes("em_desenvolvimento"))
     : [];
 
   // Columns explicitly visible to client (excluding entrada which has its own section)
   const visibleColumns = columns.filter((c) => c.visibleToClient && c.id !== entradaColumn?.id);
   const visibleColumnPosts = visibleColumns.map((col) => ({
     column: col,
-    posts: monthFilteredPosts.filter((p) => p.columnId === col.id),
+    posts: posts.filter((p) => p.columnId === col.id),
   })).filter((g) => g.posts.length > 0);
 
   const sortByDate = (list: typeof posts) =>
