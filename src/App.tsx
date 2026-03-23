@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/i18n/I18nContext";
@@ -30,40 +31,42 @@ import NotFound from "./pages/NotFound.tsx";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <I18nProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/accept-invite" element={<AcceptInvitePage />} />
-            <Route path="/" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminDashboard /></AuthGuard>} />
-            <Route path="/admin" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminDashboard /></AuthGuard>} />
-            <Route path="/admin/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminPage /></AuthGuard>} />
-            <Route path="/social" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><SocialDashboard /></AuthGuard>} />
-            <Route path="/social/callback" element={<SocialCallbackPage />} />
-            <Route path="/team" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><TeamDashboard /></AuthGuard>} />
-            <Route path="/team-management" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><TeamManagementPage /></AuthGuard>} />
-            <Route path="/agenda" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AgendaPage /></AuthGuard>} />
-            <Route path="/ideas" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><IdeasPage /></AuthGuard>} />
-            <Route path="/calendar" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CalendarPage /></AuthGuard>} />
-            <Route path="/briefs" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><BriefsPage /></AuthGuard>} />
-            <Route path="/commemorative-dates" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CommemorativeDatesPage /></AuthGuard>} />
-            <Route path="/activity-log" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><ActivityLogPage /></AuthGuard>} />
-            <Route path="/reports" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><ReportsPage /></AuthGuard>} />
-            <Route path="/reports/new" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><CreateReportPage /></AuthGuard>} />
-            <Route path="/reports/:id" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ReportViewPage /></AuthGuard>} />
-            <Route path="/billing" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><BillingPage /></AuthGuard>} />
-            <Route path="/client/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ClientPage /></AuthGuard>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </I18nProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <I18nProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/accept-invite" element={<AcceptInvitePage />} />
+              <Route path="/" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminDashboard /></AuthGuard>} />
+              <Route path="/admin" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminDashboard /></AuthGuard>} />
+              <Route path="/admin/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminPage /></AuthGuard>} />
+              <Route path="/social" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><SocialDashboard /></AuthGuard>} />
+              <Route path="/social/callback" element={<SocialCallbackPage />} />
+              <Route path="/team" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><TeamDashboard /></AuthGuard>} />
+              <Route path="/team-management" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><TeamManagementPage /></AuthGuard>} />
+              <Route path="/agenda" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AgendaPage /></AuthGuard>} />
+              <Route path="/ideas" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><IdeasPage /></AuthGuard>} />
+              <Route path="/calendar" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CalendarPage /></AuthGuard>} />
+              <Route path="/briefs" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><BriefsPage /></AuthGuard>} />
+              <Route path="/commemorative-dates" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CommemorativeDatesPage /></AuthGuard>} />
+              <Route path="/activity-log" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><ActivityLogPage /></AuthGuard>} />
+              <Route path="/reports" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><ReportsPage /></AuthGuard>} />
+              <Route path="/reports/new" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><CreateReportPage /></AuthGuard>} />
+              <Route path="/reports/:id" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ReportViewPage /></AuthGuard>} />
+              <Route path="/billing" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><BillingPage /></AuthGuard>} />
+              <Route path="/client/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ClientPage /></AuthGuard>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </I18nProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

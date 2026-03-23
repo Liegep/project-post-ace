@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useMyBillingPermission } from "@/hooks/useBillingPermissions";
 import { useNavigate } from "react-router-dom";
 import ClientBriefs from "@/components/ClientBriefs";
@@ -621,11 +622,13 @@ const ClientPage = () => {
   const clientLocale = (clientData.locale || "pt") as Locale;
 
   return (
-    <I18nProvider key={clientLocale} defaultLocale={clientLocale}>
-      <PostsProvider clientId={clientData.id} clientLogo={clientData.logo_url} clientPostingPeriod={clientData.posting_period}>
-        <ClientPageInner clientData={clientData} />
-      </PostsProvider>
-    </I18nProvider>
+    <ErrorBoundary fallbackTitle="Erro ao carregar página do cliente">
+      <I18nProvider key={clientLocale} defaultLocale={clientLocale}>
+        <PostsProvider clientId={clientData.id} clientLogo={clientData.logo_url} clientPostingPeriod={clientData.posting_period}>
+          <ClientPageInner clientData={clientData} />
+        </PostsProvider>
+      </I18nProvider>
+    </ErrorBoundary>
   );
 };
 
