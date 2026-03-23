@@ -532,17 +532,17 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, allowC
         )}
 
         {!isAdmin && !hideFeedback && (
-          <div onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
+          <div onClick={(e) => e.stopPropagation()}>
             <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
-              <SelectTrigger className="h-9 w-full text-sm font-semibold bg-info text-info-foreground border-info hover:bg-info/90 rounded-lg">
+              <SelectTrigger className="h-11 w-full text-sm font-semibold bg-info text-info-foreground border-info hover:bg-info/90 rounded-lg touch-manipulation">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="de_seu_feedback">💬 {t("labelGiveFeedback")}</SelectItem>
+              <SelectContent position="popper" className="z-[9999]" sideOffset={4}>
+                <SelectItem value="de_seu_feedback" className="py-3 text-sm">💬 {t("labelGiveFeedback")}</SelectItem>
                 {(Object.keys(LABEL_KEYS) as ClientLabel[])
                   .filter((key) => key !== "de_seu_feedback")
                   .map((key) => (
-                    <SelectItem key={key} value={key}>{t(LABEL_KEYS[key])}</SelectItem>
+                    <SelectItem key={key} value={key} className="py-3 text-sm">{t(LABEL_KEYS[key])}</SelectItem>
                   ))}
               </SelectContent>
             </Select>
