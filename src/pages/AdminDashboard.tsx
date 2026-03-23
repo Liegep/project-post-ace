@@ -235,9 +235,11 @@ const AdminDashboard = () => {
   const handleAppLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const ext = file.name.split(".").pop();
+    const { compressImage } = await import("@/lib/imageCompressor");
+    const compressed = await compressImage(file);
+    const ext = compressed.name.split(".").pop();
     const path = `app-logo-${Date.now()}.${ext}`;
-    const { error: uploadError } = await supabase.storage.from("app-branding").upload(path, file, { upsert: true });
+    const { error: uploadError } = await supabase.storage.from("app-branding").upload(path, compressed, { upsert: true });
     if (uploadError) {
       toast({ title: "Erro ao enviar logo", description: uploadError.message, variant: "destructive" });
       return;
@@ -712,9 +714,11 @@ const AdminDashboard = () => {
     try {
       let logoUrl = editingClient?.logo_url || "";
       if (logoFile) {
-        const ext = logoFile.name.split(".").pop();
+        const { compressImage } = await import("@/lib/imageCompressor");
+        const compressed = await compressImage(logoFile);
+        const ext = compressed.name.split(".").pop();
         const fileName = `logos/${crypto.randomUUID()}.${ext}`;
-        const { error } = await supabase.storage.from("media").upload(fileName, logoFile);
+        const { error } = await supabase.storage.from("media").upload(fileName, compressed);
         if (error) throw error;
         const { data } = supabase.storage.from("media").getPublicUrl(fileName);
         logoUrl = data.publicUrl;

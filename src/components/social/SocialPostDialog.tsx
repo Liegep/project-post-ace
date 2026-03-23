@@ -73,7 +73,9 @@ export function SocialPostDialog({ open, onOpenChange, post, pages, clientId, on
     if (!files) return;
     setUploading(true);
     const newUrls: string[] = [];
-    for (const file of Array.from(files)) {
+    const { compressImage } = await import("@/lib/imageCompressor");
+    for (const rawFile of Array.from(files)) {
+      const file = await compressImage(rawFile);
       const ext = file.name.split(".").pop();
       const fileName = `social/${crypto.randomUUID()}.${ext}`;
       const { error } = await supabase.storage.from("media").upload(fileName, file);

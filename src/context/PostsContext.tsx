@@ -418,9 +418,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, []);
 
   const uploadMedia = useCallback(async (file: File): Promise<string> => {
-    const ext = file.name.split(".").pop();
+    const { compressImage } = await import("@/lib/imageCompressor");
+    const compressed = await compressImage(file);
+    const ext = compressed.name.split(".").pop();
     const fileName = `${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from("media").upload(fileName, file);
+    const { error } = await supabase.storage.from("media").upload(fileName, compressed);
     if (error) throw error;
     const { data } = supabase.storage.from("media").getPublicUrl(fileName);
     return data.publicUrl;
