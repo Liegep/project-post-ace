@@ -59,17 +59,28 @@ export function TextContentsPanel({ clientId, clientName, isAdmin }: Props) {
       if (detailItem?.id === id) {
         setDetailItem({ ...detailItem!, status: status as TextContentStatus });
       }
-      // Notify admins
       const actionLabel = status === "approved" ? "aprovou" : "reprovou";
       const title = `Conteúdo textual ${status === "approved" ? "aprovado" : "reprovado"}`;
       const message = `${clientName || "Cliente"} ${actionLabel} o conteúdo "${item?.title || ""}"`;
       await supabase.from("admin_notifications").insert({
-        title,
-        message,
+        title, message,
         type: status === "approved" ? "text_approved" : "text_rejected",
         client_id: clientId,
       } as any);
     }
+  };
+
+  const handleCardComment = async (id: string, msg: string) => {
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData?.user?.id || "anonymous";
+    const { error } = await supabase.from("text_content_comments").insert({
+      text_content_id: id,
+      user_id: userId,
+      author_name: clientName || "Cliente",
+      author_role: "client",
+      message: msg,
+    } as any);
+    if (!error) toast({ title: "Comentário enviado!" });
   };
 
   // Filter for client view: hide approved/published
@@ -123,6 +134,9 @@ export function TextContentsPanel({ clientId, clientName, isAdmin }: Props) {
                 content={content}
                 onClick={() => setDetailItem(content)}
                 isAdmin={isAdmin}
+                onApprove={(id) => handleStatusChange(id, "approved")}
+                onReject={(id) => handleStatusChange(id, "rejected")}
+                onComment={handleCardComment}
               />
               {isAdmin && (
                 <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
