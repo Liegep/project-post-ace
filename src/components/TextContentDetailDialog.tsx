@@ -124,9 +124,10 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
 
       {/* Article body */}
       <ScrollArea className="flex-1 px-6 py-6">
-        <article className="prose prose-sm sm:prose max-w-none text-foreground leading-[1.8]" style={{ whiteSpace: "pre-wrap" }}>
-          {content.body}
-        </article>
+        <article
+          className="prose prose-sm sm:prose max-w-none text-foreground leading-[1.8]"
+          dangerouslySetInnerHTML={{ __html: content.body }}
+        />
 
         {content.observations && (
           <div className="mt-8 rounded-lg border bg-muted/50 p-4">

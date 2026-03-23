@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
@@ -112,11 +113,10 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
 
           <div>
             <Label className="text-xs">Texto Completo</Label>
-            <Textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
+            <RichTextEditor
+              content={body}
+              onChange={setBody}
               placeholder="Escreva o conteúdo completo aqui..."
-              className="min-h-[200px] leading-relaxed"
             />
           </div>
 
