@@ -1205,6 +1205,10 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             onToggleSelect={toggleSelect}
             t={t}
           />
+        ) : activeTab === "texts" ? (
+          <div className="mx-auto max-w-4xl">
+            <TextContentsPanel clientId={clientData.id} clientName={clientData.name} isAdmin />
+          </div>
         ) : (
           <div className="mx-auto max-w-2xl">
             <ActivityTimeline
