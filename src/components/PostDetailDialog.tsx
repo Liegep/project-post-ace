@@ -60,7 +60,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
     .filter(Boolean) as Tag[];
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setMediaIndex(0); setShowHistory(false); } }}>
+    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setMediaIndex(0); setShowHistory(false); setShowChangeForm(false); setChangeComment(""); } }}>
       <DialogContent className="max-w-2xl p-0 overflow-hidden gap-0 max-h-[90vh] overflow-y-auto">
         {/* Media area */}
         {hasMedia && (
