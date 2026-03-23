@@ -136,18 +136,6 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
           </div>
         )}
 
-        {/* Approval actions for client */}
-        {!isAdmin && content.status === "pending_approval" && (
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button onClick={handleApprove} className="bg-success text-success-foreground hover:bg-success/90">
-              <Check className="mr-2 h-4 w-4" /> Aprovar
-            </Button>
-            <Button onClick={handleReject} variant="outline" className="text-destructive border-destructive/30 hover:bg-destructive/10">
-              <X className="mr-2 h-4 w-4" /> Reprovar
-            </Button>
-          </div>
-        )}
-
         {/* Comments section */}
         <div className="mt-8">
           <div className="flex items-center gap-2 mb-4">
