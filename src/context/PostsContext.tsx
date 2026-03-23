@@ -296,52 +296,56 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, [posts, clientId, ensureAgendadosColumn]);
 
   const updateClientLabel = useCallback(async (id: string, label: ClientLabel) => {
-    let newColumnId: string | undefined;
+    try {
+      let newColumnId: string | undefined;
 
-    // When client approves, move post to "Aprovados" column
-    if (label === "aprovado" && clientId) {
-      const { data: existingCols } = await supabase
-        .from("columns")
-        .select("id, name")
-        .eq("client_id", clientId);
-
-      const aprovadosCol = (existingCols || []).find((c: any) => c.name.toLowerCase() === "aprovados");
-      if (aprovadosCol) {
-        newColumnId = aprovadosCol.id;
-      } else {
-        // Create "Aprovados" column at the end
-        const maxPos = (existingCols || []).length;
-        const { data: newCol } = await supabase
+      // When client approves, move post to "Aprovados" column
+      if (label === "aprovado" && clientId) {
+        const { data: existingCols } = await supabase
           .from("columns")
-          .insert({ client_id: clientId, name: "Aprovados", position: maxPos } as any)
-          .select()
-          .single();
-        if (newCol) {
-          newColumnId = (newCol as any).id;
-          setColumns((prev) => [...prev, { id: (newCol as any).id, clientId, name: "Aprovados", position: maxPos, visibleToClient: false }]);
+          .select("id, name")
+          .eq("client_id", clientId);
+
+        const aprovadosCol = (existingCols || []).find((c: any) => c.name.toLowerCase() === "aprovados");
+        if (aprovadosCol) {
+          newColumnId = aprovadosCol.id;
+        } else {
+          // Create "Aprovados" column at the end
+          const maxPos = (existingCols || []).length;
+          const { data: newCol } = await supabase
+            .from("columns")
+            .insert({ client_id: clientId, name: "Aprovados", position: maxPos } as any)
+            .select()
+            .single();
+          if (newCol) {
+            newColumnId = (newCol as any).id;
+            setColumns((prev) => [...prev, { id: (newCol as any).id, clientId, name: "Aprovados", position: maxPos, visibleToClient: false }]);
+          }
         }
       }
-    }
 
-    const dbUpdates: Record<string, any> = { client_label: label };
-    if (newColumnId) dbUpdates.column_id = newColumnId;
+      const dbUpdates: Record<string, any> = { client_label: label };
+      if (newColumnId) dbUpdates.column_id = newColumnId;
 
-    const post = posts.find(p => p.id === id);
-    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, clientLabel: label, ...(newColumnId ? { columnId: newColumnId } : {}) } : p)));
-    await supabase.from("posts").update(dbUpdates).eq("id", id);
+      const post = posts.find(p => p.id === id);
+      setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, clientLabel: label, ...(newColumnId ? { columnId: newColumnId } : {}) } : p)));
+      await supabase.from("posts").update(dbUpdates).eq("id", id);
 
-    // Log approval or change request
-    const action = label === "aprovado" ? "post_approved" : label === "alteracao_solicitada" ? "post_change_requested" : null;
-    if (action) {
-      const { data: cl } = await supabase.from("clients").select("name").eq("id", clientId).maybeSingle();
-      logActivity({
-        action,
-        itemType: "post",
-        itemId: id,
-        itemTitle: post?.title || "",
-        clientId,
-        clientName: (cl as any)?.name || "",
-      });
+      // Log approval or change request
+      const action = label === "aprovado" ? "post_approved" : label === "alteracao_solicitada" ? "post_change_requested" : null;
+      if (action) {
+        const { data: cl } = await supabase.from("clients").select("name").eq("id", clientId).maybeSingle();
+        logActivity({
+          action,
+          itemType: "post",
+          itemId: id,
+          itemTitle: post?.title || "",
+          clientId,
+          clientName: (cl as any)?.name || "",
+        }).catch(() => {});
+      }
+    } catch (err) {
+      console.error("[updateClientLabel] Error:", err);
     }
   }, [clientId, posts]);
 

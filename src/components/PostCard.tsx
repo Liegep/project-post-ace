@@ -533,7 +533,16 @@ export const PostCard = ({ post, isAdmin, hideFeedback, allowEditCaption, allowC
 
         {!isAdmin && !hideFeedback && (
           <div onClick={(e) => e.stopPropagation()}>
-            <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
+            <Select
+              value={post.clientLabel}
+              onValueChange={(v) => {
+                try {
+                  updateClientLabel(post.id, v as ClientLabel);
+                } catch (err) {
+                  console.error("[PostCard] label change error:", err);
+                }
+              }}
+            >
               <SelectTrigger className="h-11 w-full text-sm font-semibold bg-info text-info-foreground border-info hover:bg-info/90 rounded-lg touch-manipulation">
                 <SelectValue />
               </SelectTrigger>
