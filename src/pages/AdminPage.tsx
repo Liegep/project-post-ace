@@ -23,8 +23,6 @@ import { ClientRightSidebar } from "@/components/ClientRightSidebar";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
-import { ClientNotes } from "@/components/ClientNotes";
-import { ClientLinksPanel } from "@/components/ClientLinksPanel";
 import ClientAccessPanel from "@/components/ClientAccessPanel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
