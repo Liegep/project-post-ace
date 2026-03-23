@@ -1737,6 +1737,100 @@ export type Database = {
           },
         ]
       }
+      text_content_comments: {
+        Row: {
+          author_name: string
+          author_role: string
+          created_at: string
+          id: string
+          message: string
+          text_content_id: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string
+          author_role?: string
+          created_at?: string
+          id?: string
+          message?: string
+          text_content_id: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          author_role?: string
+          created_at?: string
+          id?: string
+          message?: string
+          text_content_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "text_content_comments_text_content_id_fkey"
+            columns: ["text_content_id"]
+            isOneToOne: false
+            referencedRelation: "text_contents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      text_contents: {
+        Row: {
+          body: string
+          client_id: string
+          client_label: string
+          content_type: Database["public"]["Enums"]["text_content_type"]
+          created_at: string
+          created_by: string | null
+          id: string
+          observations: string
+          planned_date: string | null
+          status: Database["public"]["Enums"]["text_content_status"]
+          subtitle: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string
+          client_id: string
+          client_label?: string
+          content_type?: Database["public"]["Enums"]["text_content_type"]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          observations?: string
+          planned_date?: string | null
+          status?: Database["public"]["Enums"]["text_content_status"]
+          subtitle?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          client_id?: string
+          client_label?: string
+          content_type?: Database["public"]["Enums"]["text_content_type"]
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          observations?: string
+          planned_date?: string | null
+          status?: Database["public"]["Enums"]["text_content_status"]
+          subtitle?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "text_contents_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tracking_order: {
         Row: {
           client_id: string
@@ -1920,6 +2014,14 @@ export type Database = {
         | "published"
         | "error"
         | "cancelled"
+      text_content_status:
+        | "draft"
+        | "internal"
+        | "pending_approval"
+        | "approved"
+        | "rejected"
+        | "published"
+      text_content_type: "blog" | "artigo" | "texto" | "copy" | "documento"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2080,6 +2182,15 @@ export const Constants = {
         "error",
         "cancelled",
       ],
+      text_content_status: [
+        "draft",
+        "internal",
+        "pending_approval",
+        "approved",
+        "rejected",
+        "published",
+      ],
+      text_content_type: ["blog", "artigo", "texto", "copy", "documento"],
     },
   },
 } as const
