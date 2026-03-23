@@ -420,7 +420,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               <TrackingDrawer clientId={clientData.id} posts={posts} columns={columns} tags={tags} />
             )}
 
-            <div className="flex flex-col lg:flex-row gap-6">
               <div className="flex-1 min-w-0 space-y-8">
                 {postsLoading ? (
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -501,7 +500,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                   <p className="py-12 text-center text-muted-foreground">{t("noPostsToReview")}</p>
                 )}
               </div>
-            </div>
           </>
         ) : (
           <div>
