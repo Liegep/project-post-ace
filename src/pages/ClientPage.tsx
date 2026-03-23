@@ -307,6 +307,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           <ClientBriefs clientId={clientData.id} clientName={clientData.name} filterMonth={selectedMonth} />
         </div>
 
+        {/* Text Contents for Approval */}
+        <div className="mb-8">
+          <TextContentsPanel clientId={clientData.id} clientName={clientData.name} />
+        </div>
+
         {/* Client Invoices - permission-controlled */}
         {clientData.show_invoices_to_client && billingPerm?.can_view_invoices && (
           <div className="mb-8">
