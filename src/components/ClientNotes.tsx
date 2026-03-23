@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Trash2, Paperclip, Link, X, StickyNote, ImagePlus } from "lucide-react";
+import { Plus, Trash2, Paperclip, Link, X, StickyNote, ImagePlus, FileText } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useI18n } from "@/i18n/I18nContext";
 import { format } from "date-fns";
@@ -21,7 +21,7 @@ const NOTE_COLORS = [
 ];
 
 interface Attachment {
-  type: "link" | "image" | "video";
+  type: "link" | "image" | "video" | "pdf";
   url: string;
   name: string;
 }
@@ -103,8 +103,13 @@ export const ClientNotes = ({ clientId, onCountChange }: ClientNotesProps) => {
     if (!files?.length) return;
     setUploading(true);
 
+    const MAX_SIZE = 20 * 1024 * 1024; // 20MB
+
     for (const file of Array.from(files)) {
-      const ext = file.name.split(".").pop();
+      if (file.size > MAX_SIZE) {
+        toast({ title: `Arquivo "${file.name}" excede 20 MB`, variant: "destructive" });
+        continue;
+      }
       const path = `notes/${clientId}/${Date.now()}_${file.name}`;
       const { error } = await supabase.storage.from("media").upload(path, file);
       if (error) {
@@ -112,10 +117,12 @@ export const ClientNotes = ({ clientId, onCountChange }: ClientNotesProps) => {
         continue;
       }
       const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+      const isPdf = file.type === "application/pdf";
       const isVideo = file.type.startsWith("video/");
+      const fileType: Attachment["type"] = isPdf ? "pdf" : isVideo ? "video" : "image";
       setAttachments((prev) => [
         ...prev,
-        { type: isVideo ? "video" : "image", url: urlData.publicUrl, name: file.name },
+        { type: fileType, url: urlData.publicUrl, name: file.name },
       ]);
     }
     setUploading(false);
@@ -222,6 +229,16 @@ export const ClientNotes = ({ clientId, onCountChange }: ClientNotesProps) => {
                             className="rounded-md max-h-24 w-full object-cover"
                           />
                         </a>
+                      ) : att.type === "pdf" ? (
+                        <a
+                          href={att.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 text-xs text-red-700 hover:underline bg-white/60 rounded-md px-2 py-1.5"
+                        >
+                          <FileText className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{att.name}</span>
+                        </a>
                       ) : (
                         <video src={att.url} controls className="rounded-md max-h-24 w-full" />
                       )}
@@ -302,13 +319,14 @@ export const ClientNotes = ({ clientId, onCountChange }: ClientNotesProps) => {
                 {uploading ? "Enviando..." : t("noteSelectFile")}
                 <input
                   type="file"
-                  accept="image/*,video/*"
+                  accept="image/*,video/*,application/pdf"
                   multiple
                   className="hidden"
                   onChange={handleFileUpload}
                   disabled={uploading}
                 />
               </label>
+              <span className="text-[10px] text-muted-foreground ml-1">Imagens, vídeos e PDFs (máx. 20 MB)</span>
             </div>
 
             {/* Attachments preview */}
@@ -318,6 +336,8 @@ export const ClientNotes = ({ clientId, onCountChange }: ClientNotesProps) => {
                   <div key={i} className="flex items-center gap-2 bg-muted rounded-md px-3 py-1.5 text-sm">
                     {att.type === "link" ? (
                       <Link className="h-3.5 w-3.5 shrink-0 text-blue-600" />
+                    ) : att.type === "pdf" ? (
+                      <FileText className="h-3.5 w-3.5 shrink-0 text-red-600" />
                     ) : att.type === "image" ? (
                       <img src={att.url} className="h-8 w-8 rounded object-cover" />
                     ) : (
