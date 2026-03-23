@@ -134,6 +134,10 @@ export function TextContentsPanel({ clientId, clientName, isAdmin }: Props) {
                 content={content}
                 onClick={() => setDetailItem(content)}
                 isAdmin={isAdmin}
+                onApprove={(id) => handleStatusChange(id, "approved")}
+                onReject={(id) => handleStatusChange(id, "rejected")}
+                onComment={handleCardComment}
+              />
               />
               {isAdmin && (
                 <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
