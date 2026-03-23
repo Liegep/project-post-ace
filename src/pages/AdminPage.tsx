@@ -18,7 +18,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2, History, Download } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2, History, Download, CalendarClock } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
 import { ClientNotes } from "@/components/ClientNotes";
@@ -89,6 +89,7 @@ interface ClientData {
   show_archived_to_client: boolean;
   tracking_enabled: boolean;
   tracking_visible_to_client: boolean;
+  show_upcoming_posts: boolean;
   instagram_url: string;
   facebook_url: string;
   tiktok_url: string;
@@ -531,6 +532,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [allowClientDownload, setAllowClientDownload] = useState((clientData as any).allow_client_download ?? false);
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
   const [trackingVisibleToClient, setTrackingVisibleToClient] = useState(clientData.tracking_visible_to_client ?? false);
+  const [showUpcomingPosts, setShowUpcomingPosts] = useState((clientData as any).show_upcoming_posts ?? false);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -916,6 +918,16 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   Mostrar arquivados
                 </label>
                 <Switch checked={showArchivedToClient} onCheckedChange={toggleShowArchivedToClient} />
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground flex items-center gap-2">
+                  <CalendarClock className="h-3.5 w-3.5 text-muted-foreground" />
+                  Próximos posts
+                </label>
+                <Switch checked={showUpcomingPosts} onCheckedChange={async (checked) => {
+                  setShowUpcomingPosts(checked);
+                  await supabase.from("clients").update({ show_upcoming_posts: checked } as any).eq("id", clientData.id);
+                }} />
               </div>
               {trackingEnabled && (
                 <>

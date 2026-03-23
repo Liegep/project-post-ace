@@ -44,6 +44,7 @@ interface ClientData {
   allow_client_download: boolean;
   tracking_enabled: boolean;
   tracking_visible_to_client: boolean;
+  show_upcoming_posts: boolean;
 }
 
 const POSTS_PER_PAGE = 6;
@@ -131,7 +132,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
     }
   };
 
-  const readyPosts = posts.filter((p) => p.status.includes("pronto"));
+  const readyPosts = posts.filter((p) => p.status.includes("pronto") && p.clientLabel !== "aprovado");
 
   const entradaColumn = columns.find((c) => c.name.toLowerCase() === "entrada");
   const entradaPosts = entradaColumn
@@ -367,9 +368,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         )}
 
         {/* Upcoming Posts Widget */}
-        <div className="mb-8">
-          <UpcomingPostsWidget posts={[...posts, ...archivedPosts]} />
-        </div>
+        {clientData.show_upcoming_posts && (
+          <div className="mb-8">
+            <UpcomingPostsWidget posts={[...posts, ...archivedPosts]} />
+          </div>
+        )}
 
         {clientData.show_archived_to_client && (
           <div className="mb-6 flex items-center justify-center">
