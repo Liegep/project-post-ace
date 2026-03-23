@@ -21,7 +21,7 @@ const NOTE_COLORS = [
 ];
 
 interface Attachment {
-  type: "link" | "image" | "video";
+  type: "link" | "image" | "video" | "pdf";
   url: string;
   name: string;
 }
