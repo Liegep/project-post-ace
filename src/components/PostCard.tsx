@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
+import { LazyImage, LazyVideo } from "@/components/LazyImage";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Post, PostStatus, ClientLabel, STATUS_CONFIG, LABEL_CONFIG } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
