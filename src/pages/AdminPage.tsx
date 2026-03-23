@@ -520,6 +520,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [notesCount, setNotesCount] = useState(0);
   const [notesOpen, setNotesOpen] = useState(false);
   const [linksCount, setLinksCount] = useState(0);
+  const [linksOpen, setLinksOpen] = useState(false);
 
   // Selection mode state
   const [selectionMode, setSelectionMode] = useState(false);
@@ -855,30 +856,15 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   </span>
                 )}
               </Button>
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full justify-start relative" onClick={() => setSettingsDrawerOpen(false)}>
-                    <LinkIcon className="mr-2 h-4 w-4 text-blue-500" />
-                    Links
-                    {linksCount > 0 && (
-                      <span className="ml-auto rounded-full bg-blue-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                        {linksCount}
-                      </span>
-                    )}
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="w-full sm:w-[440px] overflow-y-auto">
-                  <SheetHeader>
-                    <SheetTitle className="flex items-center gap-2">
-                      <LinkIcon className="h-5 w-5 text-blue-500" />
-                      Links do Cliente
-                    </SheetTitle>
-                  </SheetHeader>
-                  <div className="mt-6">
-                    <ClientLinksPanel clientId={clientData.id} onCountChange={setLinksCount} />
-                  </div>
-                </SheetContent>
-              </Sheet>
+              <Button variant="outline" size="sm" className="w-full justify-start relative" onClick={() => { setSettingsDrawerOpen(false); setLinksOpen(true); }}>
+                <LinkIcon className="mr-2 h-4 w-4 text-blue-500" />
+                Links
+                {linksCount > 0 && (
+                  <span className="ml-auto rounded-full bg-blue-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                    {linksCount}
+                  </span>
+                )}
+              </Button>
               <Sheet>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="sm" className="w-full justify-start">
@@ -984,6 +970,21 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
           </SheetHeader>
           <div className="mt-4">
             <ClientNotes clientId={clientData.id} onCountChange={setNotesCount} />
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Links sheet (opened from settings drawer) */}
+      <Sheet open={linksOpen} onOpenChange={setLinksOpen}>
+        <SheetContent className="w-full sm:w-[440px] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <LinkIcon className="h-5 w-5 text-blue-500" />
+              Links do Cliente
+            </SheetTitle>
+          </SheetHeader>
+          <div className="mt-6">
+            <ClientLinksPanel clientId={clientData.id} onCountChange={setLinksCount} />
           </div>
         </SheetContent>
       </Sheet>
