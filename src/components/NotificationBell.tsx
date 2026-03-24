@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Bell } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -19,6 +21,7 @@ interface DeadlineNotification {
   createdAt: string;
   clientId: string | null;
   postId: string | null;
+  actorAvatarUrl: string;
 }
 
 export const NotificationBell = () => {
@@ -73,6 +76,7 @@ export const NotificationBell = () => {
         createdAt: n.created_at,
         clientId: n.client_id,
         postId: n.post_id,
+        actorAvatarUrl: n.actor_avatar_url || "",
       }))
     );
   };
