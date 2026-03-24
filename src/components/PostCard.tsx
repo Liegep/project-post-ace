@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud, DollarSign, Check } from "lucide-react";
+import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { PostTrackingLabels } from "@/components/PostTrackingLabels";
 import { format } from "date-fns";
@@ -584,6 +585,13 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
+            <ApprovalLinkButton
+              clientId={clientId}
+              postId={post.id}
+              postTitle={post.title}
+              variant="individual"
+              className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}
+            />
             <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
               <Trash2 className="h-4 w-4" />
             </Button>

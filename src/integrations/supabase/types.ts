@@ -255,6 +255,105 @@ export type Database = {
           },
         ]
       }
+      approval_actions: {
+        Row: {
+          action: string
+          actor_name: string
+          comment: string
+          created_at: string
+          id: string
+          post_id: string
+          token_id: string
+        }
+        Insert: {
+          action: string
+          actor_name?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          post_id: string
+          token_id: string
+        }
+        Update: {
+          action?: string
+          actor_name?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          token_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_actions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approval_actions_token_id_fkey"
+            columns: ["token_id"]
+            isOneToOne: false
+            referencedRelation: "approval_tokens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      approval_tokens: {
+        Row: {
+          active: boolean
+          client_id: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          post_id: string | null
+          token: string
+          token_type: string
+          used_at: string | null
+        }
+        Insert: {
+          active?: boolean
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          post_id?: string | null
+          token: string
+          token_type?: string
+          used_at?: string | null
+        }
+        Update: {
+          active?: boolean
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          post_id?: string | null
+          token?: string
+          token_type?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_tokens_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approval_tokens_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       billing_access_logs: {
         Row: {
           action: string
@@ -583,6 +682,7 @@ export type Database = {
           allow_client_create_post: boolean
           allow_client_download: boolean
           allow_client_edit_caption: boolean
+          allow_quick_access: boolean
           billing_currency: string
           billing_description: string
           billing_due_day: number
@@ -595,12 +695,14 @@ export type Database = {
           facebook_url: string
           id: string
           instagram_url: string
+          link_expiration_days: number
           linkedin_url: string
           locale: string
           logo_url: string
           name: string
           owner_id: string | null
           posting_period: string
+          require_login: boolean
           shared: boolean
           show_archived_to_client: boolean
           show_invoices_to_client: boolean
@@ -619,6 +721,7 @@ export type Database = {
           allow_client_create_post?: boolean
           allow_client_download?: boolean
           allow_client_edit_caption?: boolean
+          allow_quick_access?: boolean
           billing_currency?: string
           billing_description?: string
           billing_due_day?: number
@@ -631,12 +734,14 @@ export type Database = {
           facebook_url?: string
           id?: string
           instagram_url?: string
+          link_expiration_days?: number
           linkedin_url?: string
           locale?: string
           logo_url?: string
           name: string
           owner_id?: string | null
           posting_period?: string
+          require_login?: boolean
           shared?: boolean
           show_archived_to_client?: boolean
           show_invoices_to_client?: boolean
@@ -655,6 +760,7 @@ export type Database = {
           allow_client_create_post?: boolean
           allow_client_download?: boolean
           allow_client_edit_caption?: boolean
+          allow_quick_access?: boolean
           billing_currency?: string
           billing_description?: string
           billing_due_day?: number
@@ -667,12 +773,14 @@ export type Database = {
           facebook_url?: string
           id?: string
           instagram_url?: string
+          link_expiration_days?: number
           linkedin_url?: string
           locale?: string
           logo_url?: string
           name?: string
           owner_id?: string | null
           posting_period?: string
+          require_login?: boolean
           shared?: boolean
           show_archived_to_client?: boolean
           show_invoices_to_client?: boolean

@@ -24,6 +24,8 @@ import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
 import ClientAccessPanel from "@/components/ClientAccessPanel";
+import { HybridAccessConfig } from "@/components/HybridAccessConfig";
+import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -853,11 +855,17 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                       Acesso do Cliente
                     </SheetTitle>
                   </SheetHeader>
-                  <div className="mt-6">
+                  <div className="mt-6 space-y-6">
                     <ClientAccessPanel clientId={clientData.id} clientName={clientData.name} />
+                    <HybridAccessConfig clientId={clientData.id} />
                   </div>
                 </SheetContent>
               </Sheet>
+              <ApprovalLinkButton
+                clientId={clientData.id}
+                variant="batch"
+                className="w-full justify-start"
+              />
             </div>
 
             {/* Permissions */}
