@@ -134,16 +134,6 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         await movePostToColumn(post.id, columnId);
       }
 
-      // Log post edit (no-op for non-approval actions now)
-      const { data: cl } = await supabase.from("clients").select("name").eq("id", clientId).maybeSingle();
-      logActivity({
-        action: "post_edited",
-        itemType: "post",
-        itemId: post.id,
-        itemTitle: title,
-        clientId,
-        clientName: (cl as any)?.name || "",
-      });
 
       onOpenChange(false);
     } finally {

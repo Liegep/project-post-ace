@@ -780,15 +780,6 @@ const AdminDashboard = () => {
       }
 
       setDialogOpen(false);
-      // Log client creation/update
-      logActivity({
-        action: editingClient ? "client_updated" : "client_created",
-        itemType: "client",
-        itemId: clientId || "",
-        itemTitle: name,
-        clientId: clientId || undefined,
-        clientName: name,
-      });
       fetchClients().then(() => fetchClientUsers());
     } catch (err) {
       console.error(err);
