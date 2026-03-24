@@ -73,6 +73,7 @@ const TeamDashboard = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState("");
+  const [userAvatar, setUserAvatar] = useState("");
   const [userId, setUserId] = useState("");
 
   // Post detail for status change
@@ -121,8 +122,11 @@ const TeamDashboard = () => {
     setUserId(session.user.id);
 
     // Get profile name
-    const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", session.user.id).single();
-    if (profile) setUserName((profile as any).full_name);
+    const { data: profile } = await supabase.from("profiles").select("full_name, avatar_url").eq("id", session.user.id).single();
+    if (profile) {
+      setUserName((profile as any).full_name);
+      setUserAvatar((profile as any).avatar_url || "");
+    }
 
     // Get assigned client IDs
     const { data: assignmentData } = await supabase.from("user_client_assignments").select("client_id").eq("user_id", session.user.id);
