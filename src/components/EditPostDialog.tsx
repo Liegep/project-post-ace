@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { usePosts } from "@/context/PostsContext";
-import { logActivity } from "@/lib/activityLogger";
+
 import { useI18n } from "@/i18n/I18nContext";
 import { HashtagManager } from "@/components/HashtagManager";
 import { Post, PostStatus, MediaType } from "@/types/post";

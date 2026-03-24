@@ -21,7 +21,7 @@ import {
   TrendingUp, TrendingDown, Minus, MessageSquareText
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { logActivity } from "@/lib/activityLogger";
+
 import { cn } from "@/lib/utils";
 
 interface Client { id: string; name: string; slug: string; logo_url: string; }
