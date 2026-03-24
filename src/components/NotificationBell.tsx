@@ -29,30 +29,16 @@ export const NotificationBell = () => {
   const [notifications, setNotifications] = useState<DeadlineNotification[]>([]);
   const [open, setOpen] = useState(false);
 
+  // Fetch only on mount and when popover opens — no realtime, no polling
   useEffect(() => {
     if (!userId) return;
     fetchNotifications();
-
-    // Realtime
-    const channel = supabase
-      .channel("deadline-notifs")
-      .on("postgres_changes", {
-        event: "INSERT",
-        schema: "public",
-        table: "admin_notifications",
-      }, () => {
-        fetchNotifications();
-      })
-      .subscribe();
-
-    // Poll every 5 min
-    const interval = setInterval(fetchNotifications, 5 * 60 * 1000);
-
-    return () => {
-      supabase.removeChannel(channel);
-      clearInterval(interval);
-    };
   }, [userId]);
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (isOpen) fetchNotifications();
+  };
 
   const fetchNotifications = async () => {
     if (!userId) return;
@@ -113,7 +99,7 @@ export const NotificationBell = () => {
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button className="relative rounded-full p-2 text-muted-foreground hover:bg-muted transition-colors">
           <Bell className="h-5 w-5" />

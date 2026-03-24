@@ -268,38 +268,7 @@ const AdminDashboard = () => {
     fetchClientCreatedNotifs();
     fetchTodayPosts();
     fetchStatusNotifs();
-
-    // Realtime: listen for new client feedback (client_label changes)
-    const channel = supabase
-      .channel("feedback-realtime")
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "posts",
-        },
-        (payload) => {
-          const newLabel = (payload.new as any).client_label;
-          if (newLabel && newLabel !== "pendente") {
-            playNotificationSound();
-            fetchFeedbacks();
-          }
-          if ((payload.new as any).client_unarchived_at && !(payload.old as any).client_unarchived_at) {
-            playNotificationSound();
-            fetchUnarchiveNotifs();
-          }
-          if ((payload.new as any).client_created_at && !(payload.old as any).client_created_at) {
-            playNotificationSound();
-            fetchClientCreatedNotifs();
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    // No realtime — data loads on page access only
   }, [role, currentUserId]);
 
   const fetchTodayPosts = async () => {
