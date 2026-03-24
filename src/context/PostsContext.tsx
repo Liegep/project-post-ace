@@ -291,6 +291,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
           client_id: clientId || null,
           post_id: id,
           user_id: null,
+          actor_avatar_url: userAvatar,
         } as any);
       }
     }

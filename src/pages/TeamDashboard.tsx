@@ -241,7 +241,8 @@ const TeamDashboard = () => {
         message: `Post "${post.postTitle}" marcado como "${status}" por ${userName}`,
         client_id: post.clientId,
         post_id: post.postId,
-        user_id: null, // null = for admins
+        user_id: null,
+        actor_avatar_url: userAvatar,
       } as any);
     }
 
