@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Bell } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -19,6 +20,7 @@ interface DeadlineNotification {
   createdAt: string;
   clientId: string | null;
   postId: string | null;
+  actorAvatarUrl: string;
 }
 
 export const NotificationBell = () => {
@@ -73,6 +75,7 @@ export const NotificationBell = () => {
         createdAt: n.created_at,
         clientId: n.client_id,
         postId: n.post_id,
+        actorAvatarUrl: n.actor_avatar_url || "",
       }))
     );
   };
@@ -149,7 +152,18 @@ export const NotificationBell = () => {
                     setOpen(false);
                   }}
                 >
-                  <div className="mt-0.5 shrink-0">{getTypeIcon(n.type)}</div>
+                  <div className="mt-0.5 shrink-0 flex items-center gap-2">
+                    {n.actorAvatarUrl ? (
+                      <Avatar className="h-7 w-7">
+                        <AvatarImage src={n.actorAvatarUrl} />
+                        <AvatarFallback className="text-[10px]">{n.title.charAt(0).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted shrink-0">
+                        {getTypeIcon(n.type)}
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">{n.title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>

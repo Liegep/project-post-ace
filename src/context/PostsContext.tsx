@@ -267,10 +267,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       if (session?.user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("full_name")
+          .select("full_name, avatar_url")
           .eq("id", session.user.id)
           .maybeSingle();
         const userName = (profile as any)?.full_name || session.user.email || "Usuário";
+        const userAvatar = (profile as any)?.avatar_url || "";
 
         // Get client name
         let clientName = "";
@@ -290,6 +291,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
           client_id: clientId || null,
           post_id: id,
           user_id: null,
+          actor_avatar_url: userAvatar,
         } as any);
       }
     }

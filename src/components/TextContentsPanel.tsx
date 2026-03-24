@@ -62,10 +62,17 @@ export function TextContentsPanel({ clientId, clientName, isAdmin }: Props) {
       const actionLabel = status === "approved" ? "aprovou" : "reprovou";
       const title = `Conteúdo textual ${status === "approved" ? "aprovado" : "reprovado"}`;
       const message = `${clientName || "Cliente"} ${actionLabel} o conteúdo "${item?.title || ""}"`;
+      const { data: sessionData } = await supabase.auth.getSession();
+      let actorAvatar = "";
+      if (sessionData?.session?.user?.id) {
+        const { data: prof } = await supabase.from("profiles").select("avatar_url").eq("id", sessionData.session.user.id).maybeSingle();
+        actorAvatar = (prof as any)?.avatar_url || "";
+      }
       await supabase.from("admin_notifications").insert({
         title, message,
         type: status === "approved" ? "text_approved" : "text_rejected",
         client_id: clientId,
+        actor_avatar_url: actorAvatar,
       } as any);
     }
   };

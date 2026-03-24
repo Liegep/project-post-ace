@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 import { logActivity } from "@/lib/activityLogger";
 import { cn } from "@/lib/utils";
@@ -102,6 +103,7 @@ interface StatusNotification {
   clientId: string | null;
   postId: string | null;
   createdAt: string;
+  actorAvatarUrl: string;
 }
 
 interface TodayPost {
@@ -188,6 +190,7 @@ const AdminDashboard = () => {
       clientId: n.client_id,
       postId: n.post_id,
       createdAt: n.created_at,
+      actorAvatarUrl: n.actor_avatar_url || "",
     }));
     const seen = new Map<string, StatusNotification>();
     allNotifs.forEach((n) => {
@@ -1119,7 +1122,12 @@ const AdminDashboard = () => {
                     }}
                     className="flex items-center gap-3 rounded-lg bg-muted/50 px-3 py-2.5 cursor-pointer hover:bg-muted transition-colors"
                   >
-                    {client?.logo_url ? (
+                    {n.actorAvatarUrl ? (
+                      <Avatar className="h-7 w-7 shrink-0">
+                        <AvatarImage src={n.actorAvatarUrl} />
+                        <AvatarFallback className="text-[10px]">{n.title.charAt(0).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                    ) : client?.logo_url ? (
                       <img src={client.logo_url} alt={client.name} className="h-7 w-7 rounded-full object-contain border shrink-0" />
                     ) : (
                       <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted border shrink-0">
