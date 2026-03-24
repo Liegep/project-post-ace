@@ -38,17 +38,26 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [retainFiles, setRetainFiles] = useState(false);
+  const [externalLink, setExternalLink] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (post) {
       setTitle(post.title);
       const urls = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
-      setMediaItems(urls.map((url) => ({
-        id: `existing-${mediaIdCounter++}`,
-        url,
-        type: url.match(/\.(mp4|webm|mov|avi)/i) ? "video" as MediaType : "image" as MediaType,
-      })));
+      // Check if the only URL is an external link (not from storage)
+      const isExternal = urls.length === 1 && urls[0] && !urls[0].includes("supabase") && (urls[0].startsWith("http://") || urls[0].startsWith("https://"));
+      if (isExternal && !urls[0].includes("storage")) {
+        setMediaItems([]);
+        setExternalLink(urls[0]);
+      } else {
+        setMediaItems(urls.map((url) => ({
+          id: `existing-${mediaIdCounter++}`,
+          url,
+          type: url.match(/\.(mp4|webm|mov|avi)/i) ? "video" as MediaType : "image" as MediaType,
+        })));
+        setExternalLink("");
+      }
       const coverIdx = post.imageUrl ? urls.indexOf(post.imageUrl) : 0;
       setCoverIndex(coverIdx >= 0 ? coverIdx : 0);
       setCaption(post.caption);
@@ -56,7 +65,6 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       setStatus(Array.isArray(post.status) ? post.status : [post.status]);
       setColumnId(post.columnId);
       setSelectedTags(post.tags);
-      // Fetch retain_files value
       supabase.from("posts").select("retain_files").eq("id", post.id).maybeSingle().then(({ data }) => {
         setRetainFiles((data as any)?.retain_files ?? false);
       });
@@ -95,13 +103,18 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
     setUploading(true);
     try {
-      const finalUrls: string[] = [];
-      for (const item of mediaItems) {
-        if (item.file) {
-          const url = await uploadMedia(item.file);
-          finalUrls.push(url);
-        } else {
-          finalUrls.push(item.url);
+      let finalUrls: string[] = [];
+
+      if (mediaItems.length === 0 && externalLink.trim()) {
+        finalUrls = [externalLink.trim()];
+      } else {
+        for (const item of mediaItems) {
+          if (item.file) {
+            const url = await uploadMedia(item.file);
+            finalUrls.push(url);
+          } else {
+            finalUrls.push(item.url);
+          }
         }
       }
 
@@ -169,6 +182,19 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               onAddMore={() => fileInputRef.current?.click()}
               emptyLabel={t("clickToSelectMedia")}
             />
+            <div className="mt-2">
+              <Label htmlFor="edit-external-link" className="text-xs text-muted-foreground">Ou usar link</Label>
+              <Input
+                id="edit-external-link"
+                value={externalLink}
+                onChange={(e) => setExternalLink(e.target.value)}
+                placeholder="https://drive.google.com/..."
+                disabled={mediaItems.length > 0}
+              />
+              {mediaItems.length > 0 && externalLink && (
+                <p className="text-xs text-muted-foreground mt-1">Arquivos enviados têm prioridade sobre o link.</p>
+              )}
+            </div>
           </div>
           <div>
             <div className="flex items-center justify-between mb-1">
