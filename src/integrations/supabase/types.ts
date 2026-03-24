@@ -1461,6 +1461,8 @@ export type Database = {
           media_type: string
           media_urls: string[]
           position: number
+          published_at: string | null
+          retain_files: boolean
           status: string[]
           tags: string[]
           title: string
@@ -1483,6 +1485,8 @@ export type Database = {
           media_type?: string
           media_urls?: string[]
           position?: number
+          published_at?: string | null
+          retain_files?: boolean
           status?: string[]
           tags?: string[]
           title: string
@@ -1505,6 +1509,8 @@ export type Database = {
           media_type?: string
           media_urls?: string[]
           position?: number
+          published_at?: string | null
+          retain_files?: boolean
           status?: string[]
           tags?: string[]
           title?: string
