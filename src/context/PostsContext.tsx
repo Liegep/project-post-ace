@@ -401,7 +401,16 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.mediaUrls !== undefined) dbUpdates.media_urls = updates.mediaUrls;
     if (updates.caption !== undefined) dbUpdates.caption = updates.caption;
     if (updates.deadline !== undefined) dbUpdates.deadline = updates.deadline instanceof Date ? updates.deadline.toISOString() : updates.deadline;
-    if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
+    if (updates.tags !== undefined) {
+      dbUpdates.tags = updates.tags;
+      // Set published_at when "publicado" tag is added for retention tracking
+      const currentPost = posts.find((p) => p.id === id);
+      const hadPublicado = currentPost?.tags.includes("publicado") ?? false;
+      const hasPublicado = updates.tags.includes("publicado");
+      if (!hadPublicado && hasPublicado) {
+        dbUpdates.published_at = new Date().toISOString();
+      }
+    }
     if (updates.status !== undefined) dbUpdates.status = updates.status;
     if (updates.clientLabel !== undefined) dbUpdates.client_label = updates.clientLabel;
     if (updates.columnId !== undefined) dbUpdates.column_id = updates.columnId;
