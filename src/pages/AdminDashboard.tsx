@@ -22,10 +22,8 @@ import InviteAdminDialog from "@/components/InviteAdminDialog";
 import { TodayAppointmentsWidget } from "@/components/TodayAppointmentsWidget";
 import { CommemorativeDatesWidget } from "@/components/CommemorativeDatesWidget";
 import { PostDetailDialog } from "@/components/PostDetailDialog";
-import { RecentReportsWidget } from "@/components/RecentReportsWidget";
 import { TodayTasksWidget } from "@/components/TodayTasksWidget";
 import { NotificationBell } from "@/components/NotificationBell";
-import { BillingAlertsWidget } from "@/components/billing/BillingAlertsWidget";
 
 const CLIENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
   standard: { label: "Padrão", color: "bg-muted text-muted-foreground" },
@@ -990,11 +988,6 @@ const AdminDashboard = () => {
         {/* Commemorative dates widget */}
         <CommemorativeDatesWidget />
 
-        {/* Billing alerts widget */}
-        <BillingAlertsWidget />
-
-        {/* Recent reports widget */}
-        <RecentReportsWidget />
 
         {/* Today's posts reminder */}
         {todayPosts.length > 0 && (

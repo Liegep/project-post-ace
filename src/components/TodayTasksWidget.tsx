@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { getDeadlineUrgency, URGENCY_STYLES, DeadlineUrgency } from "@/lib/deadlineColors";
-import { CalendarClock, FileText, DollarSign, Newspaper, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
+import { CalendarClock, FileText, DollarSign, Newspaper, AlertTriangle, CheckCircle2, Clock, ChevronDown } from "lucide-react";
 import { format, startOfDay, endOfDay, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -262,8 +262,8 @@ export const TodayTasksWidget = () => {
           {filter === "today" ? "Nenhuma tarefa para hoje 🎉" : filter === "overdue" ? "Nenhuma tarefa atrasada ✅" : "Nenhuma tarefa nos próximos 3 dias"}
         </div>
       ) : (
-        <div className="space-y-2 max-h-72 overflow-y-auto">
-          {filteredTasks.map((task) => {
+        <div className="space-y-2">
+          {filteredTasks.slice(0, 5).map((task) => {
             const urgencyStyle = URGENCY_STYLES[task.urgency];
             const typeConfig = TYPE_CONFIG[task.type];
             const TypeIcon = typeConfig.icon;
@@ -287,10 +287,7 @@ export const TodayTasksWidget = () => {
                   "hover:opacity-80"
                 )}
               >
-                {/* Urgency dot */}
                 <div className={cn("h-2.5 w-2.5 rounded-full shrink-0", urgencyStyle.dot)} />
-
-                {/* Client logo */}
                 {task.clientLogo ? (
                   <img src={task.clientLogo} alt={task.clientName} className="h-7 w-7 rounded-full object-contain border shrink-0" />
                 ) : (
@@ -298,20 +295,14 @@ export const TodayTasksWidget = () => {
                     <span className="text-xs font-bold text-muted-foreground">{task.clientName.charAt(0).toUpperCase()}</span>
                   </div>
                 )}
-
-                {/* Content */}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">{task.title}</p>
                   <p className="text-xs text-muted-foreground">{task.clientName}</p>
                 </div>
-
-                {/* Type badge */}
                 <span className={cn("shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold", typeConfig.color)}>
                   <TypeIcon className="h-3 w-3" />
                   {typeConfig.label}
                 </span>
-
-                {/* Deadline badge */}
                 <span className={cn("shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold", urgencyStyle.bg, urgencyStyle.text)}>
                   {getUrgencyIcon(task.urgency)}
                   {format(new Date(task.deadline), "dd/MM")}
@@ -319,6 +310,15 @@ export const TodayTasksWidget = () => {
               </div>
             );
           })}
+          {filteredTasks.length > 5 && (
+            <button
+              onClick={() => navigate("/agenda")}
+              className="w-full flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
+            >
+              <ChevronDown className="h-3.5 w-3.5" />
+              Ver mais {filteredTasks.length - 5} tarefas
+            </button>
+          )}
         </div>
       )}
     </div>
