@@ -201,6 +201,17 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
             </div>
           </div>
+          {/* Retain files toggle */}
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              <div>
+                <p className="text-sm font-medium text-foreground">Manter arquivos</p>
+                <p className="text-[11px] text-muted-foreground">Impede a remoção automática após 30 dias</p>
+              </div>
+            </div>
+            <Switch checked={retainFiles} onCheckedChange={setRetainFiles} />
+          </div>
           <Button type="submit" disabled={uploading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
             <Save className="mr-2 h-4 w-4" /> {uploading ? "..." : t("saveChanges")}
           </Button>
