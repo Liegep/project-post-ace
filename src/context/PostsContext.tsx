@@ -240,40 +240,6 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     pushToTrello(id, "update");
 
 
-    // Notify admins when status includes "pronto" or "finalizado"
-    if (status.some(s => ["pronto", "finalizado"].includes(s))) {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name, avatar_url")
-          .eq("id", session.user.id)
-          .maybeSingle();
-        const userName = (profile as any)?.full_name || session.user.email || "Usuário";
-        const userAvatar = (profile as any)?.avatar_url || "";
-
-        // Get client name
-        let clientName = "";
-        if (clientId) {
-          const { data: clientData } = await supabase
-            .from("clients")
-            .select("name")
-            .eq("id", clientId)
-            .maybeSingle();
-          clientName = (clientData as any)?.name || "";
-        }
-
-        await supabase.from("admin_notifications").insert({
-          type: "status_change",
-          title: `${userName}${clientName ? " - " + clientName : ""}`,
-          message: `Post "${post?.title || ""}" marcado como "${status.join(', ')}" por ${userName}`,
-          client_id: clientId || null,
-          post_id: id,
-          user_id: null,
-          actor_avatar_url: userAvatar,
-        } as any);
-      }
-    }
   }, [posts, clientId, ensureAgendadosColumn]);
 
   const updateClientLabel = useCallback(async (id: string, label: ClientLabel) => {

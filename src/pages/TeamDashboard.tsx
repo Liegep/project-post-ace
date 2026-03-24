@@ -233,18 +233,6 @@ const TeamDashboard = () => {
     // Update post
     await supabase.from("posts").update({ status: [status] } as any).eq("id", post.postId);
 
-    // Create notification for admin if status is ready/finalizado
-    if (["pronto", "finalizado"].includes(status.toLowerCase())) {
-      await supabase.from("admin_notifications").insert({
-        type: "status_change",
-        title: `${userName} - ${post.clientName}`,
-        message: `Post "${post.postTitle}" marcado como "${status}" por ${userName}`,
-        client_id: post.clientId,
-        post_id: post.postId,
-        user_id: null,
-        actor_avatar_url: userAvatar,
-      } as any);
-    }
 
     // Refresh
     setPosts(prev => prev.map(p => p.postId === post.postId ? { ...p, status: [status] } : p));
