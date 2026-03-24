@@ -944,11 +944,7 @@ const AdminDashboard = () => {
               <button onClick={() => { setMobileMenuOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
                 <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
               </button>
-              {isAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); navigate("/activity-log"); }} className={navItemClass("/activity-log")}>
-                  <HistoryIcon className={navIconClass("/activity-log")} /> Histórico
-                </button>
-              )}
+              {/* Activity log link removed */}
             </nav>
           </div>
         </SheetContent>
@@ -979,11 +975,7 @@ const AdminDashboard = () => {
             <button onClick={() => { setNavDrawerOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
               <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
             </button>
-            {isAdmin && (
-              <button onClick={() => { setNavDrawerOpen(false); navigate("/activity-log"); }} className={navItemClass("/activity-log")}>
-                <HistoryIcon className={navIconClass("/activity-log")} /> Histórico de Atividades
-              </button>
-            )}
+            {/* Activity log link removed */}
           </nav>
         </SheetContent>
       </Sheet>
