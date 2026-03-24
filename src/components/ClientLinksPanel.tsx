@@ -84,45 +84,53 @@ function SortableItem({ link, onUpdate, onRemove }: {
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center gap-2 rounded-lg border p-3 group bg-card">
+    <a
+      ref={setNodeRef}
+      style={style}
+      href={link.url ? (link.url.startsWith("http") ? link.url : `https://${link.url}`) : undefined}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 rounded-lg border p-3 group bg-card hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer no-underline"
+      onClick={(e) => {
+        // Prevent navigation when interacting with inputs or buttons
+        const target = e.target as HTMLElement;
+        if (target.tagName === "INPUT" || target.tagName === "BUTTON" || target.closest("button")) {
+          e.preventDefault();
+        }
+      }}
+    >
       <button
         {...attributes}
         {...listeners}
         className="shrink-0 cursor-grab active:cursor-grabbing touch-none rounded p-1 text-muted-foreground hover:text-foreground transition-colors"
+        onClick={(e) => e.preventDefault()}
       >
         <GripVertical className="h-4 w-4" />
       </button>
       <div className="flex-1 min-w-0 space-y-1">
         <input
-          className="w-full bg-transparent text-sm font-medium border-none outline-none focus:ring-0 p-0"
+          className="w-full bg-transparent text-sm font-medium text-foreground border-none outline-none focus:ring-0 p-0"
           value={link.title}
           onChange={(e) => onUpdate(link.id, "title", e.target.value)}
           placeholder="Título do link"
+          onClick={(e) => e.stopPropagation()}
         />
         <input
           className="w-full bg-transparent text-xs text-muted-foreground border-none outline-none focus:ring-0 p-0 truncate"
           value={link.url}
           onChange={(e) => onUpdate(link.id, "url", e.target.value)}
           placeholder="https://..."
+          onClick={(e) => e.stopPropagation()}
         />
       </div>
-      {link.url && (
-        <a
-          href={link.url.startsWith("http") ? link.url : `https://${link.url}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shrink-0 rounded p-1 text-muted-foreground hover:text-primary transition-colors"
-        >
-          <ExternalLink className="h-4 w-4" />
-        </a>
-      )}
+      <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
       <button
-        onClick={() => onRemove(link.id)}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onRemove(link.id); }}
         className="shrink-0 rounded p-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
       >
         <Trash2 className="h-3.5 w-3.5" />
       </button>
-    </div>
+    </a>
   );
 }
 
