@@ -12,7 +12,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign, Eye } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 import { logActivity } from "@/lib/activityLogger";
@@ -1234,22 +1234,56 @@ const AdminDashboard = () => {
                         {new Date(fb.updatedAt).toLocaleDateString("pt-BR")}
                       </span>
                       <div className="flex-1" />
-                      <button
-                        onClick={(e) => markAsAgendado(fb, e)}
-                        className="inline-flex items-center rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-purple-700 transition-colors"
-                        title="Marcar como Agendado"
-                      >
-                        <CalendarClock className="h-3 w-3 mr-0.5" />
-                        Agendado
-                      </button>
-                      <button
-                        onClick={(e) => dismissFeedback(fb.postId, e)}
-                        className="rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-                        title="Dispensar"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
+                       <button
+                         onClick={async (e) => {
+                           e.stopPropagation();
+                           const { data: postData } = await supabase.from("posts").select("*").eq("id", fb.postId).maybeSingle();
+                           if (postData) {
+                             const p: Post = {
+                               id: postData.id,
+                               title: postData.title,
+                               imageUrl: postData.image_url,
+                               mediaType: (postData.media_type as any) || "image",
+                               mediaUrls: postData.media_urls || [],
+                               caption: postData.caption || "",
+                               deadline: postData.deadline ? new Date(postData.deadline) : null,
+                               status: (postData.status || []) as PostStatus[],
+                               clientLabel: (postData.client_label || "pendente") as ClientLabel,
+                               comments: [],
+                               tags: postData.tags || [],
+                               createdAt: new Date(postData.created_at),
+                               columnId: postData.column_id,
+                               position: postData.position,
+                               archived: postData.archived,
+                               archivedAt: postData.archived_at ? new Date(postData.archived_at) : null,
+                               trelloCardId: postData.trello_card_id,
+                             };
+                             setViewPost(p);
+                             setViewPostOpen(true);
+                           }
+                         }}
+                         className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary hover:bg-primary/20 transition-colors"
+                         title="Ver post completo"
+                       >
+                         <Eye className="h-3 w-3 mr-0.5" />
+                         Ver
+                       </button>
+                       <button
+                         onClick={(e) => markAsAgendado(fb, e)}
+                         className="inline-flex items-center rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-purple-700 transition-colors"
+                         title="Marcar como Agendado"
+                       >
+                         <CalendarClock className="h-3 w-3 mr-0.5" />
+                         Agendado
+                       </button>
+                       <button
+                         onClick={(e) => dismissFeedback(fb.postId, e)}
+                         className="rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                         title="Dispensar"
+                       >
+                         <X className="h-3.5 w-3.5" />
+                       </button>
+                     </div>
                   </div>
                 );
               })}
