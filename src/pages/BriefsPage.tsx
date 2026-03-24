@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { logActivity } from "@/lib/activityLogger";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -257,14 +257,6 @@ const BriefsPage = () => {
       toast({ title: "Erro ao salvar pauta", description: error.message, variant: "destructive" });
     } else {
       toast({ title: editingBrief ? "Pauta atualizada" : "Pauta criada" });
-      const clientObj = clients.find((c: any) => c.id === formClientId);
-      logActivity({
-        action: editingBrief ? "brief_status_changed" : "brief_created",
-        itemType: "brief",
-        itemTitle: formTitle.trim(),
-        clientId: formClientId,
-        clientName: clientObj?.name || "",
-      });
       setDialogOpen(false);
       resetForm();
       loadData();

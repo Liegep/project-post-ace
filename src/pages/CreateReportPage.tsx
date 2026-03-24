@@ -21,7 +21,7 @@ import {
   TrendingUp, TrendingDown, Minus, MessageSquareText
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { logActivity } from "@/lib/activityLogger";
+
 import { cn } from "@/lib/utils";
 
 interface Client { id: string; name: string; slug: string; logo_url: string; }
@@ -119,14 +119,6 @@ export default function CreateReportPage() {
         status,
       });
 
-      await logActivity({
-        action: "report_created",
-        itemType: "report",
-        itemId: report.id,
-        itemTitle: report.title,
-        clientId,
-        clientName: client?.name || "",
-      });
 
       toast({ title: status === "published" ? "Relatório publicado!" : "Rascunho salvo!" });
       navigate(`/reports/${report.id}`);

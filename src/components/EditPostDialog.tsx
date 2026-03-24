@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { usePosts } from "@/context/PostsContext";
-import { logActivity } from "@/lib/activityLogger";
+
 import { useI18n } from "@/i18n/I18nContext";
 import { HashtagManager } from "@/components/HashtagManager";
 import { Post, PostStatus, MediaType } from "@/types/post";
@@ -134,16 +134,6 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         await movePostToColumn(post.id, columnId);
       }
 
-      // Log post edit (no-op for non-approval actions now)
-      const { data: cl } = await supabase.from("clients").select("name").eq("id", clientId).maybeSingle();
-      logActivity({
-        action: "post_edited",
-        itemType: "post",
-        itemId: post.id,
-        itemTitle: title,
-        clientId,
-        clientName: (cl as any)?.name || "",
-      });
 
       onOpenChange(false);
     } finally {
