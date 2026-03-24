@@ -34,6 +34,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
   const [columnId, setColumnId] = useState<string | null>(defaultColumnId ?? null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [externalLink, setExternalLink] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync columnId when defaultColumnId changes (e.g., opening from a specific column)
@@ -95,19 +96,27 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
 
     setUploading(true);
     try {
-      const uploadedUrls: string[] = [];
-      for (const mp of mediaItems) {
-        if (mp.file) {
-          const url = await uploadMedia(mp.file);
-          uploadedUrls.push(url);
+      let finalUrls: string[] = [];
+      let finalType: MediaType = "image";
+
+      if (mediaItems.length === 0 && externalLink.trim()) {
+        finalUrls = [externalLink.trim()];
+        finalType = externalLink.match(/\.(mp4|webm|mov|avi)/i) ? "video" : "image";
+      } else {
+        for (const mp of mediaItems) {
+          if (mp.file) {
+            const url = await uploadMedia(mp.file);
+            finalUrls.push(url);
+          }
         }
+        finalType = mediaItems[coverIndex]?.type || mediaItems[0]?.type || "image";
       }
 
       const success = await addPost({
         title,
-        imageUrl: uploadedUrls[coverIndex] || uploadedUrls[0] || "",
-        mediaType: mediaItems[coverIndex]?.type || mediaItems[0]?.type || "image",
-        mediaUrls: uploadedUrls,
+        imageUrl: finalUrls[coverIndex] || finalUrls[0] || "",
+        mediaType: finalType,
+        mediaUrls: finalUrls,
         caption,
         deadline: deadline ? new Date(deadline) : undefined,
         status,
@@ -127,6 +136,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
       setTitle("");
       setMediaItems([]);
       setCoverIndex(0);
+      setExternalLink("");
       setCaption("");
       setDeadline("");
       setStatus(["entrada"]);
@@ -161,6 +171,19 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
               onAddMore={() => fileInputRef.current?.click()}
               emptyLabel={t("clickToSelectMedia")}
             />
+            <div className="mt-2">
+              <Label htmlFor="external-link" className="text-xs text-muted-foreground">Ou usar link</Label>
+              <Input
+                id="external-link"
+                value={externalLink}
+                onChange={(e) => setExternalLink(e.target.value)}
+                placeholder="https://drive.google.com/..."
+                disabled={mediaItems.length > 0}
+              />
+              {mediaItems.length > 0 && externalLink && (
+                <p className="text-xs text-muted-foreground mt-1">Arquivos enviados têm prioridade sobre o link.</p>
+              )}
+            </div>
           </div>
           <div>
             <div className="flex items-center justify-between mb-1">
