@@ -102,6 +102,7 @@ export type Database = {
       }
       admin_notifications: {
         Row: {
+          actor_avatar_url: string
           client_id: string | null
           created_at: string
           id: string
@@ -113,6 +114,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          actor_avatar_url?: string
           client_id?: string | null
           created_at?: string
           id?: string
@@ -124,6 +126,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          actor_avatar_url?: string
           client_id?: string | null
           created_at?: string
           id?: string

@@ -1,0 +1,1 @@
+ALTER TABLE public.admin_notifications ADD COLUMN actor_avatar_url text NOT NULL DEFAULT '';
