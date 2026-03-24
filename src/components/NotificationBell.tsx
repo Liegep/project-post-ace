@@ -45,7 +45,7 @@ export const NotificationBell = () => {
     const { data } = await supabase
       .from("admin_notifications")
       .select("*")
-      .in("type", ["deadline_warning", "deadline_today", "deadline_overdue", "status_change"])
+      .in("type", ["deadline_warning", "deadline_today", "deadline_overdue"])
       .eq("read", false)
       .or(`user_id.eq.${userId},user_id.is.null`)
       .order("created_at", { ascending: false })

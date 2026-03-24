@@ -174,30 +174,7 @@ const AdminDashboard = () => {
   const appLogoInputRef = useRef<HTMLInputElement>(null);
 
   const fetchStatusNotifs = async () => {
-    const { data } = await supabase
-      .from("admin_notifications")
-      .select("*")
-      .eq("type", "status_change")
-      .eq("read", false)
-      .order("created_at", { ascending: false });
-
-    const allNotifs = (data || []).map((n: any) => ({
-      id: n.id,
-      title: n.title,
-      message: n.message,
-      clientId: n.client_id,
-      postId: n.post_id,
-      createdAt: n.created_at,
-      actorAvatarUrl: n.actor_avatar_url || "",
-    }));
-    const seen = new Map<string, StatusNotification>();
-    allNotifs.forEach((n) => {
-      const key = n.postId || n.id;
-      if (!seen.has(key) || new Date(n.createdAt) > new Date(seen.get(key)!.createdAt)) {
-        seen.set(key, n);
-      }
-    });
-    setStatusNotifs(Array.from(seen.values()));
+    setStatusNotifs([]);
   };
 
   const dismissStatusNotif = async (id: string, e: React.MouseEvent) => {
