@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud, DollarSign, Check } from "lucide-react";
+import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { PostTrackingLabels } from "@/components/PostTrackingLabels";
 import { format } from "date-fns";
@@ -585,7 +586,7 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
               </Tooltip>
             </TooltipProvider>
             <ApprovalLinkButton
-              clientId={post.columnId ? "" : ""}
+              clientId={clientId}
               postId={post.id}
               postTitle={post.title}
               variant="individual"
