@@ -152,7 +152,18 @@ export const NotificationBell = () => {
                     setOpen(false);
                   }}
                 >
-                  <div className="mt-0.5 shrink-0">{getTypeIcon(n.type)}</div>
+                  <div className="mt-0.5 shrink-0 flex items-center gap-2">
+                    {n.actorAvatarUrl ? (
+                      <Avatar className="h-7 w-7">
+                        <AvatarImage src={n.actorAvatarUrl} />
+                        <AvatarFallback className="text-[10px]">{n.title.charAt(0).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted shrink-0">
+                        {getTypeIcon(n.type)}
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">{n.title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{n.message}</p>
