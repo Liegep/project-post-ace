@@ -102,6 +102,7 @@ interface StatusNotification {
   clientId: string | null;
   postId: string | null;
   createdAt: string;
+  actorAvatarUrl: string;
 }
 
 interface TodayPost {
@@ -188,6 +189,7 @@ const AdminDashboard = () => {
       clientId: n.client_id,
       postId: n.post_id,
       createdAt: n.created_at,
+      actorAvatarUrl: n.actor_avatar_url || "",
     }));
     const seen = new Map<string, StatusNotification>();
     allNotifs.forEach((n) => {
