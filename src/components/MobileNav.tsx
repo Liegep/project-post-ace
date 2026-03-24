@@ -17,7 +17,6 @@ const NAV_ITEMS = [
   { path: "/briefs", label: "Pautas", icon: FileText },
   { path: "/commemorative-dates", label: "Datas Comemorativas", icon: CalendarHeart },
   { path: "/reports", label: "Relatórios", icon: FileBarChart },
-  { path: "/activity-log", label: "Atividades", icon: History },
 ];
 
 interface MobileNavProps {

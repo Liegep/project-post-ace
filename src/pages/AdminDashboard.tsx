@@ -268,38 +268,7 @@ const AdminDashboard = () => {
     fetchClientCreatedNotifs();
     fetchTodayPosts();
     fetchStatusNotifs();
-
-    // Realtime: listen for new client feedback (client_label changes)
-    const channel = supabase
-      .channel("feedback-realtime")
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "posts",
-        },
-        (payload) => {
-          const newLabel = (payload.new as any).client_label;
-          if (newLabel && newLabel !== "pendente") {
-            playNotificationSound();
-            fetchFeedbacks();
-          }
-          if ((payload.new as any).client_unarchived_at && !(payload.old as any).client_unarchived_at) {
-            playNotificationSound();
-            fetchUnarchiveNotifs();
-          }
-          if ((payload.new as any).client_created_at && !(payload.old as any).client_created_at) {
-            playNotificationSound();
-            fetchClientCreatedNotifs();
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    // No realtime — data loads on page access only
   }, [role, currentUserId]);
 
   const fetchTodayPosts = async () => {
@@ -975,11 +944,7 @@ const AdminDashboard = () => {
               <button onClick={() => { setMobileMenuOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
                 <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
               </button>
-              {isAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); navigate("/activity-log"); }} className={navItemClass("/activity-log")}>
-                  <HistoryIcon className={navIconClass("/activity-log")} /> Histórico
-                </button>
-              )}
+              {/* Activity log link removed */}
             </nav>
           </div>
         </SheetContent>
@@ -1010,11 +975,7 @@ const AdminDashboard = () => {
             <button onClick={() => { setNavDrawerOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
               <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
             </button>
-            {isAdmin && (
-              <button onClick={() => { setNavDrawerOpen(false); navigate("/activity-log"); }} className={navItemClass("/activity-log")}>
-                <HistoryIcon className={navIconClass("/activity-log")} /> Histórico de Atividades
-              </button>
-            )}
+            {/* Activity log link removed */}
           </nav>
         </SheetContent>
       </Sheet>

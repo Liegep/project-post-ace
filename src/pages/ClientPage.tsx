@@ -4,7 +4,7 @@ import { useMyBillingPermission } from "@/hooks/useBillingPermissions";
 import { useNavigate } from "react-router-dom";
 import ClientBriefs from "@/components/ClientBriefs";
 import { ClientInvoicesPanel } from "@/components/billing/ClientInvoicesPanel";
-import { UpcomingPostsWidget } from "@/components/UpcomingPostsWidget";
+// UpcomingPostsWidget removed for optimization
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -373,12 +373,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           </div>
         )}
 
-        {/* Upcoming Posts Widget */}
-        {clientData.show_upcoming_posts && (
-          <div className="mb-8">
-            <UpcomingPostsWidget posts={[...posts, ...archivedPosts]} />
-          </div>
-        )}
+        {/* Upcoming Posts Widget removed for optimization */}
 
         {clientData.show_archived_to_client && (
           <div className="mb-6 flex items-center justify-center">

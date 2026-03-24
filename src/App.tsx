@@ -21,7 +21,7 @@ import IdeasPage from "./pages/IdeasPage.tsx";
 import CalendarPage from "./pages/CalendarPage.tsx";
 import BriefsPage from "./pages/BriefsPage.tsx";
 import CommemorativeDatesPage from "./pages/CommemorativeDatesPage.tsx";
-import ActivityLogPage from "./pages/ActivityLogPage.tsx";
+// ActivityLogPage removed — logs simplified to approval/feedback only
 import ReportsPage from "./pages/ReportsPage.tsx";
 import CreateReportPage from "./pages/CreateReportPage.tsx";
 import ReportViewPage from "./pages/ReportViewPage.tsx";
@@ -56,7 +56,7 @@ const App = () => (
               <Route path="/calendar" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CalendarPage /></AuthGuard>} />
               <Route path="/briefs" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><BriefsPage /></AuthGuard>} />
               <Route path="/commemorative-dates" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CommemorativeDatesPage /></AuthGuard>} />
-              <Route path="/activity-log" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><ActivityLogPage /></AuthGuard>} />
+              {/* activity-log route removed */}
               <Route path="/reports" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><ReportsPage /></AuthGuard>} />
               <Route path="/reports/new" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><CreateReportPage /></AuthGuard>} />
               <Route path="/reports/:id" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ReportViewPage /></AuthGuard>} />

@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
+// Only approval and feedback actions are logged now
 export type ActivityAction =
   | "post_approved"
   | "post_change_requested"
@@ -38,12 +39,21 @@ interface LogActivityParams {
   metadata?: Record<string, unknown>;
 }
 
+// Only these actions actually get persisted — all others silently no-op
+const ALLOWED_ACTIONS: Set<string> = new Set([
+  "post_approved",
+  "post_change_requested",
+  "feedback_sent",
+]);
+
 export async function logActivity(params: LogActivityParams) {
+  // Only log client approval/feedback actions — skip everything else
+  if (!ALLOWED_ACTIONS.has(params.action)) return;
+
   try {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) return;
 
-    // Get user name from profile
     const { data: profile } = await supabase
       .from("profiles")
       .select("full_name, email")
@@ -68,56 +78,14 @@ export async function logActivity(params: LogActivityParams) {
   }
 }
 
-export const ACTION_LABELS: Record<ActivityAction, string> = {
+export const ACTION_LABELS: Record<string, string> = {
   post_approved: "aprovou o post",
   post_change_requested: "solicitou alteração no post",
-  post_edited: "editou o post",
-  post_created: "criou o post",
-  post_status_changed: "alterou o status do post",
-  post_commented: "comentou no post",
-  post_archived: "arquivou o post",
-  post_unarchived: "desarquivou o post",
-  post_moved: "moveu o post",
-  brief_created: "criou a pauta",
-  brief_status_changed: "alterou o status da pauta",
-  brief_commented: "comentou na pauta",
-  client_created: "criou o cliente",
-  client_updated: "atualizou o cliente",
-  client_assigned: "atribuiu acesso ao cliente",
-  client_unassigned: "removeu acesso ao cliente",
-  caption_edited: "editou a legenda do post",
   feedback_sent: "enviou feedback no post",
-  social_post_created: "criou post social",
-  social_post_published: "publicou post social",
-  social_post_scheduled: "agendou post social",
-  report_created: "criou relatório",
-  report_updated: "atualizou relatório",
-  report_published: "publicou relatório",
 };
 
-export const ACTION_ICONS: Record<ActivityAction, string> = {
+export const ACTION_ICONS: Record<string, string> = {
   post_approved: "CheckCircle2",
   post_change_requested: "AlertTriangle",
-  post_edited: "Pencil",
-  post_created: "Plus",
-  post_status_changed: "ArrowRightLeft",
-  post_commented: "MessageCircle",
-  post_archived: "Archive",
-  post_unarchived: "RotateCcw",
-  post_moved: "MoveHorizontal",
-  brief_created: "FileText",
-  brief_status_changed: "ArrowRightLeft",
-  brief_commented: "MessageCircle",
-  client_created: "UserPlus",
-  client_updated: "Settings",
-  client_assigned: "UserPlus",
-  client_unassigned: "UserMinus",
-  caption_edited: "Type",
   feedback_sent: "Send",
-  social_post_created: "Share2",
-  social_post_published: "Globe",
-  social_post_scheduled: "CalendarClock",
-  report_created: "FileText",
-  report_updated: "Pencil",
-  report_published: "Globe",
 };

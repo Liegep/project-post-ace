@@ -10,9 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Save } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Save, ShieldCheck } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 import { SortableMediaGrid, SortableMediaItem } from "@/components/SortableMediaGrid";
+import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 
 interface EditPostDialogProps {
@@ -35,6 +37,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [columnId, setColumnId] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [retainFiles, setRetainFiles] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -46,7 +49,6 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         url,
         type: url.match(/\.(mp4|webm|mov|avi)/i) ? "video" as MediaType : "image" as MediaType,
       })));
-      // Find cover index: the imageUrl position in mediaUrls
       const coverIdx = post.imageUrl ? urls.indexOf(post.imageUrl) : 0;
       setCoverIndex(coverIdx >= 0 ? coverIdx : 0);
       setCaption(post.caption);
@@ -54,6 +56,10 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       setStatus(Array.isArray(post.status) ? post.status : [post.status]);
       setColumnId(post.columnId);
       setSelectedTags(post.tags);
+      // Fetch retain_files value
+      supabase.from("posts").select("retain_files").eq("id", post.id).maybeSingle().then(({ data }) => {
+        setRetainFiles((data as any)?.retain_files ?? false);
+      });
     }
   }, [post]);
 
@@ -108,13 +114,14 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         deadline: deadline ? new Date(deadline) : null,
         tags: selectedTags,
       });
+      // Update retain_files flag
+      await supabase.from("posts").update({ retain_files: retainFiles } as any).eq("id", post.id);
       await updatePostStatus(post.id, status);
       if (columnId !== post.columnId) {
         await movePostToColumn(post.id, columnId);
       }
 
-      // Log post edit
-      const { supabase } = await import("@/integrations/supabase/client");
+      // Log post edit (no-op for non-approval actions now)
       const { data: cl } = await supabase.from("clients").select("name").eq("id", clientId).maybeSingle();
       logActivity({
         action: "post_edited",
@@ -193,6 +200,17 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
             <div className="mt-1">
               <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
             </div>
+          </div>
+          {/* Retain files toggle */}
+          <div className="flex items-center justify-between rounded-lg border p-3">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              <div>
+                <p className="text-sm font-medium text-foreground">Manter arquivos</p>
+                <p className="text-[11px] text-muted-foreground">Impede a remoção automática após 30 dias</p>
+              </div>
+            </div>
+            <Switch checked={retainFiles} onCheckedChange={setRetainFiles} />
           </div>
           <Button type="submit" disabled={uploading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
             <Save className="mr-2 h-4 w-4" /> {uploading ? "..." : t("saveChanges")}
