@@ -82,7 +82,8 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
-  const isVideo = url.match(/\.(mp4|webm|mov|avi)/i);
+  const externalVideo = detectExternalVideo(url);
+  const isVideo = !externalVideo && url.match(/\.(mp4|webm|mov|avi)/i);
   return (
     <div
       ref={setNodeRef}
@@ -91,7 +92,15 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
       {...listeners}
       className={`relative h-10 w-10 shrink-0 rounded overflow-hidden cursor-grab active:cursor-grabbing border-2 transition-colors ${isActive ? "border-accent" : "border-transparent hover:border-muted-foreground/50"}`}
     >
-      {isVideo ? (
+      {externalVideo ? (
+        externalVideo.thumbnailUrl ? (
+          <img src={externalVideo.thumbnailUrl} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="h-full w-full bg-muted flex items-center justify-center">
+            <Play className="h-3 w-3 text-muted-foreground" />
+          </div>
+        )
+      ) : isVideo ? (
         <video src={url} className="h-full w-full object-cover" muted />
       ) : (
         <img src={url} alt="" className="h-full w-full object-cover" />
