@@ -82,8 +82,9 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
-  const externalVideo = detectExternalVideo(url);
-  const isVideo = !externalVideo && url.match(/\.(mp4|webm|mov|avi)/i);
+  const isExternal = isExternalLink(url);
+  const externalVideo = !isExternal ? null : detectExternalVideo(url);
+  const isVideo = !isExternal && url.match(/\.(mp4|webm|mov|avi)/i);
   return (
     <div
       ref={setNodeRef}
