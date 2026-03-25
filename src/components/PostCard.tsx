@@ -295,9 +295,12 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
           <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
             {(() => {
               const currentUrl = allMedia[mediaIndex] || allMedia[0];
-              const externalVideo = detectExternalVideo(currentUrl);
-              if (externalVideo) {
-                return <VideoPreviewCard video={externalVideo} originalUrl={currentUrl} className="!rounded-none !aspect-[4/5]" />;
+              if (isExternalLink(currentUrl)) {
+                return (
+                  <div className="absolute inset-0 flex items-center justify-center bg-muted/30 p-6">
+                    <ExternalLinkCard url={currentUrl} />
+                  </div>
+                );
               }
               const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
               return isVideo ? (
