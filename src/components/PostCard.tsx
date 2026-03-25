@@ -1,5 +1,7 @@
 import { useState, useEffect, memo } from "react";
 import { LazyImage, LazyVideo } from "@/components/LazyImage";
+import { VideoPreviewCard } from "@/components/VideoPreviewCard";
+import { detectExternalVideo } from "@/lib/videoEmbed";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Post, PostStatus, ClientLabel, STATUS_CONFIG, LABEL_CONFIG } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
