@@ -1,6 +1,6 @@
 import { useState, useEffect, memo } from "react";
 import { LazyImage, LazyVideo } from "@/components/LazyImage";
-import { VideoPreviewCard } from "@/components/VideoPreviewCard";
+import { ExternalLinkCard, isExternalLink } from "@/components/ExternalLinkCard";
 import { detectExternalVideo } from "@/lib/videoEmbed";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Post, PostStatus, ClientLabel, STATUS_CONFIG, LABEL_CONFIG } from "@/types/post";
@@ -82,8 +82,9 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
-  const externalVideo = detectExternalVideo(url);
-  const isVideo = !externalVideo && url.match(/\.(mp4|webm|mov|avi)/i);
+  const isExternal = isExternalLink(url);
+  const externalVideo = !isExternal ? null : detectExternalVideo(url);
+  const isVideo = !isExternal && url.match(/\.(mp4|webm|mov|avi)/i);
   return (
     <div
       ref={setNodeRef}
@@ -92,14 +93,10 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
       {...listeners}
       className={`relative h-10 w-10 shrink-0 rounded overflow-hidden cursor-grab active:cursor-grabbing border-2 transition-colors ${isActive ? "border-accent" : "border-transparent hover:border-muted-foreground/50"}`}
     >
-      {externalVideo ? (
-        externalVideo.thumbnailUrl ? (
-          <img src={externalVideo.thumbnailUrl} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <div className="h-full w-full bg-muted flex items-center justify-center">
-            <Play className="h-3 w-3 text-muted-foreground" />
-          </div>
-        )
+      {isExternal ? (
+        <div className="h-full w-full bg-muted flex items-center justify-center">
+          <Play className="h-3 w-3 text-muted-foreground" />
+        </div>
       ) : isVideo ? (
         <video src={url} className="h-full w-full object-cover" muted />
       ) : (
@@ -295,9 +292,12 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
           <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
             {(() => {
               const currentUrl = allMedia[mediaIndex] || allMedia[0];
-              const externalVideo = detectExternalVideo(currentUrl);
-              if (externalVideo) {
-                return <VideoPreviewCard video={externalVideo} originalUrl={currentUrl} className="!rounded-none !aspect-[4/5]" />;
+              if (isExternalLink(currentUrl)) {
+                return (
+                  <div className="absolute inset-0 flex items-center justify-center bg-muted/30 p-6">
+                    <ExternalLinkCard url={currentUrl} />
+                  </div>
+                );
               }
               const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
               return isVideo ? (
