@@ -31,7 +31,13 @@ export function SocialPostCard({ post, onEdit, onDuplicate, onDelete, onPublishN
           {/* Media preview */}
           {post.media_urls && post.media_urls.length > 0 && (
             <div className="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-muted">
-              <img src={post.media_urls[0]} alt="" className="w-full h-full object-cover" />
+              {isExternalLink(post.media_urls[0]) ? (
+                <div className="w-full h-full flex items-center justify-center bg-muted">
+                  <Film className="h-6 w-6 text-muted-foreground" />
+                </div>
+              ) : (
+                <img src={post.media_urls[0]} alt="" className="w-full h-full object-cover" />
+              )}
               {post.media_urls.length > 1 && (
                 <div className="relative -mt-6 text-center">
                   <span className="bg-foreground/70 text-background text-[10px] font-bold px-1.5 py-0.5 rounded-full">
