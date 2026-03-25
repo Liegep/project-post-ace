@@ -1,3 +1,4 @@
+import { LinkedText } from "@/components/LinkedText";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -106,7 +107,9 @@ export function SocialPostCard({ post, onEdit, onDuplicate, onDelete, onPublishN
               </div>
             </div>
 
-            <p className="text-sm text-foreground line-clamp-2">{post.caption || "(Sem legenda)"}</p>
+            <div className="text-sm text-foreground line-clamp-2">
+              {post.caption ? <LinkedText text={post.caption} /> : "(Sem legenda)"}
+            </div>
 
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
               {post.scheduled_at && (
