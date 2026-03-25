@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle, Tag as TagIcon } from "lucide-react";
 import { useState } from "react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
+import { LinkedText } from "@/components/LinkedText";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { toast } from "sonner";
 
@@ -141,7 +142,9 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
           )}
 
           {post.caption && (
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">{post.caption}</p>
+            <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+              <LinkedText text={post.caption} />
+            </div>
           )}
 
           {/* Client action buttons */}
