@@ -1,5 +1,7 @@
 import { useState, useEffect, memo } from "react";
 import { LazyImage, LazyVideo } from "@/components/LazyImage";
+import { VideoPreviewCard } from "@/components/VideoPreviewCard";
+import { detectExternalVideo } from "@/lib/videoEmbed";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Post, PostStatus, ClientLabel, STATUS_CONFIG, LABEL_CONFIG } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
@@ -11,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud, DollarSign, Check } from "lucide-react";
+import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud, DollarSign, Check, Play } from "lucide-react";
 import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { PostTrackingLabels } from "@/components/PostTrackingLabels";
@@ -80,7 +82,8 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
-  const isVideo = url.match(/\.(mp4|webm|mov|avi)/i);
+  const externalVideo = detectExternalVideo(url);
+  const isVideo = !externalVideo && url.match(/\.(mp4|webm|mov|avi)/i);
   return (
     <div
       ref={setNodeRef}
@@ -89,7 +92,15 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
       {...listeners}
       className={`relative h-10 w-10 shrink-0 rounded overflow-hidden cursor-grab active:cursor-grabbing border-2 transition-colors ${isActive ? "border-accent" : "border-transparent hover:border-muted-foreground/50"}`}
     >
-      {isVideo ? (
+      {externalVideo ? (
+        externalVideo.thumbnailUrl ? (
+          <img src={externalVideo.thumbnailUrl} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="h-full w-full bg-muted flex items-center justify-center">
+            <Play className="h-3 w-3 text-muted-foreground" />
+          </div>
+        )
+      ) : isVideo ? (
         <video src={url} className="h-full w-full object-cover" muted />
       ) : (
         <img src={url} alt="" className="h-full w-full object-cover" />
@@ -284,6 +295,10 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
           <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
             {(() => {
               const currentUrl = allMedia[mediaIndex] || allMedia[0];
+              const externalVideo = detectExternalVideo(currentUrl);
+              if (externalVideo) {
+                return <VideoPreviewCard video={externalVideo} originalUrl={currentUrl} className="!rounded-none !aspect-[4/5]" />;
+              }
               const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
               return isVideo ? (
                 <LazyVideo src={currentUrl} className="h-full w-full object-cover" />
