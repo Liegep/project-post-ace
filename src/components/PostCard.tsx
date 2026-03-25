@@ -28,12 +28,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 
+import { LinkedText } from "@/components/LinkedText";
+
 const CaptionText = ({ text, t }: { text: string; t: (key: keyof typeof import("@/i18n/translations").translations.pt) => string }) => {
   const [expanded, setExpanded] = useState(false);
   const isLong = text.length > 150;
   return (
     <div>
-      <p className={`text-sm text-muted-foreground ${!expanded && isLong ? "line-clamp-3" : ""}`}>{text}</p>
+      <div className={`text-sm text-muted-foreground whitespace-pre-wrap ${!expanded && isLong ? "line-clamp-3" : ""}`}>
+        <LinkedText text={text} />
+      </div>
       {isLong && (
         <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="text-xs font-medium text-primary hover:underline mt-1">
           {expanded ? t("readLess") : t("readMore")}
