@@ -105,6 +105,7 @@ const BriefsPage = () => {
   const [filterType, setFilterType] = useState("all");
   const [filterAssigned, setFilterAssigned] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterMonth, setFilterMonth] = useState(() => new Date());
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
