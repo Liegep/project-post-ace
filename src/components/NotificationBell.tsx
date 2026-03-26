@@ -103,6 +103,7 @@ export const NotificationBell = () => {
   };
 
   return (
+    <>
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button className="relative rounded-full p-2 text-muted-foreground hover:bg-muted transition-colors">
