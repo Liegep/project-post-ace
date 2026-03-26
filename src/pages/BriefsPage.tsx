@@ -21,7 +21,8 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import {
   ArrowLeft, Plus, CalendarIcon, Copy, Eye, EyeOff, Send, Check, X,
-  Filter, Search, Pencil, MessageCircle, Paperclip, FileText, Trash2
+  Filter, Search, Pencil, MessageCircle, Paperclip, FileText, Trash2,
+  ChevronLeft, ChevronRight
 } from "lucide-react";
 import { MobileNav } from "@/components/MobileNav";
 import { BriefSimilarityPanel } from "@/components/BriefSimilarityPanel";
