@@ -49,6 +49,12 @@
     --sidebar-accent-foreground: 220 16% 90%;
     --sidebar-border: 228 30% 22%;
     --sidebar-ring: 38 92% 50%;
+
+    /* Gradient & glass tokens */
+    --gradient-start: 228 45% 17%;
+    --gradient-end: 38 92% 50%;
+    --glass-bg: 0 0% 100% / 0.65;
+    --glass-border: 0 0% 100% / 0.25;
   }
 }
 
