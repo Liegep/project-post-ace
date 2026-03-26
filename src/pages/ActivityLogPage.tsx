@@ -94,8 +94,11 @@ const ActivityLogPage = () => {
                 <SelectItem value="post_status_changed">Mudanças de status</SelectItem>
                 <SelectItem value="post_commented">Comentários</SelectItem>
                 <SelectItem value="brief_created">Pautas criadas</SelectItem>
-                <SelectItem value="client_created">Clientes criados</SelectItem>
+                <SelectItem value="brief_commented">Comentários em pautas</SelectItem>
+                <SelectItem value="caption_edited">Edições de legenda</SelectItem>
                 <SelectItem value="feedback_sent">Feedbacks</SelectItem>
+                <SelectItem value="post_viewed">Visualizações</SelectItem>
+                <SelectItem value="post_downloaded">Downloads</SelectItem>
               </SelectContent>
             </Select>
           </div>
