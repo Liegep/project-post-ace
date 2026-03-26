@@ -393,7 +393,7 @@ const BriefsPage = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
+      <header className="sticky top-0 z-30 glass-header">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 md:gap-3 px-3 md:px-4">
           <MobileNav title="Pautas" />
           <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/admin")}>

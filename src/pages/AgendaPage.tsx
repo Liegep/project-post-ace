@@ -180,7 +180,7 @@ const AgendaPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur px-4 sm:px-6 py-4">
+      <header className="sticky top-0 z-30 glass-header px-4 sm:px-6 py-4">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div className="flex items-center gap-3">
             <MobileNav title="Agenda" />

@@ -152,7 +152,7 @@ export default function CommemorativeDatesPage() {
   return (
     <TooltipProvider>
     <div className="min-h-screen bg-background overflow-x-hidden">
-      <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur px-4 py-3 md:px-6 md:py-4 flex items-center justify-between gap-2">
+      <header className="sticky top-0 z-30 glass-header px-4 py-3 md:px-6 md:py-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
           <MobileNav title="Datas Comemorativas" />
           <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
