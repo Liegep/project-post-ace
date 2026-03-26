@@ -91,10 +91,10 @@
   }
 
   .btn-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 50%, hsl(var(--accent) / 0.9) 100%);
-    color: hsl(var(--primary-foreground));
+    background: linear-gradient(135deg, hsl(var(--gradient-start)) 0%, hsl(var(--gradient-mid)) 50%, hsl(var(--gradient-end)) 100%);
+    color: hsl(0 0% 100%);
     border: none;
-    box-shadow: 0 4px 14px -2px hsl(var(--primary) / 0.3);
+    box-shadow: 0 4px 14px -2px hsl(var(--gradient-mid) / 0.35);
     transition: all 0.2s ease;
   }
   .btn-gradient:hover {
