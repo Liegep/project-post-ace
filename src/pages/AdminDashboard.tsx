@@ -812,7 +812,7 @@ const AdminDashboard = () => {
               <img src={appLogo} alt="Logo" className="h-9 w-9 md:h-10 md:w-10 rounded-lg object-contain border bg-card shrink-0" />
             ) : null}
             <div>
-              <h1 className="text-xl md:text-2xl font-bold text-foreground">ContentFlow</h1>
+              <h1 className="text-xl md:text-2xl font-bold text-foreground">Design Hub</h1>
               <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">{t("selectOrCreateClient")}</p>
             </div>
           </div>
@@ -858,7 +858,7 @@ const AdminDashboard = () => {
           <SheetHeader className="border-b px-5 py-4">
             <SheetTitle className="text-left text-lg font-bold flex items-center gap-2">
               {appLogo && <img src={appLogo} alt="Logo" className="h-7 w-7 rounded-md object-contain" />}
-              ContentFlow
+              Design Hub
             </SheetTitle>
           </SheetHeader>
           <div className="flex flex-col py-2">
