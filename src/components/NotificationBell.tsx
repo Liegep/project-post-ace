@@ -29,6 +29,7 @@ export const NotificationBell = () => {
   const { userId } = useUserRole();
   const [notifications, setNotifications] = useState<DeadlineNotification[]>([]);
   const [open, setOpen] = useState(false);
+  const [reviewPostId, setReviewPostId] = useState<string | null>(null);
 
   // Fetch only on mount and when popover opens — no realtime, no polling
   useEffect(() => {
