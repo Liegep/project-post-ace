@@ -54,6 +54,8 @@
     --gradient-start: 185 72% 58%;
     --gradient-mid: 228 80% 58%;
     --gradient-end: 265 70% 58%;
+    --gradient-hover-start: 185 72% 58%;
+    --gradient-hover-end: 330 80% 60%;
     --glass-bg: 0 0% 100% / 0.65;
     --glass-border: 0 0% 100% / 0.25;
   }
