@@ -159,8 +159,9 @@ const UserProfileMenu = () => {
             </span>
             {role && (
               <span className={cn(
-                "hidden sm:inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                isSuperAdmin ? "bg-amber-500/15 text-amber-600" : role === "admin" ? "bg-blue-500/15 text-blue-600" : "bg-emerald-500/15 text-emerald-600"
+                "hidden sm:inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors",
+                isSuperAdmin ? "bg-amber-500/15 text-amber-600" : role === "admin" ? "bg-blue-500/15 text-blue-600" : "bg-emerald-500/15 text-emerald-600",
+                "group-hover:bg-white/20 group-hover:text-white"
               )}>
                 <Shield className="h-2.5 w-2.5" />
                 {isSuperAdmin ? "Super Admin" : role === "admin" ? "Admin" : "Colaborador"}
