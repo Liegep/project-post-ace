@@ -46,7 +46,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
     onOpenChange(isOpen);
   };
 
-  const MAX_FILE_SIZE = 7 * 1024 * 1024; // 7MB
+  const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -55,18 +55,11 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
       if (file.size > MAX_FILE_SIZE) {
         toast({
           title: "Arquivo grande",
-          description: `"${file.name}" excede 7MB. Use um link externo para melhor performance.`,
+          description: `"${file.name}" excede 20MB. Use um link externo para melhor performance.`,
           variant: "destructive",
           duration: 5000,
         });
         return;
-      }
-      if (file.type.startsWith("video/")) {
-        toast({
-          title: "Vídeos grandes",
-          description: "Para vídeos, recomendamos usar um link externo (Google Drive, YouTube) para economizar armazenamento.",
-          duration: 5000,
-        });
       }
       const isVideo = file.type.startsWith("video/");
       const reader = new FileReader();
