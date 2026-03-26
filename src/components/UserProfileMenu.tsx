@@ -149,7 +149,7 @@ const UserProfileMenu = () => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="flex items-center gap-2 px-2 group hover:!bg-primary/10">
+          <Button variant="ghost" className="flex items-center gap-2 px-2 group hover:btn-hover-gradient">
             <Avatar className="h-7 w-7">
               <AvatarImage src={profile?.avatar_url || ""} />
               <AvatarFallback className="text-xs bg-primary/10 text-primary">{initials}</AvatarFallback>
