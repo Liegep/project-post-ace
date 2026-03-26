@@ -243,7 +243,26 @@ const AdminDashboard = () => {
     fetchClientCreatedNotifs();
     fetchTodayPosts();
     fetchStatusNotifs();
-    // No realtime — data loads on page access only
+
+    // Realtime: refresh feedbacks when any post's client_label changes
+    const channel = supabase
+      .channel("feedback-realtime")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "posts" },
+        (payload) => {
+          const oldLabel = (payload.old as any)?.client_label;
+          const newLabel = (payload.new as any)?.client_label;
+          if (oldLabel !== newLabel) {
+            fetchFeedbacks();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [role, currentUserId]);
 
   const fetchTodayPosts = async () => {
