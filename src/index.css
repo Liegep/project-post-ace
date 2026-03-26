@@ -100,7 +100,8 @@
     transition: all 0.2s ease;
   }
   .btn-gradient:hover {
-    box-shadow: 0 6px 20px -2px hsl(var(--gradient-mid) / 0.5);
+    background: linear-gradient(135deg, hsl(var(--gradient-hover-start)) 0%, hsl(var(--gradient-mid)) 40%, hsl(var(--gradient-hover-end)) 100%);
+    box-shadow: 0 6px 20px -2px hsl(var(--gradient-hover-end) / 0.4);
     transform: translateY(-1px);
   }
 
