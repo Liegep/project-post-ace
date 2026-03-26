@@ -214,7 +214,7 @@ export const TodayTasksWidget = () => {
   };
 
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-sm">
+    <div className="rounded-xl border bg-card p-4 shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
       <div className="flex items-center gap-2 mb-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
           <CalendarClock className="h-4 w-4 text-primary" />

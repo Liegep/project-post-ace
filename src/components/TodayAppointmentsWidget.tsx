@@ -166,7 +166,7 @@ export const TodayAppointmentsWidget = () => {
 
   return (
     <>
-      <div className="rounded-xl border border-border bg-white dark:bg-card p-4">
+      <div className="rounded-xl border border-border bg-white dark:bg-card p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20">
