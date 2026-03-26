@@ -13,24 +13,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 228 45% 15%;
 
-    --primary: 228 45% 17%;
-    --primary-foreground: 40 100% 97%;
+    --primary: 240 55% 55%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 220 16% 92%;
-    --secondary-foreground: 228 45% 17%;
+    --secondary-foreground: 240 40% 30%;
 
     --muted: 220 16% 94%;
     --muted-foreground: 220 10% 46%;
 
-    --accent: 38 92% 50%;
-    --accent-foreground: 228 45% 10%;
+    --accent: 260 70% 58%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 220 16% 88%;
     --input: 220 16% 88%;
-    --ring: 38 92% 50%;
+    --ring: 240 55% 55%;
 
     --radius: 0.75rem;
 
@@ -41,18 +41,19 @@
     --info: 210 92% 55%;
     --info-foreground: 0 0% 100%;
 
-    --sidebar-background: 228 45% 12%;
+    --sidebar-background: 245 40% 14%;
     --sidebar-foreground: 220 16% 85%;
-    --sidebar-primary: 38 92% 50%;
-    --sidebar-primary-foreground: 228 45% 10%;
-    --sidebar-accent: 228 35% 20%;
+    --sidebar-primary: 260 70% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 245 35% 22%;
     --sidebar-accent-foreground: 220 16% 90%;
-    --sidebar-border: 228 30% 22%;
-    --sidebar-ring: 38 92% 50%;
+    --sidebar-border: 245 30% 24%;
+    --sidebar-ring: 260 70% 58%;
 
-    /* Gradient & glass tokens */
-    --gradient-start: 228 45% 17%;
-    --gradient-end: 38 92% 50%;
+    /* Gradient & glass tokens — cyan → blue → purple like the logo */
+    --gradient-start: 185 72% 58%;
+    --gradient-mid: 228 80% 58%;
+    --gradient-end: 265 70% 58%;
     --glass-bg: 0 0% 100% / 0.65;
     --glass-border: 0 0% 100% / 0.25;
   }
@@ -66,8 +67,8 @@
   body {
     @apply bg-background text-foreground;
     background-image: 
-      radial-gradient(ellipse at 20% 0%, hsl(var(--gradient-start) / 0.06) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 100%, hsl(var(--gradient-end) / 0.08) 0%, transparent 50%);
+      radial-gradient(ellipse at 20% 0%, hsl(var(--gradient-end) / 0.07) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, hsl(var(--gradient-start) / 0.09) 0%, transparent 50%);
     background-attachment: fixed;
     min-height: 100vh;
   }
@@ -90,14 +91,14 @@
   }
 
   .btn-gradient {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 50%, hsl(var(--accent) / 0.9) 100%);
-    color: hsl(var(--primary-foreground));
+    background: linear-gradient(135deg, hsl(var(--gradient-start)) 0%, hsl(var(--gradient-mid)) 50%, hsl(var(--gradient-end)) 100%);
+    color: hsl(0 0% 100%);
     border: none;
-    box-shadow: 0 4px 14px -2px hsl(var(--primary) / 0.3);
+    box-shadow: 0 4px 14px -2px hsl(var(--gradient-mid) / 0.35);
     transition: all 0.2s ease;
   }
   .btn-gradient:hover {
-    box-shadow: 0 6px 20px -2px hsl(var(--primary) / 0.45);
+    box-shadow: 0 6px 20px -2px hsl(var(--gradient-mid) / 0.5);
     transform: translateY(-1px);
   }
 
