@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
-import { Bell } from "lucide-react";
+import { Bell, Users } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -45,7 +45,7 @@ export const NotificationBell = () => {
     const { data } = await supabase
       .from("admin_notifications")
       .select("*")
-      .in("type", ["deadline_warning", "deadline_today", "deadline_overdue"])
+      .in("type", ["deadline_warning", "deadline_today", "deadline_overdue", "internal_approval"])
       .eq("read", false)
       .or(`user_id.eq.${userId},user_id.is.null`)
       .order("created_at", { ascending: false })
@@ -84,7 +84,8 @@ export const NotificationBell = () => {
     switch (type) {
       case "deadline_overdue": return <AlertTriangle className="h-3.5 w-3.5 text-destructive" />;
       case "deadline_today": return <CalendarClock className="h-3.5 w-3.5 text-amber-500" />;
-      case "deadline_warning": return <Clock className="h-3.5 w-3.5 text-blue-500" />;
+      case "deadline_warning": return <Clock className="h-3.5 w-3.5 text-primary" />;
+      case "internal_approval": return <Users className="h-3.5 w-3.5 text-primary" />;
       default: return <Bell className="h-3.5 w-3.5 text-muted-foreground" />;
     }
   };
@@ -93,7 +94,8 @@ export const NotificationBell = () => {
     switch (type) {
       case "deadline_overdue": return "border-destructive/20 bg-destructive/5";
       case "deadline_today": return "border-amber-400/20 bg-amber-500/5";
-      case "deadline_warning": return "border-blue-400/20 bg-blue-500/5";
+      case "deadline_warning": return "border-primary/20 bg-primary/5";
+      case "internal_approval": return "border-primary/20 bg-primary/5";
       default: return "bg-muted/50";
     }
   };
