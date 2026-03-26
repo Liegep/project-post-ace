@@ -54,6 +54,8 @@
     --gradient-start: 185 72% 58%;
     --gradient-mid: 228 80% 58%;
     --gradient-end: 265 70% 58%;
+    --gradient-hover-start: 185 72% 58%;
+    --gradient-hover-end: 330 80% 60%;
     --glass-bg: 0 0% 100% / 0.65;
     --glass-border: 0 0% 100% / 0.25;
   }
@@ -98,7 +100,8 @@
     transition: all 0.2s ease;
   }
   .btn-gradient:hover {
-    box-shadow: 0 6px 20px -2px hsl(var(--gradient-mid) / 0.5);
+    background: linear-gradient(135deg, hsl(var(--gradient-hover-start)) 0%, hsl(var(--gradient-mid)) 40%, hsl(var(--gradient-hover-end)) 100%);
+    box-shadow: 0 6px 20px -2px hsl(var(--gradient-hover-end) / 0.4);
     transform: translateY(-1px);
   }
 
@@ -112,6 +115,12 @@
   .btn-glass:hover {
     background: hsl(0 0% 100% / 0.85);
     box-shadow: 0 4px 12px -2px hsl(var(--primary) / 0.1);
+  }
+
+  .btn-hover-gradient {
+    background: linear-gradient(135deg, hsl(var(--gradient-hover-start)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-hover-end)) 100%) !important;
+    box-shadow: 0 4px 14px -2px hsl(var(--gradient-hover-end) / 0.3);
+    transform: translateY(-0.5px);
   }
 }
 

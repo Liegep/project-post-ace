@@ -149,12 +149,12 @@ const UserProfileMenu = () => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="flex items-center gap-2 px-2">
+          <Button variant="ghost" className="flex items-center gap-2 px-2 group hover:btn-hover-gradient">
             <Avatar className="h-7 w-7">
               <AvatarImage src={profile?.avatar_url || ""} />
               <AvatarFallback className="text-xs bg-primary/10 text-primary">{initials}</AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium text-foreground max-w-[120px] truncate hidden sm:block">
+            <span className="text-sm font-medium text-foreground max-w-[120px] truncate hidden sm:block group-hover:text-primary-foreground transition-colors">
               {displayName}
             </span>
             {role && (
