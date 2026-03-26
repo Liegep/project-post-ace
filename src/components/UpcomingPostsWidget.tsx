@@ -67,7 +67,7 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
   if (scheduledPosts.length === 0) return null;
 
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-sm">
+    <div className="rounded-xl border bg-card p-4 shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <CalendarClock className="h-5 w-5 text-primary" />

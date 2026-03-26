@@ -30,7 +30,7 @@ export function CommemorativeDatesWidget() {
 
   return (
     <TooltipProvider>
-      <div className="rounded-xl border bg-card shadow-sm">
+      <div className="rounded-xl border bg-card shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <div className="flex items-center gap-2">
