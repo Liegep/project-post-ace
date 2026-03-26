@@ -1068,6 +1068,57 @@ export type Database = {
           },
         ]
       }
+      internal_approvals: {
+        Row: {
+          assigned_to: string
+          client_id: string
+          comment: string
+          created_at: string
+          id: string
+          post_id: string
+          requested_by: string
+          responded_at: string | null
+          status: string
+        }
+        Insert: {
+          assigned_to: string
+          client_id: string
+          comment?: string
+          created_at?: string
+          id?: string
+          post_id: string
+          requested_by: string
+          responded_at?: string | null
+          status?: string
+        }
+        Update: {
+          assigned_to?: string
+          client_id?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          requested_by?: string
+          responded_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_approvals_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internal_approvals_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_attachments: {
         Row: {
           created_at: string

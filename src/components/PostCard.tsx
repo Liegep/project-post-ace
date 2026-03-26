@@ -13,8 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud, DollarSign, Check, Play } from "lucide-react";
+import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud, DollarSign, Check, Play, Users } from "lucide-react";
 import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
+import { InternalApprovalDialog } from "@/components/InternalApprovalDialog";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { PostTrackingLabels } from "@/components/PostTrackingLabels";
 import { format } from "date-fns";
@@ -153,6 +154,7 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
   const [invoiceStatus, setInvoiceStatus] = useState<"loading" | "not_invoiced" | "invoiced">("loading");
   const [invoicing, setInvoicing] = useState(false);
   const [uninvoicing, setUninvoicing] = useState(false);
+  const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
 
   const baseMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
   const allMedia = localMediaOrder || baseMedia;
@@ -611,9 +613,24 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
               variant="individual"
               className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}
             />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setInternalApprovalOpen(true); }} className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
+                  <Users className="h-4 w-4 text-primary" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent><p className="text-xs">Enviar para aprovação interna</p></TooltipContent>
+            </Tooltip>
             <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
               <Trash2 className="h-4 w-4" />
             </Button>
+            <InternalApprovalDialog
+              open={internalApprovalOpen}
+              onOpenChange={setInternalApprovalOpen}
+              postId={post.id}
+              postTitle={post.title}
+              clientId={clientId}
+            />
           </div>
         )}
 
