@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -11,8 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import UserProfileMenu from "@/components/UserProfileMenu";
@@ -20,7 +21,8 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import {
   ArrowLeft, Plus, CalendarIcon, Copy, Eye, EyeOff, Send, Check, X,
-  Filter, Search, Pencil, MessageCircle, Paperclip, FileText, Trash2
+  Filter, Search, Pencil, MessageCircle, Paperclip, FileText, Trash2,
+  ChevronLeft, ChevronRight
 } from "lucide-react";
 import { MobileNav } from "@/components/MobileNav";
 import { BriefSimilarityPanel } from "@/components/BriefSimilarityPanel";
@@ -103,6 +105,7 @@ const BriefsPage = () => {
   const [filterType, setFilterType] = useState("all");
   const [filterAssigned, setFilterAssigned] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterMonth, setFilterMonth] = useState(() => new Date());
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -349,8 +352,18 @@ const BriefsPage = () => {
     }
   };
 
+  // Month filtering
+  const monthFiltered = useMemo(() => {
+    const ms = startOfMonth(filterMonth);
+    const me = endOfMonth(filterMonth);
+    return briefs.filter((b) => {
+      const d = b.planned_date ? new Date(b.planned_date + "T00:00:00") : new Date(b.created_at);
+      return d >= ms && d <= me;
+    });
+  }, [briefs, filterMonth]);
+
   // Filtering
-  const filtered = briefs.filter((b) => {
+  const filtered = monthFiltered.filter((b) => {
     if (filterClient !== "all" && b.client_id !== filterClient) return false;
     if (filterStatus !== "all" && b.status !== filterStatus) return false;
     if (filterType !== "all" && b.content_type !== filterType) return false;
@@ -366,6 +379,10 @@ const BriefsPage = () => {
     if (diff !== 0) return diff;
     return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
   });
+
+  const prevMonth = () => setFilterMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  const nextMonth = () => setFilterMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  const goToday = () => setFilterMonth(new Date());
 
   const getAssignedName = (id: string | null) => {
     if (!id) return "—";
@@ -443,89 +460,127 @@ const BriefsPage = () => {
           </Select>
         </div>
 
-        {/* Brief cards */}
+        {/* Month/Year Navigator */}
+        <div className="flex items-center justify-between rounded-lg border bg-card px-3 py-2">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prevMonth}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold capitalize">
+              {format(filterMonth, "MMMM yyyy", { locale: ptBR })}
+            </span>
+            <Button variant="outline" size="sm" className="h-6 text-[10px] px-2" onClick={goToday}>
+              Hoje
+            </Button>
+          </div>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={nextMonth}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Spreadsheet-style table */}
         {loading ? (
           <div className="text-center py-12 text-muted-foreground">Carregando...</div>
         ) : sorted.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <FileText className="h-12 w-12 mx-auto mb-3 opacity-30" />
-            <p>Nenhuma pauta encontrada</p>
+            <p>Nenhuma pauta neste mês</p>
             <Button variant="outline" className="mt-3" onClick={openCreate}>Criar primeira pauta</Button>
           </div>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {sorted.map((brief) => {
-              const sc = STATUS_CONFIG[brief.status];
-              const ct = CONTENT_TYPES.find((c) => c.value === brief.content_type);
-              return (
-                <div
-                  key={brief.id}
-                  className="rounded-xl border bg-card p-4 hover:shadow-md transition-shadow cursor-pointer flex flex-col gap-2"
-                  onClick={() => openDetail(brief)}
-                >
-                  {/* Client + status */}
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      {brief.clients?.logo_url ? (
-                        <img src={brief.clients.logo_url} className="h-6 w-6 rounded-full object-contain border shrink-0" />
-                      ) : (
-                        <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center shrink-0">
-                          <span className="text-[10px] font-bold">{brief.clients?.name?.charAt(0)}</span>
+          <div className="rounded-lg border bg-card overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="w-[180px] text-xs font-semibold">Cliente</TableHead>
+                  <TableHead className="text-xs font-semibold">Título</TableHead>
+                  <TableHead className="w-[90px] text-xs font-semibold hidden sm:table-cell">Tipo</TableHead>
+                  <TableHead className="w-[100px] text-xs font-semibold hidden md:table-cell">Data</TableHead>
+                  <TableHead className="w-[130px] text-xs font-semibold hidden lg:table-cell">Responsável</TableHead>
+                  <TableHead className="w-[140px] text-xs font-semibold">Status</TableHead>
+                  <TableHead className="w-[160px] text-xs font-semibold text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sorted.map((brief) => {
+                  const sc = STATUS_CONFIG[brief.status];
+                  const ct = CONTENT_TYPES.find((c) => c.value === brief.content_type);
+                  return (
+                    <TableRow
+                      key={brief.id}
+                      className="cursor-pointer hover:bg-muted/30 transition-colors"
+                      onClick={() => openDetail(brief)}
+                    >
+                      <TableCell className="py-2.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {brief.clients?.logo_url ? (
+                            <img src={brief.clients.logo_url} className="h-5 w-5 rounded-full object-contain border shrink-0" />
+                          ) : (
+                            <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center shrink-0">
+                              <span className="text-[9px] font-bold">{brief.clients?.name?.charAt(0)}</span>
+                            </div>
+                          )}
+                          <span className="text-xs truncate">{brief.clients?.name}</span>
                         </div>
-                      )}
-                      <span className="text-xs text-muted-foreground truncate">{brief.clients?.name}</span>
-                    </div>
-                    <Badge variant="secondary" className={cn("text-[10px] shrink-0", sc.color)}>{sc.label}</Badge>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="font-semibold text-sm leading-tight line-clamp-2">{brief.title}</h3>
-
-                  {/* Meta */}
-                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
-                    {ct && <span className="rounded bg-muted px-1.5 py-0.5">{ct.label}</span>}
-                    {brief.planned_date && (
-                      <span className="flex items-center gap-1">
-                        <CalendarIcon className="h-3 w-3" />
-                        {new Date(brief.planned_date + "T00:00:00").toLocaleDateString("pt-BR")}
-                      </span>
-                    )}
-                    {brief.assigned_to && <span>👤 {getAssignedName(brief.assigned_to)}</span>}
-                    {(brief.comment_count || 0) > 0 && (
-                      <span className="flex items-center gap-0.5">
-                        <MessageCircle className="h-3 w-3" /> {brief.comment_count}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-1.5 mt-auto pt-2 border-t">
-                    <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={(e) => { e.stopPropagation(); openEdit(brief); }}>
-                      <Pencil className="h-3 w-3" /> Editar
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={(e) => { e.stopPropagation(); duplicateBrief(brief); }}>
-                      <Copy className="h-3 w-3" /> Duplicar
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 text-xs gap-1 text-destructive hover:text-destructive"
-                      onClick={(e) => { e.stopPropagation(); setDeletingBrief(brief); }}
-                    >
-                      <Trash2 className="h-3 w-3" /> Apagar
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className={cn("h-7 text-xs gap-1 ml-auto", brief.status === "pending_approval" ? "text-amber-600" : "text-muted-foreground")}
-                      onClick={(e) => { e.stopPropagation(); toggleClientVisibility(brief); }}
-                    >
-                      {brief.status === "pending_approval" ? <><EyeOff className="h-3 w-3" /> Ocultar</> : <><Send className="h-3 w-3" /> Enviar</>}
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
+                      </TableCell>
+                      <TableCell className="py-2.5">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-sm font-medium truncate">{brief.title}</span>
+                          {(brief.comment_count || 0) > 0 && (
+                            <span className="flex items-center gap-0.5 text-muted-foreground text-[10px] shrink-0">
+                              <MessageCircle className="h-3 w-3" /> {brief.comment_count}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-2.5 hidden sm:table-cell">
+                        <span className="text-xs text-muted-foreground">{ct?.label || brief.content_type}</span>
+                      </TableCell>
+                      <TableCell className="py-2.5 hidden md:table-cell">
+                        {brief.planned_date ? (
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(brief.planned_date + "T00:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground/50">—</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="py-2.5 hidden lg:table-cell">
+                        <span className="text-xs text-muted-foreground truncate">{getAssignedName(brief.assigned_to)}</span>
+                      </TableCell>
+                      <TableCell className="py-2.5">
+                        <Badge variant="secondary" className={cn("text-[10px]", sc.color)}>{sc.label}</Badge>
+                      </TableCell>
+                      <TableCell className="py-2.5 text-right">
+                        <div className="flex items-center justify-end gap-0.5">
+                          <Button variant="ghost" size="icon" className="h-7 w-7" title="Editar" onClick={(e) => { e.stopPropagation(); openEdit(brief); }}>
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7" title="Duplicar" onClick={(e) => { e.stopPropagation(); duplicateBrief(brief); }}>
+                            <Copy className="h-3 w-3" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" title="Apagar" onClick={(e) => { e.stopPropagation(); setDeletingBrief(brief); }}>
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className={cn("h-7 w-7", brief.status === "pending_approval" ? "text-amber-600" : "text-muted-foreground")}
+                            title={brief.status === "pending_approval" ? "Ocultar" : "Enviar"}
+                            onClick={(e) => { e.stopPropagation(); toggleClientVisibility(brief); }}
+                          >
+                            {brief.status === "pending_approval" ? <EyeOff className="h-3 w-3" /> : <Send className="h-3 w-3" />}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+            <div className="border-t px-3 py-2 text-xs text-muted-foreground bg-muted/30">
+              {sorted.length} pauta{sorted.length !== 1 ? "s" : ""} em {format(filterMonth, "MMMM yyyy", { locale: ptBR })}
+            </div>
           </div>
         )}
       </main>
