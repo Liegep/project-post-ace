@@ -84,7 +84,8 @@ export const NotificationBell = () => {
     switch (type) {
       case "deadline_overdue": return <AlertTriangle className="h-3.5 w-3.5 text-destructive" />;
       case "deadline_today": return <CalendarClock className="h-3.5 w-3.5 text-amber-500" />;
-      case "deadline_warning": return <Clock className="h-3.5 w-3.5 text-blue-500" />;
+      case "deadline_warning": return <Clock className="h-3.5 w-3.5 text-primary" />;
+      case "internal_approval": return <Users className="h-3.5 w-3.5 text-primary" />;
       default: return <Bell className="h-3.5 w-3.5 text-muted-foreground" />;
     }
   };
