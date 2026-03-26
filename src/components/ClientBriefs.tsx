@@ -205,7 +205,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
           return (
             <div
               key={brief.id}
-              className="rounded-xl border bg-card p-4 hover:shadow-md transition-shadow cursor-pointer flex flex-col gap-2"
+              className="rounded-xl border bg-card p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer flex flex-col gap-2"
               onClick={() => openDetail(brief)}
             >
               <div className="flex items-center justify-between">
