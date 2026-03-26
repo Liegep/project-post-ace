@@ -154,6 +154,7 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
   const [invoiceStatus, setInvoiceStatus] = useState<"loading" | "not_invoiced" | "invoiced">("loading");
   const [invoicing, setInvoicing] = useState(false);
   const [uninvoicing, setUninvoicing] = useState(false);
+  const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
 
   const baseMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
   const allMedia = localMediaOrder || baseMedia;
