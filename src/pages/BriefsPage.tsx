@@ -352,8 +352,18 @@ const BriefsPage = () => {
     }
   };
 
+  // Month filtering
+  const monthFiltered = useMemo(() => {
+    const ms = startOfMonth(filterMonth);
+    const me = endOfMonth(filterMonth);
+    return briefs.filter((b) => {
+      const d = b.planned_date ? new Date(b.planned_date + "T00:00:00") : new Date(b.created_at);
+      return d >= ms && d <= me;
+    });
+  }, [briefs, filterMonth]);
+
   // Filtering
-  const filtered = briefs.filter((b) => {
+  const filtered = monthFiltered.filter((b) => {
     if (filterClient !== "all" && b.client_id !== filterClient) return false;
     if (filterStatus !== "all" && b.status !== filterStatus) return false;
     if (filterType !== "all" && b.content_type !== filterType) return false;
@@ -369,6 +379,10 @@ const BriefsPage = () => {
     if (diff !== 0) return diff;
     return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
   });
+
+  const prevMonth = () => setFilterMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  const nextMonth = () => setFilterMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  const goToday = () => setFilterMonth(new Date());
 
   const getAssignedName = (id: string | null) => {
     if (!id) return "—";
