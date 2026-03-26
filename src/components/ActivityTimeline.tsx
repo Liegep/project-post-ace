@@ -33,18 +33,10 @@ const ACTION_ICON_NAME: Record<ActivityAction, string> = {
   brief_created: "FileText",
   brief_status_changed: "ArrowRightLeft",
   brief_commented: "MessageCircle",
-  client_created: "UserPlus",
-  client_updated: "Settings",
-  client_assigned: "UserPlus",
-  client_unassigned: "UserMinus",
   caption_edited: "Type",
   feedback_sent: "Send",
-  social_post_created: "Share2",
-  social_post_published: "Globe",
-  social_post_scheduled: "CalendarClock",
-  report_created: "FileText",
-  report_updated: "Pencil",
-  report_published: "Globe",
+  post_viewed: "FileText",
+  post_downloaded: "FileText",
 };
 
 const ACTION_COLOR: Record<string, string> = {

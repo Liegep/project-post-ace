@@ -1,0 +1,1 @@
+CREATE POLICY "Service role can delete activity_logs" ON public.activity_logs FOR DELETE TO authenticated USING (has_role(auth.uid(), 'admin'::app_role));
