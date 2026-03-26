@@ -832,7 +832,7 @@ const AdminDashboard = () => {
             ) : null}
             <div>
               <h1 className="text-xl md:text-2xl font-bold text-foreground">Design Hub</h1>
-              <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">{t("selectOrCreateClient")}</p>
+              
             </div>
           </div>
           {/* Desktop nav */}
