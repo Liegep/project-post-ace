@@ -49,6 +49,12 @@
     --sidebar-accent-foreground: 220 16% 90%;
     --sidebar-border: 228 30% 22%;
     --sidebar-ring: 38 92% 50%;
+
+    /* Gradient & glass tokens */
+    --gradient-start: 228 45% 17%;
+    --gradient-end: 38 92% 50%;
+    --glass-bg: 0 0% 100% / 0.65;
+    --glass-border: 0 0% 100% / 0.25;
   }
 }
 
@@ -59,6 +65,52 @@
 
   body {
     @apply bg-background text-foreground;
+    background-image: 
+      radial-gradient(ellipse at 20% 0%, hsl(var(--gradient-start) / 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, hsl(var(--gradient-end) / 0.08) 0%, transparent 50%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: 0 4px 24px -4px hsl(var(--primary) / 0.06);
+  }
+
+  .glass-header {
+    background: hsl(0 0% 100% / 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid hsl(var(--glass-border));
+  }
+
+  .btn-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 50%, hsl(var(--accent) / 0.9) 100%);
+    color: hsl(var(--primary-foreground));
+    border: none;
+    box-shadow: 0 4px 14px -2px hsl(var(--primary) / 0.3);
+    transition: all 0.2s ease;
+  }
+  .btn-gradient:hover {
+    box-shadow: 0 6px 20px -2px hsl(var(--primary) / 0.45);
+    transform: translateY(-1px);
+  }
+
+  .btn-glass {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid hsl(var(--glass-border));
+    transition: all 0.2s ease;
+  }
+  .btn-glass:hover {
+    background: hsl(0 0% 100% / 0.85);
+    box-shadow: 0 4px 12px -2px hsl(var(--primary) / 0.1);
   }
 }
 

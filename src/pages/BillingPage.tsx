@@ -208,7 +208,7 @@ const BillingPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
+      <header className="sticky top-0 z-30 glass-header">
         <div className="mx-auto max-w-5xl flex items-center gap-3 px-4 py-3">
           <MobileNav title="Faturamento" />
           <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
