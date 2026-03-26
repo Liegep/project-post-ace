@@ -255,7 +255,7 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
 
   return (
     <Card
-      className={`overflow-hidden transition-shadow hover:shadow-md ${isAdmin ? "cursor-pointer" : ""} ${selectionMode && isSelected ? "ring-2 ring-accent shadow-lg" : ""} ${!isAdmin && hasAlteradoTag ? "ring-2 ring-warning" : ""}`}
+      className={`overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1 ${isAdmin ? "cursor-pointer" : ""} ${selectionMode && isSelected ? "ring-2 ring-accent shadow-lg" : ""} ${!isAdmin && hasAlteradoTag ? "ring-2 ring-warning" : ""}`}
       onClick={handleCardClick}
     >
       {!isAdmin && hasAlteradoTag && (
