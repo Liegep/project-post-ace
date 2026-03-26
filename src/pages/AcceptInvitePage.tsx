@@ -98,7 +98,7 @@ const AcceptInvitePage = () => {
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
           {appLogo && <img src={appLogo} alt="Logo" className="h-14 w-14 rounded-xl object-contain mx-auto mb-3" />}
-          <h1 className="text-2xl font-bold text-foreground">ContentFlow</h1>
+          <h1 className="text-2xl font-bold text-foreground">Design Hub</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Configure sua senha para acessar o painel
           </p>
