@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { URGENCY_STYLES } from "@/lib/deadlineColors";
 import { AlertTriangle, Clock, CalendarClock, Check } from "lucide-react";
+import { InternalApprovalReviewDialog } from "@/components/InternalApprovalReviewDialog";
 
 interface DeadlineNotification {
   id: string;
