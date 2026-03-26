@@ -583,7 +583,6 @@ const BriefsPage = () => {
             </div>
           </div>
         )}
-        )}
       </main>
 
       {/* Create / Edit Dialog */}
