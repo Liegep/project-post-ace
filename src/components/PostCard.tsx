@@ -613,9 +613,24 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
               variant="individual"
               className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}
             />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setInternalApprovalOpen(true); }} className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
+                  <Users className="h-4 w-4 text-primary" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent><p className="text-xs">Enviar para aprovação interna</p></TooltipContent>
+            </Tooltip>
             <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
               <Trash2 className="h-4 w-4" />
             </Button>
+            <InternalApprovalDialog
+              open={internalApprovalOpen}
+              onOpenChange={setInternalApprovalOpen}
+              postId={post.id}
+              postTitle={post.title}
+              clientId={clientId}
+            />
           </div>
         )}
 
