@@ -188,6 +188,49 @@ export default function CommemorativeDatesPage() {
                   <X className="h-4 w-4 text-muted-foreground" />
                 </button>
               )}
+              {/* Country dropdown results */}
+              {searchQuery.trim().length > 0 && (() => {
+                const matchedCountries = countries.filter(c =>
+                  c.name.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+                return matchedCountries.length > 0 ? (
+                  <div className="absolute top-full left-0 right-0 mt-1 z-20 rounded-lg border bg-popover shadow-lg max-h-48 overflow-y-auto">
+                    {matchedCountries.map((c) => (
+                      <div
+                        key={c.name}
+                        className="flex items-center justify-between px-3 py-2 hover:bg-muted transition-colors cursor-pointer"
+                        onClick={() => {
+                          toggleCountry(c.name);
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: c.color }} />
+                          <span className={cn(
+                            "text-sm",
+                            selectedCountries.includes(c.name) ? "font-semibold text-foreground" : "text-muted-foreground"
+                          )}>{c.name}</span>
+                          {selectedCountries.includes(c.name) && (
+                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">filtrado</Badge>
+                          )}
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(c.name);
+                          }}
+                          className="p-1 hover:scale-125 transition-transform"
+                          title={c.isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                        >
+                          <Star className={cn(
+                            "h-4 w-4",
+                            c.isFavorite ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40 hover:text-amber-400"
+                          )} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : null;
+              })()}
             </div>
             <div className="flex gap-2">
               <Select value={filterMonth} onValueChange={setFilterMonth}>
@@ -217,48 +260,32 @@ export default function CommemorativeDatesPage() {
             </div>
           </div>
 
-          {/* Country filter chips */}
-          <div className="flex flex-wrap gap-1.5">
-            {countries.map((c) => (
-              <div key={c.name} className="inline-flex items-center gap-0">
-                <button
-                  onClick={() => toggleFavorite(c.name)}
-                  className="p-1 hover:scale-110 transition-transform"
-                  title={c.isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-                >
-                  <Star className={cn(
-                    "h-3 w-3",
-                    c.isFavorite ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40"
-                  )} />
-                </button>
-                <button
-                  onClick={() => toggleCountry(c.name)}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all border",
-                    selectedCountries.includes(c.name)
-                      ? "border-transparent text-white shadow-sm"
-                      : "border-border bg-card text-muted-foreground hover:bg-muted"
-                  )}
-                  style={
-                    selectedCountries.includes(c.name)
-                      ? { backgroundColor: c.color }
-                      : undefined
-                  }
-                >
-                  <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: c.color }} />
-                  {c.name}
-                </button>
-              </div>
-            ))}
-            {selectedCountries.length > 0 && (
+          {/* Active country filters */}
+          {selectedCountries.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 items-center">
+              {selectedCountries.map((name) => {
+                const c = countries.find(co => co.name === name);
+                return (
+                  <button
+                    key={name}
+                    onClick={() => toggleCountry(name)}
+                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-white shadow-sm border border-transparent"
+                    style={{ backgroundColor: c?.color || "hsl(var(--primary))" }}
+                  >
+                    <span className="h-2 w-2 rounded-full bg-white/40 shrink-0" />
+                    {name}
+                    <X className="h-3 w-3 ml-0.5" />
+                  </button>
+                );
+              })}
               <button
                 onClick={() => setSelectedCountries([])}
                 className="text-xs text-muted-foreground hover:text-foreground underline px-2"
               >
                 Limpar filtros
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Dates by month */}
