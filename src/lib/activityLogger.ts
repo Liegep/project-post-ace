@@ -1,6 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 
-// Only approval and feedback actions are logged now
 export type ActivityAction =
   | "post_approved"
   | "post_change_requested"
@@ -14,18 +13,10 @@ export type ActivityAction =
   | "brief_created"
   | "brief_status_changed"
   | "brief_commented"
-  | "client_created"
-  | "client_updated"
-  | "client_assigned"
-  | "client_unassigned"
   | "caption_edited"
   | "feedback_sent"
-  | "social_post_created"
-  | "social_post_published"
-  | "social_post_scheduled"
-  | "report_created"
-  | "report_updated"
-  | "report_published";
+  | "post_viewed"
+  | "post_downloaded";
 
 export type ItemType = "post" | "brief" | "client" | "social_post" | "comment" | "report";
 
@@ -39,20 +30,23 @@ interface LogActivityParams {
   metadata?: Record<string, unknown>;
 }
 
-// Only these actions actually get persisted — all others silently no-op
-const ALLOWED_ACTIONS: Set<string> = new Set([
-  "post_approved",
-  "post_change_requested",
-  "feedback_sent",
-]);
-
+/**
+ * Logs activity ONLY for users with the 'client' role.
+ * Admin/team actions are silently skipped.
+ */
 export async function logActivity(params: LogActivityParams) {
-  // Only log client approval/feedback actions — skip everything else
-  if (!ALLOWED_ACTIONS.has(params.action)) return;
-
   try {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) return;
+
+    // Check if the user has the 'client' role — skip logging for all other roles
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", session.user.id);
+
+    const isClient = roles?.some(r => r.role === "client");
+    if (!isClient) return;
 
     const { data: profile } = await supabase
       .from("profiles")
@@ -60,7 +54,7 @@ export async function logActivity(params: LogActivityParams) {
       .eq("id", session.user.id)
       .maybeSingle();
 
-    const userName = profile?.full_name || profile?.email || session.user.email || "Usuário";
+    const userName = profile?.full_name || profile?.email || session.user.email || "Cliente";
 
     await supabase.from("activity_logs" as any).insert({
       user_id: session.user.id,
@@ -81,11 +75,37 @@ export async function logActivity(params: LogActivityParams) {
 export const ACTION_LABELS: Record<string, string> = {
   post_approved: "aprovou o post",
   post_change_requested: "solicitou alteração no post",
+  post_edited: "editou o post",
+  post_created: "criou o post",
+  post_status_changed: "alterou o status do post",
+  post_commented: "comentou no post",
+  post_archived: "arquivou o post",
+  post_unarchived: "desarquivou o post",
+  post_moved: "moveu o post",
+  brief_created: "criou a pauta",
+  brief_status_changed: "alterou status da pauta",
+  brief_commented: "comentou na pauta",
+  caption_edited: "editou a legenda",
   feedback_sent: "enviou feedback no post",
+  post_viewed: "visualizou o post",
+  post_downloaded: "baixou arquivo do post",
 };
 
 export const ACTION_ICONS: Record<string, string> = {
   post_approved: "CheckCircle2",
   post_change_requested: "AlertTriangle",
+  post_edited: "Pencil",
+  post_created: "Plus",
+  post_status_changed: "ArrowRightLeft",
+  post_commented: "MessageSquare",
+  post_archived: "Archive",
+  post_unarchived: "ArchiveRestore",
+  post_moved: "MoveHorizontal",
+  brief_created: "FileText",
+  brief_status_changed: "ArrowRightLeft",
+  brief_commented: "MessageSquare",
+  caption_edited: "Type",
   feedback_sent: "Send",
+  post_viewed: "Eye",
+  post_downloaded: "Download",
 };
