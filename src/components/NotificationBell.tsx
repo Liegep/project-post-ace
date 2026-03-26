@@ -94,7 +94,8 @@ export const NotificationBell = () => {
     switch (type) {
       case "deadline_overdue": return "border-destructive/20 bg-destructive/5";
       case "deadline_today": return "border-amber-400/20 bg-amber-500/5";
-      case "deadline_warning": return "border-blue-400/20 bg-blue-500/5";
+      case "deadline_warning": return "border-primary/20 bg-primary/5";
+      case "internal_approval": return "border-primary/20 bg-primary/5";
       default: return "bg-muted/50";
     }
   };
