@@ -140,6 +140,9 @@ export const NotificationBell = () => {
                   onClick={() => {
                     markAsRead(n.id);
                     setOpen(false);
+                    if (n.type === "internal_approval" && n.postId) {
+                      setReviewPostId(n.postId);
+                    }
                   }}
                 >
                   <div className="mt-0.5 shrink-0 flex items-center gap-2">
@@ -168,5 +171,12 @@ export const NotificationBell = () => {
         </div>
       </PopoverContent>
     </Popover>
+
+    <InternalApprovalReviewDialog
+      open={!!reviewPostId}
+      onOpenChange={(v) => { if (!v) setReviewPostId(null); }}
+      postId={reviewPostId || ""}
+    />
+  </>
   );
 };
