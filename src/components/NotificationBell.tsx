@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { URGENCY_STYLES } from "@/lib/deadlineColors";
 import { AlertTriangle, Clock, CalendarClock, Check } from "lucide-react";
+import { InternalApprovalReviewDialog } from "@/components/InternalApprovalReviewDialog";
 
 interface DeadlineNotification {
   id: string;
@@ -28,6 +29,7 @@ export const NotificationBell = () => {
   const { userId } = useUserRole();
   const [notifications, setNotifications] = useState<DeadlineNotification[]>([]);
   const [open, setOpen] = useState(false);
+  const [reviewPostId, setReviewPostId] = useState<string | null>(null);
 
   // Fetch only on mount and when popover opens — no realtime, no polling
   useEffect(() => {
@@ -101,6 +103,7 @@ export const NotificationBell = () => {
   };
 
   return (
+    <>
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button className="relative rounded-full p-2 text-muted-foreground hover:bg-muted transition-colors">
@@ -138,6 +141,9 @@ export const NotificationBell = () => {
                   onClick={() => {
                     markAsRead(n.id);
                     setOpen(false);
+                    if (n.type === "internal_approval" && n.postId) {
+                      setReviewPostId(n.postId);
+                    }
                   }}
                 >
                   <div className="mt-0.5 shrink-0 flex items-center gap-2">
@@ -166,5 +172,12 @@ export const NotificationBell = () => {
         </div>
       </PopoverContent>
     </Popover>
+
+    <InternalApprovalReviewDialog
+      open={!!reviewPostId}
+      onOpenChange={(v) => { if (!v) setReviewPostId(null); }}
+      postId={reviewPostId || ""}
+    />
+  </>
   );
 };
