@@ -110,21 +110,36 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: Soci
                 ))}
                 {/* Social posts */}
                 {dayPosts.slice(0, Math.max(0, maxVisible - dayKanban.length)).map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => onPostClick(p)}
-                    className="w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate hover:bg-muted transition-colors flex items-center gap-1"
-                  >
-                    {p.platform === "instagram" ? (
-                      <Instagram className="h-2.5 w-2.5 text-pink-500 shrink-0" />
-                    ) : (
-                      <Facebook className="h-2.5 w-2.5 text-blue-600 shrink-0" />
-                    )}
-                    <span className="truncate">{p.caption.slice(0, 20) || "Sem legenda"}</span>
-                    {(p as any).clients?.name && (
-                      <span className="text-muted-foreground shrink-0">· {(p as any).clients.name}</span>
-                    )}
-                  </button>
+                  <HoverCard key={p.id} openDelay={200} closeDelay={100}>
+                    <HoverCardTrigger asChild>
+                      <button
+                        onClick={() => onPostClick(p)}
+                        className="w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate hover:bg-muted transition-colors flex items-center gap-1"
+                      >
+                        {p.platform === "instagram" ? (
+                          <Instagram className="h-2.5 w-2.5 text-pink-500 shrink-0" />
+                        ) : (
+                          <Facebook className="h-2.5 w-2.5 text-blue-600 shrink-0" />
+                        )}
+                        <span className="truncate">{p.caption.slice(0, 20) || "Sem legenda"}</span>
+                        {(p as any).clients?.name && (
+                          <span className="text-muted-foreground shrink-0">· {(p as any).clients.name}</span>
+                        )}
+                      </button>
+                    </HoverCardTrigger>
+                    <HoverCardContent side="right" align="start" className="w-56 p-2 space-y-2">
+                      {p.media_urls && p.media_urls.length > 0 && (
+                        <img
+                          src={p.media_urls[0]}
+                          alt=""
+                          className="w-full aspect-square rounded-md object-cover"
+                        />
+                      )}
+                      {p.caption && (
+                        <p className="text-xs text-foreground line-clamp-3">{p.caption}</p>
+                      )}
+                    </HoverCardContent>
+                  </HoverCard>
                 ))}
                 {totalItems > maxVisible && (
                   <p className="text-[10px] text-muted-foreground text-center">+{totalItems - maxVisible} mais</p>
