@@ -56,8 +56,12 @@
     --gradient-end: 265 70% 58%;
     --gradient-hover-start: 185 72% 58%;
     --gradient-hover-end: 330 80% 60%;
-    --glass-bg: 0 0% 100% / 0.65;
-    --glass-border: 0 0% 100% / 0.25;
+    --glass-bg: 0 0% 100% / 0.72;
+    --glass-border: 220 16% 90% / 0.6;
+    --glass-blur: 16px;
+    --glass-shadow: 0 8px 32px -8px hsl(var(--primary) / 0.08);
+    --focus-border-gradient: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)));
+    --btn-glow: 0 0 12px -2px hsl(var(--gradient-mid) / 0.45);
   }
 }
 
@@ -79,17 +83,41 @@
 @layer components {
   .glass-card {
     background: hsl(var(--glass-bg));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid hsl(var(--glass-border));
-    box-shadow: 0 4px 24px -4px hsl(var(--primary) / 0.06);
+    box-shadow: var(--glass-shadow);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .glass-card:focus-within {
+    border-color: hsl(var(--gradient-mid) / 0.35);
+    box-shadow: var(--glass-shadow), 0 0 0 1px hsl(var(--gradient-mid) / 0.18);
+  }
+
+  .glass-panel {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: var(--glass-shadow);
   }
 
   .glass-header {
-    background: hsl(0 0% 100% / 0.75);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: hsl(0 0% 100% / 0.78);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid hsl(var(--glass-border));
+  }
+
+  .glass-modal {
+    background: hsl(0 0% 100% / 0.82);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow:
+      0 24px 80px -12px hsl(var(--primary) / 0.12),
+      0 0 0 1px hsl(var(--glass-border));
   }
 
   .btn-gradient {
@@ -104,6 +132,10 @@
     box-shadow: 0 6px 20px -2px hsl(var(--gradient-hover-end) / 0.4);
     transform: translateY(-1px);
   }
+  .btn-gradient:active {
+    box-shadow: var(--btn-glow);
+    transform: translateY(0);
+  }
 
   .btn-glass {
     background: hsl(var(--glass-bg));
@@ -113,14 +145,24 @@
     transition: all 0.2s ease;
   }
   .btn-glass:hover {
-    background: hsl(0 0% 100% / 0.85);
+    background: hsl(0 0% 100% / 0.88);
     box-shadow: 0 4px 12px -2px hsl(var(--primary) / 0.1);
+  }
+  .btn-glass:active {
+    box-shadow: var(--btn-glow);
   }
 
   .btn-hover-gradient {
     background: linear-gradient(135deg, hsl(var(--gradient-hover-start)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-hover-end)) 100%) !important;
     box-shadow: 0 4px 14px -2px hsl(var(--gradient-hover-end) / 0.3);
     transform: translateY(-0.5px);
+  }
+
+  /* Glow on click for ALL buttons */
+  button:active:not(:disabled),
+  [role="button"]:active:not(:disabled) {
+    box-shadow: var(--btn-glow);
+    transition: box-shadow 0.1s ease;
   }
 }
 
