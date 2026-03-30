@@ -4,10 +4,10 @@
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
+    --background: transparent;
     --foreground: 228 45% 15%;
 
-    --card: 0 0% 100%;
+    --card: 0 0% 100% / 0.55;
     --card-foreground: 228 45% 15%;
 
     --popover: 0 0% 100%;
@@ -71,10 +71,14 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background-color: hsl(220 20% 97%);
     background-image: 
-      radial-gradient(ellipse at 20% 0%, hsl(var(--gradient-end) / 0.07) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 100%, hsl(var(--gradient-start) / 0.09) 0%, transparent 50%);
+      radial-gradient(ellipse at 0% 0%, hsl(200 60% 88% / 0.6) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 0%, hsl(220 40% 92% / 0.4) 0%, transparent 40%),
+      radial-gradient(ellipse at 100% 0%, hsl(280 50% 90% / 0.5) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, hsl(320 50% 92% / 0.5) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 100%, hsl(190 50% 90% / 0.4) 0%, transparent 50%);
     background-attachment: fixed;
     min-height: 100vh;
   }
