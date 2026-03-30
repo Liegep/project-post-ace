@@ -172,6 +172,26 @@ const AdminDashboard = () => {
   const [navDrawerOpen, setNavDrawerOpen] = useState(false);
   const [appLogo, setAppLogo] = useState<string | null>(null);
   const appLogoInputRef = useRef<HTMLInputElement>(null);
+  const [userName, setUserName] = useState<string>("");
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    supabase.from("profiles").select("full_name").eq("id", currentUserId).single()
+      .then(({ data }) => { if (data?.full_name) setUserName(data.full_name); });
+  }, [currentUserId]);
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Bom dia";
+    if (hour < 18) return "Boa tarde";
+    return "Boa noite";
+  };
+
+  const getFormattedDate = () => {
+    return new Date().toLocaleDateString("pt-BR", {
+      weekday: "long", day: "numeric", month: "long", year: "numeric"
+    });
+  };
 
   const fetchStatusNotifs = async () => {
     setStatusNotifs([]);
@@ -966,6 +986,14 @@ const AdminDashboard = () => {
       </Sheet>
 
       <main className="mx-auto max-w-5xl px-4 md:px-6 py-4 md:py-6 space-y-4 md:space-y-6">
+        {/* Greeting widget */}
+        <div className="rounded-xl border bg-card px-5 py-4">
+          <h2 className="text-xl md:text-2xl font-bold text-foreground">
+            {getGreeting()}{userName ? `, ${userName.split(" ")[0]}` : ""} 👋
+          </h2>
+          <p className="text-sm text-muted-foreground capitalize mt-0.5">{getFormattedDate()}</p>
+        </div>
+
         {/* Today's tasks with deadline priority */}
         <TodayTasksWidget />
 
