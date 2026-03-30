@@ -438,7 +438,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                       <div className="flex gap-4 overflow-x-auto pb-4">
                         {visibleColumnPosts.map(({ column, posts: colPosts }) => (
                           <div key={column.id} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
-                            <div className="mb-4 flex items-center gap-2">
+                            <div className="mb-4 flex items-center gap-2 rounded-lg bg-background/80 backdrop-blur-sm px-3 py-2 shadow-sm border border-border/50">
                               <span className="text-sm font-semibold text-foreground">{column.name}</span>
                               <span className="text-xs text-muted-foreground">({colPosts.length})</span>
                             </div>
