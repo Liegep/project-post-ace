@@ -12,6 +12,8 @@ export interface ScheduledKanbanPost {
   title: string;
   client_name: string;
   deadline: string;
+  preview_url?: string | null;
+  preview_text?: string | null;
 }
 
 interface SocialCalendarProps {
@@ -99,14 +101,33 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: Soci
               <div className="space-y-1">
                 {/* Kanban "Agendado" posts */}
                 {dayKanban.slice(0, maxVisible).map((p) => (
-                  <div
-                    key={`kanban-${p.id}`}
-                    className="w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate flex items-center gap-1 bg-accent/50 border border-accent"
-                  >
-                    <FileText className="h-2.5 w-2.5 text-primary shrink-0" />
-                    <span className="truncate font-medium">{p.title}</span>
-                    <span className="text-muted-foreground shrink-0">· {p.client_name}</span>
-                  </div>
+                  <HoverCard key={`kanban-${p.id}`} openDelay={200} closeDelay={100}>
+                    <HoverCardTrigger asChild>
+                      <div
+                        className="w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate flex items-center gap-1 bg-accent/50 border border-accent"
+                      >
+                        <FileText className="h-2.5 w-2.5 text-primary shrink-0" />
+                        <span className="truncate font-medium">{p.title}</span>
+                        <span className="text-muted-foreground shrink-0">· {p.client_name}</span>
+                      </div>
+                    </HoverCardTrigger>
+                    <HoverCardContent side="right" align="start" className="w-56 p-2 space-y-2">
+                      {p.preview_url ? (
+                        <img
+                          src={p.preview_url}
+                          alt=""
+                          className="w-full aspect-square rounded-md object-cover"
+                        />
+                      ) : (
+                        <div className="w-full aspect-square rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                          Sem imagem
+                        </div>
+                      )}
+                      {p.preview_text && (
+                        <p className="text-xs text-foreground line-clamp-3">{p.preview_text}</p>
+                      )}
+                    </HoverCardContent>
+                  </HoverCard>
                 ))}
                 {/* Social posts */}
                 {dayPosts.slice(0, Math.max(0, maxVisible - dayKanban.length)).map((p) => (
