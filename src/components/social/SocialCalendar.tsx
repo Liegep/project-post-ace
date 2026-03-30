@@ -69,7 +69,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: Soci
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
+      <div className="grid grid-cols-7 gap-px bg-border rounded-lg">
         {/* Weekday headers */}
         {weekDays.map((d) => (
           <div key={d} className="bg-muted px-2 py-2 text-center text-xs font-medium text-muted-foreground">
