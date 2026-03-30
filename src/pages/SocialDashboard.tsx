@@ -56,7 +56,7 @@ export default function SocialDashboard() {
     async function fetchScheduledKanban() {
       const { data } = await supabase
         .from("posts")
-        .select("id, title, deadline, client_id, clients(name)")
+        .select("id, title, caption, image_url, media_urls, deadline, client_id, clients(name)")
         .contains("status", ["agendado"])
         .not("deadline", "is", null) as any;
       
@@ -66,6 +66,8 @@ export default function SocialDashboard() {
           title: p.title,
           client_name: p.clients?.name || "—",
           deadline: p.deadline,
+          preview_url: p.image_url || (Array.isArray(p.media_urls) ? p.media_urls[0] : null) || null,
+          preview_text: p.caption || null,
         }));
         setScheduledKanbanPosts(mapped);
       }
