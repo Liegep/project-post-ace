@@ -1,10 +1,9 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { ChevronLeft, ChevronRight, Facebook, Instagram, FileText } from "lucide-react";
-import { SocialStatusBadge } from "./SocialStatusBadge";
-import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 import type { SocialPost } from "@/hooks/useSocialPosts";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export interface ScheduledKanbanPost {
@@ -29,7 +28,6 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: Soci
   const monthEnd = endOfMonth(currentMonth);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
-  // Pad start to align with weekday
   const startPad = getDay(monthStart); // 0=Sunday
 
   const postsByDay = useMemo(() => {
@@ -57,7 +55,6 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: Soci
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
           <ChevronLeft className="h-4 w-4" />
@@ -70,21 +67,17 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: Soci
         </Button>
       </div>
 
-      {/* Grid */}
       <div className="grid grid-cols-7 gap-px bg-border rounded-lg">
-        {/* Weekday headers */}
         {weekDays.map((d) => (
           <div key={d} className="bg-muted px-2 py-2 text-center text-xs font-medium text-muted-foreground">
             {d}
           </div>
         ))}
 
-        {/* Padding cells */}
         {Array.from({ length: startPad }).map((_, i) => (
           <div key={`pad-${i}`} className="bg-card min-h-[100px]" />
         ))}
 
-        {/* Day cells */}
         {days.map((day) => {
           const key = format(day, "yyyy-MM-dd");
           const dayPosts = postsByDay[key] || [];
@@ -99,69 +92,63 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: Soci
                 {format(day, "d")}
               </div>
               <div className="space-y-1">
-                {/* Kanban "Agendado" posts */}
                 {dayKanban.slice(0, maxVisible).map((p) => (
-                  <HoverCard key={`kanban-${p.id}`} openDelay={200} closeDelay={100}>
-                    <HoverCardTrigger asChild>
-                      <div
-                        className="w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate flex items-center gap-1 bg-accent/50 border border-accent"
-                      >
+                  <Tooltip key={`kanban-${p.id}`}>
+                    <TooltipTrigger asChild>
+                      <div className="w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate flex items-center gap-1 bg-accent/50 border border-accent cursor-default">
                         <FileText className="h-2.5 w-2.5 text-primary shrink-0" />
                         <span className="truncate font-medium">{p.title}</span>
                         <span className="text-muted-foreground shrink-0">· {p.client_name}</span>
                       </div>
-                    </HoverCardTrigger>
-                    <HoverCardContent side="right" align="start" className="w-56 p-2 space-y-2">
+                    </TooltipTrigger>
+                    <TooltipContent side="right" align="start" className="w-56 p-2 space-y-2">
                       {p.preview_url ? (
-                        <img
-                          src={p.preview_url}
-                          alt=""
-                          className="w-full aspect-square rounded-md object-cover"
-                        />
+                        <img src={p.preview_url} alt="Prévia do post" className="w-full aspect-square rounded-md object-cover" />
                       ) : (
                         <div className="w-full aspect-square rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">
                           Sem imagem
                         </div>
                       )}
-                      {p.preview_text && (
-                        <p className="text-xs text-foreground line-clamp-3">{p.preview_text}</p>
-                      )}
-                    </HoverCardContent>
-                  </HoverCard>
+                      {p.preview_text && <p className="text-xs text-foreground line-clamp-3">{p.preview_text}</p>}
+                    </TooltipContent>
+                  </Tooltip>
                 ))}
-                {/* Social posts */}
-                {dayPosts.slice(0, Math.max(0, maxVisible - dayKanban.length)).map((p) => (
-                  <HoverCard key={p.id} openDelay={200} closeDelay={100}>
-                    <HoverCardTrigger asChild>
-                      <button
-                        onClick={() => onPostClick(p)}
-                        className="w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate hover:bg-muted transition-colors flex items-center gap-1"
-                      >
-                        {p.platform === "instagram" ? (
-                          <Instagram className="h-2.5 w-2.5 text-pink-500 shrink-0" />
+
+                {dayPosts.slice(0, Math.max(0, maxVisible - dayKanban.length)).map((p) => {
+                  const previewUrl = p.media_urls?.[0] || null;
+
+                  return (
+                    <Tooltip key={p.id}>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => onPostClick(p)}
+                          className="w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate hover:bg-muted transition-colors flex items-center gap-1"
+                        >
+                          {p.platform === "instagram" ? (
+                            <Instagram className="h-2.5 w-2.5 text-pink-500 shrink-0" />
+                          ) : (
+                            <Facebook className="h-2.5 w-2.5 text-blue-600 shrink-0" />
+                          )}
+                          <span className="truncate">{p.caption.slice(0, 20) || "Sem legenda"}</span>
+                          {(p as any).clients?.name && (
+                            <span className="text-muted-foreground shrink-0">· {(p as any).clients.name}</span>
+                          )}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" align="start" className="w-56 p-2 space-y-2">
+                        {previewUrl ? (
+                          <img src={previewUrl} alt="Prévia do post" className="w-full aspect-square rounded-md object-cover" />
                         ) : (
-                          <Facebook className="h-2.5 w-2.5 text-blue-600 shrink-0" />
+                          <div className="w-full aspect-square rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                            Sem imagem
+                          </div>
                         )}
-                        <span className="truncate">{p.caption.slice(0, 20) || "Sem legenda"}</span>
-                        {(p as any).clients?.name && (
-                          <span className="text-muted-foreground shrink-0">· {(p as any).clients.name}</span>
-                        )}
-                      </button>
-                    </HoverCardTrigger>
-                    <HoverCardContent side="right" align="start" className="w-56 p-2 space-y-2">
-                      {p.media_urls && p.media_urls.length > 0 && (
-                        <img
-                          src={p.media_urls[0]}
-                          alt=""
-                          className="w-full aspect-square rounded-md object-cover"
-                        />
-                      )}
-                      {p.caption && (
-                        <p className="text-xs text-foreground line-clamp-3">{p.caption}</p>
-                      )}
-                    </HoverCardContent>
-                  </HoverCard>
-                ))}
+                        {p.caption && <p className="text-xs text-foreground line-clamp-3">{p.caption}</p>}
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                })}
+
                 {totalItems > maxVisible && (
                   <p className="text-[10px] text-muted-foreground text-center">+{totalItems - maxVisible} mais</p>
                 )}
@@ -173,3 +160,4 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick }: Soci
     </div>
   );
 }
+
