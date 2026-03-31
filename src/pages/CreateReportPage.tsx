@@ -54,6 +54,7 @@ export default function CreateReportPage() {
   const [templateName, setTemplateName] = useState("");
   const [showTemplateSave, setShowTemplateSave] = useState(false);
   const [sendToClient, setSendToClient] = useState(false);
+  const [reportLocale, setReportLocale] = useState<Locale>("pt");
 
   const handleCsvParsed = (csvMetrics: SocialReportMetrics, csvPrevMetrics: SocialReportMetrics, fields: string[]) => {
     setMetrics(csvMetrics);
