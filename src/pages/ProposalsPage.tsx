@@ -157,6 +157,9 @@ export default function ProposalsPage() {
       currency,
       deadline_days: deadlineDays,
       locale,
+      proposal_type: proposalType,
+      plan,
+      pieces_quantity: piecesQuantity,
       services: services.filter((s) => s.name.trim()) as any,
       total_value: totalValue,
     });
