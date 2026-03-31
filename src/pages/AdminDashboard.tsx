@@ -477,6 +477,7 @@ const AdminDashboard = () => {
         deadline: p.deadline || null,
         imageUrl: p.image_url || "",
         mediaUrls: p.media_urls || [],
+        caption: p.caption || "",
       }))
     );
   };
