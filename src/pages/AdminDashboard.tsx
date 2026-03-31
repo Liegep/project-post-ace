@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/I18nContext";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import UserProfileMenu from "@/components/UserProfileMenu";
@@ -140,6 +141,9 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [schedulePopoverOpen, setSchedulePopoverOpen] = useState<string | null>(null);
+  const [scheduleDate, setScheduleDate] = useState("");
+  const [scheduleTime, setScheduleTime] = useState("09:00");
 
   // Form state
   const [name, setName] = useState("");
@@ -521,8 +525,14 @@ const AdminDashboard = () => {
     setFeedbacks((prev) => prev.filter((fb) => fb.postId !== postId));
   };
 
-  const markAsAgendado = async (fb: FeedbackNotification, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const markAsAgendado = async (fb: FeedbackNotification, selectedDate: string, selectedTime: string) => {
+    if (!selectedDate || !selectedTime) {
+      toast({ title: "Informe a data e o horário do agendamento", variant: "destructive" });
+      return;
+    }
+
+    const deadlineISO = new Date(`${selectedDate}T${selectedTime}:00`).toISOString();
+
     // Ensure "Agendados" column exists for this client
     const { data: existingCols } = await supabase
       .from("columns")
@@ -544,20 +554,17 @@ const AdminDashboard = () => {
       agendadosColId = (newCol as any).id;
     }
 
-    // Update post: set status to agendado, move to Agendados column, reset label
+    // Update post: set status to agendado, move to Agendados column, reset label, set deadline
     await supabase.from("posts").update({
       status: ["agendado"],
       column_id: agendadosColId,
       client_label: "pendente",
+      deadline: deadlineISO,
     } as any).eq("id", fb.postId);
 
     // Also create an entry in the social calendar
-    const publishDate = fb.deadline
-      ? new Date(fb.deadline).toISOString().split("T")[0]
-      : new Date().toISOString().split("T")[0];
-    const publishTime = fb.deadline
-      ? new Date(fb.deadline).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", hour12: false })
-      : "09:00";
+    const publishDate = selectedDate;
+    const publishTime = selectedTime;
 
     await supabase.from("calendar_posts").insert({
       client_id: fb.clientId,
@@ -572,7 +579,8 @@ const AdminDashboard = () => {
     } as any);
 
     setFeedbacks((prev) => prev.filter((f) => f.postId !== fb.postId));
-    toast({ title: "Post agendado", description: `"${fb.postTitle}" adicionado ao calendário de postagens.` });
+    setSchedulePopoverOpen(null);
+    toast({ title: "Post agendado", description: `"${fb.postTitle}" agendado para ${selectedDate} às ${selectedTime}.` });
   };
 
   const dismissUnarchiveNotif = async (postId: string, e: React.MouseEvent) => {
@@ -1298,14 +1306,58 @@ const AdminDashboard = () => {
                          <Eye className="h-3 w-3 mr-0.5" />
                          Ver
                        </button>
-                       <button
-                         onClick={(e) => markAsAgendado(fb, e)}
-                         className="inline-flex items-center rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-purple-700 transition-colors"
-                         title="Marcar como Agendado"
-                       >
-                         <CalendarClock className="h-3 w-3 mr-0.5" />
-                         Agendado
-                       </button>
+                        <Popover
+                          open={schedulePopoverOpen === fb.postId}
+                          onOpenChange={(open) => {
+                            if (open) {
+                              setSchedulePopoverOpen(fb.postId);
+                              setScheduleDate(fb.deadline ? new Date(fb.deadline).toISOString().split("T")[0] : new Date().toISOString().split("T")[0]);
+                              setScheduleTime(fb.deadline ? new Date(fb.deadline).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", hour12: false }) : "09:00");
+                            } else {
+                              setSchedulePopoverOpen(null);
+                            }
+                          }}
+                        >
+                          <PopoverTrigger asChild>
+                            <button
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-purple-700 transition-colors"
+                              title="Marcar como Agendado"
+                            >
+                              <CalendarClock className="h-3 w-3 mr-0.5" />
+                              Agendar
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-64 p-3 space-y-3" align="end" onClick={(e) => e.stopPropagation()}>
+                            <p className="text-xs font-semibold text-foreground">Agendar publicação</p>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">Data</Label>
+                              <Input
+                                type="date"
+                                value={scheduleDate}
+                                onChange={(e) => setScheduleDate(e.target.value)}
+                                className="h-8 text-xs"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">Horário</Label>
+                              <Input
+                                type="time"
+                                value={scheduleTime}
+                                onChange={(e) => setScheduleTime(e.target.value)}
+                                className="h-8 text-xs"
+                              />
+                            </div>
+                            <Button
+                              size="sm"
+                              className="w-full h-7 text-xs"
+                              onClick={() => markAsAgendado(fb, scheduleDate, scheduleTime)}
+                            >
+                              <CalendarClock className="h-3 w-3 mr-1" />
+                              Confirmar Agendamento
+                            </Button>
+                          </PopoverContent>
+                        </Popover>
                        <button
                          onClick={(e) => dismissFeedback(fb.postId, e)}
                          className="rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
