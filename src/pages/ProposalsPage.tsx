@@ -91,6 +91,9 @@ export default function ProposalsPage() {
     setCurrency("BRL");
     setDeadlineDays(7);
     setLocale("pt");
+    setProposalType("project");
+    setPlan("");
+    setPiecesQuantity(0);
     setServices([{ name: "", description: "", value: 0 }]);
   };
 
