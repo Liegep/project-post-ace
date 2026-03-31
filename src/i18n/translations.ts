@@ -238,6 +238,10 @@ type TranslationKeys = {
   inviteMemberDesc: string;
   roleLabel: string;
   sendInvite: string;
+  // Greetings
+  goodMorning: string;
+  goodAfternoon: string;
+  goodEvening: string;
 };
 
 const pt: TranslationKeys = {
@@ -437,6 +441,9 @@ const pt: TranslationKeys = {
   inviteMemberDesc: "Convide alguém para a equipe ou como administrador",
   roleLabel: "Tipo de acesso",
   sendInvite: "Enviar Convite",
+  goodMorning: "Bom dia",
+  goodAfternoon: "Boa tarde",
+  goodEvening: "Boa noite",
 };
 
 const en: TranslationKeys = {
@@ -634,6 +641,9 @@ const en: TranslationKeys = {
   inviteMemberDesc: "Invite someone as team member or admin",
   roleLabel: "Access type",
   sendInvite: "Send Invite",
+  goodMorning: "Good morning",
+  goodAfternoon: "Good afternoon",
+  goodEvening: "Good evening",
 };
 
 const it: TranslationKeys = {
@@ -831,6 +841,9 @@ const it: TranslationKeys = {
   inviteMemberDesc: "Invita qualcuno come membro del team o amministratore",
   roleLabel: "Tipo di accesso",
   sendInvite: "Invia Invito",
+  goodMorning: "Buongiorno",
+  goodAfternoon: "Buon pomeriggio",
+  goodEvening: "Buonasera",
 };
 
 const es: TranslationKeys = {
@@ -1028,6 +1041,9 @@ const es: TranslationKeys = {
   inviteMemberDesc: "Invita a alguien como miembro del equipo o administrador",
   roleLabel: "Tipo de acceso",
   sendInvite: "Enviar Invitación",
+  goodMorning: "Buenos días",
+  goodAfternoon: "Buenas tardes",
+  goodEvening: "Buenas noches",
 };
 
 const sv: TranslationKeys = {
@@ -1225,6 +1241,9 @@ const sv: TranslationKeys = {
   inviteMemberDesc: "Bjud in någon som teammedlem eller administratör",
   roleLabel: "Åtkomsttyp",
   sendInvite: "Skicka Inbjudan",
+  goodMorning: "God morgon",
+  goodAfternoon: "God eftermiddag",
+  goodEvening: "God kväll",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };
