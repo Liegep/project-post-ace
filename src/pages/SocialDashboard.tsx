@@ -13,6 +13,7 @@ import { MobileNav } from "@/components/MobileNav";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Plus, CalendarDays, List, ArrowLeft, Facebook, Instagram, Settings, FileText, CheckCircle, Clock, Send, AlertTriangle, LogOut } from "lucide-react";
+import { format } from "date-fns";
 
 interface Client {
   id: string;
