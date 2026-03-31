@@ -53,26 +53,27 @@ export default function SocialDashboard() {
   }, []);
 
   // Fetch kanban posts with "agendado" status that have a deadline
-  useEffect(() => {
-    async function fetchScheduledKanban() {
-      const { data } = await supabase
-        .from("posts")
-        .select("id, title, caption, image_url, media_urls, deadline, client_id, clients(name)")
-        .contains("status", ["agendado"])
-        .not("deadline", "is", null) as any;
-      
-      if (data) {
-        const mapped: ScheduledKanbanPost[] = data.map((p: any) => ({
-          id: p.id,
-          title: p.title,
-          client_name: p.clients?.name || "—",
-          deadline: p.deadline,
-          preview_url: p.image_url || (Array.isArray(p.media_urls) ? p.media_urls[0] : null) || null,
-          preview_text: p.caption || null,
-        }));
-        setScheduledKanbanPosts(mapped);
-      }
+  const fetchScheduledKanban = async () => {
+    const { data } = await supabase
+      .from("posts")
+      .select("id, title, caption, image_url, media_urls, deadline, client_id, clients(name)")
+      .contains("status", ["agendado"])
+      .not("deadline", "is", null) as any;
+    
+    if (data) {
+      const mapped: ScheduledKanbanPost[] = data.map((p: any) => ({
+        id: p.id,
+        title: p.title,
+        client_name: p.clients?.name || "—",
+        deadline: p.deadline,
+        preview_url: p.image_url || (Array.isArray(p.media_urls) ? p.media_urls[0] : null) || null,
+        preview_text: p.caption || null,
+      }));
+      setScheduledKanbanPosts(mapped);
     }
+  };
+
+  useEffect(() => {
     fetchScheduledKanban();
   }, []);
 
