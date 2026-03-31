@@ -1525,6 +1525,14 @@ const AdminDashboard = () => {
                     >
                       {t("manage")}
                     </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => { e.stopPropagation(); navigate(`/client/${client.slug}`); }}
+                      title="Ver portal do cliente"
+                    >
+                      <Eye className="h-3.5 w-3.5" />
+                    </Button>
                     {(isSuperAdmin || client.owner_id === currentUserId) && (
                       <Button
                         variant="outline"
