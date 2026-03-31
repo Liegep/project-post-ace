@@ -142,6 +142,23 @@ export default function SocialDashboard() {
     toast({ title: "Agendamento cancelado" });
   };
 
+  const handleReschedule = async (post: SocialPost, newDate: Date) => {
+    // Keep the existing time, just change the date
+    const currentDate = post.scheduled_at ? new Date(post.scheduled_at) : new Date();
+    const hours = currentDate.getHours();
+    const minutes = currentDate.getMinutes();
+    newDate.setHours(hours, minutes, 0, 0);
+
+    const { error } = await updatePost(post.id, {
+      scheduled_at: newDate.toISOString(),
+    } as any);
+    if (!error) {
+      toast({ title: "Post reagendado", description: `Movido para ${format(newDate, "dd/MM/yyyy")}` });
+    } else {
+      toast({ title: "Erro ao reagendar", variant: "destructive" });
+    }
+  };
+
   const handleRetry = async (id: string) => {
     const result = await publishPost(id, true);
     if (result.success) {
