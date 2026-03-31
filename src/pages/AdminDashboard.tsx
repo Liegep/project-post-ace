@@ -24,6 +24,7 @@ import { CommemorativeDatesWidget } from "@/components/CommemorativeDatesWidget"
 import { PostDetailDialog } from "@/components/PostDetailDialog";
 import { TodayTasksWidget } from "@/components/TodayTasksWidget";
 import { NotificationBell } from "@/components/NotificationBell";
+import { QuickLinksPanel } from "@/components/QuickLinksPanel";
 
 const CLIENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
   standard: { label: "Padrão", color: "bg-muted text-muted-foreground" },
