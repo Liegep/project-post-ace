@@ -1241,6 +1241,9 @@ const sv: TranslationKeys = {
   inviteMemberDesc: "Bjud in någon som teammedlem eller administratör",
   roleLabel: "Åtkomsttyp",
   sendInvite: "Skicka Inbjudan",
+  goodMorning: "God morgon",
+  goodAfternoon: "God eftermiddag",
+  goodEvening: "God kväll",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };
