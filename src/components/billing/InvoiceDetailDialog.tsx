@@ -274,7 +274,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2">
@@ -410,8 +410,8 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
               {items.map(item => (
                 <div key={item.id} className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium truncate">{item.name}</span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium break-words whitespace-normal">{item.name}</span>
                       <Badge variant="secondary" className="text-[10px] shrink-0">
                         {CATEGORIES.find(c => c.value === item.category)?.label || item.category}
                       </Badge>
