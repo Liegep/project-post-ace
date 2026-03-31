@@ -472,12 +472,19 @@ export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, a
           </div>
         )}
 
-        {!isAdmin && !hideFeedback && post.deadline && (
-          <div className="rounded-lg bg-primary/10 px-3 py-2 text-center">
-            <span className="text-sm font-semibold text-primary">
-              {t("publishForecast")} {format(post.deadline, "dd/MM/yyyy")}
-            </span>
-          </div>
+        {post.deadline && (
+          isAdmin ? (
+            <div className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium ${isOverdue ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"}`}>
+              <Calendar className="h-3 w-3" />
+              {format(post.deadline, "dd/MM")}
+            </div>
+          ) : !hideFeedback ? (
+            <div className="rounded-lg bg-primary/10 px-3 py-2 text-center">
+              <span className="text-sm font-semibold text-primary">
+                {t("publishForecast")} {format(post.deadline, "dd/MM/yyyy")}
+              </span>
+            </div>
+          ) : null
         )}
 
         <div onClick={(e) => e.stopPropagation()}>
