@@ -1,0 +1,1 @@
+ALTER TABLE public.social_reports ADD COLUMN locale text NOT NULL DEFAULT 'pt';
