@@ -150,6 +150,7 @@ export default function CreateReportPage() {
             <h1 className="text-lg font-semibold">Novo Relatório</h1>
           </div>
           <div className="flex items-center gap-2">
+            <LanguageSelector />
             <UserProfileMenu />
           </div>
         </div>
