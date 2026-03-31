@@ -551,8 +551,28 @@ const AdminDashboard = () => {
       client_label: "pendente",
     } as any).eq("id", fb.postId);
 
+    // Also create an entry in the social calendar
+    const publishDate = fb.deadline
+      ? new Date(fb.deadline).toISOString().split("T")[0]
+      : new Date().toISOString().split("T")[0];
+    const publishTime = fb.deadline
+      ? new Date(fb.deadline).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", hour12: false })
+      : "09:00";
+
+    await supabase.from("calendar_posts").insert({
+      client_id: fb.clientId,
+      title: fb.postTitle,
+      caption: fb.caption || "",
+      media_urls: fb.mediaUrls || [],
+      media_type: fb.mediaUrls?.some((u: string) => /\.(mp4|mov|webm)/i.test(u)) ? "video" : "image",
+      publish_date: publishDate,
+      publish_time: publishTime,
+      status: "scheduled",
+      created_by: currentUserId,
+    } as any);
+
     setFeedbacks((prev) => prev.filter((f) => f.postId !== fb.postId));
-    toast({ title: "Post agendado", description: `"${fb.postTitle}" movido para a coluna Agendados.` });
+    toast({ title: "Post agendado", description: `"${fb.postTitle}" adicionado ao calendário de postagens.` });
   };
 
   const dismissUnarchiveNotif = async (postId: string, e: React.MouseEvent) => {
