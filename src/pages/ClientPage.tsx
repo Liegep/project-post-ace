@@ -694,7 +694,7 @@ const ClientPage = () => {
     );
   }
 
-  const { isClient } = useUserRole();
+
   const clientLocale = (clientData.locale || "pt") as Locale;
 
   return (
