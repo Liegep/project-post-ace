@@ -203,6 +203,18 @@ export const TodayTasksWidget = () => {
   });
   const upcomingTasks = tasks.filter(t => t.urgency === "urgent" && new Date(t.deadline) > todayEnd);
 
+  const handleMarkPublished = async (task: TaskItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const now = new Date().toISOString();
+    if (task.type === "post") {
+      await supabase.from("posts").update({ published_at: now, status: ["publicado"] }).eq("id", task.id);
+    } else if (task.type === "calendar_post") {
+      await supabase.from("calendar_posts").update({ status: "published" as any }).eq("id", task.id);
+    }
+    toast({ title: "Post marcado como publicado!" });
+    fetchTasks();
+  };
+
   if (loading || tasks.length === 0) return null;
 
   const getUrgencyIcon = (urgency: DeadlineUrgency) => {
