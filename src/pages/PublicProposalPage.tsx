@@ -98,7 +98,20 @@ export default function PublicProposalPage() {
       toast({ title: t("enterFullName"), variant: "destructive" });
       return;
     }
+    if (!acceptEmail.trim()) {
+      toast({ title: loc === "pt" ? "Informe seu e-mail" : "Enter your email", variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
+
+    // Capture IP
+    let clientIp = "";
+    try {
+      const ipRes = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipRes.json();
+      clientIp = ipData.ip || "";
+    } catch {}
+
     const { error } = await supabase
       .from("proposals")
       .update({
@@ -106,6 +119,8 @@ export default function PublicProposalPage() {
         accepted_at: new Date().toISOString(),
         accepted_name: acceptName.trim(),
         accepted_signature: acceptSignature.trim(),
+        accepted_email: acceptEmail.trim(),
+        accepted_ip: clientIp,
       })
       .eq("id", proposal!.id);
     setSubmitting(false);

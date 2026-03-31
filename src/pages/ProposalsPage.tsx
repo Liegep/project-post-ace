@@ -374,6 +374,41 @@ export default function ProposalsPage() {
               </Select>
             </div>
 
+            {/* Tipo + Plano + Peças */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <Label>Tipo de proposta</Label>
+                <Select value={proposalType} onValueChange={setProposalType}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="monthly">Mensal</SelectItem>
+                    <SelectItem value="project">Projeto</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Plano</Label>
+                <Select value={plan} onValueChange={setPlan}>
+                  <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="essencial">Essencial</SelectItem>
+                    <SelectItem value="profissional">Profissional</SelectItem>
+                    <SelectItem value="premium">Premium</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Qtd. de peças</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={piecesQuantity || ""}
+                  onChange={(e) => setPiecesQuantity(Number(e.target.value))}
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
             <div className="space-y-1.5">
               <Label>Escopo do Projeto</Label>
               <Textarea
