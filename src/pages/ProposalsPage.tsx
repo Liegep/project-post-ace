@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -13,10 +13,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Trash2, Copy, Send, Eye, CheckCircle2, Clock, FileText, X } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Copy, Send, Eye, Clock, FileText, X, Save, FolderOpen } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CURRENCIES } from "@/lib/currency";
+import { ProposalLocale, PROPOSAL_LOCALE_LABELS, PROPOSAL_LOCALE_FLAGS } from "@/i18n/proposalTranslations";
 
 const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   draft: { label: "Rascunho", className: "bg-muted text-muted-foreground" },
@@ -26,12 +27,28 @@ const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   expired: { label: "Expirada", className: "bg-destructive/15 text-destructive" },
 };
 
+interface ProposalTemplate {
+  id: string;
+  name: string;
+  scope_description: string;
+  investment_description: string;
+  services: ProposalService[];
+  currency: string;
+  locale: string;
+}
+
 export default function ProposalsPage() {
   const navigate = useNavigate();
   const { userId, isSuperAdmin } = useUserRole();
   const { proposals, loading, refetch } = useProposals();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  // Templates
+  const [templates, setTemplates] = useState<ProposalTemplate[]>([]);
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
+  const [templateName, setTemplateName] = useState("");
+  const [savingTemplate, setSavingTemplate] = useState(false);
 
   // Form state
   const [clientName, setClientName] = useState("");
@@ -40,9 +57,28 @@ export default function ProposalsPage() {
   const [investmentDescription, setInvestmentDescription] = useState("");
   const [currency, setCurrency] = useState("BRL");
   const [deadlineDays, setDeadlineDays] = useState(7);
+  const [locale, setLocale] = useState<ProposalLocale>("pt");
   const [services, setServices] = useState<ProposalService[]>([{ name: "", description: "", value: 0 }]);
 
   const totalValue = services.reduce((s, svc) => s + (svc.value || 0), 0);
+
+  const fetchTemplates = useCallback(async () => {
+    if (!userId) return;
+    const { data } = await supabase
+      .from("proposal_templates")
+      .select("*")
+      .order("name");
+    if (data) {
+      setTemplates(
+        data.map((t: any) => ({
+          ...t,
+          services: Array.isArray(t.services) ? t.services : JSON.parse(t.services || "[]"),
+        }))
+      );
+    }
+  }, [userId]);
+
+  useEffect(() => { fetchTemplates(); }, [fetchTemplates]);
 
   const resetForm = () => {
     setClientName("");
@@ -51,7 +87,49 @@ export default function ProposalsPage() {
     setInvestmentDescription("");
     setCurrency("BRL");
     setDeadlineDays(7);
+    setLocale("pt");
     setServices([{ name: "", description: "", value: 0 }]);
+  };
+
+  const loadTemplate = (tpl: ProposalTemplate) => {
+    setScopeDescription(tpl.scope_description);
+    setInvestmentDescription(tpl.investment_description);
+    setCurrency(tpl.currency);
+    setLocale((tpl.locale || "pt") as ProposalLocale);
+    setServices(tpl.services.length > 0 ? tpl.services : [{ name: "", description: "", value: 0 }]);
+    toast({ title: `Template "${tpl.name}" carregado` });
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!templateName.trim()) {
+      toast({ title: "Informe o nome do template", variant: "destructive" });
+      return;
+    }
+    setSavingTemplate(true);
+    const { error } = await supabase.from("proposal_templates").insert({
+      user_id: userId!,
+      name: templateName.trim(),
+      scope_description: scopeDescription.trim(),
+      investment_description: investmentDescription.trim(),
+      services: services.filter((s) => s.name.trim()) as any,
+      currency,
+      locale,
+    });
+    setSavingTemplate(false);
+    if (error) {
+      toast({ title: "Erro ao salvar template", variant: "destructive" });
+    } else {
+      toast({ title: "Template salvo!" });
+      setTemplateDialogOpen(false);
+      setTemplateName("");
+      fetchTemplates();
+    }
+  };
+
+  const handleDeleteTemplate = async (id: string) => {
+    await supabase.from("proposal_templates").delete().eq("id", id);
+    toast({ title: "Template excluído" });
+    fetchTemplates();
   };
 
   const handleCreate = async () => {
@@ -72,6 +150,7 @@ export default function ProposalsPage() {
       investment_description: investmentDescription.trim(),
       currency,
       deadline_days: deadlineDays,
+      locale,
       services: services.filter((s) => s.name.trim()) as any,
       total_value: totalValue,
     });
@@ -144,6 +223,7 @@ export default function ProposalsPage() {
             {proposals.map((p) => {
               const badge = STATUS_BADGE[p.status] || STATUS_BADGE.draft;
               const daysLeft = Math.max(0, differenceInDays(new Date(p.expires_at), new Date()));
+              const pLocale = (p as any).locale as string | undefined;
               return (
                 <Card key={p.id} className="relative overflow-hidden">
                   <CardHeader className="pb-3">
@@ -155,7 +235,11 @@ export default function ProposalsPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        {/* Status dots */}
+                        {pLocale && (
+                          <span className="text-xs" title={PROPOSAL_LOCALE_LABELS[pLocale as ProposalLocale] || pLocale}>
+                            {PROPOSAL_LOCALE_FLAGS[pLocale as ProposalLocale] || "🌐"}
+                          </span>
+                        )}
                         {p.viewed_at && (
                           <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" title="Visualizada" />
                         )}
@@ -231,6 +315,28 @@ export default function ProposalsPage() {
           </DialogHeader>
 
           <div className="space-y-4">
+            {/* Template bar */}
+            {templates.length > 0 && (
+              <div className="flex items-center gap-2 p-3 rounded-lg border bg-muted/30">
+                <FolderOpen className="h-4 w-4 text-muted-foreground shrink-0" />
+                <Select onValueChange={(id) => {
+                  const tpl = templates.find((t) => t.id === id);
+                  if (tpl) loadTemplate(tpl);
+                }}>
+                  <SelectTrigger className="h-8 flex-1 text-xs">
+                    <SelectValue placeholder="Carregar template..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {templates.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label>Nome do Cliente *</Label>
@@ -240,6 +346,23 @@ export default function ProposalsPage() {
                 <Label>E-mail</Label>
                 <Input value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="email@cliente.com" />
               </div>
+            </div>
+
+            {/* Language selector */}
+            <div className="space-y-1.5">
+              <Label>Idioma da proposta</Label>
+              <Select value={locale} onValueChange={(v) => setLocale(v as ProposalLocale)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(PROPOSAL_LOCALE_LABELS) as ProposalLocale[]).map((loc) => (
+                    <SelectItem key={loc} value={loc}>
+                      {PROPOSAL_LOCALE_FLAGS[loc]} {PROPOSAL_LOCALE_LABELS[loc]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-1.5">
@@ -350,8 +473,61 @@ export default function ProposalsPage() {
               </div>
             </div>
 
-            <Button className="w-full" onClick={handleCreate} disabled={saving}>
-              {saving ? "Criando..." : "Criar Proposta"}
+            <div className="flex gap-2">
+              <Button className="flex-1" onClick={handleCreate} disabled={saving}>
+                {saving ? "Criando..." : "Criar Proposta"}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setTemplateDialogOpen(true)}
+                title="Salvar como template"
+              >
+                <Save className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Save Template Dialog */}
+      <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Salvar Template</DialogTitle>
+            <DialogDescription>Salve o formulário atual como template reutilizável.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label>Nome do template *</Label>
+              <Input
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder="Ex: Pacote Social Media"
+              />
+            </div>
+
+            {/* Existing templates for deletion */}
+            {templates.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-xs text-muted-foreground">Templates existentes</Label>
+                {templates.map((t) => (
+                  <div key={t.id} className="flex items-center justify-between text-sm p-2 rounded border">
+                    <span>{t.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 text-destructive"
+                      onClick={() => handleDeleteTemplate(t.id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <Button className="w-full" onClick={handleSaveTemplate} disabled={savingTemplate}>
+              {savingTemplate ? "Salvando..." : "Salvar Template"}
             </Button>
           </div>
         </DialogContent>

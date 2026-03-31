@@ -10,6 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
 import { CheckCircle2, Clock, FileX, Pen } from "lucide-react";
 import { useAppLogo } from "@/hooks/useAppLogo";
+import { ProposalLocale, getProposalT } from "@/i18n/proposalTranslations";
 
 interface ProposalService {
   name: string;
@@ -30,6 +31,7 @@ interface ProposalData {
   accepted_at: string | null;
   accepted_name: string;
   created_at: string;
+  locale: ProposalLocale;
 }
 
 export default function PublicProposalPage() {
@@ -44,6 +46,9 @@ export default function PublicProposalPage() {
   const [submitting, setSubmitting] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
   const appLogo = useAppLogo();
+
+  const loc: ProposalLocale = proposal?.locale || "pt";
+  const t = getProposalT(loc);
 
   useEffect(() => {
     if (!token) return;
@@ -62,9 +67,9 @@ export default function PublicProposalPage() {
       const p: ProposalData = {
         ...data,
         services: Array.isArray(data.services) ? data.services as any : JSON.parse(data.services as string || "[]"),
+        locale: ((data as any).locale || "pt") as ProposalLocale,
       };
 
-      // Check expiration
       if (new Date(p.expires_at) < new Date()) {
         setExpired(true);
         if (p.status !== "expired") {
@@ -73,7 +78,6 @@ export default function PublicProposalPage() {
       } else if (p.status === "accepted") {
         setAccepted(true);
       } else {
-        // Mark as viewed
         if (p.status === "sent" || p.status === "draft") {
           await supabase
             .from("proposals")
@@ -90,7 +94,7 @@ export default function PublicProposalPage() {
 
   const handleAccept = async () => {
     if (!acceptName.trim()) {
-      toast({ title: "Informe seu nome completo", variant: "destructive" });
+      toast({ title: t("enterFullName"), variant: "destructive" });
       return;
     }
     setSubmitting(true);
@@ -105,25 +109,24 @@ export default function PublicProposalPage() {
       .eq("id", proposal!.id);
     setSubmitting(false);
     if (error) {
-      toast({ title: "Erro ao aceitar proposta", variant: "destructive" });
+      toast({ title: t("errorAccepting"), variant: "destructive" });
     } else {
       setAccepted(true);
       setAcceptOpen(false);
-      toast({ title: "Proposta aceita com sucesso!" });
+      toast({ title: t("proposalAccepted") });
     }
   };
 
-  // Time remaining
   const getTimeRemaining = () => {
     if (!proposal) return "";
     const now = new Date();
     const exp = new Date(proposal.expires_at);
     const days = differenceInDays(exp, now);
-    if (days > 0) return `${days} dia${days > 1 ? "s" : ""}`;
+    if (days > 0) return `${days} ${days > 1 ? t("days") : t("day")}`;
     const hours = differenceInHours(exp, now);
-    if (hours > 0) return `${hours} hora${hours > 1 ? "s" : ""}`;
+    if (hours > 0) return `${hours} ${hours > 1 ? t("hours") : t("hour")}`;
     const mins = differenceInMinutes(exp, now);
-    return `${Math.max(0, mins)} minuto${mins !== 1 ? "s" : ""}`;
+    return `${Math.max(0, mins)} ${mins !== 1 ? t("minutes") : t("minute")}`;
   };
 
   if (loading) {
@@ -138,8 +141,8 @@ export default function PublicProposalPage() {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex flex-col items-center justify-center text-white/70 gap-4">
         <FileX className="h-16 w-16 text-white/20" />
-        <h1 className="text-2xl font-light tracking-wide">Proposta não encontrada</h1>
-        <p className="text-sm text-white/40">O link pode estar incorreto ou a proposta foi removida.</p>
+        <h1 className="text-2xl font-light tracking-wide">{t("proposalNotFound")}</h1>
+        <p className="text-sm text-white/40">{t("notFoundMessage")}</p>
       </div>
     );
   }
@@ -150,9 +153,9 @@ export default function PublicProposalPage() {
         <div className="h-20 w-20 rounded-full bg-white/5 flex items-center justify-center backdrop-blur-xl border border-white/10">
           <Clock className="h-10 w-10 text-white/30" />
         </div>
-        <h1 className="text-3xl font-extralight tracking-widest text-white/80">Proposta Expirada</h1>
+        <h1 className="text-3xl font-extralight tracking-widest text-white/80">{t("proposalExpired")}</h1>
         <p className="text-sm text-white/40 max-w-md text-center leading-relaxed">
-          O prazo de validade desta proposta foi encerrado. Entre em contato para solicitar uma nova proposta.
+          {t("expiredMessage")}
         </p>
         {appLogo && <img src={appLogo} alt="Logo" className="h-8 mt-8 opacity-30" />}
       </div>
@@ -165,11 +168,11 @@ export default function PublicProposalPage() {
         <div className="h-20 w-20 rounded-full bg-emerald-500/10 flex items-center justify-center backdrop-blur-xl border border-emerald-500/20">
           <CheckCircle2 className="h-10 w-10 text-emerald-400" />
         </div>
-        <h1 className="text-3xl font-extralight tracking-widest text-white/80">Proposta Aceita</h1>
+        <h1 className="text-3xl font-extralight tracking-widest text-white/80">{t("acceptedTitle")}</h1>
         <p className="text-sm text-white/40 max-w-md text-center leading-relaxed">
           {proposal.accepted_name
-            ? `Aceita por ${proposal.accepted_name}. Entraremos em contato em breve.`
-            : "Obrigado! Entraremos em contato em breve para os próximos passos."}
+            ? t("acceptedBy").replace("{name}", proposal.accepted_name)
+            : t("acceptedGeneric")}
         </p>
         {appLogo && <img src={appLogo} alt="Logo" className="h-8 mt-8 opacity-30" />}
       </div>
@@ -184,11 +187,11 @@ export default function PublicProposalPage() {
           {appLogo ? (
             <img src={appLogo} alt="Logo" className="h-8 opacity-80" />
           ) : (
-            <span className="text-lg font-light tracking-[0.2em] uppercase text-white/60">Proposta</span>
+            <span className="text-lg font-light tracking-[0.2em] uppercase text-white/60">{t("proposal")}</span>
           )}
           <div className="flex items-center gap-2 text-xs text-white/40">
             <Clock className="h-3.5 w-3.5" />
-            <span>Expira em {getTimeRemaining()}</span>
+            <span>{t("expiresIn")} {getTimeRemaining()}</span>
           </div>
         </div>
       </header>
@@ -198,7 +201,7 @@ export default function PublicProposalPage() {
         <div
           className={`transition-all duration-700 ${animateIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
         >
-          <p className="text-sm text-white/40 uppercase tracking-widest mb-2">Proposta para</p>
+          <p className="text-sm text-white/40 uppercase tracking-widest mb-2">{t("proposalFor")}</p>
           <h1 className="text-4xl md:text-5xl font-extralight tracking-tight">{proposal.client_name}</h1>
         </div>
 
@@ -207,7 +210,7 @@ export default function PublicProposalPage() {
           <section
             className={`transition-all duration-700 delay-150 ${animateIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
           >
-            <h2 className="text-xs uppercase tracking-[0.25em] text-white/40 mb-4">Escopo do Projeto</h2>
+            <h2 className="text-xs uppercase tracking-[0.25em] text-white/40 mb-4">{t("projectScope")}</h2>
             <div className="rounded-2xl border border-white/8 bg-white/[0.03] backdrop-blur-xl p-6 md:p-8">
               <p className="text-sm md:text-base leading-relaxed text-white/70 whitespace-pre-line">
                 {proposal.scope_description}
@@ -220,7 +223,7 @@ export default function PublicProposalPage() {
         <section
           className={`transition-all duration-700 delay-300 ${animateIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
         >
-          <h2 className="text-xs uppercase tracking-[0.25em] text-white/40 mb-4">Serviços</h2>
+          <h2 className="text-xs uppercase tracking-[0.25em] text-white/40 mb-4">{t("services")}</h2>
           <div className="space-y-3">
             {proposal.services.map((svc, i) => (
               <div
@@ -245,10 +248,10 @@ export default function PublicProposalPage() {
         <section
           className={`transition-all duration-700 delay-[450ms] ${animateIn ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
         >
-          <h2 className="text-xs uppercase tracking-[0.25em] text-white/40 mb-4">Investimento</h2>
+          <h2 className="text-xs uppercase tracking-[0.25em] text-white/40 mb-4">{t("investment")}</h2>
           <div className="rounded-2xl border border-white/8 bg-white/[0.03] backdrop-blur-xl p-6 md:p-8">
             <div className="flex items-end justify-between mb-4">
-              <span className="text-sm text-white/50">Total</span>
+              <span className="text-sm text-white/50">{t("total")}</span>
               <span className="text-3xl md:text-4xl font-extralight tracking-tight">
                 {formatCurrency(proposal.total_value, proposal.currency)}
               </span>
@@ -269,7 +272,7 @@ export default function PublicProposalPage() {
           className="flex items-center gap-2.5 rounded-full bg-white text-[#0a0a0f] px-8 py-3.5 text-sm font-medium shadow-2xl shadow-white/10 hover:shadow-white/20 hover:scale-[1.02] transition-all duration-300"
         >
           <CheckCircle2 className="h-4 w-4" />
-          Aceitar Proposta
+          {t("acceptProposal")}
         </button>
       </div>
 
@@ -277,29 +280,29 @@ export default function PublicProposalPage() {
       <Dialog open={acceptOpen} onOpenChange={setAcceptOpen}>
         <DialogContent className="bg-[#12121a] border-white/10 text-white max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-white">Aceitar Proposta</DialogTitle>
+            <DialogTitle className="text-white">{t("acceptTitle")}</DialogTitle>
             <DialogDescription className="text-white/40">
-              Preencha seus dados para confirmar a aceitação.
+              {t("acceptDescription")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div className="space-y-1.5">
-              <Label className="text-white/60">Nome completo *</Label>
+              <Label className="text-white/60">{t("fullName")}</Label>
               <Input
                 value={acceptName}
                 onChange={(e) => setAcceptName(e.target.value)}
-                placeholder="Seu nome completo"
+                placeholder={t("fullNamePlaceholder")}
                 className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-white/60">Assinatura digital (digite seu nome)</Label>
+              <Label className="text-white/60">{t("digitalSignature")}</Label>
               <div className="relative">
                 <Pen className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
                 <Input
                   value={acceptSignature}
                   onChange={(e) => setAcceptSignature(e.target.value)}
-                  placeholder="Sua assinatura"
+                  placeholder={t("signaturePlaceholder")}
                   className="bg-white/5 border-white/10 text-white placeholder:text-white/30 pl-10 italic font-serif text-lg"
                 />
               </div>
@@ -309,7 +312,7 @@ export default function PublicProposalPage() {
               onClick={handleAccept}
               disabled={submitting}
             >
-              {submitting ? "Processando..." : "Confirmar Aceitação"}
+              {submitting ? t("processing") : t("confirmAccept")}
             </Button>
           </div>
         </DialogContent>
