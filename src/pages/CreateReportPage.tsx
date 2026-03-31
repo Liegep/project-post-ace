@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LanguageSelector } from "@/components/LanguageSelector";
+import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { supabase } from "@/integrations/supabase/client";
 import {
   useCreateReport, useSocialReportTemplates, useSaveTemplate,
@@ -54,6 +54,7 @@ export default function CreateReportPage() {
   const [templateName, setTemplateName] = useState("");
   const [showTemplateSave, setShowTemplateSave] = useState(false);
   const [sendToClient, setSendToClient] = useState(false);
+  const [reportLocale, setReportLocale] = useState<Locale>("pt");
 
   const handleCsvParsed = (csvMetrics: SocialReportMetrics, csvPrevMetrics: SocialReportMetrics, fields: string[]) => {
     setMetrics(csvMetrics);
@@ -125,6 +126,7 @@ export default function CreateReportPage() {
         worst_content: worstContent,
         best_format: bestFormat,
         observations,
+        locale: reportLocale,
         status,
       });
 
@@ -150,7 +152,6 @@ export default function CreateReportPage() {
             <h1 className="text-lg font-semibold">Novo Relatório</h1>
           </div>
           <div className="flex items-center gap-2">
-            <LanguageSelector />
             <UserProfileMenu />
           </div>
         </div>
@@ -187,6 +188,21 @@ export default function CreateReportPage() {
                   <SelectContent>
                     <SelectItem value="instagram"><span className="flex items-center gap-2"><Instagram className="h-3.5 w-3.5" />Instagram</span></SelectItem>
                     <SelectItem value="facebook"><span className="flex items-center gap-2"><Facebook className="h-3.5 w-3.5" />Facebook</span></SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Idioma do relatório</Label>
+                <Select value={reportLocale} onValueChange={(v) => setReportLocale(v as Locale)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {(Object.keys(LOCALE_LABELS) as Locale[]).map((loc) => (
+                      <SelectItem key={loc} value={loc}>
+                        <span className="flex items-center gap-2">
+                          {LOCALE_FLAGS[loc]} {LOCALE_LABELS[loc]}
+                        </span>
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

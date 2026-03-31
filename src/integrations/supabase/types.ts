@@ -1930,6 +1930,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          locale: string
           metrics: Json
           observations: string
           period_end: string
@@ -1951,6 +1952,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          locale?: string
           metrics?: Json
           observations?: string
           period_end: string
@@ -1972,6 +1974,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          locale?: string
           metrics?: Json
           observations?: string
           period_end?: string
