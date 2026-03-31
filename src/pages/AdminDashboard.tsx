@@ -1306,14 +1306,58 @@ const AdminDashboard = () => {
                          <Eye className="h-3 w-3 mr-0.5" />
                          Ver
                        </button>
-                       <button
-                         onClick={(e) => markAsAgendado(fb, e)}
-                         className="inline-flex items-center rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-purple-700 transition-colors"
-                         title="Marcar como Agendado"
-                       >
-                         <CalendarClock className="h-3 w-3 mr-0.5" />
-                         Agendado
-                       </button>
+                        <Popover
+                          open={schedulePopoverOpen === fb.postId}
+                          onOpenChange={(open) => {
+                            if (open) {
+                              setSchedulePopoverOpen(fb.postId);
+                              setScheduleDate(fb.deadline ? new Date(fb.deadline).toISOString().split("T")[0] : new Date().toISOString().split("T")[0]);
+                              setScheduleTime(fb.deadline ? new Date(fb.deadline).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", hour12: false }) : "09:00");
+                            } else {
+                              setSchedulePopoverOpen(null);
+                            }
+                          }}
+                        >
+                          <PopoverTrigger asChild>
+                            <button
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center rounded-full bg-purple-600 px-2 py-0.5 text-[10px] font-semibold text-white hover:bg-purple-700 transition-colors"
+                              title="Marcar como Agendado"
+                            >
+                              <CalendarClock className="h-3 w-3 mr-0.5" />
+                              Agendar
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-64 p-3 space-y-3" align="end" onClick={(e) => e.stopPropagation()}>
+                            <p className="text-xs font-semibold text-foreground">Agendar publicação</p>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">Data</Label>
+                              <Input
+                                type="date"
+                                value={scheduleDate}
+                                onChange={(e) => setScheduleDate(e.target.value)}
+                                className="h-8 text-xs"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label className="text-xs">Horário</Label>
+                              <Input
+                                type="time"
+                                value={scheduleTime}
+                                onChange={(e) => setScheduleTime(e.target.value)}
+                                className="h-8 text-xs"
+                              />
+                            </div>
+                            <Button
+                              size="sm"
+                              className="w-full h-7 text-xs"
+                              onClick={() => markAsAgendado(fb, scheduleDate, scheduleTime)}
+                            >
+                              <CalendarClock className="h-3 w-3 mr-1" />
+                              Confirmar Agendamento
+                            </Button>
+                          </PopoverContent>
+                        </Popover>
                        <button
                          onClick={(e) => dismissFeedback(fb.postId, e)}
                          className="rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
