@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LanguageSelector } from "@/components/LanguageSelector";
+import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { supabase } from "@/integrations/supabase/client";
 import {
   useCreateReport, useSocialReportTemplates, useSaveTemplate,
