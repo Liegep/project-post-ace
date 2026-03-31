@@ -201,7 +201,7 @@ export default function ProposalsPage() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => window.open(`/proposta/${p.token}`, "_blank")}
+                        onClick={() => navigate(`/proposta/${p.token}`)}
                       >
                         <Eye className="h-3.5 w-3.5 mr-1.5" /> Preview
                       </Button>
