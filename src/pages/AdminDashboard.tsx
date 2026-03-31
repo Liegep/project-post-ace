@@ -999,6 +999,21 @@ const AdminDashboard = () => {
         </SheetContent>
       </Sheet>
 
+      {/* Quick Links drawer */}
+      <Sheet open={quickLinksOpen} onOpenChange={setQuickLinksOpen}>
+        <SheetContent side="right" className="w-72 p-0">
+          <SheetHeader className="border-b px-5 py-4">
+            <SheetTitle className="text-left text-base font-semibold flex items-center gap-2">
+              <Link2 className="h-4 w-4" />
+              Links Rápidos
+            </SheetTitle>
+          </SheetHeader>
+          <div className="p-4">
+            <QuickLinksPanel />
+          </div>
+        </SheetContent>
+      </Sheet>
+
       <main className="mx-auto max-w-5xl px-4 md:px-6 py-4 md:py-6 space-y-4 md:space-y-6">
         {/* Greeting widget */}
         <div className="rounded-xl border bg-card px-5 py-4">
