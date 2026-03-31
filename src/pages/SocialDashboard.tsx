@@ -144,7 +144,6 @@ export default function SocialDashboard() {
   };
 
   const handleReschedule = async (post: SocialPost, newDate: Date) => {
-    // Keep the existing time, just change the date
     const currentDate = post.scheduled_at ? new Date(post.scheduled_at) : new Date();
     const hours = currentDate.getHours();
     const minutes = currentDate.getMinutes();
@@ -155,6 +154,19 @@ export default function SocialDashboard() {
     } as any);
     if (!error) {
       toast({ title: "Post reagendado", description: `Movido para ${format(newDate, "dd/MM/yyyy")}` });
+    } else {
+      toast({ title: "Erro ao reagendar", variant: "destructive" });
+    }
+  };
+
+  const handleRescheduleKanban = async (postId: string, newDate: Date) => {
+    const { error } = await supabase
+      .from("posts")
+      .update({ deadline: newDate.toISOString() })
+      .eq("id", postId);
+    if (!error) {
+      toast({ title: "Post reagendado", description: `Movido para ${format(newDate, "dd/MM/yyyy")}` });
+      fetchScheduledKanban();
     } else {
       toast({ title: "Erro ao reagendar", variant: "destructive" });
     }
