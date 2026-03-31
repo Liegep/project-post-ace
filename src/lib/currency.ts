@@ -2,6 +2,7 @@ export const CURRENCIES = [
   { value: "BRL", label: "Real (R$)", symbol: "R$", locale: "pt-BR" },
   { value: "USD", label: "Dólar (US$)", symbol: "US$", locale: "en-US" },
   { value: "EUR", label: "Euro (€)", symbol: "€", locale: "de-DE" },
+  { value: "SEK", label: "Coroa Sueca (kr)", symbol: "kr", locale: "sv-SE" },
 ] as const;
 
 export type CurrencyCode = (typeof CURRENCIES)[number]["value"];
