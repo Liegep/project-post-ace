@@ -2242,6 +2242,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_quick_links: {
+        Row: {
+          created_at: string
+          icon_url: string
+          id: string
+          position: number
+          title: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          icon_url?: string
+          id?: string
+          position?: number
+          title?: string
+          url?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          icon_url?: string
+          id?: string
+          position?: number
+          title?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
