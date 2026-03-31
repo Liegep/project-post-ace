@@ -877,6 +877,9 @@ const AdminDashboard = () => {
               <Plus className="mr-2 h-4 w-4" /> Clientes
             </Button>
             )}
+            <Button variant="ghost" size="icon" onClick={() => setQuickLinksOpen(true)} title="Links Rápidos">
+              <Link2 className="h-5 w-5" />
+            </Button>
             <NotificationBell />
             <UserProfileMenu />
           </div>
