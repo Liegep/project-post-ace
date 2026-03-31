@@ -946,6 +946,9 @@ const AdminDashboard = () => {
               <button onClick={() => { setMobileMenuOpen(false); navigate("/billing"); }} className={navItemClass("/billing")}>
                 <DollarSign className={navIconClass("/billing")} /> Faturamento
               </button>
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/proposals"); }} className={navItemClass("/proposals")}>
+                <FileSignature className={navIconClass("/proposals")} /> Propostas
+              </button>
               <button onClick={() => { setMobileMenuOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
                 <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
               </button>
