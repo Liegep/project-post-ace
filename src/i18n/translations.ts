@@ -238,6 +238,10 @@ type TranslationKeys = {
   inviteMemberDesc: string;
   roleLabel: string;
   sendInvite: string;
+  // Greetings
+  goodMorning: string;
+  goodAfternoon: string;
+  goodEvening: string;
 };
 
 const pt: TranslationKeys = {
