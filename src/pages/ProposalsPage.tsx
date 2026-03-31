@@ -1,0 +1,361 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useProposals, ProposalService } from "@/hooks/useProposals";
+import { formatCurrency } from "@/lib/currency";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/hooks/use-toast";
+import { ArrowLeft, Plus, Trash2, Copy, Send, Eye, CheckCircle2, Clock, FileText, X } from "lucide-react";
+import { format, differenceInDays } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { CURRENCIES } from "@/lib/currency";
+
+const STATUS_BADGE: Record<string, { label: string; className: string }> = {
+  draft: { label: "Rascunho", className: "bg-muted text-muted-foreground" },
+  sent: { label: "Enviada", className: "bg-blue-500/15 text-blue-600" },
+  viewed: { label: "Visualizada", className: "bg-emerald-500/15 text-emerald-600" },
+  accepted: { label: "Aceita", className: "bg-green-500/15 text-green-700" },
+  expired: { label: "Expirada", className: "bg-destructive/15 text-destructive" },
+};
+
+export default function ProposalsPage() {
+  const navigate = useNavigate();
+  const { userId, isSuperAdmin } = useUserRole();
+  const { proposals, loading, refetch } = useProposals();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // Form state
+  const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [scopeDescription, setScopeDescription] = useState("");
+  const [investmentDescription, setInvestmentDescription] = useState("");
+  const [currency, setCurrency] = useState("BRL");
+  const [deadlineDays, setDeadlineDays] = useState(7);
+  const [services, setServices] = useState<ProposalService[]>([{ name: "", description: "", value: 0 }]);
+
+  const totalValue = services.reduce((s, svc) => s + (svc.value || 0), 0);
+
+  const resetForm = () => {
+    setClientName("");
+    setClientEmail("");
+    setScopeDescription("");
+    setInvestmentDescription("");
+    setCurrency("BRL");
+    setDeadlineDays(7);
+    setServices([{ name: "", description: "", value: 0 }]);
+  };
+
+  const handleCreate = async () => {
+    if (!clientName.trim()) {
+      toast({ title: "Informe o nome do cliente", variant: "destructive" });
+      return;
+    }
+    if (services.every((s) => !s.name.trim())) {
+      toast({ title: "Adicione pelo menos um serviço", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("proposals").insert({
+      user_id: userId!,
+      client_name: clientName.trim(),
+      client_email: clientEmail.trim(),
+      scope_description: scopeDescription.trim(),
+      investment_description: investmentDescription.trim(),
+      currency,
+      deadline_days: deadlineDays,
+      services: services.filter((s) => s.name.trim()) as any,
+      total_value: totalValue,
+    });
+    setSaving(false);
+    if (error) {
+      toast({ title: "Erro ao criar proposta", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Proposta criada com sucesso!" });
+      setDialogOpen(false);
+      resetForm();
+      refetch();
+    }
+  };
+
+  const handleSend = async (id: string) => {
+    await supabase.from("proposals").update({ status: "sent" as any }).eq("id", id);
+    toast({ title: "Proposta marcada como enviada" });
+    refetch();
+  };
+
+  const handleDelete = async (id: string) => {
+    await supabase.from("proposals").delete().eq("id", id);
+    toast({ title: "Proposta excluída" });
+    refetch();
+  };
+
+  const copyLink = (token: string) => {
+    const url = `${window.location.origin}/proposta/${token}`;
+    navigator.clipboard.writeText(url);
+    toast({ title: "Link copiado!" });
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-lg">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-lg font-bold text-foreground">Propostas Comerciais</h1>
+              <p className="text-xs text-muted-foreground">
+                {isSuperAdmin ? "Todas as propostas" : "Suas propostas"}
+              </p>
+            </div>
+          </div>
+          <Button onClick={() => setDialogOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" /> Nova Proposta
+          </Button>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-5xl px-4 py-6 space-y-4">
+        {loading ? (
+          <div className="text-center text-muted-foreground py-12">Carregando...</div>
+        ) : proposals.length === 0 ? (
+          <Card className="text-center py-16">
+            <CardContent>
+              <FileText className="mx-auto h-12 w-12 text-muted-foreground/40 mb-4" />
+              <p className="text-muted-foreground">Nenhuma proposta criada ainda.</p>
+              <Button className="mt-4" onClick={() => setDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" /> Criar Primeira Proposta
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {proposals.map((p) => {
+              const badge = STATUS_BADGE[p.status] || STATUS_BADGE.draft;
+              const daysLeft = Math.max(0, differenceInDays(new Date(p.expires_at), new Date()));
+              return (
+                <Card key={p.id} className="relative overflow-hidden">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <CardTitle className="text-base">{p.client_name}</CardTitle>
+                        {p.client_email && (
+                          <p className="text-xs text-muted-foreground">{p.client_email}</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {/* Status dots */}
+                        {p.viewed_at && (
+                          <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" title="Visualizada" />
+                        )}
+                        {p.accepted_at && (
+                          <span className="h-2.5 w-2.5 rounded-full bg-blue-500" title="Aceita" />
+                        )}
+                        <Badge className={badge.className} variant="secondary">
+                          {badge.label}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Valor total</span>
+                      <span className="font-semibold">{formatCurrency(p.total_value, p.currency)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Serviços</span>
+                      <span>{p.services.length} item(ns)</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Criada em</span>
+                      <span>{format(new Date(p.created_at), "dd/MM/yyyy", { locale: ptBR })}</span>
+                    </div>
+                    {p.status !== "accepted" && p.status !== "expired" && (
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        <span>Expira em {daysLeft} dia(s)</span>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-2 pt-2 border-t">
+                      {p.status === "draft" && (
+                        <Button size="sm" variant="outline" onClick={() => handleSend(p.id)}>
+                          <Send className="h-3.5 w-3.5 mr-1.5" /> Enviar
+                        </Button>
+                      )}
+                      <Button size="sm" variant="outline" onClick={() => copyLink(p.token)}>
+                        <Copy className="h-3.5 w-3.5 mr-1.5" /> Link
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => window.open(`/proposta/${p.token}`, "_blank")}
+                      >
+                        <Eye className="h-3.5 w-3.5 mr-1.5" /> Preview
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => handleDelete(p.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </main>
+
+      {/* Create Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Nova Proposta Comercial</DialogTitle>
+            <DialogDescription>Preencha os dados do cliente e serviços oferecidos.</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Nome do Cliente *</Label>
+                <Input value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Ex: Empresa ABC" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>E-mail</Label>
+                <Input value={clientEmail} onChange={(e) => setClientEmail(e.target.value)} placeholder="email@cliente.com" />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Escopo do Projeto</Label>
+              <Textarea
+                value={scopeDescription}
+                onChange={(e) => setScopeDescription(e.target.value)}
+                placeholder="Descreva o escopo dos serviços..."
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label>Descrição do Investimento</Label>
+              <Textarea
+                value={investmentDescription}
+                onChange={(e) => setInvestmentDescription(e.target.value)}
+                placeholder="Condições de pagamento, observações..."
+                rows={2}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label>Moeda</Label>
+                <Select value={currency} onValueChange={setCurrency}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {CURRENCIES.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Prazo de expiração (dias)</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={90}
+                  value={deadlineDays}
+                  onChange={(e) => setDeadlineDays(Number(e.target.value))}
+                />
+              </div>
+            </div>
+
+            {/* Services */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-semibold">Serviços</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setServices([...services, { name: "", description: "", value: 0 }])}
+                >
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Adicionar
+                </Button>
+              </div>
+              {services.map((svc, i) => (
+                <div key={i} className="rounded-lg border p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      placeholder="Nome do serviço"
+                      value={svc.name}
+                      onChange={(e) => {
+                        const copy = [...services];
+                        copy[i] = { ...copy[i], name: e.target.value };
+                        setServices(copy);
+                      }}
+                      className="flex-1"
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Valor"
+                      value={svc.value || ""}
+                      onChange={(e) => {
+                        const copy = [...services];
+                        copy[i] = { ...copy[i], value: Number(e.target.value) };
+                        setServices(copy);
+                      }}
+                      className="w-28"
+                    />
+                    {services.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="shrink-0 text-destructive"
+                        onClick={() => setServices(services.filter((_, j) => j !== i))}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  <Input
+                    placeholder="Descrição (opcional)"
+                    value={svc.description}
+                    onChange={(e) => {
+                      const copy = [...services];
+                      copy[i] = { ...copy[i], description: e.target.value };
+                      setServices(copy);
+                    }}
+                  />
+                </div>
+              ))}
+              <div className="flex justify-end text-sm font-semibold">
+                Total: {formatCurrency(totalValue, currency)}
+              </div>
+            </div>
+
+            <Button className="w-full" onClick={handleCreate} disabled={saving}>
+              {saving ? "Criando..." : "Criar Proposta"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
