@@ -623,6 +623,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
 const ClientPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { isClient } = useUserRole();
   const [clientData, setClientData] = useState<ClientData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
