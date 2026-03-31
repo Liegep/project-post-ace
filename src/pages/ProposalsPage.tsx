@@ -270,6 +270,24 @@ export default function ProposalsPage() {
                       <span className="text-muted-foreground">Serviços</span>
                       <span>{p.services.length} item(ns)</span>
                     </div>
+                    {p.proposal_type && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Tipo</span>
+                        <span>{p.proposal_type === "monthly" ? "Mensal" : "Projeto"}</span>
+                      </div>
+                    )}
+                    {p.plan && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Plano</span>
+                        <span className="capitalize">{p.plan}</span>
+                      </div>
+                    )}
+                    {p.pieces_quantity > 0 && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Peças</span>
+                        <span>{p.pieces_quantity}</span>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Criada em</span>
                       <span>{format(new Date(p.created_at), "dd/MM/yyyy", { locale: ptBR })}</span>
