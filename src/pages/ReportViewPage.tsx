@@ -183,39 +183,8 @@ export default function ReportViewPage() {
           </div>
         )}
 
-        {/* Chart */}
-        {chartData.length > 0 && chartData.some(d => d.previous > 0) && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Comparação com Período Anterior</CardTitle>
-            </CardHeader>
-            <CardContent className="pb-4">
-              <div className="h-[280px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 40 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-35} textAnchor="end" />
-                    <YAxis tick={{ fontSize: 10 }} />
-                    <Tooltip
-                      contentStyle={{
-                        background: "hsl(var(--popover))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "8px",
-                        fontSize: "12px",
-                      }}
-                    />
-                    <Bar dataKey="previous" name="Anterior" fill="hsl(var(--muted-foreground))" opacity={0.4} radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="current" name="Atual" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="flex items-center justify-center gap-6 mt-2 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-muted-foreground/40" />Anterior</span>
-                <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary" />Atual</span>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Charts */}
+        <ReportCharts metrics={metrics} prevMetrics={prevMetrics} />
 
         {/* Content Analysis */}
         {(report.best_content || report.worst_content || report.best_format) && (
