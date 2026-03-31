@@ -61,6 +61,30 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
     [locale]
   );
 
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", session.user.id)
+          .maybeSingle();
+        if (profile?.full_name) setUserName(profile.full_name);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t("goodMorning");
+    if (hour < 18) return t("goodAfternoon");
+    return t("goodEvening");
+  };
+
   const [activeTab, setActiveTab] = useState<"board" | "archived">("board");
   const [createOpen, setCreateOpen] = useState(false);
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
