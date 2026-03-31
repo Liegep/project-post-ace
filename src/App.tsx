@@ -30,6 +30,7 @@ import ProposalsPage from "./pages/ProposalsPage.tsx";
 import PublicProposalPage from "./pages/PublicProposalPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ApprovalPage from "./pages/ApprovalPage.tsx";
+import ContractsPage from "./pages/ContractsPage.tsx";
 
 const queryClient = new QueryClient();
 
