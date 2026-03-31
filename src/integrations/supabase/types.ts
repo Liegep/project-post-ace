@@ -1657,6 +1657,8 @@ export type Database = {
       proposals: {
         Row: {
           accepted_at: string | null
+          accepted_email: string
+          accepted_ip: string
           accepted_name: string
           accepted_signature: string
           client_email: string
@@ -1668,6 +1670,9 @@ export type Database = {
           id: string
           investment_description: string
           locale: string
+          pieces_quantity: number
+          plan: string
+          proposal_type: string
           scope_description: string
           services: Json
           status: Database["public"]["Enums"]["proposal_status"]
@@ -1679,6 +1684,8 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
+          accepted_email?: string
+          accepted_ip?: string
           accepted_name?: string
           accepted_signature?: string
           client_email?: string
@@ -1690,6 +1697,9 @@ export type Database = {
           id?: string
           investment_description?: string
           locale?: string
+          pieces_quantity?: number
+          plan?: string
+          proposal_type?: string
           scope_description?: string
           services?: Json
           status?: Database["public"]["Enums"]["proposal_status"]
@@ -1701,6 +1711,8 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
+          accepted_email?: string
+          accepted_ip?: string
           accepted_name?: string
           accepted_signature?: string
           client_email?: string
@@ -1712,6 +1724,9 @@ export type Database = {
           id?: string
           investment_description?: string
           locale?: string
+          pieces_quantity?: number
+          plan?: string
+          proposal_type?: string
           scope_description?: string
           services?: Json
           status?: Database["public"]["Enums"]["proposal_status"]
