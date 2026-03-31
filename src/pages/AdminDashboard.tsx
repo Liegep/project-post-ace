@@ -12,7 +12,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign, Eye, FileSignature } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign, Eye, FileSignature, Link2 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 
@@ -24,6 +24,7 @@ import { CommemorativeDatesWidget } from "@/components/CommemorativeDatesWidget"
 import { PostDetailDialog } from "@/components/PostDetailDialog";
 import { TodayTasksWidget } from "@/components/TodayTasksWidget";
 import { NotificationBell } from "@/components/NotificationBell";
+import { QuickLinksPanel } from "@/components/QuickLinksPanel";
 
 const CLIENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
   standard: { label: "Padrão", color: "bg-muted text-muted-foreground" },
@@ -170,6 +171,7 @@ const AdminDashboard = () => {
   const [clientUsersMap, setClientUsersMap] = useState<ClientUserMap>({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navDrawerOpen, setNavDrawerOpen] = useState(false);
+  const [quickLinksOpen, setQuickLinksOpen] = useState(false);
   const [appLogo, setAppLogo] = useState<string | null>(null);
   const appLogoInputRef = useRef<HTMLInputElement>(null);
   const [userName, setUserName] = useState<string>("");
@@ -875,11 +877,17 @@ const AdminDashboard = () => {
               <Plus className="mr-2 h-4 w-4" /> Clientes
             </Button>
             )}
+            <Button variant="ghost" size="icon" onClick={() => setQuickLinksOpen(true)} title="Links Rápidos">
+              <Link2 className="h-5 w-5" />
+            </Button>
             <NotificationBell />
             <UserProfileMenu />
           </div>
           {/* Mobile: only essential actions */}
           <div className="flex md:hidden items-center gap-1">
+            <Button size="icon" variant="ghost" onClick={() => setQuickLinksOpen(true)}>
+              <Link2 className="h-5 w-5" />
+            </Button>
             <NotificationBell />
             {isAdmin && (
               <Button size="icon" variant="ghost" onClick={openCreate}>
@@ -988,6 +996,21 @@ const AdminDashboard = () => {
             </button>
             {/* Activity log link removed */}
           </nav>
+        </SheetContent>
+      </Sheet>
+
+      {/* Quick Links drawer */}
+      <Sheet open={quickLinksOpen} onOpenChange={setQuickLinksOpen}>
+        <SheetContent side="right" className="w-72 p-0">
+          <SheetHeader className="border-b px-5 py-4">
+            <SheetTitle className="text-left text-base font-semibold flex items-center gap-2">
+              <Link2 className="h-4 w-4" />
+              Links Rápidos
+            </SheetTitle>
+          </SheetHeader>
+          <div className="p-4">
+            <QuickLinksPanel />
+          </div>
         </SheetContent>
       </Sheet>
 
