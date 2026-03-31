@@ -58,6 +58,9 @@ export default function ProposalsPage() {
   const [currency, setCurrency] = useState("BRL");
   const [deadlineDays, setDeadlineDays] = useState(7);
   const [locale, setLocale] = useState<ProposalLocale>("pt");
+  const [proposalType, setProposalType] = useState("project");
+  const [plan, setPlan] = useState("");
+  const [piecesQuantity, setPiecesQuantity] = useState(0);
   const [services, setServices] = useState<ProposalService[]>([{ name: "", description: "", value: 0 }]);
 
   const totalValue = services.reduce((s, svc) => s + (svc.value || 0), 0);
