@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { supabase } from "@/integrations/supabase/client";
 import {
   useCreateReport, useSocialReportTemplates, useSaveTemplate,
@@ -149,6 +150,7 @@ export default function CreateReportPage() {
             <h1 className="text-lg font-semibold">Novo Relatório</h1>
           </div>
           <div className="flex items-center gap-2">
+            <LanguageSelector />
             <UserProfileMenu />
           </div>
         </div>
