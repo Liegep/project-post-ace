@@ -19,6 +19,9 @@ export interface Proposal {
   scope_description: string;
   investment_description: string;
   deadline_days: number;
+  proposal_type: string;
+  plan: string;
+  pieces_quantity: number;
   status: "draft" | "sent" | "viewed" | "accepted" | "expired";
   token: string;
   expires_at: string;
@@ -26,6 +29,8 @@ export interface Proposal {
   accepted_at: string | null;
   accepted_name: string;
   accepted_signature: string;
+  accepted_ip: string;
+  accepted_email: string;
   created_at: string;
   updated_at: string;
 }

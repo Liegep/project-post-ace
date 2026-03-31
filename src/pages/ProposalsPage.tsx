@@ -58,6 +58,9 @@ export default function ProposalsPage() {
   const [currency, setCurrency] = useState("BRL");
   const [deadlineDays, setDeadlineDays] = useState(7);
   const [locale, setLocale] = useState<ProposalLocale>("pt");
+  const [proposalType, setProposalType] = useState("project");
+  const [plan, setPlan] = useState("");
+  const [piecesQuantity, setPiecesQuantity] = useState(0);
   const [services, setServices] = useState<ProposalService[]>([{ name: "", description: "", value: 0 }]);
 
   const totalValue = services.reduce((s, svc) => s + (svc.value || 0), 0);
@@ -88,6 +91,9 @@ export default function ProposalsPage() {
     setCurrency("BRL");
     setDeadlineDays(7);
     setLocale("pt");
+    setProposalType("project");
+    setPlan("");
+    setPiecesQuantity(0);
     setServices([{ name: "", description: "", value: 0 }]);
   };
 
@@ -151,6 +157,9 @@ export default function ProposalsPage() {
       currency,
       deadline_days: deadlineDays,
       locale,
+      proposal_type: proposalType,
+      plan,
+      pieces_quantity: piecesQuantity,
       services: services.filter((s) => s.name.trim()) as any,
       total_value: totalValue,
     });
@@ -261,6 +270,24 @@ export default function ProposalsPage() {
                       <span className="text-muted-foreground">Serviços</span>
                       <span>{p.services.length} item(ns)</span>
                     </div>
+                    {p.proposal_type && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Tipo</span>
+                        <span>{p.proposal_type === "monthly" ? "Mensal" : "Projeto"}</span>
+                      </div>
+                    )}
+                    {p.plan && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Plano</span>
+                        <span className="capitalize">{p.plan}</span>
+                      </div>
+                    )}
+                    {p.pieces_quantity > 0 && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Peças</span>
+                        <span>{p.pieces_quantity}</span>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Criada em</span>
                       <span>{format(new Date(p.created_at), "dd/MM/yyyy", { locale: ptBR })}</span>
@@ -363,6 +390,41 @@ export default function ProposalsPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Tipo + Plano + Peças */}
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <Label>Tipo de proposta</Label>
+                <Select value={proposalType} onValueChange={setProposalType}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="monthly">Mensal</SelectItem>
+                    <SelectItem value="project">Projeto</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Plano</Label>
+                <Select value={plan} onValueChange={setPlan}>
+                  <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="essencial">Essencial</SelectItem>
+                    <SelectItem value="profissional">Profissional</SelectItem>
+                    <SelectItem value="premium">Premium</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Qtd. de peças</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={piecesQuantity || ""}
+                  onChange={(e) => setPiecesQuantity(Number(e.target.value))}
+                  placeholder="0"
+                />
+              </div>
             </div>
 
             <div className="space-y-1.5">

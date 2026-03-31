@@ -43,6 +43,7 @@ export default function PublicProposalPage() {
   const [acceptOpen, setAcceptOpen] = useState(false);
   const [acceptName, setAcceptName] = useState("");
   const [acceptSignature, setAcceptSignature] = useState("");
+  const [acceptEmail, setAcceptEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
   const appLogo = useAppLogo();
@@ -97,7 +98,20 @@ export default function PublicProposalPage() {
       toast({ title: t("enterFullName"), variant: "destructive" });
       return;
     }
+    if (!acceptEmail.trim()) {
+      toast({ title: loc === "pt" ? "Informe seu e-mail" : "Enter your email", variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
+
+    // Capture IP
+    let clientIp = "";
+    try {
+      const ipRes = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipRes.json();
+      clientIp = ipData.ip || "";
+    } catch {}
+
     const { error } = await supabase
       .from("proposals")
       .update({
@@ -105,6 +119,8 @@ export default function PublicProposalPage() {
         accepted_at: new Date().toISOString(),
         accepted_name: acceptName.trim(),
         accepted_signature: acceptSignature.trim(),
+        accepted_email: acceptEmail.trim(),
+        accepted_ip: clientIp,
       })
       .eq("id", proposal!.id);
     setSubmitting(false);
@@ -292,6 +308,16 @@ export default function PublicProposalPage() {
                 value={acceptName}
                 onChange={(e) => setAcceptName(e.target.value)}
                 placeholder={t("fullNamePlaceholder")}
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-white/60">{loc === "pt" ? "E-mail" : "Email"}</Label>
+              <Input
+                type="email"
+                value={acceptEmail}
+                onChange={(e) => setAcceptEmail(e.target.value)}
+                placeholder={loc === "pt" ? "seu@email.com" : "your@email.com"}
                 className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
               />
             </div>
