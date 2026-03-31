@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ContractGateModal } from "@/components/ContractGateModal";
+import { useUserRole } from "@/hooks/useUserRole";
 import { useMyBillingPermission } from "@/hooks/useBillingPermissions";
 import { useNavigate } from "react-router-dom";
 import ClientBriefs from "@/components/ClientBriefs";
