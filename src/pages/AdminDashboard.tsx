@@ -171,6 +171,7 @@ const AdminDashboard = () => {
   const [clientUsersMap, setClientUsersMap] = useState<ClientUserMap>({});
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [navDrawerOpen, setNavDrawerOpen] = useState(false);
+  const [quickLinksOpen, setQuickLinksOpen] = useState(false);
   const [appLogo, setAppLogo] = useState<string | null>(null);
   const appLogoInputRef = useRef<HTMLInputElement>(null);
   const [userName, setUserName] = useState<string>("");
