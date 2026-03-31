@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { getDeadlineUrgency, URGENCY_STYLES, DeadlineUrgency } from "@/lib/deadlineColors";
-import { CalendarClock, FileText, DollarSign, Newspaper, AlertTriangle, CheckCircle2, Clock, ChevronDown } from "lucide-react";
+import { CalendarClock, FileText, DollarSign, Newspaper, AlertTriangle, CheckCircle2, Clock, ChevronDown, Send } from "lucide-react";
 import { format, startOfDay, endOfDay, addDays } from "date-fns";
+import { toast } from "@/hooks/use-toast";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
@@ -202,6 +203,18 @@ export const TodayTasksWidget = () => {
   });
   const upcomingTasks = tasks.filter(t => t.urgency === "urgent" && new Date(t.deadline) > todayEnd);
 
+  const handleMarkPublished = async (task: TaskItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const now = new Date().toISOString();
+    if (task.type === "post") {
+      await supabase.from("posts").update({ published_at: now, status: ["publicado"] }).eq("id", task.id);
+    } else if (task.type === "calendar_post") {
+      await supabase.from("calendar_posts").update({ status: "published" as any }).eq("id", task.id);
+    }
+    toast({ title: "Post marcado como publicado!" });
+    fetchTasks();
+  };
+
   if (loading || tasks.length === 0) return null;
 
   const getUrgencyIcon = (urgency: DeadlineUrgency) => {
@@ -303,6 +316,16 @@ export const TodayTasksWidget = () => {
                   <TypeIcon className="h-3 w-3" />
                   {typeConfig.label}
                 </span>
+                {(task.type === "post" || task.type === "calendar_post") && (
+                  <button
+                    onClick={(e) => handleMarkPublished(task, e)}
+                    className="shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/30 transition-colors"
+                    title="Marcar como publicado"
+                  >
+                    <Send className="h-3 w-3" />
+                    Publicado
+                  </button>
+                )}
                 <span className={cn("shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold", urgencyStyle.bg, urgencyStyle.text)}>
                   {getUrgencyIcon(task.urgency)}
                   {format(new Date(task.deadline), "dd/MM")}
