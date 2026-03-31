@@ -265,19 +265,19 @@ const ApprovalPage = () => {
                           <Button
                             size="icon"
                             variant="secondary"
-                            className="h-7 w-7 rounded-full shadow"
+                            className="h-7 w-7 rounded-full bg-background/90 backdrop-blur shadow-md border border-border hover:bg-background"
                             disabled={idx === 0}
                             onClick={() => setMediaIndex(post.id, idx - 1)}
                           >
                             <ChevronLeft className="h-4 w-4" />
                           </Button>
-                          <span className="bg-card/90 rounded-full px-2 py-0.5 text-xs font-medium text-foreground shadow">
+                          <span className="bg-background/90 backdrop-blur rounded-full px-2 py-0.5 text-xs font-medium text-foreground shadow-md border border-border">
                             {idx + 1}/{urls.length}
                           </span>
                           <Button
                             size="icon"
                             variant="secondary"
-                            className="h-7 w-7 rounded-full shadow"
+                            className="h-7 w-7 rounded-full bg-background/90 backdrop-blur shadow-md border border-border hover:bg-background"
                             disabled={idx === urls.length - 1}
                             onClick={() => setMediaIndex(post.id, idx + 1)}
                           >
