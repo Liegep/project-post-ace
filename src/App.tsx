@@ -30,6 +30,7 @@ import ProposalsPage from "./pages/ProposalsPage.tsx";
 import PublicProposalPage from "./pages/PublicProposalPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ApprovalPage from "./pages/ApprovalPage.tsx";
+import ContractsPage from "./pages/ContractsPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,7 @@ const App = () => (
               <Route path="/reports/:id" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ReportViewPage /></AuthGuard>} />
               <Route path="/billing" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><BillingPage /></AuthGuard>} />
               <Route path="/proposals" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><ProposalsPage /></AuthGuard>} />
+              <Route path="/contracts" element={<AuthGuard allowedRoles={["super_admin"]}><ContractsPage /></AuthGuard>} />
               <Route path="/client/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ClientPage /></AuthGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>

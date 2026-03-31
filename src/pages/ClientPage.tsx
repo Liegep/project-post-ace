@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ContractGateModal } from "@/components/ContractGateModal";
+import { useUserRole } from "@/hooks/useUserRole";
 import { useMyBillingPermission } from "@/hooks/useBillingPermissions";
 import { useNavigate } from "react-router-dom";
 import ClientBriefs from "@/components/ClientBriefs";
@@ -621,6 +623,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
 const ClientPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { isClient } = useUserRole();
   const [clientData, setClientData] = useState<ClientData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -691,10 +694,12 @@ const ClientPage = () => {
     );
   }
 
+
   const clientLocale = (clientData.locale || "pt") as Locale;
 
   return (
     <ErrorBoundary fallbackTitle="Erro ao carregar página do cliente">
+      {isClient && <ContractGateModal />}
       <I18nProvider key={clientLocale} defaultLocale={clientLocale}>
         <PostsProvider clientId={clientData.id} clientLogo={clientData.logo_url} clientPostingPeriod={clientData.posting_period}>
           <ClientPageInner clientData={clientData} />
