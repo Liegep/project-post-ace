@@ -10,18 +10,16 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MobileNav } from "@/components/MobileNav";
 import UserProfileMenu from "@/components/UserProfileMenu";
+import { ReportCharts } from "@/components/reports/ReportCharts";
 import {
   ArrowLeft, TrendingUp, TrendingDown, Minus, Instagram, Facebook,
   Calendar, Pencil, Star, AlertTriangle, Lightbulb, BarChart3,
-  Eye, MessageSquareText, ArrowUpRight, ArrowDownRight
+  Eye, MessageSquareText, ArrowUpRight, ArrowDownRight, Send, Check
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Cell
-} from "recharts";
+import { toast } from "@/hooks/use-toast";
 
 interface Client { id: string; name: string; logo_url: string; }
 
@@ -90,17 +88,12 @@ export default function ReportViewPage() {
 
   const PlatformIcon = report.platform === "instagram" ? Instagram : Facebook;
 
-  // Chart data
-  const chartData = metricKeys.map(key => ({
-    name: METRIC_LABELS[key] || key,
-    current: metrics[key] ?? 0,
-    previous: prevMetrics[key] ?? 0,
-  }));
 
   const handlePublish = async () => {
     if (!report) return;
     await updateReport.mutateAsync({ id: report.id, status: "published" });
     setReport({ ...report, status: "published" });
+    toast({ title: "Relatório publicado e disponível para o cliente!" });
   };
 
   return (
@@ -122,7 +115,14 @@ export default function ReportViewPage() {
           </div>
           <div className="flex items-center gap-2">
             {report.status === "draft" && (
-              <Button size="sm" className="h-8 text-xs" onClick={handlePublish}>Publicar</Button>
+              <Button size="sm" className="h-8 text-xs gap-1.5 bg-gradient-to-r from-primary to-accent hover:opacity-90" onClick={handlePublish}>
+                <Send className="h-3.5 w-3.5" /> Publicar e Enviar
+              </Button>
+            )}
+            {report.status === "published" && (
+              <Badge className="bg-emerald-500/15 text-emerald-600 gap-1">
+                <Check className="h-3 w-3" /> Enviado ao cliente
+              </Badge>
             )}
             <UserProfileMenu />
           </div>
@@ -183,39 +183,8 @@ export default function ReportViewPage() {
           </div>
         )}
 
-        {/* Chart */}
-        {chartData.length > 0 && chartData.some(d => d.previous > 0) && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Comparação com Período Anterior</CardTitle>
-            </CardHeader>
-            <CardContent className="pb-4">
-              <div className="h-[280px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 40 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-35} textAnchor="end" />
-                    <YAxis tick={{ fontSize: 10 }} />
-                    <Tooltip
-                      contentStyle={{
-                        background: "hsl(var(--popover))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "8px",
-                        fontSize: "12px",
-                      }}
-                    />
-                    <Bar dataKey="previous" name="Anterior" fill="hsl(var(--muted-foreground))" opacity={0.4} radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="current" name="Atual" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="flex items-center justify-center gap-6 mt-2 text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-muted-foreground/40" />Anterior</span>
-                <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary" />Atual</span>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Charts */}
+        <ReportCharts metrics={metrics} prevMetrics={prevMetrics} />
 
         {/* Content Analysis */}
         {(report.best_content || report.worst_content || report.best_format) && (
