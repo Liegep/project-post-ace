@@ -353,6 +353,25 @@ export default function CreateReportPage() {
           </CardContent>
         </Card>
 
+        {/* Send to Client Toggle */}
+        <Card className="glass-card border-primary/20">
+          <CardContent className="p-4 flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={sendToClient}
+              onChange={e => setSendToClient(e.target.checked)}
+              className="h-4 w-4 rounded border-primary accent-primary"
+            />
+            <div className="flex-1">
+              <p className="text-sm font-medium flex items-center gap-2">
+                <Send className="h-3.5 w-3.5 text-primary" />
+                Enviar para o cliente
+              </p>
+              <p className="text-[11px] text-muted-foreground">O relatório ficará visível na área do cliente selecionado</p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3 pb-8">
           <Button
@@ -364,11 +383,11 @@ export default function CreateReportPage() {
             <Save className="h-4 w-4" /> Salvar Rascunho
           </Button>
           <Button
-            className="flex-1 gap-2"
-            onClick={() => handleSubmit("published")}
+            className="flex-1 gap-2 bg-gradient-to-r from-primary to-accent hover:opacity-90"
+            onClick={() => handleSubmit(sendToClient ? "published" : "draft")}
             disabled={saving}
           >
-            Publicar Relatório
+            {sendToClient ? <><Send className="h-4 w-4" /> Publicar e Enviar</> : "Publicar Relatório"}
           </Button>
         </div>
       </main>
