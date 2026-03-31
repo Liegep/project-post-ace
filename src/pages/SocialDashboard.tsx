@@ -13,6 +13,7 @@ import { MobileNav } from "@/components/MobileNav";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Plus, CalendarDays, List, ArrowLeft, Facebook, Instagram, Settings, FileText, CheckCircle, Clock, Send, AlertTriangle, LogOut } from "lucide-react";
+import { format } from "date-fns";
 
 interface Client {
   id: string;
@@ -139,6 +140,23 @@ export default function SocialDashboard() {
     if (!confirm("Cancelar este agendamento?")) return;
     await cancelPost(id);
     toast({ title: "Agendamento cancelado" });
+  };
+
+  const handleReschedule = async (post: SocialPost, newDate: Date) => {
+    // Keep the existing time, just change the date
+    const currentDate = post.scheduled_at ? new Date(post.scheduled_at) : new Date();
+    const hours = currentDate.getHours();
+    const minutes = currentDate.getMinutes();
+    newDate.setHours(hours, minutes, 0, 0);
+
+    const { error } = await updatePost(post.id, {
+      scheduled_at: newDate.toISOString(),
+    } as any);
+    if (!error) {
+      toast({ title: "Post reagendado", description: `Movido para ${format(newDate, "dd/MM/yyyy")}` });
+    } else {
+      toast({ title: "Erro ao reagendar", variant: "destructive" });
+    }
   };
 
   const handleRetry = async (id: string) => {
@@ -280,7 +298,7 @@ export default function SocialDashboard() {
           </TabsList>
 
           <TabsContent value="calendar" className="mt-4">
-            <SocialCalendar posts={filteredPosts} scheduledPosts={scheduledKanbanPosts} onPostClick={handleEdit} />
+            <SocialCalendar posts={filteredPosts} scheduledPosts={scheduledKanbanPosts} onPostClick={handleEdit} onReschedule={handleReschedule} />
           </TabsContent>
 
           <TabsContent value="list" className="mt-4">
