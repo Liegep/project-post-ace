@@ -95,6 +95,11 @@ export function TextContentsPanel({ clientId, clientName, isAdmin }: Props) {
     ? contents
     : contents.filter((c) => c.status !== "approved" && c.status !== "published");
 
+  // Hide entire widget for clients when no contents
+  if (!isAdmin && !loading && visibleContents.length === 0) {
+    return null;
+  }
+
   if (loading) {
     return (
       <div className="space-y-3">
