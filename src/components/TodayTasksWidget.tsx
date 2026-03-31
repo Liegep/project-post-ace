@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { getDeadlineUrgency, URGENCY_STYLES, DeadlineUrgency } from "@/lib/deadlineColors";
-import { CalendarClock, FileText, DollarSign, Newspaper, AlertTriangle, CheckCircle2, Clock, ChevronDown } from "lucide-react";
+import { CalendarClock, FileText, DollarSign, Newspaper, AlertTriangle, CheckCircle2, Clock, ChevronDown, Send } from "lucide-react";
 import { format, startOfDay, endOfDay, addDays } from "date-fns";
+import { toast } from "@/hooks/use-toast";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
