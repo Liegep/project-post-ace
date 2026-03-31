@@ -18,10 +18,11 @@ import { MobileNav } from "@/components/MobileNav";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import {
   ArrowLeft, Save, BookTemplate, Instagram, Facebook,
-  TrendingUp, TrendingDown, Minus, MessageSquareText
+  TrendingUp, TrendingDown, Minus, MessageSquareText, Send
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-
+import { CsvUploadPanel } from "@/components/reports/CsvUploadPanel";
+import { ReportCharts } from "@/components/reports/ReportCharts";
 import { cn } from "@/lib/utils";
 
 interface Client { id: string; name: string; slug: string; logo_url: string; }
