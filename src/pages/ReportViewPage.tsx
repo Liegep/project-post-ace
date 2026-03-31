@@ -88,12 +88,6 @@ export default function ReportViewPage() {
 
   const PlatformIcon = report.platform === "instagram" ? Instagram : Facebook;
 
-  // Chart data
-  const chartData = metricKeys.map(key => ({
-    name: METRIC_LABELS[key] || key,
-    current: metrics[key] ?? 0,
-    previous: prevMetrics[key] ?? 0,
-  }));
 
   const handlePublish = async () => {
     if (!report) return;
