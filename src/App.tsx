@@ -26,6 +26,8 @@ import ReportsPage from "./pages/ReportsPage.tsx";
 import CreateReportPage from "./pages/CreateReportPage.tsx";
 import ReportViewPage from "./pages/ReportViewPage.tsx";
 import BillingPage from "./pages/BillingPage.tsx";
+import ProposalsPage from "./pages/ProposalsPage.tsx";
+import PublicProposalPage from "./pages/PublicProposalPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ApprovalPage from "./pages/ApprovalPage.tsx";
 
