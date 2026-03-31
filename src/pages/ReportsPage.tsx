@@ -92,7 +92,7 @@ export default function ReportsPage() {
   const clientMap = Object.fromEntries(clients.map(c => [c.id, c]));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.04),transparent_70%)]">
       {/* Header */}
       <header className="sticky top-0 z-30 glass-header">
         <div className="flex items-center justify-between px-4 py-3 md:px-6">
