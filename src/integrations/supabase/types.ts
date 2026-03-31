@@ -1615,6 +1615,72 @@ export type Database = {
         }
         Relationships: []
       }
+      proposals: {
+        Row: {
+          accepted_at: string | null
+          accepted_name: string
+          accepted_signature: string
+          client_email: string
+          client_name: string
+          created_at: string
+          currency: string
+          deadline_days: number
+          expires_at: string
+          id: string
+          investment_description: string
+          scope_description: string
+          services: Json
+          status: Database["public"]["Enums"]["proposal_status"]
+          token: string
+          total_value: number
+          updated_at: string
+          user_id: string
+          viewed_at: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_name?: string
+          accepted_signature?: string
+          client_email?: string
+          client_name: string
+          created_at?: string
+          currency?: string
+          deadline_days?: number
+          expires_at?: string
+          id?: string
+          investment_description?: string
+          scope_description?: string
+          services?: Json
+          status?: Database["public"]["Enums"]["proposal_status"]
+          token?: string
+          total_value?: number
+          updated_at?: string
+          user_id: string
+          viewed_at?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_name?: string
+          accepted_signature?: string
+          client_email?: string
+          client_name?: string
+          created_at?: string
+          currency?: string
+          deadline_days?: number
+          expires_at?: string
+          id?: string
+          investment_description?: string
+          scope_description?: string
+          services?: Json
+          status?: Database["public"]["Enums"]["proposal_status"]
+          token?: string
+          total_value?: number
+          updated_at?: string
+          user_id?: string
+          viewed_at?: string | null
+        }
+        Relationships: []
+      }
       social_logs: {
         Row: {
           action: string
@@ -2173,6 +2239,7 @@ export type Database = {
         | "scheduled"
         | "published"
       invoice_status: "open" | "paid" | "overdue" | "cancelled"
+      proposal_status: "draft" | "sent" | "viewed" | "accepted" | "expired"
       social_post_status:
         | "draft"
         | "pending_approval"
@@ -2340,6 +2407,7 @@ export const Constants = {
         "published",
       ],
       invoice_status: ["open", "paid", "overdue", "cancelled"],
+      proposal_status: ["draft", "sent", "viewed", "accepted", "expired"],
       social_post_status: [
         "draft",
         "pending_approval",
