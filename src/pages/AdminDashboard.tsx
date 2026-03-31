@@ -1018,6 +1018,11 @@ const AdminDashboard = () => {
             <button onClick={() => { setNavDrawerOpen(false); navigate("/proposals"); }} className={navItemClass("/proposals")}>
               <FileSignature className={navIconClass("/proposals")} /> Propostas
             </button>
+            {isSuperAdmin && (
+              <button onClick={() => { setNavDrawerOpen(false); navigate("/contracts"); }} className={navItemClass("/contracts")}>
+                <FileText className={navIconClass("/contracts")} /> Contratos
+              </button>
+            )}
             <button onClick={() => { setNavDrawerOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
               <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
             </button>
