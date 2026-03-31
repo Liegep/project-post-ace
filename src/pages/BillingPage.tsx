@@ -197,7 +197,7 @@ const BillingPage = () => {
       if (i.status === "overdue") byCurrency[cur].totalOverdue += total;
     });
     // Sort: BRL first, then USD, then EUR, then others
-    const order = ["BRL", "USD", "EUR"];
+    const order = ["BRL", "USD", "EUR", "SEK"];
     const sorted = Object.keys(byCurrency).sort((a, b) => {
       const ai = order.indexOf(a); const bi = order.indexOf(b);
       return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
