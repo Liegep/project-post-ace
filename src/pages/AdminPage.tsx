@@ -415,7 +415,7 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
   t: (key: any) => string;
 }) => {
   const grouped = archivedPosts.reduce<Record<string, Post[]>>((acc, post) => {
-    const date = post.archivedAt || post.createdAt;
+    const date = post.deadline || post.archivedAt || post.createdAt;
     const key = format(date, "MMMM yyyy", { locale: ptBR });
     if (!acc[key]) acc[key] = [];
     acc[key].push(post);
@@ -423,8 +423,8 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
   }, {});
 
   const months = Object.keys(grouped).sort((a, b) => {
-    const dateA = grouped[a][0].archivedAt || grouped[a][0].createdAt;
-    const dateB = grouped[b][0].archivedAt || grouped[b][0].createdAt;
+    const dateA = grouped[a][0].deadline || grouped[a][0].archivedAt || grouped[a][0].createdAt;
+    const dateB = grouped[b][0].deadline || grouped[b][0].archivedAt || grouped[b][0].createdAt;
     return dateB.getTime() - dateA.getTime();
   });
 
