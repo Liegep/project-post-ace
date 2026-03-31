@@ -312,6 +312,16 @@ export default function PublicProposalPage() {
               />
             </div>
             <div className="space-y-1.5">
+              <Label className="text-white/60">{loc === "pt" ? "E-mail" : "Email"}</Label>
+              <Input
+                type="email"
+                value={acceptEmail}
+                onChange={(e) => setAcceptEmail(e.target.value)}
+                placeholder={loc === "pt" ? "seu@email.com" : "your@email.com"}
+                className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+              />
+            </div>
+            <div className="space-y-1.5">
               <Label className="text-white/60">{t("digitalSignature")}</Label>
               <div className="relative">
                 <Pen className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
