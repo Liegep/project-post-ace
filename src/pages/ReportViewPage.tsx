@@ -115,7 +115,14 @@ export default function ReportViewPage() {
           </div>
           <div className="flex items-center gap-2">
             {report.status === "draft" && (
-              <Button size="sm" className="h-8 text-xs" onClick={handlePublish}>Publicar</Button>
+              <Button size="sm" className="h-8 text-xs gap-1.5 bg-gradient-to-r from-primary to-accent hover:opacity-90" onClick={handlePublish}>
+                <Send className="h-3.5 w-3.5" /> Publicar e Enviar
+              </Button>
+            )}
+            {report.status === "published" && (
+              <Badge className="bg-emerald-500/15 text-emerald-600 gap-1">
+                <Check className="h-3 w-3" /> Enviado ao cliente
+              </Badge>
             )}
             <UserProfileMenu />
           </div>
