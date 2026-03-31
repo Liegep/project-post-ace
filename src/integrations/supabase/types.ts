@@ -1615,6 +1615,45 @@ export type Database = {
         }
         Relationships: []
       }
+      proposal_templates: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          investment_description: string
+          locale: string
+          name: string
+          scope_description: string
+          services: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          investment_description?: string
+          locale?: string
+          name: string
+          scope_description?: string
+          services?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          investment_description?: string
+          locale?: string
+          name?: string
+          scope_description?: string
+          services?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       proposals: {
         Row: {
           accepted_at: string | null
@@ -1628,6 +1667,7 @@ export type Database = {
           expires_at: string
           id: string
           investment_description: string
+          locale: string
           scope_description: string
           services: Json
           status: Database["public"]["Enums"]["proposal_status"]
@@ -1649,6 +1689,7 @@ export type Database = {
           expires_at?: string
           id?: string
           investment_description?: string
+          locale?: string
           scope_description?: string
           services?: Json
           status?: Database["public"]["Enums"]["proposal_status"]
@@ -1670,6 +1711,7 @@ export type Database = {
           expires_at?: string
           id?: string
           investment_description?: string
+          locale?: string
           scope_description?: string
           services?: Json
           status?: Database["public"]["Enums"]["proposal_status"]
