@@ -1041,6 +1041,9 @@ const es: TranslationKeys = {
   inviteMemberDesc: "Invita a alguien como miembro del equipo o administrador",
   roleLabel: "Tipo de acceso",
   sendInvite: "Enviar Invitación",
+  goodMorning: "Buenos días",
+  goodAfternoon: "Buenas tardes",
+  goodEvening: "Buenas noches",
 };
 
 const sv: TranslationKeys = {
