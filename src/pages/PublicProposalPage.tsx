@@ -43,6 +43,7 @@ export default function PublicProposalPage() {
   const [acceptOpen, setAcceptOpen] = useState(false);
   const [acceptName, setAcceptName] = useState("");
   const [acceptSignature, setAcceptSignature] = useState("");
+  const [acceptEmail, setAcceptEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
   const appLogo = useAppLogo();
