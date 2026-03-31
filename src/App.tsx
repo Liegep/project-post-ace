@@ -26,6 +26,8 @@ import ReportsPage from "./pages/ReportsPage.tsx";
 import CreateReportPage from "./pages/CreateReportPage.tsx";
 import ReportViewPage from "./pages/ReportViewPage.tsx";
 import BillingPage from "./pages/BillingPage.tsx";
+import ProposalsPage from "./pages/ProposalsPage.tsx";
+import PublicProposalPage from "./pages/PublicProposalPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ApprovalPage from "./pages/ApprovalPage.tsx";
 
@@ -41,6 +43,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/proposta/:token" element={<PublicProposalPage />} />
               <Route path="/aprovacao/:token" element={<ApprovalPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/accept-invite" element={<AcceptInvitePage />} />
@@ -61,6 +64,7 @@ const App = () => (
               <Route path="/reports/new" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><CreateReportPage /></AuthGuard>} />
               <Route path="/reports/:id" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ReportViewPage /></AuthGuard>} />
               <Route path="/billing" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><BillingPage /></AuthGuard>} />
+              <Route path="/proposals" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><ProposalsPage /></AuthGuard>} />
               <Route path="/client/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ClientPage /></AuthGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
