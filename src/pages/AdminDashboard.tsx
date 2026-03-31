@@ -75,6 +75,7 @@ interface FeedbackNotification {
   deadline: string | null;
   imageUrl: string;
   mediaUrls: string[];
+  caption: string;
 }
 
 interface UnarchiveNotification {
