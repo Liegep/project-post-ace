@@ -126,6 +126,7 @@ export default function CreateReportPage() {
         worst_content: worstContent,
         best_format: bestFormat,
         observations,
+        locale: reportLocale,
         status,
       });
 

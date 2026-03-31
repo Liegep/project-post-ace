@@ -31,6 +31,7 @@ export interface SocialReport {
   worst_content: string;
   best_format: string;
   observations: string;
+  locale: string;
   status: string;
   template_id: string | null;
   created_at: string;
