@@ -693,10 +693,12 @@ const ClientPage = () => {
     );
   }
 
+  const { isClient } = useUserRole();
   const clientLocale = (clientData.locale || "pt") as Locale;
 
   return (
     <ErrorBoundary fallbackTitle="Erro ao carregar página do cliente">
+      {isClient && <ContractGateModal />}
       <I18nProvider key={clientLocale} defaultLocale={clientLocale}>
         <PostsProvider clientId={clientData.id} clientLogo={clientData.logo_url} clientPostingPeriod={clientData.posting_period}>
           <ClientPageInner clientData={clientData} />
