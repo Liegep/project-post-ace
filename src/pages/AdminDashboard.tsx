@@ -525,8 +525,14 @@ const AdminDashboard = () => {
     setFeedbacks((prev) => prev.filter((fb) => fb.postId !== postId));
   };
 
-  const markAsAgendado = async (fb: FeedbackNotification, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const markAsAgendado = async (fb: FeedbackNotification, selectedDate: string, selectedTime: string) => {
+    if (!selectedDate || !selectedTime) {
+      toast({ title: "Informe a data e o horário do agendamento", variant: "destructive" });
+      return;
+    }
+
+    const deadlineISO = new Date(`${selectedDate}T${selectedTime}:00`).toISOString();
+
     // Ensure "Agendados" column exists for this client
     const { data: existingCols } = await supabase
       .from("columns")
@@ -548,20 +554,17 @@ const AdminDashboard = () => {
       agendadosColId = (newCol as any).id;
     }
 
-    // Update post: set status to agendado, move to Agendados column, reset label
+    // Update post: set status to agendado, move to Agendados column, reset label, set deadline
     await supabase.from("posts").update({
       status: ["agendado"],
       column_id: agendadosColId,
       client_label: "pendente",
+      deadline: deadlineISO,
     } as any).eq("id", fb.postId);
 
     // Also create an entry in the social calendar
-    const publishDate = fb.deadline
-      ? new Date(fb.deadline).toISOString().split("T")[0]
-      : new Date().toISOString().split("T")[0];
-    const publishTime = fb.deadline
-      ? new Date(fb.deadline).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", hour12: false })
-      : "09:00";
+    const publishDate = selectedDate;
+    const publishTime = selectedTime;
 
     await supabase.from("calendar_posts").insert({
       client_id: fb.clientId,
@@ -576,7 +579,8 @@ const AdminDashboard = () => {
     } as any);
 
     setFeedbacks((prev) => prev.filter((f) => f.postId !== fb.postId));
-    toast({ title: "Post agendado", description: `"${fb.postTitle}" adicionado ao calendário de postagens.` });
+    setSchedulePopoverOpen(null);
+    toast({ title: "Post agendado", description: `"${fb.postTitle}" agendado para ${selectedDate} às ${selectedTime}.` });
   };
 
   const dismissUnarchiveNotif = async (postId: string, e: React.MouseEvent) => {
