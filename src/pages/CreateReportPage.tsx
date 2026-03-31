@@ -190,6 +190,21 @@ export default function CreateReportPage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Idioma do relatório</Label>
+                <Select value={reportLocale} onValueChange={(v) => setReportLocale(v as Locale)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {(Object.keys(LOCALE_LABELS) as Locale[]).map((loc) => (
+                      <SelectItem key={loc} value={loc}>
+                        <span className="flex items-center gap-2">
+                          {LOCALE_FLAGS[loc]} {LOCALE_LABELS[loc]}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">Título do relatório</Label>
