@@ -128,7 +128,7 @@ export default function ReportsPage() {
             </SelectContent>
           </Select>
 
-          <Button onClick={() => navigate("/reports/new")} className="w-full sm:w-auto gap-2">
+          <Button onClick={() => navigate("/reports/new")} className="w-full sm:w-auto gap-2 bg-gradient-to-r from-primary to-accent hover:opacity-90">
             <Plus className="h-4 w-4" />
             Novo Relatório
           </Button>
