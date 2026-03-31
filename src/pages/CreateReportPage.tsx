@@ -52,6 +52,13 @@ export default function CreateReportPage() {
   const [saving, setSaving] = useState(false);
   const [templateName, setTemplateName] = useState("");
   const [showTemplateSave, setShowTemplateSave] = useState(false);
+  const [sendToClient, setSendToClient] = useState(false);
+
+  const handleCsvParsed = (csvMetrics: SocialReportMetrics, csvPrevMetrics: SocialReportMetrics, fields: string[]) => {
+    setMetrics(csvMetrics);
+    setPrevMetrics(csvPrevMetrics);
+    setActiveFields(fields);
+  };
 
   useEffect(() => {
     const fetch = async () => {
