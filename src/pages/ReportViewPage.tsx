@@ -10,18 +10,16 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MobileNav } from "@/components/MobileNav";
 import UserProfileMenu from "@/components/UserProfileMenu";
+import { ReportCharts } from "@/components/reports/ReportCharts";
 import {
   ArrowLeft, TrendingUp, TrendingDown, Minus, Instagram, Facebook,
   Calendar, Pencil, Star, AlertTriangle, Lightbulb, BarChart3,
-  Eye, MessageSquareText, ArrowUpRight, ArrowDownRight
+  Eye, MessageSquareText, ArrowUpRight, ArrowDownRight, Send, Check
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Cell
-} from "recharts";
+import { toast } from "@/hooks/use-toast";
 
 interface Client { id: string; name: string; logo_url: string; }
 
