@@ -279,6 +279,12 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
       </header>
 
       <main className="mx-auto max-w-full p-6">
+        {/* Greeting */}
+        <div className="mb-6 rounded-xl border bg-card px-5 py-4">
+          <h2 className="text-xl md:text-2xl font-bold text-foreground">
+            {getGreeting()}{userName ? `, ${userName.split(" ")[0]}` : ""} 👋
+          </h2>
+        </div>
         {postingPeriod && (
           <div className="mb-4 flex justify-center">
             <span className="rounded-full bg-primary px-6 py-2 text-lg font-bold text-primary-foreground shadow-md">
