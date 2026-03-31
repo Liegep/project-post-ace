@@ -965,6 +965,79 @@ export type Database = {
           },
         ]
       }
+      contract_acceptances: {
+        Row: {
+          accepted_at: string
+          contract_id: string
+          id: string
+          ip_address: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          contract_id: string
+          id?: string
+          ip_address?: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          contract_id?: string
+          id?: string
+          ip_address?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contract_acceptances_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contracts: {
+        Row: {
+          body: string
+          client_id: string
+          created_at: string
+          created_by: string
+          id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string
+          client_id: string
+          created_at?: string
+          created_by: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          client_id?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contracts_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hashtag_groups: {
         Row: {
           client_id: string
