@@ -93,6 +93,7 @@ export default function ReportViewPage() {
     if (!report) return;
     await updateReport.mutateAsync({ id: report.id, status: "published" });
     setReport({ ...report, status: "published" });
+    toast({ title: "Relatório publicado e disponível para o cliente!" });
   };
 
   return (
