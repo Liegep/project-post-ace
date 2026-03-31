@@ -206,6 +206,14 @@ export default function CreateReportPage() {
           </CardContent>
         </Card>
 
+        {/* CSV Upload */}
+        <CsvUploadPanel onMetricsParsed={handleCsvParsed} />
+
+        {/* Live Chart Preview */}
+        {Object.keys(metrics).filter(k => metrics[k] !== undefined).length > 0 && (
+          <ReportCharts metrics={metrics} prevMetrics={prevMetrics} />
+        )}
+
         {/* Strategic Comment */}
         <Card>
           <CardHeader className="pb-3">
