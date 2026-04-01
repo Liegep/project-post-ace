@@ -895,7 +895,7 @@ const AdminDashboard = () => {
                 <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
               </Button>
             )}
-            <Button variant="ghost" size="icon" onClick={() => setNavDrawerOpen(true)} title="Menu">
+            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)} title="Menu">
               <Menu className="h-5 w-5" />
             </Button>
             {isAdmin && (
