@@ -994,6 +994,9 @@ const AdminDashboard = () => {
               <button onClick={() => { setMobileMenuOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
                 <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
               </button>
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/design-briefs"); }} className={navItemClass("/design-briefs")}>
+                <Palette className={navIconClass("/design-briefs")} /> Briefs de Design
+              </button>
               {/* Activity log link removed */}
             </nav>
           </div>
