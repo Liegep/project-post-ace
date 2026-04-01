@@ -1003,44 +1003,6 @@ const AdminDashboard = () => {
         </SheetContent>
       </Sheet>
 
-      {/* Desktop nav drawer */}
-      <Sheet open={navDrawerOpen} onOpenChange={setNavDrawerOpen}>
-        <SheetContent side="right" className="w-64 p-0">
-          <SheetHeader className="border-b px-5 py-4">
-            <SheetTitle className="text-left text-base font-semibold">Navegação</SheetTitle>
-          </SheetHeader>
-          <nav className="flex flex-col py-2">
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/ideas"); }} className={navItemClass("/ideas")}>
-              <Lightbulb className={navIconClass("/ideas")} /> Ideias de Pauta
-            </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/calendar"); }} className={navItemClass("/calendar")}>
-              <Calendar className={navIconClass("/calendar")} /> Calendário
-            </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/briefs"); }} className={navItemClass("/briefs")}>
-              <FileText className={navIconClass("/briefs")} /> Pautas
-            </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/reports"); }} className={navItemClass("/reports")}>
-              <FileBarChart className={navIconClass("/reports")} /> Relatórios
-            </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/billing"); }} className={navItemClass("/billing")}>
-              <DollarSign className={navIconClass("/billing")} /> Faturamento
-            </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/proposals"); }} className={navItemClass("/proposals")}>
-              <FileSignature className={navIconClass("/proposals")} /> Propostas
-            </button>
-            {isSuperAdmin && (
-              <button onClick={() => { setNavDrawerOpen(false); navigate("/contracts"); }} className={navItemClass("/contracts")}>
-                <FileText className={navIconClass("/contracts")} /> Contratos
-              </button>
-            )}
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
-              <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
-            </button>
-            {/* Activity log link removed */}
-          </nav>
-        </SheetContent>
-      </Sheet>
-
       {/* Quick Links drawer */}
       <Sheet open={quickLinksOpen} onOpenChange={setQuickLinksOpen}>
         <SheetContent side="right" className="w-72 p-0">
