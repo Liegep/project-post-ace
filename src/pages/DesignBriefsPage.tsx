@@ -5,10 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import {
   ArrowLeft, Plus, Trash2, Eye, Edit2, Search,
   FileText, PenTool, Palette, Share2, Globe, Megaphone,
+  Link2, Download, Copy, Check,
 } from "lucide-react";
 import { MobileNav } from "@/components/MobileNav";
 import UserProfileMenu from "@/components/UserProfileMenu";
@@ -16,6 +19,7 @@ import { format } from "date-fns";
 import { briefTemplates, getTemplate } from "@/lib/briefTemplates";
 import BriefForm from "@/components/briefs/BriefForm";
 import BriefDetailDialog from "@/components/briefs/BriefDetailDialog";
+import { downloadBriefPdf } from "@/lib/briefPdf";
 import type { LucideIcon } from "lucide-react";
 
 interface DesignBrief {
