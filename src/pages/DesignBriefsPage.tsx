@@ -24,6 +24,7 @@ interface DesignBrief {
   category: string;
   answers: Record<string, any>;
   status: string;
+  locale: string;
   user_id: string;
   created_at: string;
   updated_at: string;
