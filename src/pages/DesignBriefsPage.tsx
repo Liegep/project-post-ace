@@ -31,6 +31,9 @@ interface DesignBrief {
   locale: string;
   user_id: string;
   client_id: string | null;
+  respondent_name: string;
+  respondent_email: string;
+  submitted_at: string | null;
   created_at: string;
   updated_at: string;
 }
