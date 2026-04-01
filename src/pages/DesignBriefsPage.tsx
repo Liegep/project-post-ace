@@ -145,7 +145,18 @@ export default function DesignBriefsPage() {
   // ─── Form view ───
   if (view === "create" || view === "edit") {
     return (
-      <div className="min-h-screen p-4 md:p-8">
+      <div className="min-h-screen bg-background">
+        <header className="sticky top-0 z-30 glass-header px-4 py-3 md:px-6 md:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 md:gap-3">
+            <MobileNav title="Briefs de Design" />
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-lg font-bold text-foreground">{view === "edit" ? "Editar Brief" : "Novo Brief"}</h1>
+          </div>
+          <UserProfileMenu />
+        </header>
+        <div className="p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
           <button
             onClick={() => { setView("list"); setForm(emptyBrief); setEditId(null); }}
