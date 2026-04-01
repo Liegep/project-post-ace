@@ -81,7 +81,12 @@ export default function DesignBriefsPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { loadBriefs(); }, [loadBriefs]);
+  const loadClients = useCallback(async () => {
+    const { data } = await supabase.from("clients").select("id, name").order("name");
+    if (data) setClients(data);
+  }, []);
+
+  useEffect(() => { loadBriefs(); loadClients(); }, [loadBriefs, loadClients]);
 
   const briefCounts = briefTemplates.reduce((acc, t) => {
     acc[t.id] = briefs.filter(b => b.category === t.id).length;
