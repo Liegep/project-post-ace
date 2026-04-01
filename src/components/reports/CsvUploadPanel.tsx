@@ -91,22 +91,19 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
         mappedHeaders.forEach((key, idx) => {
           if (!key) return;
           detectedFields.push(key);
-          const val = rows[0]?.[idx];
-          metrics[key] = val ? parseFloat(val.replace(/[^\d.-]/g, "")) || 0 : 0;
+          metrics[key] = cleanNumber(rows[0]?.[idx] || "");
           if (rows.length > 1) {
-            const prev = rows[1]?.[idx];
-            prevMetrics[key] = prev ? parseFloat(prev.replace(/[^\d.-]/g, "")) || 0 : 0;
+            prevMetrics[key] = cleanNumber(rows[1]?.[idx] || "");
           }
         });
       } else {
-        // Row-based: each row has metric_name, value, [previous_value]
         rows.forEach(row => {
           const key = normalizeHeader(row[0] || "");
           if (!key) return;
           detectedFields.push(key);
-          metrics[key] = row[1] ? parseFloat(row[1].replace(/[^\d.-]/g, "")) || 0 : 0;
+          metrics[key] = cleanNumber(row[1] || "");
           if (row[2]) {
-            prevMetrics[key] = parseFloat(row[2].replace(/[^\d.-]/g, "")) || 0;
+            prevMetrics[key] = cleanNumber(row[2]);
           }
         });
       }
