@@ -165,6 +165,32 @@ export default function DesignBriefsPage() {
     }
   };
 
+  const handleShareLink = async (brief: DesignBrief) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("design_brief_tokens")
+      .insert({ brief_id: brief.id, created_by: user.id })
+      .select("token")
+      .single();
+
+    if (error || !data) {
+      toast({ title: "Erro ao gerar link", description: error?.message, variant: "destructive" });
+      return;
+    }
+
+    const url = `${window.location.origin}/brief/${data.token}`;
+    await navigator.clipboard.writeText(url);
+    setCopiedId(brief.id);
+    setTimeout(() => setCopiedId(null), 2000);
+    toast({ title: "Link copiado!", description: "Link válido por 7 dias." });
+  };
+
+  const handleExportPdf = (brief: DesignBrief) => {
+    downloadBriefPdf(brief);
+  };
+
   const goBack = () => {
     if (view === "form") {
       const template = getTemplate(selectedCategory);
