@@ -331,6 +331,7 @@ export default function DesignBriefsPage() {
                 template={currentTemplate}
                 initialAnswers={editingBrief?.answers || {}}
                 initialTitle={editingBrief?.title || ""}
+                initialLocale={(editingBrief?.locale as BriefLocale) || "pt"}
                 saving={saving}
                 onSave={handleSave}
               />
