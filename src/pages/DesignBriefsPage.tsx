@@ -54,13 +54,16 @@ const categoryIcons: Record<string, LucideIcon> = {
 export default function DesignBriefsPage() {
   const navigate = useNavigate();
   const [briefs, setBriefs] = useState<DesignBrief[]>([]);
+  const [clients, setClients] = useState<ClientOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [view, setView] = useState<View>("categories");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [editingBrief, setEditingBrief] = useState<DesignBrief | null>(null);
   const [viewingBrief, setViewingBrief] = useState<DesignBrief | null>(null);
   const [search, setSearch] = useState("");
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const loadBriefs = useCallback(async () => {
     setLoading(true);
