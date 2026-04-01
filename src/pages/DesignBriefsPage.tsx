@@ -141,7 +141,7 @@ export default function DesignBriefsPage() {
           category: selectedCategory,
           locale,
           user_id: user.id,
-          status: "completed",
+          status: Object.keys(answers).length > 0 ? "completed" : "draft",
           client_id: clientId,
         });
       if (error) {
