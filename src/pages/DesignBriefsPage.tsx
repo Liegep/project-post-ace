@@ -31,6 +31,9 @@ interface DesignBrief {
   locale: string;
   user_id: string;
   client_id: string | null;
+  respondent_name: string;
+  respondent_email: string;
+  submitted_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -138,7 +141,7 @@ export default function DesignBriefsPage() {
           category: selectedCategory,
           locale,
           user_id: user.id,
-          status: "completed",
+          status: Object.keys(answers).length > 0 ? "completed" : "draft",
           client_id: clientId,
         });
       if (error) {
@@ -327,20 +330,34 @@ export default function DesignBriefsPage() {
                     key={b.id}
                     className="group relative rounded-2xl border border-white/20 bg-white/55 dark:bg-white/5 backdrop-blur-xl shadow-md hover:shadow-xl transition-all duration-300 p-5 flex flex-col"
                   >
-                    <h3 className="font-semibold text-foreground line-clamp-2 mb-2 pr-2">{b.title}</h3>
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h3 className="font-semibold text-foreground line-clamp-2">{b.title}</h3>
+                      {b.submitted_at ? (
+                        <Badge className="text-[10px] bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30 shrink-0">
+                          Respondido
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-[10px] shrink-0">
+                          Aguardando
+                        </Badge>
+                      )}
+                    </div>
 
+                    {b.submitted_at && b.respondent_name && (
+                      <p className="text-xs text-muted-foreground mb-1">
+                        <span className="font-medium">Respondido por:</span> {b.respondent_name}
+                        {b.respondent_email && ` (${b.respondent_email})`}
+                      </p>
+                    )}
                     {b.client_id && (
                       <p className="text-xs text-muted-foreground mb-1">
                         <span className="font-medium">Cliente:</span> {clients.find(c => c.id === b.client_id)?.name || "—"}
                       </p>
                     )}
-                    {b.answers?.company_name && (
+                    {b.submitted_at && b.answers?.company_name && (
                       <p className="text-xs text-muted-foreground mb-1">
                         <span className="font-medium">Empresa:</span> {b.answers.company_name}
                       </p>
-                    )}
-                    {b.answers?.main_objective && (
-                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{b.answers.main_objective}</p>
                     )}
 
                     <div className="mt-auto pt-3 border-t border-white/15 flex items-center justify-between">
@@ -348,15 +365,19 @@ export default function DesignBriefsPage() {
                         {format(new Date(b.created_at), "dd/MM/yyyy")}
                       </span>
                       <div className="flex gap-1">
-                        <button onClick={() => handleShareLink(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-primary transition-colors" title="Gerar link público">
+                        <button onClick={() => handleShareLink(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-primary transition-colors" title="Gerar link para preenchimento">
                           {copiedId === b.id ? <Check className="h-4 w-4 text-green-500" /> : <Link2 className="h-4 w-4" />}
                         </button>
-                        <button onClick={() => handleExportPdf(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Exportar PDF">
-                          <Download className="h-4 w-4" />
-                        </button>
-                        <button onClick={() => setViewingBrief(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Visualizar">
-                          <Eye className="h-4 w-4" />
-                        </button>
+                        {b.submitted_at && (
+                          <>
+                            <button onClick={() => handleExportPdf(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Exportar PDF">
+                              <Download className="h-4 w-4" />
+                            </button>
+                            <button onClick={() => setViewingBrief(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Ver respostas">
+                              <Eye className="h-4 w-4" />
+                            </button>
+                          </>
+                        )}
                         <button onClick={() => { setEditingBrief(b); setSelectedClientId(b.client_id || ""); setView("form"); }} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Editar">
                           <Edit2 className="h-4 w-4" />
                         </button>

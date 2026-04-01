@@ -1089,8 +1089,11 @@ export type Database = {
           objectives: string
           preferred_colors: string
           references_links: string
+          respondent_email: string
+          respondent_name: string
           status: string
           style_preferences: string
+          submitted_at: string | null
           target_audience: string
           title: string
           updated_at: string
@@ -1108,8 +1111,11 @@ export type Database = {
           objectives?: string
           preferred_colors?: string
           references_links?: string
+          respondent_email?: string
+          respondent_name?: string
           status?: string
           style_preferences?: string
+          submitted_at?: string | null
           target_audience?: string
           title?: string
           updated_at?: string
@@ -1127,8 +1133,11 @@ export type Database = {
           objectives?: string
           preferred_colors?: string
           references_links?: string
+          respondent_email?: string
+          respondent_name?: string
           status?: string
           style_preferences?: string
+          submitted_at?: string | null
           target_audience?: string
           title?: string
           updated_at?: string
