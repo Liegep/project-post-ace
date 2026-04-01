@@ -207,6 +207,7 @@ export default function DesignBriefsPage() {
             </Button>
           </div>
         </div>
+        </div>
       </div>
     );
   }
