@@ -340,6 +340,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           <ClientBriefs clientId={clientData.id} clientName={clientData.name} filterMonth={selectedMonth} />
         </div>
 
+        {/* Design Briefs */}
+        <div className="mb-8">
+          <ClientDesignBriefs clientId={clientData.id} />
+        </div>
+
         {/* Text Contents for Approval */}
         <div className="mb-8">
           <TextContentsPanel clientId={clientData.id} clientName={clientData.name} />
