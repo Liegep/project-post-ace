@@ -42,6 +42,7 @@ const emptyBrief = {
 type View = "list" | "create" | "edit";
 
 export default function DesignBriefsPage() {
+  const navigate = useNavigate();
   const [briefs, setBriefs] = useState<DesignBrief[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
