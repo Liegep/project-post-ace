@@ -17,6 +17,9 @@ interface DesignBrief {
   answers: Record<string, any>;
   status: string;
   locale?: string;
+  respondent_name?: string;
+  respondent_email?: string;
+  submitted_at?: string | null;
   created_at: string;
   updated_at: string;
 }
