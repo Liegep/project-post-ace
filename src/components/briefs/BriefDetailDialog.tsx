@@ -2,7 +2,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { getTemplate } from "@/lib/briefTemplates";
-import { ExternalLink } from "lucide-react";
+import { tLabel, tMeta, briefLocaleNames, type BriefLocale } from "@/lib/briefTranslations";
+import { ExternalLink, Globe } from "lucide-react";
 
 interface DesignBrief {
   id: string;
@@ -10,6 +11,7 @@ interface DesignBrief {
   category: string;
   answers: Record<string, any>;
   status: string;
+  locale?: string;
   created_at: string;
   updated_at: string;
 }
@@ -25,6 +27,9 @@ export default function BriefDetailDialog({ brief, open, onClose }: Props) {
 
   const template = getTemplate(brief.category);
   const questions = template?.questions || [];
+  const locale = (brief.locale || 'pt') as BriefLocale;
+  const templateName = (template && tMeta(template.id, 'name', locale)) || template?.name || brief.category;
+  const localeName = briefLocaleNames[locale] || locale;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -33,9 +38,13 @@ export default function BriefDetailDialog({ brief, open, onClose }: Props) {
           <DialogTitle className="flex items-center gap-2 text-lg">
             {brief.title}
           </DialogTitle>
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-2 pt-1 flex-wrap">
             <Badge variant="secondary" className="text-[10px]">
-              {template?.name || brief.category}
+              {templateName}
+            </Badge>
+            <Badge variant="outline" className="text-[10px] flex items-center gap-1">
+              <Globe className="h-3 w-3" />
+              {localeName}
             </Badge>
             <span className="text-[10px] text-muted-foreground">
               {format(new Date(brief.updated_at), "dd/MM/yyyy 'às' HH:mm")}
@@ -48,10 +57,13 @@ export default function BriefDetailDialog({ brief, open, onClose }: Props) {
             const val = brief.answers[q.id];
             if (val === undefined || val === null || val === "" || (Array.isArray(val) && val.length === 0)) return null;
 
+            const label = tLabel(template!.id, q.id, locale) || q.label;
             let display: React.ReactNode;
 
             if (q.type === "yes_no") {
-              display = val === true ? "Sim" : "Não";
+              display = val === true
+                ? (locale === 'sv' ? 'Ja' : locale === 'it' ? 'Sì' : locale === 'es' ? 'Sí' : locale === 'en' ? 'Yes' : 'Sim')
+                : (locale === 'sv' ? 'Nej' : locale === 'en' ? 'No' : 'Não');
             } else if (q.type === "checkbox" && Array.isArray(val)) {
               display = (
                 <div className="flex flex-wrap gap-1.5">
@@ -86,7 +98,7 @@ export default function BriefDetailDialog({ brief, open, onClose }: Props) {
             return (
               <div key={q.id} className="rounded-xl bg-white/40 dark:bg-white/5 border border-white/15 p-3">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
-                  {q.label}
+                  {label}
                 </p>
                 {display}
               </div>
