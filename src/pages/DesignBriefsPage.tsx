@@ -370,6 +370,7 @@ export default function DesignBriefsPage() {
           )}
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }
