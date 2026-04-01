@@ -1041,7 +1041,9 @@ export type Database = {
       design_briefs: {
         Row: {
           additional_notes: string
+          answers: Json
           brand_name: string
+          category: string
           created_at: string
           id: string
           objectives: string
@@ -1056,7 +1058,9 @@ export type Database = {
         }
         Insert: {
           additional_notes?: string
+          answers?: Json
           brand_name?: string
+          category?: string
           created_at?: string
           id?: string
           objectives?: string
@@ -1071,7 +1075,9 @@ export type Database = {
         }
         Update: {
           additional_notes?: string
+          answers?: Json
           brand_name?: string
+          category?: string
           created_at?: string
           id?: string
           objectives?: string
