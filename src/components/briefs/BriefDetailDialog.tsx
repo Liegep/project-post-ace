@@ -1,9 +1,14 @@
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { getTemplate } from "@/lib/briefTemplates";
 import { tLabel, tMeta, briefLocaleNames, type BriefLocale } from "@/lib/briefTranslations";
-import { ExternalLink, Globe } from "lucide-react";
+import { ExternalLink, Globe, Link2, Download, Check } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { downloadBriefPdf } from "@/lib/briefPdf";
 
 interface DesignBrief {
   id: string;
