@@ -94,7 +94,7 @@ export default function DesignBriefsPage() {
     }
   };
 
-  const handleSave = async (title: string, answers: Record<string, any>) => {
+  const handleSave = async (title: string, answers: Record<string, any>, locale: BriefLocale) => {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
