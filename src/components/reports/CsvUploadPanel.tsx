@@ -11,17 +11,31 @@ interface CsvUploadPanelProps {
 }
 
 const METRIC_ALIASES: Record<string, string> = {
-  reach: "reach", alcance: "reach",
+  reach: "reach", alcance: "reach", resultados: "reach", results: "reach",
   impressions: "impressions", impressoes: "impressions", "impressões": "impressions",
-  engagement: "engagement", engajamento: "engagement",
+  engagement: "engagement", engajamento: "engagement", "taxa de engajamento": "engagement", "engagement rate": "engagement",
   interactions: "interactions", "interações": "interactions", interacoes: "interactions",
-  clicks: "clicks", cliques: "clicks",
+  clicks: "clicks", cliques: "clicks", "cliques no link": "clicks", "link clicks": "clicks", "cliques em links": "clicks", "link click": "clicks",
   profile_visits: "profile_visits", "visitas ao perfil": "profile_visits", "visitas_perfil": "profile_visits", "profile visits": "profile_visits",
-  followers_gained: "followers_gained", "seguidores ganhos": "followers_gained", "seguidores_ganhos": "followers_gained", "followers gained": "followers_gained",
+  followers_gained: "followers_gained", "seguidores ganhos": "followers_gained", "seguidores_ganhos": "followers_gained", "followers gained": "followers_gained", "novos seguidores": "followers_gained", "new followers": "followers_gained",
   followers_lost: "followers_lost", "seguidores perdidos": "followers_lost", "seguidores_perdidos": "followers_lost", "followers lost": "followers_lost",
   posts_published: "posts_published", "posts publicados": "posts_published", "posts_publicados": "posts_published", "posts published": "posts_published",
   reels_published: "reels_published", "reels publicados": "reels_published", "reels_publicados": "reels_published", "reels published": "reels_published",
 };
+
+function cleanNumber(raw: string): number {
+  if (!raw || !raw.trim()) return 0;
+  let s = raw.trim().replace(/[%$€R\s]/g, "");
+  // Detect pt-BR format: 1.234,56 → 1234.56
+  if (/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(s)) {
+    s = s.replace(/\./g, "").replace(",", ".");
+  } else {
+    // EN format or plain: remove commas as thousand sep
+    s = s.replace(/,/g, "");
+  }
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
 
 function normalizeHeader(h: string): string | null {
   const clean = h.trim().toLowerCase().replace(/[_\s]+/g, " ").replace(/[áàã]/g, "a").replace(/[éê]/g, "e").replace(/[íì]/g, "i").replace(/[óòõ]/g, "o").replace(/[úù]/g, "u").replace(/[ç]/g, "c");
