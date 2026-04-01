@@ -112,7 +112,7 @@ export default function DesignBriefsPage() {
     } else {
       const { error } = await supabase
         .from("design_briefs")
-        .insert({ title, answers: answers as any, category: selectedCategory, user_id: user.id, status: "completed" });
+        .insert({ title, answers: answers as any, category: selectedCategory, locale, user_id: user.id, status: "completed" });
       if (error) {
         toast({ title: "Erro ao criar", description: error.message, variant: "destructive" });
       } else {
