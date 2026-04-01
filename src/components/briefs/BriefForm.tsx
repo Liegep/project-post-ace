@@ -1,0 +1,244 @@
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Save, Upload, X, Link as LinkIcon } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import type { BriefTemplate } from "@/lib/briefTemplates";
+
+interface BriefFormProps {
+  template: BriefTemplate;
+  initialAnswers?: Record<string, any>;
+  initialTitle?: string;
+  saving: boolean;
+  onSave: (title: string, answers: Record<string, any>) => void;
+}
+
+export default function BriefForm({ template, initialAnswers = {}, initialTitle = "", saving, onSave }: BriefFormProps) {
+  const [answers, setAnswers] = useState<Record<string, any>>(initialAnswers);
+  const [title, setTitle] = useState(initialTitle);
+  const [uploading, setUploading] = useState<Record<string, boolean>>({});
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  const updateAnswer = (questionId: string, value: any) => {
+    setAnswers(prev => ({ ...prev, [questionId]: value }));
+  };
+
+  const toggleCheckbox = (questionId: string, option: string) => {
+    const current: string[] = answers[questionId] || [];
+    const updated = current.includes(option)
+      ? current.filter((o: string) => o !== option)
+      : [...current, option];
+    updateAnswer(questionId, updated);
+  };
+
+  const handleFileUpload = async (questionId: string, files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(prev => ({ ...prev, [questionId]: true }));
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setUploading(prev => ({ ...prev, [questionId]: false })); return; }
+
+    const currentFiles: string[] = answers[questionId] || [];
+    const newFiles = [...currentFiles];
+
+    for (const file of Array.from(files)) {
+      if (file.size > 20 * 1024 * 1024) {
+        toast({ title: "Arquivo muito grande", description: `${file.name} excede 20MB`, variant: "destructive" });
+        continue;
+      }
+      const ext = file.name.split(".").pop();
+      const path = `briefs/${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("media").upload(path, file);
+      if (error) {
+        toast({ title: "Erro no upload", description: error.message, variant: "destructive" });
+      } else {
+        const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+        newFiles.push(urlData.publicUrl);
+      }
+    }
+
+    updateAnswer(questionId, newFiles);
+    setUploading(prev => ({ ...prev, [questionId]: false }));
+  };
+
+  const removeFile = (questionId: string, index: number) => {
+    const current: string[] = answers[questionId] || [];
+    updateAnswer(questionId, current.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = () => {
+    const autoTitle = template.isBase
+      ? `Briefing Geral${answers.company_name ? ` - ${answers.company_name}` : ""}`
+      : title || `${template.name} - ${new Date().toLocaleDateString("pt-BR")}`;
+    onSave(autoTitle, answers);
+  };
+
+  const hasRequired = template.questions
+    .filter(q => q.required)
+    .every(q => {
+      const val = answers[q.id];
+      if (typeof val === "string") return val.trim().length > 0;
+      if (Array.isArray(val)) return val.length > 0;
+      return val !== undefined && val !== null;
+    });
+
+  return (
+    <div className="space-y-6">
+      {!template.isBase && (
+        <div className="space-y-1.5">
+          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Título do Brief *
+          </Label>
+          <Input
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder={`Ex: ${template.name} - Cliente X`}
+            className="bg-white/50 dark:bg-white/5 border-white/30 backdrop-blur-sm"
+          />
+        </div>
+      )}
+
+      {template.questions.map(q => (
+        <div key={q.id} className="space-y-2">
+          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {q.label} {q.required && <span className="text-destructive">*</span>}
+          </Label>
+
+          {q.type === "short_text" && (
+            <Input
+              value={answers[q.id] || ""}
+              onChange={e => updateAnswer(q.id, e.target.value)}
+              className="bg-white/50 dark:bg-white/5 border-white/30 backdrop-blur-sm"
+            />
+          )}
+
+          {q.type === "long_text" && (
+            <Textarea
+              value={answers[q.id] || ""}
+              onChange={e => updateAnswer(q.id, e.target.value)}
+              rows={3}
+              className="bg-white/50 dark:bg-white/5 border-white/30 backdrop-blur-sm"
+            />
+          )}
+
+          {q.type === "link" && (
+            <div className="relative">
+              <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={answers[q.id] || ""}
+                onChange={e => updateAnswer(q.id, e.target.value)}
+                placeholder="https://..."
+                className="pl-10 bg-white/50 dark:bg-white/5 border-white/30 backdrop-blur-sm"
+              />
+            </div>
+          )}
+
+          {q.type === "yes_no" && (
+            <div className="flex items-center gap-3 py-1">
+              <Switch
+                checked={answers[q.id] === true}
+                onCheckedChange={val => updateAnswer(q.id, val)}
+              />
+              <span className="text-sm text-foreground">
+                {answers[q.id] === true ? "Sim" : answers[q.id] === false ? "Não" : "Não informado"}
+              </span>
+            </div>
+          )}
+
+          {q.type === "multiple_choice" && q.options && (
+            <Select
+              value={answers[q.id] || ""}
+              onValueChange={val => updateAnswer(q.id, val)}
+            >
+              <SelectTrigger className="bg-white/50 dark:bg-white/5 border-white/30 backdrop-blur-sm">
+                <SelectValue placeholder="Selecione uma opção" />
+              </SelectTrigger>
+              <SelectContent>
+                {q.options.map(opt => (
+                  <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {q.type === "checkbox" && q.options && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {q.options.map(opt => {
+                const checked = (answers[q.id] || []).includes(opt);
+                return (
+                  <label
+                    key={opt}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition-all text-sm ${
+                      checked
+                        ? "border-primary/40 bg-primary/10 text-foreground"
+                        : "border-white/20 bg-white/30 dark:bg-white/5 text-muted-foreground hover:border-white/40"
+                    }`}
+                  >
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={() => toggleCheckbox(q.id, opt)}
+                    />
+                    {opt}
+                  </label>
+                );
+              })}
+            </div>
+          )}
+
+          {q.type === "file_upload" && (
+            <div className="space-y-2">
+              <div
+                className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-white/30 rounded-xl bg-white/20 dark:bg-white/5 cursor-pointer hover:border-primary/40 transition-colors"
+                onClick={() => fileInputRefs.current[q.id]?.click()}
+              >
+                <Upload className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
+                  {uploading[q.id] ? "Enviando..." : "Clique para enviar arquivos (máx. 20MB)"}
+                </span>
+                <input
+                  ref={el => { fileInputRefs.current[q.id] = el; }}
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={e => handleFileUpload(q.id, e.target.files)}
+                />
+              </div>
+              {(answers[q.id] || []).length > 0 && (
+                <div className="space-y-1">
+                  {(answers[q.id] as string[]).map((url, idx) => {
+                    const fileName = decodeURIComponent(url.split("/").pop() || "arquivo");
+                    return (
+                      <div key={idx} className="flex items-center gap-2 text-xs bg-white/30 dark:bg-white/5 rounded-lg px-3 py-2">
+                        <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary truncate flex-1 hover:underline">
+                          {fileName}
+                        </a>
+                        <button onClick={() => removeFile(q.id, idx)} className="text-muted-foreground hover:text-destructive">
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+
+      <Button
+        onClick={handleSubmit}
+        disabled={saving || (!template.isBase && !title.trim()) || !hasRequired}
+        className="w-full bg-gradient-to-r from-[hsl(var(--gradient-start))] via-[hsl(var(--gradient-mid))] to-[hsl(var(--gradient-end))] text-white hover:opacity-90"
+      >
+        <Save className="h-4 w-4 mr-2" />
+        {saving ? "Salvando..." : "Salvar Brief"}
+      </Button>
+    </div>
+  );
+}
