@@ -28,6 +28,8 @@ interface Props {
 }
 
 export default function BriefDetailDialog({ brief, open, onClose }: Props) {
+  const [copied, setCopied] = useState(false);
+
   if (!brief) return null;
 
   const template = getTemplate(brief.category);
@@ -36,9 +38,28 @@ export default function BriefDetailDialog({ brief, open, onClose }: Props) {
   const templateName = (template && tMeta(template.id, 'name', locale)) || template?.name || brief.category;
   const localeName = briefLocaleNames[locale] || locale;
 
+  const handleShareLink = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data, error } = await supabase
+      .from("design_brief_tokens")
+      .insert({ brief_id: brief.id, created_by: user.id })
+      .select("token")
+      .single();
+    if (error || !data) {
+      toast({ title: "Erro ao gerar link", description: error?.message, variant: "destructive" });
+      return;
+    }
+    const url = `${window.location.origin}/brief/${data.token}`;
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast({ title: "Link copiado!", description: "Link válido por 7 dias." });
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[85vh] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-white/20">
+      <DialogContent className="max-w-lg max-h-[85vh] bg-card backdrop-blur-2xl border-border">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
             {brief.title}
@@ -54,6 +75,15 @@ export default function BriefDetailDialog({ brief, open, onClose }: Props) {
             <span className="text-[10px] text-muted-foreground">
               {format(new Date(brief.updated_at), "dd/MM/yyyy 'às' HH:mm")}
             </span>
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button size="sm" variant="outline" onClick={handleShareLink} className="text-xs h-7">
+              {copied ? <Check className="h-3 w-3 mr-1" /> : <Link2 className="h-3 w-3 mr-1" />}
+              {copied ? "Copiado!" : "Gerar link"}
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => downloadBriefPdf(brief)} className="text-xs h-7">
+              <Download className="h-3 w-3 mr-1" /> Exportar PDF
+            </Button>
           </div>
         </DialogHeader>
 
