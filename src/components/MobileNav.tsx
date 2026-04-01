@@ -4,7 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button";
 import {
   Menu, LayoutDashboard, Users, CalendarClock, Lightbulb,
-  Calendar, FileText, CalendarHeart, X, History, FileBarChart
+  Calendar, FileText, CalendarHeart, X, History, FileBarChart, Palette
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
