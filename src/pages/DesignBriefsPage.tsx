@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { Palette, Plus, ArrowLeft, Trash2, Eye, Edit2, Save, Search } from "lucide-react";
+import { MobileNav } from "@/components/MobileNav";
+import UserProfileMenu from "@/components/UserProfileMenu";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -39,6 +42,7 @@ const emptyBrief = {
 type View = "list" | "create" | "edit";
 
 export default function DesignBriefsPage() {
+  const navigate = useNavigate();
   const [briefs, setBriefs] = useState<DesignBrief[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -141,7 +145,18 @@ export default function DesignBriefsPage() {
   // ─── Form view ───
   if (view === "create" || view === "edit") {
     return (
-      <div className="min-h-screen p-4 md:p-8">
+      <div className="min-h-screen bg-background">
+        <header className="sticky top-0 z-30 glass-header px-4 py-3 md:px-6 md:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 md:gap-3">
+            <MobileNav title="Briefs de Design" />
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-lg font-bold text-foreground">{view === "edit" ? "Editar Brief" : "Novo Brief"}</h1>
+          </div>
+          <UserProfileMenu />
+        </header>
+        <div className="p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
           <button
             onClick={() => { setView("list"); setForm(emptyBrief); setEditId(null); }}
@@ -192,6 +207,7 @@ export default function DesignBriefsPage() {
             </Button>
           </div>
         </div>
+        </div>
       </div>
     );
   }
@@ -201,7 +217,18 @@ export default function DesignBriefsPage() {
 
   // ─── List view ───
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-30 glass-header px-4 py-3 md:px-6 md:py-4 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 md:gap-3">
+          <MobileNav title="Briefs de Design" />
+          <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-lg font-bold text-foreground">Briefs de Design</h1>
+        </div>
+        <UserProfileMenu />
+      </header>
+      <div className="p-4 md:p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -343,6 +370,7 @@ export default function DesignBriefsPage() {
           )}
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }
