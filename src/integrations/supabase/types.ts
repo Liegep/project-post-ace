@@ -1038,6 +1038,54 @@ export type Database = {
           },
         ]
       }
+      design_briefs: {
+        Row: {
+          additional_notes: string
+          brand_name: string
+          created_at: string
+          id: string
+          objectives: string
+          preferred_colors: string
+          references_links: string
+          status: string
+          style_preferences: string
+          target_audience: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_notes?: string
+          brand_name?: string
+          created_at?: string
+          id?: string
+          objectives?: string
+          preferred_colors?: string
+          references_links?: string
+          status?: string
+          style_preferences?: string
+          target_audience?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_notes?: string
+          brand_name?: string
+          created_at?: string
+          id?: string
+          objectives?: string
+          preferred_colors?: string
+          references_links?: string
+          status?: string
+          style_preferences?: string
+          target_audience?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       hashtag_groups: {
         Row: {
           client_id: string
