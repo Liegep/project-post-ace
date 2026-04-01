@@ -855,10 +855,6 @@ const AdminDashboard = () => {
       <header className="sticky top-0 z-30 glass-header">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center gap-3">
-            {/* Menu hamburger */}
-            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
-              <Menu className="h-5 w-5" />
-            </Button>
             {/* App logo upload area */}
             <input type="file" accept="image/*" ref={appLogoInputRef} className="hidden" onChange={handleAppLogoUpload} />
             {isAdmin ? (
