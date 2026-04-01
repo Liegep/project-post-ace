@@ -139,7 +139,7 @@ export default function DesignBriefsPage() {
           locale,
           user_id: user.id,
           status: "completed",
-          client_id: selectedClientId || null,
+          client_id: clientId,
         });
       if (error) {
         toast({ title: "Erro ao criar", description: error.message, variant: "destructive" });
