@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import type { BriefLocale } from "@/lib/briefTranslations";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,7 @@ interface DesignBrief {
   category: string;
   answers: Record<string, any>;
   status: string;
+  locale: string;
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -92,7 +94,7 @@ export default function DesignBriefsPage() {
     }
   };
 
-  const handleSave = async (title: string, answers: Record<string, any>) => {
+  const handleSave = async (title: string, answers: Record<string, any>, locale: BriefLocale) => {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
@@ -100,7 +102,7 @@ export default function DesignBriefsPage() {
     if (editingBrief) {
       const { error } = await supabase
         .from("design_briefs")
-        .update({ title, answers: answers as any, status: "completed" })
+        .update({ title, answers: answers as any, locale, status: "completed" })
         .eq("id", editingBrief.id);
       if (error) {
         toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" });
@@ -110,7 +112,7 @@ export default function DesignBriefsPage() {
     } else {
       const { error } = await supabase
         .from("design_briefs")
-        .insert({ title, answers: answers as any, category: selectedCategory, user_id: user.id, status: "completed" });
+        .insert({ title, answers: answers as any, category: selectedCategory, locale, user_id: user.id, status: "completed" });
       if (error) {
         toast({ title: "Erro ao criar", description: error.message, variant: "destructive" });
       } else {
@@ -329,6 +331,7 @@ export default function DesignBriefsPage() {
                 template={currentTemplate}
                 initialAnswers={editingBrief?.answers || {}}
                 initialTitle={editingBrief?.title || ""}
+                initialLocale={(editingBrief?.locale as BriefLocale) || "pt"}
                 saving={saving}
                 onSave={handleSave}
               />

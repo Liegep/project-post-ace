@@ -1,0 +1,1 @@
+ALTER TABLE public.design_briefs ADD COLUMN IF NOT EXISTS locale text NOT NULL DEFAULT 'pt';
