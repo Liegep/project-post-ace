@@ -32,6 +32,7 @@ import NotFound from "./pages/NotFound.tsx";
 import ApprovalPage from "./pages/ApprovalPage.tsx";
 import ContractsPage from "./pages/ContractsPage.tsx";
 import DesignBriefsPage from "./pages/DesignBriefsPage.tsx";
+import PublicBriefPage from "./pages/PublicBriefPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/login" element={<LoginPage />} />
               <Route path="/proposta/:token" element={<PublicProposalPage />} />
               <Route path="/aprovacao/:token" element={<ApprovalPage />} />
+              <Route path="/brief/:token" element={<PublicBriefPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/accept-invite" element={<AcceptInvitePage />} />
               <Route path="/" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminDashboard /></AuthGuard>} />

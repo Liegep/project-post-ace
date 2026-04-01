@@ -5,10 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import {
   ArrowLeft, Plus, Trash2, Eye, Edit2, Search,
   FileText, PenTool, Palette, Share2, Globe, Megaphone,
+  Link2, Download, Copy, Check,
 } from "lucide-react";
 import { MobileNav } from "@/components/MobileNav";
 import UserProfileMenu from "@/components/UserProfileMenu";
@@ -16,6 +19,7 @@ import { format } from "date-fns";
 import { briefTemplates, getTemplate } from "@/lib/briefTemplates";
 import BriefForm from "@/components/briefs/BriefForm";
 import BriefDetailDialog from "@/components/briefs/BriefDetailDialog";
+import { downloadBriefPdf } from "@/lib/briefPdf";
 import type { LucideIcon } from "lucide-react";
 
 interface DesignBrief {
@@ -26,8 +30,14 @@ interface DesignBrief {
   status: string;
   locale: string;
   user_id: string;
+  client_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+interface ClientOption {
+  id: string;
+  name: string;
 }
 
 type View = "categories" | "list" | "form";
@@ -44,13 +54,16 @@ const categoryIcons: Record<string, LucideIcon> = {
 export default function DesignBriefsPage() {
   const navigate = useNavigate();
   const [briefs, setBriefs] = useState<DesignBrief[]>([]);
+  const [clients, setClients] = useState<ClientOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [view, setView] = useState<View>("categories");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [editingBrief, setEditingBrief] = useState<DesignBrief | null>(null);
   const [viewingBrief, setViewingBrief] = useState<DesignBrief | null>(null);
   const [search, setSearch] = useState("");
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const loadBriefs = useCallback(async () => {
     setLoading(true);
@@ -68,7 +81,12 @@ export default function DesignBriefsPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { loadBriefs(); }, [loadBriefs]);
+  const loadClients = useCallback(async () => {
+    const { data } = await supabase.from("clients").select("id, name").order("name");
+    if (data) setClients(data);
+  }, []);
+
+  useEffect(() => { loadBriefs(); loadClients(); }, [loadBriefs, loadClients]);
 
   const briefCounts = briefTemplates.reduce((acc, t) => {
     acc[t.id] = briefs.filter(b => b.category === t.id).length;
@@ -99,10 +117,12 @@ export default function DesignBriefsPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
 
+    const clientId = selectedClientId && selectedClientId !== "none" ? selectedClientId : null;
+
     if (editingBrief) {
       const { error } = await supabase
         .from("design_briefs")
-        .update({ title, answers: answers as any, locale, status: "completed" })
+        .update({ title, answers: answers as any, locale, status: "completed", client_id: clientId })
         .eq("id", editingBrief.id);
       if (error) {
         toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" });
@@ -112,7 +132,15 @@ export default function DesignBriefsPage() {
     } else {
       const { error } = await supabase
         .from("design_briefs")
-        .insert({ title, answers: answers as any, category: selectedCategory, locale, user_id: user.id, status: "completed" });
+        .insert({
+          title,
+          answers: answers as any,
+          category: selectedCategory,
+          locale,
+          user_id: user.id,
+          status: "completed",
+          client_id: clientId,
+        });
       if (error) {
         toast({ title: "Erro ao criar", description: error.message, variant: "destructive" });
       } else {
@@ -137,6 +165,32 @@ export default function DesignBriefsPage() {
       toast({ title: "Brief excluído" });
       loadBriefs();
     }
+  };
+
+  const handleShareLink = async (brief: DesignBrief) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("design_brief_tokens")
+      .insert({ brief_id: brief.id, created_by: user.id })
+      .select("token")
+      .single();
+
+    if (error || !data) {
+      toast({ title: "Erro ao gerar link", description: error?.message, variant: "destructive" });
+      return;
+    }
+
+    const url = `${window.location.origin}/brief/${data.token}`;
+    await navigator.clipboard.writeText(url);
+    setCopiedId(brief.id);
+    setTimeout(() => setCopiedId(null), 2000);
+    toast({ title: "Link copiado!", description: "Link válido por 7 dias." });
+  };
+
+  const handleExportPdf = (brief: DesignBrief) => {
+    downloadBriefPdf(brief);
   };
 
   const goBack = () => {
@@ -275,6 +329,11 @@ export default function DesignBriefsPage() {
                   >
                     <h3 className="font-semibold text-foreground line-clamp-2 mb-2 pr-2">{b.title}</h3>
 
+                    {b.client_id && (
+                      <p className="text-xs text-muted-foreground mb-1">
+                        <span className="font-medium">Cliente:</span> {clients.find(c => c.id === b.client_id)?.name || "—"}
+                      </p>
+                    )}
                     {b.answers?.company_name && (
                       <p className="text-xs text-muted-foreground mb-1">
                         <span className="font-medium">Empresa:</span> {b.answers.company_name}
@@ -289,10 +348,16 @@ export default function DesignBriefsPage() {
                         {format(new Date(b.created_at), "dd/MM/yyyy")}
                       </span>
                       <div className="flex gap-1">
+                        <button onClick={() => handleShareLink(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-primary transition-colors" title="Gerar link público">
+                          {copiedId === b.id ? <Check className="h-4 w-4 text-green-500" /> : <Link2 className="h-4 w-4" />}
+                        </button>
+                        <button onClick={() => handleExportPdf(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Exportar PDF">
+                          <Download className="h-4 w-4" />
+                        </button>
                         <button onClick={() => setViewingBrief(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Visualizar">
                           <Eye className="h-4 w-4" />
                         </button>
-                        <button onClick={() => { setEditingBrief(b); setView("form"); }} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Editar">
+                        <button onClick={() => { setEditingBrief(b); setSelectedClientId(b.client_id || ""); setView("form"); }} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Editar">
                           <Edit2 className="h-4 w-4" />
                         </button>
                         <button onClick={() => handleDelete(b.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Excluir">
@@ -326,6 +391,26 @@ export default function DesignBriefsPage() {
                   <p className="text-xs text-muted-foreground">{currentTemplate.description}</p>
                 </div>
               </div>
+
+              {/* Client selector */}
+              {clients.length > 0 && (
+                <div className="space-y-1.5 mb-6">
+                  <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Vincular a um cliente (opcional)
+                  </Label>
+                  <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+                    <SelectTrigger className="bg-white/50 dark:bg-white/5 border-white/30 backdrop-blur-sm">
+                      <SelectValue placeholder="Nenhum cliente selecionado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {clients.map(c => (
+                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <BriefForm
                 template={currentTemplate}

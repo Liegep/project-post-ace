@@ -6,7 +6,7 @@ import { useMyBillingPermission } from "@/hooks/useBillingPermissions";
 import { useNavigate } from "react-router-dom";
 import ClientBriefs from "@/components/ClientBriefs";
 import { ClientInvoicesPanel } from "@/components/billing/ClientInvoicesPanel";
-// UpcomingPostsWidget removed for optimization
+import ClientDesignBriefs from "@/components/briefs/ClientDesignBriefs";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -338,6 +338,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         {/* Client Briefs for Approval */}
         <div className="mb-8">
           <ClientBriefs clientId={clientData.id} clientName={clientData.name} filterMonth={selectedMonth} />
+        </div>
+
+        {/* Design Briefs */}
+        <div className="mb-8">
+          <ClientDesignBriefs clientId={clientData.id} />
         </div>
 
         {/* Text Contents for Approval */}
