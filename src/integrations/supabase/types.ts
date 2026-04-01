@@ -1038,12 +1038,51 @@ export type Database = {
           },
         ]
       }
+      design_brief_tokens: {
+        Row: {
+          active: boolean
+          brief_id: string
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          token: string
+        }
+        Insert: {
+          active?: boolean
+          brief_id: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          token?: string
+        }
+        Update: {
+          active?: boolean
+          brief_id?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "design_brief_tokens_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "design_briefs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       design_briefs: {
         Row: {
           additional_notes: string
           answers: Json
           brand_name: string
           category: string
+          client_id: string | null
           created_at: string
           id: string
           locale: string
@@ -1062,6 +1101,7 @@ export type Database = {
           answers?: Json
           brand_name?: string
           category?: string
+          client_id?: string | null
           created_at?: string
           id?: string
           locale?: string
@@ -1080,6 +1120,7 @@ export type Database = {
           answers?: Json
           brand_name?: string
           category?: string
+          client_id?: string | null
           created_at?: string
           id?: string
           locale?: string
@@ -1093,7 +1134,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "design_briefs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       hashtag_groups: {
         Row: {
