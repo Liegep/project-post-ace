@@ -30,8 +30,14 @@ interface DesignBrief {
   status: string;
   locale: string;
   user_id: string;
+  client_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+interface ClientOption {
+  id: string;
+  name: string;
 }
 
 type View = "categories" | "list" | "form";
