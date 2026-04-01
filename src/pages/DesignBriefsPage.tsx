@@ -102,7 +102,7 @@ export default function DesignBriefsPage() {
     if (editingBrief) {
       const { error } = await supabase
         .from("design_briefs")
-        .update({ title, answers: answers as any, status: "completed" })
+        .update({ title, answers: answers as any, locale, status: "completed" })
         .eq("id", editingBrief.id);
       if (error) {
         toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" });
