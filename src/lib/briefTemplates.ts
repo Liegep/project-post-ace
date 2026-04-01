@@ -1,0 +1,188 @@
+export type FieldType = 'short_text' | 'long_text' | 'yes_no' | 'multiple_choice' | 'checkbox' | 'file_upload' | 'link';
+
+export interface BriefQuestion {
+  id: string;
+  label: string;
+  type: FieldType;
+  options?: string[];
+  required?: boolean;
+}
+
+export interface BriefTemplate {
+  id: string;
+  name: string;
+  description: string;
+  isBase?: boolean; // true for Briefing Geral
+  questions: BriefQuestion[];
+}
+
+export const briefTemplates: BriefTemplate[] = [
+  {
+    id: 'general',
+    name: 'Briefing Geral',
+    description: 'Informações-base do cliente e do projeto. Preenchido uma vez e atualizado quando necessário.',
+    isBase: true,
+    questions: [
+      { id: 'company_name', label: 'Qual é o nome da empresa ou profissional?', type: 'short_text', required: true },
+      { id: 'segment', label: 'Qual é o segmento/nicho de atuação?', type: 'short_text' },
+      { id: 'company_description', label: 'O que a empresa faz? Descreva de forma objetiva.', type: 'long_text' },
+      { id: 'products_services', label: 'Quais produtos ou serviços você oferece?', type: 'long_text' },
+      { id: 'main_objective', label: 'Qual é o principal objetivo deste projeto?', type: 'long_text' },
+      { id: 'target_audience', label: 'Quem é o público-alvo?', type: 'long_text' },
+      { id: 'problem_to_solve', label: 'Qual problema você quer resolver com este projeto?', type: 'long_text' },
+      { id: 'differentials', label: 'Quais são os diferenciais da sua marca ou negócio?', type: 'long_text' },
+      { id: 'competitors', label: 'Quem são seus principais concorrentes?', type: 'long_text' },
+      { id: 'existing_materials', label: 'Você já possui materiais, marca, referências ou conteúdos anteriores?', type: 'long_text' },
+      { id: 'existing_materials_files', label: 'Envie materiais existentes (links)', type: 'link' },
+      { id: 'style_preferences', label: 'Existe alguma preferência de estilo, linguagem ou direção visual?', type: 'long_text' },
+      { id: 'dislikes', label: 'Existe algo que você não gosta ou não quer usar?', type: 'long_text' },
+      { id: 'deadline', label: 'Qual é o prazo ideal para este projeto?', type: 'short_text' },
+      { id: 'extra_info', label: 'Existe alguma informação extra importante que eu deva saber?', type: 'long_text' },
+      { id: 'attachments', label: 'Upload de arquivos de referência', type: 'file_upload' },
+    ],
+  },
+  {
+    id: 'logo',
+    name: 'Briefing de Logotipo',
+    description: 'Entender a essência da marca e a direção ideal para criação do logo.',
+    questions: [
+      { id: 'exact_name', label: 'Qual é o nome exato que deve aparecer no logotipo?', type: 'short_text', required: true },
+      { id: 'has_slogan', label: 'Existe slogan? Se sim, ele deve aparecer junto?', type: 'long_text' },
+      { id: 'name_meaning', label: 'Qual é o significado da marca ou do nome?', type: 'long_text' },
+      { id: 'brand_represents', label: 'O que sua marca representa?', type: 'long_text' },
+      { id: 'brand_values', label: 'Quais são os valores da marca?', type: 'long_text' },
+      { id: 'brand_perception', label: 'Como você quer que sua marca seja percebida pelo público?', type: 'long_text' },
+      { id: 'target_audience', label: 'Quem é o público-alvo da marca?', type: 'long_text' },
+      { id: 'logo_feelings', label: 'Quais sensações o logotipo deve transmitir?', type: 'long_text' },
+      { id: 'symbols_to_explore', label: 'Há algum símbolo, ícone ou elemento que você gostaria de explorar?', type: 'long_text' },
+      { id: 'symbols_to_avoid', label: 'Existe algum símbolo, estilo ou elemento que você não quer usar?', type: 'long_text' },
+      { id: 'preferred_style', label: 'Você prefere um estilo mais...', type: 'multiple_choice', options: ['Clássico', 'Moderno', 'Minimalista', 'Sofisticado', 'Divertido', 'Outro'] },
+      { id: 'preferred_colors', label: 'Há cores que você gostaria de usar?', type: 'long_text' },
+      { id: 'avoid_colors', label: 'Há cores que você não gostaria de usar?', type: 'long_text' },
+      { id: 'logo_references_like', label: 'Existem referências de logotipos que você gosta?', type: 'long_text' },
+      { id: 'logo_references_like_links', label: 'Links de referências que gosta', type: 'link' },
+      { id: 'logo_references_dislike', label: 'Existem referências de logotipos que você não gosta?', type: 'long_text' },
+      { id: 'logo_usage', label: 'Onde o logotipo será mais utilizado?', type: 'checkbox', options: ['Instagram', 'Site', 'Embalagem', 'Uniforme', 'Cartão de visita', 'Papelaria', 'Outro'] },
+      { id: 'has_previous_identity', label: 'Já existe alguma identidade visual anterior?', type: 'yes_no' },
+      { id: 'additional_notes', label: 'Há mais alguma observação importante para a criação do logo?', type: 'long_text' },
+      { id: 'attachments', label: 'Upload de arquivos de referência', type: 'file_upload' },
+    ],
+  },
+  {
+    id: 'identity',
+    name: 'Briefing de Identidade Visual',
+    description: 'Definir o universo visual da marca além do logotipo.',
+    questions: [
+      { id: 'has_logo', label: 'Sua marca já possui logotipo definido?', type: 'yes_no' },
+      { id: 'create_or_rebrand', label: 'Você quer criar uma identidade visual do zero ou reformular uma existente?', type: 'multiple_choice', options: ['Criar do zero', 'Reformular existente'] },
+      { id: 'brand_personality', label: 'Qual é a personalidade da marca?', type: 'long_text' },
+      { id: 'values_attributes', label: 'Quais valores e atributos a identidade visual precisa transmitir?', type: 'long_text' },
+      { id: 'target_audience', label: 'Quem é o público-alvo da marca?', type: 'long_text' },
+      { id: 'channels', label: 'Em quais canais a identidade visual será mais usada?', type: 'checkbox', options: ['Instagram', 'Facebook', 'LinkedIn', 'TikTok', 'YouTube', 'Site', 'Material impresso', 'Outro'] },
+      { id: 'materials', label: 'Quais materiais você pretende produzir com essa identidade?', type: 'checkbox', options: ['Posts para redes sociais', 'Site', 'Embalagens', 'Papelaria', 'Apresentações', 'Uniformes', 'Outro'] },
+      { id: 'desired_palette', label: 'Há alguma paleta de cores desejada?', type: 'long_text' },
+      { id: 'avoid_colors', label: 'Há alguma cor que deve ser evitada?', type: 'long_text' },
+      { id: 'aesthetic', label: 'Você prefere uma estética mais...', type: 'multiple_choice', options: ['Minimalista', 'Elegante', 'Moderna', 'Ousada', 'Delicada', 'Técnica', 'Orgânica', 'Outra'] },
+      { id: 'visual_references', label: 'Existem marcas ou referências visuais que você admira?', type: 'long_text' },
+      { id: 'visual_references_links', label: 'Links de referências visuais', type: 'link' },
+      { id: 'visual_dislikes', label: 'Existe algo visual que você não gosta?', type: 'long_text' },
+      { id: 'visual_elements', label: 'A marca usa mais...', type: 'checkbox', options: ['Fotos', 'Ilustrações', 'Ícones', 'Grafismos', 'Neutro/clean'] },
+      { id: 'identity_direction', label: 'Você quer uma identidade mais versátil ou mais marcante/conceitual?', type: 'multiple_choice', options: ['Versátil', 'Marcante/conceitual'] },
+      { id: 'technical_needs', label: 'Existe alguma necessidade técnica ou aplicação específica importante?', type: 'long_text' },
+      { id: 'old_materials', label: 'Já existem materiais antigos que precisam ser considerados?', type: 'long_text' },
+      { id: 'final_notes', label: 'Há alguma observação final importante?', type: 'long_text' },
+      { id: 'attachments', label: 'Upload de arquivos de referência', type: 'file_upload' },
+    ],
+  },
+  {
+    id: 'social_media',
+    name: 'Briefing de Social Media',
+    description: 'Entender a estratégia de conteúdo, posicionamento e rotina de comunicação.',
+    questions: [
+      { id: 'profile_name', label: 'Qual é o perfil/nome da marca nas redes sociais?', type: 'short_text', required: true },
+      { id: 'social_networks', label: 'Em quais redes sociais a marca atua ou quer atuar?', type: 'checkbox', options: ['Instagram', 'Facebook', 'LinkedIn', 'TikTok', 'YouTube', 'Twitter/X', 'Pinterest', 'Outro'] },
+      { id: 'main_objective', label: 'Qual é o principal objetivo do trabalho de social media?', type: 'checkbox', options: ['Vender', 'Gerar autoridade', 'Engajar', 'Atrair leads', 'Fortalecer marca', 'Outro'] },
+      { id: 'target_audience', label: 'Quem é o público-alvo?', type: 'long_text' },
+      { id: 'products_to_promote', label: 'Quais produtos ou serviços precisam ser divulgados?', type: 'long_text' },
+      { id: 'tone_of_voice', label: 'Qual é o tom de voz da marca?', type: 'multiple_choice', options: ['Formal', 'Leve', 'Técnico', 'Divertido', 'Sofisticado', 'Outro'] },
+      { id: 'topics', label: 'Quais assuntos ou temas a marca quer abordar?', type: 'long_text' },
+      { id: 'topics_to_avoid', label: 'Existe algum assunto que deve ser evitado?', type: 'long_text' },
+      { id: 'differentials', label: 'Quais são os principais diferenciais da marca?', type: 'long_text' },
+      { id: 'competitors', label: 'Quem são os concorrentes ou perfis de referência?', type: 'long_text' },
+      { id: 'reference_profiles', label: 'Há perfis cujo estilo de conteúdo você admira?', type: 'long_text' },
+      { id: 'reference_links', label: 'Links de perfis de referência', type: 'link' },
+      { id: 'has_visual_identity', label: 'A marca já possui identidade visual definida?', type: 'yes_no' },
+      { id: 'has_media_bank', label: 'Você já possui banco de fotos, vídeos ou materiais para uso?', type: 'yes_no' },
+      { id: 'posting_frequency', label: 'Qual frequência de postagem você deseja?', type: 'multiple_choice', options: ['Diária', '3-5x por semana', '2-3x por semana', '1x por semana', 'Quinzenal', 'Outro'] },
+      { id: 'content_formats', label: 'Quais formatos de conteúdo são prioridade?', type: 'checkbox', options: ['Feed', 'Reels', 'Stories', 'Carrossel', 'Anúncio', 'Outro'] },
+      { id: 'campaigns_dates', label: 'Há campanhas, datas importantes ou sazonalidades que precisam ser consideradas?', type: 'long_text' },
+      { id: 'approval_process', label: 'Como funciona o processo de aprovação do conteúdo?', type: 'long_text' },
+      { id: 'cta', label: 'Existe CTA padrão ou objetivo principal nas legendas?', type: 'long_text' },
+      { id: 'brand_info', label: 'Há alguma informação importante sobre a marca que eu precise saber antes de criar os conteúdos?', type: 'long_text' },
+      { id: 'final_notes', label: 'Existe mais alguma observação importante?', type: 'long_text' },
+      { id: 'attachments', label: 'Upload de arquivos de referência', type: 'file_upload' },
+    ],
+  },
+  {
+    id: 'website',
+    name: 'Briefing de Site/Landing Page',
+    description: 'Coletar tudo que é necessário para estruturar um site ou página de conversão.',
+    questions: [
+      { id: 'main_objective', label: 'Qual é o objetivo principal do site ou da landing page?', type: 'long_text', required: true },
+      { id: 'project_type', label: 'O projeto é um site completo ou uma landing page?', type: 'multiple_choice', options: ['Site completo', 'Landing page', 'Ambos'] },
+      { id: 'main_action', label: 'Qual ação principal você quer que o visitante realize?', type: 'multiple_choice', options: ['Comprar', 'Pedir orçamento', 'Preencher formulário', 'Chamar no WhatsApp', 'Agendar', 'Outro'] },
+      { id: 'target_audience', label: 'Quem é o público-alvo?', type: 'long_text' },
+      { id: 'products_services', label: 'Quais serviços, produtos ou ofertas precisam ser apresentados?', type: 'long_text' },
+      { id: 'required_info', label: 'Quais informações são obrigatórias na página?', type: 'long_text' },
+      { id: 'sections', label: 'Quais seções você imagina que a página deve ter?', type: 'checkbox', options: ['Sobre', 'Serviços', 'Portfólio', 'Depoimentos', 'FAQ', 'Contato', 'Blog', 'Outro'] },
+      { id: 'site_references_like', label: 'Existe alguma referência de site que você gosta?', type: 'long_text' },
+      { id: 'site_references_like_links', label: 'Links de sites de referência', type: 'link' },
+      { id: 'site_references_dislike', label: 'Existe algum site que você não gosta?', type: 'long_text' },
+      { id: 'has_copy', label: 'Você já possui textos prontos ou precisa de ajuda com a copy?', type: 'multiple_choice', options: ['Sim, tenho textos prontos', 'Preciso de ajuda com a copy', 'Parcialmente'] },
+      { id: 'has_visual_identity', label: 'Você já possui identidade visual definida?', type: 'yes_no' },
+      { id: 'has_media', label: 'Você já possui fotos, vídeos, depoimentos ou materiais para inserir?', type: 'yes_no' },
+      { id: 'needs_form', label: 'A página precisa ter formulário?', type: 'yes_no' },
+      { id: 'integrations', label: 'A página precisa ter integração com algum serviço?', type: 'checkbox', options: ['WhatsApp', 'E-mail', 'Agenda', 'CRM', 'Outro'] },
+      { id: 'multilingual', label: 'A página precisa ser multilíngue?', type: 'yes_no' },
+      { id: 'specific_features', label: 'Há alguma funcionalidade específica necessária?', type: 'long_text' },
+      { id: 'has_domain', label: 'Existe domínio e hospedagem já contratados?', type: 'yes_no' },
+      { id: 'deadline', label: 'Há prazo para publicação?', type: 'short_text' },
+      { id: 'technical_notes', label: 'Existe alguma exigência técnica ou observação importante?', type: 'long_text' },
+      { id: 'extra_info', label: 'Há mais alguma informação relevante para este projeto?', type: 'long_text' },
+      { id: 'attachments', label: 'Upload de arquivos de referência', type: 'file_upload' },
+    ],
+  },
+  {
+    id: 'campaign',
+    name: 'Briefing de Campanha/Anúncio',
+    description: 'Entender a campanha, a oferta e a direção da comunicação/publicidade.',
+    questions: [
+      { id: 'product_service', label: 'Qual é o produto, serviço ou oferta da campanha?', type: 'long_text', required: true },
+      { id: 'main_objective', label: 'Qual é o principal objetivo da campanha?', type: 'multiple_choice', options: ['Venda', 'Geração de leads', 'Alcance', 'Tráfego', 'Reconhecimento de marca', 'Outro'] },
+      { id: 'target_audience', label: 'Quem é o público-alvo da campanha?', type: 'long_text' },
+      { id: 'problem_solved', label: 'Qual problema essa campanha resolve para o público?', type: 'long_text' },
+      { id: 'main_message', label: 'Qual é a mensagem principal que precisa ser comunicada?', type: 'long_text' },
+      { id: 'offer', label: 'Existe uma oferta, condição especial ou promoção?', type: 'long_text' },
+      { id: 'differential', label: 'Qual é o diferencial do produto/serviço anunciado?', type: 'long_text' },
+      { id: 'channels', label: 'Quais canais essa campanha vai usar?', type: 'checkbox', options: ['Instagram', 'Facebook', 'Google Ads', 'Landing page', 'WhatsApp', 'YouTube', 'Outro'] },
+      { id: 'formats', label: 'Quais formatos serão necessários?', type: 'checkbox', options: ['Imagem estática', 'Vídeo', 'Carrossel', 'Stories', 'Reels', 'Banner', 'Outro'] },
+      { id: 'visual_references', label: 'Existe alguma referência visual ou campanha inspiradora?', type: 'long_text' },
+      { id: 'visual_references_links', label: 'Links de referências', type: 'link' },
+      { id: 'limitations', label: 'Existe alguma limitação ou algo que não pode ser dito?', type: 'long_text' },
+      { id: 'tone', label: 'Qual tom de comunicação deve ser usado?', type: 'multiple_choice', options: ['Formal', 'Leve', 'Urgente', 'Divertido', 'Sofisticado', 'Técnico', 'Outro'] },
+      { id: 'cta', label: 'Qual é o CTA principal da campanha?', type: 'long_text' },
+      { id: 'start_end_dates', label: 'Existe data de início e fim da campanha?', type: 'short_text' },
+      { id: 'audience_segmentation', label: 'Há segmentação específica de público, cidade, perfil ou interesse?', type: 'long_text' },
+      { id: 'previous_materials', label: 'Já existem materiais anteriores que devem ser aproveitados?', type: 'long_text' },
+      { id: 'destination', label: 'A campanha vai direcionar para onde? (site, formulário, WhatsApp, direct etc.)', type: 'long_text' },
+      { id: 'approval_process', label: 'Como será feita a aprovação das peças?', type: 'long_text' },
+      { id: 'legal_info', label: 'Existe alguma informação legal, técnica ou obrigatória que precisa constar?', type: 'long_text' },
+      { id: 'final_notes', label: 'Há mais alguma observação importante?', type: 'long_text' },
+      { id: 'attachments', label: 'Upload de arquivos de referência', type: 'file_upload' },
+    ],
+  },
+];
+
+export function getTemplate(categoryId: string): BriefTemplate | undefined {
+  return briefTemplates.find(t => t.id === categoryId);
+}
