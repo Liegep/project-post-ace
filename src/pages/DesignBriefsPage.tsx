@@ -117,10 +117,12 @@ export default function DesignBriefsPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
 
+    const clientId = selectedClientId && selectedClientId !== "none" ? selectedClientId : null;
+
     if (editingBrief) {
       const { error } = await supabase
         .from("design_briefs")
-        .update({ title, answers: answers as any, locale, status: "completed" })
+        .update({ title, answers: answers as any, locale, status: "completed", client_id: clientId })
         .eq("id", editingBrief.id);
       if (error) {
         toast({ title: "Erro ao atualizar", description: error.message, variant: "destructive" });
