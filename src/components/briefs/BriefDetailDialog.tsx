@@ -78,6 +78,11 @@ export default function BriefDetailDialog({ brief, open, onClose }: Props) {
             <span className="text-[10px] text-muted-foreground">
               {format(new Date(brief.updated_at), "dd/MM/yyyy 'às' HH:mm")}
             </span>
+            {brief.respondent_name && (
+              <Badge variant="outline" className="text-[10px] flex items-center gap-1">
+                Respondido por: {brief.respondent_name}
+              </Badge>
+            )}
           </div>
           <div className="flex gap-2 pt-2">
             <Button size="sm" variant="outline" onClick={handleShareLink} className="text-xs h-7">
