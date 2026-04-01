@@ -911,6 +911,9 @@ const AdminDashboard = () => {
           </div>
           {/* Mobile: only essential actions */}
           <div className="flex md:hidden items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
+              <Menu className="h-5 w-5" />
+            </Button>
             <Button size="icon" variant="ghost" onClick={() => setQuickLinksOpen(true)}>
               <Link2 className="h-5 w-5" />
             </Button>
