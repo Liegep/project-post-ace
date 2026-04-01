@@ -327,6 +327,11 @@ export default function DesignBriefsPage() {
                   >
                     <h3 className="font-semibold text-foreground line-clamp-2 mb-2 pr-2">{b.title}</h3>
 
+                    {b.client_id && (
+                      <p className="text-xs text-muted-foreground mb-1">
+                        <span className="font-medium">Cliente:</span> {clients.find(c => c.id === b.client_id)?.name || "—"}
+                      </p>
+                    )}
                     {b.answers?.company_name && (
                       <p className="text-xs text-muted-foreground mb-1">
                         <span className="font-medium">Empresa:</span> {b.answers.company_name}
@@ -341,10 +346,16 @@ export default function DesignBriefsPage() {
                         {format(new Date(b.created_at), "dd/MM/yyyy")}
                       </span>
                       <div className="flex gap-1">
+                        <button onClick={() => handleShareLink(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-primary transition-colors" title="Gerar link público">
+                          {copiedId === b.id ? <Check className="h-4 w-4 text-green-500" /> : <Link2 className="h-4 w-4" />}
+                        </button>
+                        <button onClick={() => handleExportPdf(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Exportar PDF">
+                          <Download className="h-4 w-4" />
+                        </button>
                         <button onClick={() => setViewingBrief(b)} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Visualizar">
                           <Eye className="h-4 w-4" />
                         </button>
-                        <button onClick={() => { setEditingBrief(b); setView("form"); }} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Editar">
+                        <button onClick={() => { setEditingBrief(b); setSelectedClientId(b.client_id || ""); setView("form"); }} className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors" title="Editar">
                           <Edit2 className="h-4 w-4" />
                         </button>
                         <button onClick={() => handleDelete(b.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Excluir">
