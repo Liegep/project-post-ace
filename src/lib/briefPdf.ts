@@ -5,7 +5,7 @@ interface BriefForPdf {
   title: string;
   category: string;
   answers: Record<string, any>;
-  locale: string;
+  locale?: string;
   updated_at: string;
 }
 
