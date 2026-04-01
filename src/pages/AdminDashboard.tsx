@@ -13,7 +13,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign, Eye, FileSignature, Link2 } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign, Eye, FileSignature, Link2, Palette } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 
@@ -855,10 +855,6 @@ const AdminDashboard = () => {
       <header className="sticky top-0 z-30 glass-header">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 md:px-6 py-3 md:py-4">
           <div className="flex items-center gap-3">
-            {/* Menu hamburger */}
-            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
-              <Menu className="h-5 w-5" />
-            </Button>
             {/* App logo upload area */}
             <input type="file" accept="image/*" ref={appLogoInputRef} className="hidden" onChange={handleAppLogoUpload} />
             {isAdmin ? (
@@ -899,7 +895,7 @@ const AdminDashboard = () => {
                 <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
               </Button>
             )}
-            <Button variant="ghost" size="icon" onClick={() => setNavDrawerOpen(true)} title="Menu">
+            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)} title="Menu">
               <Menu className="h-5 w-5" />
             </Button>
             {isAdmin && (
@@ -915,6 +911,9 @@ const AdminDashboard = () => {
           </div>
           {/* Mobile: only essential actions */}
           <div className="flex md:hidden items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
+              <Menu className="h-5 w-5" />
+            </Button>
             <Button size="icon" variant="ghost" onClick={() => setQuickLinksOpen(true)}>
               <Link2 className="h-5 w-5" />
             </Button>
@@ -995,47 +994,12 @@ const AdminDashboard = () => {
               <button onClick={() => { setMobileMenuOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
                 <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
               </button>
+              <button onClick={() => { setMobileMenuOpen(false); navigate("/design-briefs"); }} className={navItemClass("/design-briefs")}>
+                <Palette className={navIconClass("/design-briefs")} /> Briefs de Design
+              </button>
               {/* Activity log link removed */}
             </nav>
           </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Desktop nav drawer */}
-      <Sheet open={navDrawerOpen} onOpenChange={setNavDrawerOpen}>
-        <SheetContent side="right" className="w-64 p-0">
-          <SheetHeader className="border-b px-5 py-4">
-            <SheetTitle className="text-left text-base font-semibold">Navegação</SheetTitle>
-          </SheetHeader>
-          <nav className="flex flex-col py-2">
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/ideas"); }} className={navItemClass("/ideas")}>
-              <Lightbulb className={navIconClass("/ideas")} /> Ideias de Pauta
-            </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/calendar"); }} className={navItemClass("/calendar")}>
-              <Calendar className={navIconClass("/calendar")} /> Calendário
-            </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/briefs"); }} className={navItemClass("/briefs")}>
-              <FileText className={navIconClass("/briefs")} /> Pautas
-            </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/reports"); }} className={navItemClass("/reports")}>
-              <FileBarChart className={navIconClass("/reports")} /> Relatórios
-            </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/billing"); }} className={navItemClass("/billing")}>
-              <DollarSign className={navIconClass("/billing")} /> Faturamento
-            </button>
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/proposals"); }} className={navItemClass("/proposals")}>
-              <FileSignature className={navIconClass("/proposals")} /> Propostas
-            </button>
-            {isSuperAdmin && (
-              <button onClick={() => { setNavDrawerOpen(false); navigate("/contracts"); }} className={navItemClass("/contracts")}>
-                <FileText className={navIconClass("/contracts")} /> Contratos
-              </button>
-            )}
-            <button onClick={() => { setNavDrawerOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
-              <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
-            </button>
-            {/* Activity log link removed */}
-          </nav>
         </SheetContent>
       </Sheet>
 
