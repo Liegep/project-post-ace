@@ -48,6 +48,7 @@ const App = () => (
               <Route path="/login" element={<LoginPage />} />
               <Route path="/proposta/:token" element={<PublicProposalPage />} />
               <Route path="/aprovacao/:token" element={<ApprovalPage />} />
+              <Route path="/brief/:token" element={<PublicBriefPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/accept-invite" element={<AcceptInvitePage />} />
               <Route path="/" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminDashboard /></AuthGuard>} />
