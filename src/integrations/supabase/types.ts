@@ -1046,6 +1046,7 @@ export type Database = {
           category: string
           created_at: string
           id: string
+          locale: string
           objectives: string
           preferred_colors: string
           references_links: string
@@ -1063,6 +1064,7 @@ export type Database = {
           category?: string
           created_at?: string
           id?: string
+          locale?: string
           objectives?: string
           preferred_colors?: string
           references_links?: string
@@ -1080,6 +1082,7 @@ export type Database = {
           category?: string
           created_at?: string
           id?: string
+          locale?: string
           objectives?: string
           preferred_colors?: string
           references_links?: string
