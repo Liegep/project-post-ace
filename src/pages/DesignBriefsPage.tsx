@@ -390,6 +390,26 @@ export default function DesignBriefsPage() {
                 </div>
               </div>
 
+              {/* Client selector */}
+              {clients.length > 0 && (
+                <div className="space-y-1.5 mb-6">
+                  <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Vincular a um cliente (opcional)
+                  </Label>
+                  <Select value={selectedClientId} onValueChange={setSelectedClientId}>
+                    <SelectTrigger className="bg-white/50 dark:bg-white/5 border-white/30 backdrop-blur-sm">
+                      <SelectValue placeholder="Nenhum cliente selecionado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {clients.map(c => (
+                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               <BriefForm
                 template={currentTemplate}
                 initialAnswers={editingBrief?.answers || {}}
