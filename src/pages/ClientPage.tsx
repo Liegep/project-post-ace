@@ -14,7 +14,7 @@ import { PostsProvider, usePosts } from "@/context/PostsContext";
 import { Post } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
-import { PostDetailDialog } from "@/components/PostDetailDialog";
+import { PostCardDialog } from "@/components/PostCardDialog";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
