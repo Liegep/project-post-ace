@@ -265,11 +265,11 @@ export function PostCardDialog({
                 })()}
                 {allMedia.length > 1 && (
                   <>
-                    <button onClick={() => setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length)} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 hover:bg-background shadow">
-                      <ChevronLeft className="h-4 w-4" />
+                    <button onClick={() => setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length)} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 hover:bg-black/70 shadow border border-white/10">
+                      <ChevronLeft className="h-5 w-5 text-white" />
                     </button>
-                    <button onClick={() => setMediaIndex((prev) => (prev + 1) % allMedia.length)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 hover:bg-background shadow">
-                      <ChevronRight className="h-4 w-4" />
+                    <button onClick={() => setMediaIndex((prev) => (prev + 1) % allMedia.length)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 hover:bg-black/70 shadow border border-white/10">
+                      <ChevronRight className="h-5 w-5 text-white" />
                     </button>
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                       {allMedia.map((_, i) => (
