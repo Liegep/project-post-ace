@@ -294,7 +294,9 @@ export function PostCardDialog({
                 </div>
               ) : (
                 <div
-                  className={`text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed max-h-[200px] overflow-y-auto rounded-lg p-3 bg-background/50 border border-border/30 ${(isAdmin || allowEditCaption) ? "cursor-text hover:border-primary/30 group relative" : ""}`}
+                  className={`text-sm whitespace-pre-wrap leading-relaxed max-h-[200px] overflow-y-auto rounded-lg p-3 bg-black/30 backdrop-blur-md border border-white/10 text-white/90 ${(isAdmin || allowEditCaption) ? "cursor-text hover:border-white/25 group relative" : ""}`}
+                  style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
+                  onClick={() => (isAdmin || allowEditCaption) && setIsEditingCaption(true)}
                   onClick={() => (isAdmin || allowEditCaption) && setIsEditingCaption(true)}
                 >
                   {(isAdmin || allowEditCaption) && (
