@@ -13,42 +13,39 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MessageCircle, Trash2, ChevronDown, ChevronUp, Send, ChevronLeft, ChevronRight, GripVertical, Download, DownloadCloud, DollarSign, Check, Play, Users } from "lucide-react";
+import {
+  Calendar,
+  MessageCircle,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  Send,
+  ChevronLeft,
+  ChevronRight,
+  GripVertical,
+  Download,
+  DownloadCloud,
+  DollarSign,
+  Check,
+  Play,
+  Users,
+  Pencil,
+} from "lucide-react";
 import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
 import { InternalApprovalDialog } from "@/components/InternalApprovalDialog";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { PostTrackingLabels } from "@/components/PostTrackingLabels";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, horizontalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { supabase } from "@/integrations/supabase/client";
 import { isPostInvoiced, invoicePostAuto, getPostInvoiceItem, deleteInvoiceItem } from "@/hooks/useInvoices";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-
 import { LinkedText } from "@/components/LinkedText";
 
-const CaptionText = ({ text, t }: { text: string; t: (key: keyof typeof import("@/i18n/translations").translations.pt) => string }) => {
-  const [expanded, setExpanded] = useState(false);
-  const isLong = text.length > 150;
-  return (
-    <div>
-      <div className={`text-sm text-muted-foreground whitespace-pre-wrap ${!expanded && isLong ? "line-clamp-3" : ""}`}>
-        <LinkedText text={text} />
-      </div>
-      {isLong && (
-        <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="text-xs font-medium text-primary hover:underline mt-1">
-          {expanded ? t("readLess") : t("readMore")}
-        </button>
-      )}
-    </div>
-  );
-};
+// --- Sub-componentes auxiliares ---
 
-const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "statusWritingCaption" | "statusReady" | "statusFinalized" | "statusChangeRequested" | "statusScheduled"> = {
+const STATUS_KEYS: Record<PostStatus, string> = {
   entrada: "statusEntry",
   em_desenvolvimento: "statusInDevelopment",
   escrevendo_legenda: "statusWritingCaption",
@@ -58,7 +55,7 @@ const STATUS_KEYS: Record<PostStatus, "statusEntry" | "statusInDevelopment" | "s
   agendado: "statusScheduled",
 };
 
-const LABEL_KEYS: Record<ClientLabel, "labelPending" | "labelApproved" | "labelChangeRequested" | "labelReadComment" | "labelGiveFeedback"> = {
+const LABEL_KEYS: Record<ClientLabel, string> = {
   pendente: "labelPending",
   aprovado: "labelApproved",
   alteracao_solicitada: "labelChangeRequested",
@@ -66,30 +63,18 @@ const LABEL_KEYS: Record<ClientLabel, "labelPending" | "labelApproved" | "labelC
   de_seu_feedback: "labelGiveFeedback",
 };
 
-interface PostCardProps {
-  post: Post;
-  isAdmin: boolean;
-  hideFeedback?: boolean;
-  allowEditCaption?: boolean;
-  allowClientDownload?: boolean;
-  onStatusChange?: (status: PostStatus[]) => void;
-  onDelete?: () => void;
-  onEdit?: () => void;
-  selectionMode?: boolean;
-  isSelected?: boolean;
-  onToggleSelect?: (id: string) => void;
-}
-
 const SortableThumb = ({ url, index, isActive }: { url: string; index: number; isActive: boolean }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: `thumb-${index}` });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: `thumb-${index}`,
+  });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
   const isExternal = isExternalLink(url);
-  const externalVideo = !isExternal ? null : detectExternalVideo(url);
   const isVideo = !isExternal && url.match(/\.(mp4|webm|mov|avi)/i);
+
   return (
     <div
       ref={setNodeRef}
@@ -116,6 +101,7 @@ const SortableThumb = ({ url, index, isActive }: { url: string; index: number; i
   );
 };
 
+// --- Funções de Download ---
 const downloadFile = async (url: string, filename: string) => {
   try {
     const response = await fetch(url);
@@ -140,568 +126,450 @@ const downloadAllFiles = async (urls: string[], postTitle: string) => {
   }
 };
 
-export const PostCard = memo(({ post, isAdmin, hideFeedback, allowEditCaption, allowClientDownload, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: PostCardProps) => {
-  const { addComment, updateClientLabel, updatePost, tags, clientId } = usePosts();
-  const { t } = useI18n();
-  const [expanded, setExpanded] = useState(false);
-  const [commentText, setCommentText] = useState("");
-  const [mediaIndex, setMediaIndex] = useState(0);
-  const [localMediaOrder, setLocalMediaOrder] = useState<string[] | null>(null);
-  const [editingCaption, setEditingCaption] = useState(false);
-  const [captionDraft, setCaptionDraft] = useState(post.caption);
+interface PostCardProps {
+  post: Post;
+  isAdmin: boolean;
+  hideFeedback?: boolean;
+  allowEditCaption?: boolean;
+  allowClientDownload?: boolean;
+  onStatusChange?: (status: PostStatus[]) => void;
+  onDelete?: () => void;
+  onEdit?: () => void;
+  selectionMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
+}
 
-  // Invoice state
-  const [invoiceStatus, setInvoiceStatus] = useState<"loading" | "not_invoiced" | "invoiced">("loading");
-  const [invoicing, setInvoicing] = useState(false);
-  const [uninvoicing, setUninvoicing] = useState(false);
-  const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
+export const PostCard = memo(
+  ({
+    post,
+    isAdmin,
+    hideFeedback,
+    allowEditCaption,
+    allowClientDownload,
+    onStatusChange,
+    onDelete,
+    onEdit,
+    selectionMode,
+    isSelected,
+    onToggleSelect,
+  }: PostCardProps) => {
+    const { addComment, updateClientLabel, updatePost, tags, clientId } = usePosts();
+    const { t } = useI18n();
 
-  const baseMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
-  const allMedia = localMediaOrder || baseMedia;
+    // Estados de UI
+    const [expanded, setExpanded] = useState(false);
+    const [commentText, setCommentText] = useState("");
+    const [mediaIndex, setMediaIndex] = useState(0);
+    const [localMediaOrder, setLocalMediaOrder] = useState<string[] | null>(null);
 
-  const thumbSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
-  );
+    // Novos Estados de Edição de Legenda
+    const [isEditingCaption, setIsEditingCaption] = useState(false);
+    const [editedCaption, setEditedCaption] = useState(post.caption);
 
-  // Check invoice status on mount
-  useEffect(() => {
-    if (!isAdmin) return;
-    let cancelled = false;
-    isPostInvoiced(post.id).then(invoiced => {
-      if (!cancelled) setInvoiceStatus(invoiced ? "invoiced" : "not_invoiced");
-    });
-    return () => { cancelled = true; };
-  }, [post.id, isAdmin]);
+    // Invoice state
+    const [invoiceStatus, setInvoiceStatus] = useState<"loading" | "not_invoiced" | "invoiced">("loading");
+    const [invoicing, setInvoicing] = useState(false);
+    const [uninvoicing, setUninvoicing] = useState(false);
+    const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
 
-  const handleQuickInvoice = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!clientId || invoicing) return;
-    
-    if (invoiceStatus === "invoiced") {
-      // Un-invoice
-      setUninvoicing(true);
-      try {
-        const item = await getPostInvoiceItem(post.id);
-        if (item) {
-          await deleteInvoiceItem(item.id);
-          setInvoiceStatus("not_invoiced");
-          toast({ title: "Post removido da fatura" });
-        }
-      } catch (err: any) {
-        toast({ title: "Erro", description: err.message, variant: "destructive" });
-      } finally {
-        setUninvoicing(false);
-      }
-      return;
-    }
+    const baseMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
+    const allMedia = localMediaOrder || baseMedia;
 
-    setInvoicing(true);
-    try {
-      const result = await invoicePostAuto(clientId, {
-        id: post.id,
-        title: post.title,
-        caption: post.caption,
-        mediaType: post.mediaType,
+    const thumbSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+    useEffect(() => {
+      if (!isAdmin) return;
+      let cancelled = false;
+      isPostInvoiced(post.id).then((invoiced) => {
+        if (!cancelled) setInvoiceStatus(invoiced ? "invoiced" : "not_invoiced");
       });
-      setInvoiceStatus("invoiced");
-      toast({ title: `Adicionado à fatura "${result.invoiceTitle}"` });
-    } catch (err: any) {
-      if (err.message === "ALREADY_INVOICED") {
-        setInvoiceStatus("invoiced");
-        toast({ title: "Este post já está faturado" });
-      } else {
-        toast({ title: "Erro ao faturar", description: err.message, variant: "destructive" });
+      return () => {
+        cancelled = true;
+      };
+    }, [post.id, isAdmin]);
+
+    const handleSaveCaption = async () => {
+      try {
+        await updatePost(post.id, { caption: editedCaption });
+        setIsEditingCaption(false);
+        toast({ title: "Sucesso!", description: "Legenda atualizada com sucesso." });
+      } catch (error) {
+        toast({
+          title: "Erro ao salvar",
+          description: "Não foi possível atualizar a legenda.",
+          variant: "destructive",
+        });
       }
-    } finally {
-      setInvoicing(false);
-    }
-  };
+    };
 
-  const handleThumbDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIndex = parseInt((active.id as string).replace("thumb-", ""));
-    const newIndex = parseInt((over.id as string).replace("thumb-", ""));
-    const newOrder = arrayMove(allMedia, oldIndex, newIndex);
-    setLocalMediaOrder(newOrder);
-    setMediaIndex(0);
-    updatePost(post.id, {
-      mediaUrls: newOrder,
-      imageUrl: newOrder[0] || "",
-    });
-  };
+    const handleQuickInvoice = async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!clientId || invoicing) return;
 
-  const primaryStatus = post.status[0] || "entrada";
-  const statusConfig = STATUS_CONFIG[primaryStatus];
-  const labelConfig = LABEL_CONFIG[post.clientLabel];
-  const isOverdue = post.deadline ? new Date() > post.deadline && !post.status.includes("pronto") : false;
+      if (invoiceStatus === "invoiced") {
+        setUninvoicing(true);
+        try {
+          const item = await getPostInvoiceItem(post.id);
+          if (item) {
+            await deleteInvoiceItem(item.id);
+            setInvoiceStatus("not_invoiced");
+            toast({ title: "Post removido da fatura" });
+          }
+        } catch (err: any) {
+          toast({ title: "Erro", description: err.message, variant: "destructive" });
+        } finally {
+          setUninvoicing(false);
+        }
+        return;
+      }
 
-  const handleAddComment = () => {
-    if (!commentText.trim()) return;
-    addComment(post.id, isAdmin ? "Admin" : "Cliente", commentText.trim());
-    setCommentText("");
-  };
+      setInvoicing(true);
+      try {
+        const result = await invoicePostAuto(clientId, {
+          id: post.id,
+          title: post.title,
+          caption: post.caption,
+          mediaType: post.mediaType,
+        });
+        setInvoiceStatus("invoiced");
+        toast({ title: `Adicionado à fatura "${result.invoiceTitle}"` });
+      } catch (err: any) {
+        toast({ title: "Erro ao faturar", description: err.message, variant: "destructive" });
+      } finally {
+        setInvoicing(false);
+      }
+    };
 
-  const hasMedia = allMedia.length > 0;
-  const isCompact = !hasMedia && isAdmin;
+    const handleThumbDragEnd = (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+      const oldIndex = parseInt((active.id as string).replace("thumb-", ""));
+      const newIndex = parseInt((over.id as string).replace("thumb-", ""));
+      const newOrder = arrayMove(allMedia, oldIndex, newIndex);
+      setLocalMediaOrder(newOrder);
+      setMediaIndex(0);
+      updatePost(post.id, { mediaUrls: newOrder, imageUrl: newOrder[0] || "" });
+    };
 
-  const handleCardClick = () => {
-    if (selectionMode && onToggleSelect) {
-      onToggleSelect(post.id);
-    } else if (isAdmin) {
-      onEdit?.();
-    }
-  };
+    const primaryStatus = post.status[0] || "entrada";
+    const labelConfig = LABEL_CONFIG[post.clientLabel];
+    const isOverdue = post.deadline ? new Date() > post.deadline && !post.status.includes("pronto") : false;
 
-  const hasAlteradoTag = post.tags.includes("alterado");
+    const handleAddComment = () => {
+      if (!commentText.trim()) return;
+      addComment(post.id, isAdmin ? "Admin" : "Cliente", commentText.trim());
+      setCommentText("");
+    };
 
-  return (
-    <Card
-      className={`overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1 ${isAdmin ? "cursor-pointer" : ""} ${selectionMode && isSelected ? "ring-2 ring-accent shadow-lg" : ""} ${!isAdmin && hasAlteradoTag ? "ring-2 ring-warning" : ""}`}
-      onClick={handleCardClick}
-    >
-      {!isAdmin && hasAlteradoTag && (
-        <div className="bg-warning px-3 py-1.5 text-center text-xs font-bold text-warning-foreground">
-          ✏️ {t("tagAltered") || "Alterado"} — Verifique as alterações
-        </div>
-      )}
-      <div className={`p-4 ${isCompact ? "pb-2" : "pb-2"}`}>
-        <div className="flex items-start gap-2">
-          {selectionMode && (
-            <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={() => onToggleSelect?.(post.id)}
-              />
-            </div>
-          )}
-          <h3 className={`font-bold leading-snug text-foreground ${isCompact ? "text-sm" : "text-lg"} flex-1`}>{post.title}</h3>
-          <div className="flex items-center gap-1 shrink-0">
+    const hasMedia = allMedia.length > 0;
+    const isCompact = !hasMedia && isAdmin;
+
+    return (
+      <Card
+        className={`overflow-hidden transition-all duration-200 hover:shadow-lg ${isAdmin ? "cursor-pointer" : ""} ${selectionMode && isSelected ? "ring-2 ring-accent shadow-lg" : ""}`}
+        onClick={() => (selectionMode ? onToggleSelect?.(post.id) : isAdmin && onEdit?.())}
+      >
+        <div className="p-4 pb-2">
+          <div className="flex items-start gap-2">
+            {selectionMode && (
+              <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
+                <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect?.(post.id)} />
+              </div>
+            )}
+            <h3 className={`font-bold leading-snug text-foreground ${isCompact ? "text-sm" : "text-lg"} flex-1`}>
+              {post.title}
+            </h3>
             {isAdmin && invoiceStatus === "invoiced" && (
-              <Badge variant="outline" className="text-[9px] bg-emerald-500/10 text-emerald-600 border-emerald-500/30 px-1.5 py-0">
-                <Check className="h-2.5 w-2.5 mr-0.5" />Faturado
+              <Badge
+                variant="outline"
+                className="text-[9px] bg-emerald-500/10 text-emerald-600 border-emerald-500/30 px-1.5 py-0 shrink-0"
+              >
+                <Check className="h-2.5 w-2.5 mr-0.5" />
+                Faturado
               </Badge>
             )}
-            {post.trelloCardId && (
-              <span title="Sincronizado com Trello">
-                <svg className="h-4 w-4 text-[#0079BF]" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M21 3H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM10.5 17a1.5 1.5 0 0 1-1.5-1.5V7a1.5 1.5 0 0 1 3 0v8.5a1.5 1.5 0 0 1-1.5 1.5zm5-3a1.5 1.5 0 0 1-1.5-1.5V7a1.5 1.5 0 0 1 3 0v6.5a1.5 1.5 0 0 1-1.5 1.5z"/>
-                </svg>
-              </span>
-            )}
           </div>
         </div>
-      </div>
 
-      {hasMedia && (
-        <>
-          <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
-            {(() => {
-              const currentUrl = allMedia[mediaIndex] || allMedia[0];
-              if (isExternalLink(currentUrl)) {
-                return (
-                  <div className="absolute inset-0 flex items-center justify-center bg-muted/30 p-6">
-                    <ExternalLinkCard url={currentUrl} />
-                  </div>
-                );
-              }
-              const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
-              return isVideo ? (
-                <LazyVideo src={currentUrl} className="h-full w-full object-cover" />
-              ) : (
-                <LazyImage src={currentUrl} alt={post.title} className="h-full w-full object-cover" />
-              );
-            })()}
-            {allMedia.length > 1 && (
-              <>
-                <button
-                  onClick={(e) => { e.stopPropagation(); setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length); }}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1 hover:bg-background"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); setMediaIndex((prev) => (prev + 1) % allMedia.length); }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1 hover:bg-background"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-1">
-                  {allMedia.map((_, i) => (
-                    <span key={i} className={`h-1.5 w-1.5 rounded-full ${i === mediaIndex ? "bg-primary-foreground" : "bg-primary-foreground/40"}`} />
-                  ))}
-                </div>
-              </>
-            )}
-            <div className="absolute bottom-2 right-2 flex items-center gap-1.5 flex-wrap justify-end">
-            {post.status.filter((s) => isAdmin || s !== "pronto").map((s) => (
-              <span key={s} className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${STATUS_CONFIG[s].color}`}>
-                {t(STATUS_KEYS[s])}
-              </span>
-            ))}
-              {isAdmin ? (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      onClick={(e) => e.stopPropagation()}
-                      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm cursor-pointer hover:ring-2 hover:ring-primary/40 transition-all ${labelConfig.color}`}
-                    >
-                      {t(LABEL_KEYS[post.clientLabel])}
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-44 p-1" align="end" side="top" onClick={(e) => e.stopPropagation()}>
-                    {(Object.keys(LABEL_KEYS) as ClientLabel[]).map((key) => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateClientLabel(post.id, key);
-                        }}
-                        className={`w-full text-left px-3 py-1.5 text-xs rounded hover:bg-muted transition-colors ${post.clientLabel === key ? "font-bold bg-muted" : ""}`}
-                      >
-                        {t(LABEL_KEYS[key])}
-                      </button>
-                    ))}
-                  </PopoverContent>
-                </Popover>
-              ) : (
-                <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}>
-                  {t(LABEL_KEYS[post.clientLabel])}
-                </span>
-              )}
-            </div>
-          </div>
-          {/* Sortable thumbnail strip for admin with multiple media */}
-          {isAdmin && allMedia.length > 1 && (
-            <div className="px-2 py-1.5 bg-muted/30" onClick={(e) => e.stopPropagation()}>
-              <DndContext sensors={thumbSensors} collisionDetection={closestCenter} onDragEnd={handleThumbDragEnd}>
-                <SortableContext items={allMedia.map((_, i) => `thumb-${i}`)} strategy={horizontalListSortingStrategy}>
-                  <div className="flex gap-1.5 overflow-x-auto">
-                    {allMedia.map((url, i) => (
-                      <SortableThumb key={`${url}-${i}`} url={url} index={i} isActive={i === mediaIndex} />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            </div>
-          )}
-          {/* Download buttons - for admin/team or clients with permission */}
-          {(isAdmin || allowClientDownload) && (
-            <div className="px-2 py-1.5 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-              <TooltipProvider delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => {
-                        const currentUrl = allMedia[mediaIndex] || allMedia[0];
-                        const ext = currentUrl.split(".").pop()?.split("?")[0] || "jpg";
-                        downloadFile(currentUrl, `${post.title}_${mediaIndex + 1}.${ext}`);
-                      }}
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Baixar foto atual</TooltipContent>
-                </Tooltip>
-                {allMedia.length > 1 && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => downloadAllFiles(allMedia, post.title)}
-                      >
-                        <DownloadCloud className="h-3.5 w-3.5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Baixar todas ({allMedia.length})</TooltipContent>
-                  </Tooltip>
-                )}
-              </TooltipProvider>
-            </div>
-          )}
-        </>
-      )}
-
-      <div className={`px-4 space-y-2 ${isCompact ? "pb-3 pt-1" : "p-4 pt-3"}`}>
-        {!hasMedia && (
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {post.status.filter((s) => isAdmin || s !== "pronto").map((s) => (
-              <span key={s} className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${STATUS_CONFIG[s].color}`}>
-                {t(STATUS_KEYS[s])}
-              </span>
-            ))}
-            {isAdmin ? (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    onClick={(e) => e.stopPropagation()}
-                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold cursor-pointer hover:ring-2 hover:ring-primary/40 transition-all ${labelConfig.color}`}
-                  >
-                    {t(LABEL_KEYS[post.clientLabel])}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-44 p-1" align="end" side="top" onClick={(e) => e.stopPropagation()}>
-                  {(Object.keys(LABEL_KEYS) as ClientLabel[]).map((key) => (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        updateClientLabel(post.id, key);
-                      }}
-                      className={`w-full text-left px-3 py-1.5 text-xs rounded hover:bg-muted transition-colors ${post.clientLabel === key ? "font-bold bg-muted" : ""}`}
-                    >
-                      {t(LABEL_KEYS[key])}
-                    </button>
-                  ))}
-                </PopoverContent>
-              </Popover>
-            ) : (
-              <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${labelConfig.color}`}>
-                {t(LABEL_KEYS[post.clientLabel])}
-              </span>
-            )}
-          </div>
-        )}
-
-        {post.deadline && (
-          isAdmin ? (
-            <div className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium ${isOverdue ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"}`}>
-              <Calendar className="h-3 w-3" />
-              {format(post.deadline, "dd/MM")}
-            </div>
-          ) : !hideFeedback ? (
-            <div className="rounded-lg bg-primary/10 px-3 py-2 text-center">
-              <span className="text-sm font-semibold text-primary">
-                {t("publishForecast")} {format(post.deadline, "dd/MM/yyyy")}
-              </span>
-            </div>
-          ) : null
-        )}
-
-        <div onClick={(e) => e.stopPropagation()}>
-          {isAdmin ? (
-            <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => {
-              const addedAlterado = tagIds.includes("alterado") && !post.tags.includes("alterado");
-              const updates: Partial<Post> = { tags: tagIds };
-              if (addedAlterado && post.clientLabel === "alteracao_solicitada") {
-                updates.clientLabel = "pendente";
-              }
-              updatePost(post.id, updates);
-            }} />
-          ) : (
-            <TagDisplay tagIds={post.tags} tags={tags} />
-          )}
-        </div>
-
-        {!isCompact && (
+        {hasMedia && (
           <>
-            
-            {post.caption && (
-              isAdmin ? (
-                <p className="line-clamp-3 text-sm text-muted-foreground">{post.caption}</p>
-              ) : (
-                allowEditCaption ? (
-                  editingCaption ? (
-                    <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
-                      <Textarea
-                        value={captionDraft}
-                        onChange={(e) => setCaptionDraft(e.target.value)}
-                        className="min-h-[80px] text-sm resize-none"
-                      />
-                      <div className="flex gap-2 justify-end">
-                        <Button variant="ghost" size="sm" onClick={() => { setEditingCaption(false); setCaptionDraft(post.caption); }}>
-                          Cancelar
-                        </Button>
-                        <Button size="sm" onClick={() => { updatePost(post.id, { caption: captionDraft }); setEditingCaption(false); }}>
-                          Salvar
-                        </Button>
-                      </div>
+            <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
+              {(() => {
+                const currentUrl = allMedia[mediaIndex] || allMedia[0];
+                if (isExternalLink(currentUrl))
+                  return (
+                    <div className="absolute inset-0 flex items-center justify-center bg-muted/30 p-6">
+                      <ExternalLinkCard url={currentUrl} />
                     </div>
-                  ) : (
-                    <div className="group/caption cursor-pointer" onClick={(e) => { e.stopPropagation(); setEditingCaption(true); }}>
-                      <CaptionText text={post.caption} t={t} />
-                      <span className="text-[10px] text-muted-foreground opacity-0 group-hover/caption:opacity-100 transition-opacity">Clique para editar</span>
-                    </div>
-                  )
+                  );
+                const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
+                return isVideo ? (
+                  <LazyVideo src={currentUrl} className="h-full w-full object-cover" />
                 ) : (
-                  <CaptionText text={post.caption} t={t} />
-                )
-              )
+                  <LazyImage src={currentUrl} alt={post.title} className="h-full w-full object-cover" />
+                );
+              })()}
+
+              {allMedia.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length);
+                    }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1 hover:bg-background"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMediaIndex((prev) => (prev + 1) % allMedia.length);
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1 hover:bg-background"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </>
+              )}
+
+              <div className="absolute bottom-2 right-2 flex items-center gap-1.5 flex-wrap justify-end">
+                {post.status.map((s) => (
+                  <span
+                    key={s}
+                    className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${STATUS_CONFIG[s].color}`}
+                  >
+                    {t(STATUS_KEYS[s] as any)}
+                  </span>
+                ))}
+                <span
+                  className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}
+                >
+                  {t(LABEL_KEYS[post.clientLabel] as any)}
+                </span>
+              </div>
+            </div>
+
+            {isAdmin && allMedia.length > 1 && (
+              <div className="px-2 py-1.5 bg-muted/30" onClick={(e) => e.stopPropagation()}>
+                <DndContext sensors={thumbSensors} collisionDetection={closestCenter} onDragEnd={handleThumbDragEnd}>
+                  <SortableContext
+                    items={allMedia.map((_, i) => `thumb-${i}`)}
+                    strategy={horizontalListSortingStrategy}
+                  >
+                    <div className="flex gap-1.5 overflow-x-auto">
+                      {allMedia.map((url, i) => (
+                        <SortableThumb key={`${url}-${i}`} url={url} index={i} isActive={i === mediaIndex} />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              </div>
             )}
           </>
         )}
 
-        {!isCompact && !hideFeedback && (
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <button onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }} className="flex items-center gap-1 hover:text-foreground">
-              <MessageCircle className="h-3 w-3" />
-              {post.comments.length} {post.comments.length !== 1 ? t("comments") : t("comment")}
-              {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-            </button>
-          </div>
-        )}
-
-        {isAdmin && (
-          <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className="flex-1 flex items-center gap-1.5 rounded-md border border-muted-foreground/20 px-2 py-1.5 hover:bg-muted/50 transition-colors">
-                  <div className="flex flex-wrap items-center gap-1 flex-1 min-w-0">
-                    {post.status.map((s) => (
-                      <span key={s} className={`inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CONFIG[s].color}`}>
-                        {t(STATUS_KEYS[s])}
-                      </span>
-                    ))}
+        <div className={`px-4 space-y-3 ${isCompact ? "pb-3 pt-1" : "p-4 pt-3"}`}>
+          {/* Lógica da Legenda Unificada */}
+          {post.caption && (
+            <div className="mt-1" onClick={(e) => e.stopPropagation()}>
+              {(isAdmin || allowEditCaption) && isEditingCaption ? (
+                <div className="space-y-2 animate-in fade-in duration-200">
+                  <Textarea
+                    value={editedCaption}
+                    onChange={(e) => setEditedCaption(e.target.value)}
+                    className="min-h-[180px] text-sm bg-white border-primary/20 focus:ring-accent leading-relaxed resize-none shadow-inner"
+                    placeholder="Edite a legenda aqui..."
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setIsEditingCaption(false);
+                        setEditedCaption(post.caption);
+                      }}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+                      onClick={handleSaveCaption}
+                    >
+                      Salvar
+                    </Button>
                   </div>
-                  <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-52 p-2" align="start">
-                <p className="text-xs font-semibold text-muted-foreground mb-2 px-1">Status</p>
-                <div className="space-y-0.5">
-                  {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => {
-                    const isChecked = post.status.includes(key);
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => {
-                          let newStatus: PostStatus[];
-                          if (isChecked) {
-                            newStatus = post.status.filter((s) => s !== key);
-                          } else {
-                            newStatus = [...post.status, key];
-                          }
-                          if (newStatus.length === 0) newStatus = [key];
-                          onStatusChange?.(newStatus);
-                        }}
-                        className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted cursor-pointer transition-colors"
-                      >
-                        <Checkbox checked={isChecked} className="h-3.5 w-3.5 pointer-events-none" />
-                        <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CONFIG[key].color}`}>
-                          {t(STATUS_KEYS[key])}
-                        </span>
-                      </button>
-                    );
-                  })}
                 </div>
-              </PopoverContent>
-            </Popover>
-            <TooltipProvider delayDuration={300}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant={invoiceStatus === "invoiced" ? "default" : "ghost"} 
-                    size="icon" 
-                    onClick={handleQuickInvoice} 
-                    disabled={invoicing || uninvoicing || invoiceStatus === "loading"}
-                    className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"} ${invoiceStatus === "invoiced" ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
-                  >
-                    {invoiceStatus === "invoiced" ? <Check className="h-4 w-4" /> : <DollarSign className="h-4 w-4" />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {invoiceStatus === "invoiced" ? "Desfazer faturamento" : "Faturar"}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <ApprovalLinkButton
-              clientId={clientId}
-              postId={post.id}
-              postTitle={post.title}
-              variant="individual"
-              className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}
-            />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setInternalApprovalOpen(true); }} className={`shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
-                  <Users className="h-4 w-4 text-primary" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent><p className="text-xs">Enviar para aprovação interna</p></TooltipContent>
-            </Tooltip>
-            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete?.(); }} className={`text-destructive hover:text-destructive shrink-0 ${isCompact ? "h-7 w-7" : "h-8 w-8"}`}>
-              <Trash2 className="h-4 w-4" />
-            </Button>
-            <InternalApprovalDialog
-              open={internalApprovalOpen}
-              onOpenChange={setInternalApprovalOpen}
-              postId={post.id}
-              postTitle={post.title}
-              clientId={clientId}
-            />
-          </div>
-        )}
+              ) : (
+                <div
+                  className={`group relative bg-zinc-50/80 rounded-xl p-4 border border-zinc-100 transition-all ${isAdmin || allowEditCaption ? "hover:border-indigo-200 cursor-text" : ""}`}
+                  onClick={() => (isAdmin || allowEditCaption) && setIsEditingCaption(true)}
+                >
+                  {(isAdmin || allowEditCaption) && (
+                    <div className="absolute top-2 right-2 p-1.5 bg-white shadow-sm border rounded-md text-indigo-600 opacity-0 group-hover:opacity-100 transition-all hover:scale-110">
+                      <Pencil size={14} />
+                    </div>
+                  )}
+                  <div className="text-sm text-zinc-700 whitespace-pre-wrap leading-relaxed">
+                    <LinkedText text={post.caption} />
+                  </div>
+                  {(isAdmin || allowEditCaption) && (
+                    <p className="text-[10px] text-zinc-400 mt-2 italic opacity-0 group-hover:opacity-100 transition-opacity">
+                      Clique para editar legenda
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
-        {!isAdmin && !hideFeedback && (
-          <div onClick={(e) => e.stopPropagation()}>
-            <Select
-              value={post.clientLabel}
-              onValueChange={(v) => {
-                try {
-                  updateClientLabel(post.id, v as ClientLabel);
-                } catch (err) {
-                  console.error("[PostCard] label change error:", err);
-                }
-              }}
-            >
-              <SelectTrigger className="h-11 w-full text-sm font-semibold bg-info text-info-foreground border-info hover:bg-info/90 rounded-lg touch-manipulation">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent position="popper" className="z-[9999]" sideOffset={4}>
-                <SelectItem value="de_seu_feedback" className="py-3 text-sm">💬 {t("labelGiveFeedback")}</SelectItem>
-                {(Object.keys(LABEL_KEYS) as ClientLabel[])
-                  .filter((key) => key !== "de_seu_feedback")
-                  .map((key) => (
-                    <SelectItem key={key} value={key} className="py-3 text-sm">{t(LABEL_KEYS[key])}</SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-      </div>
-
-      {(expanded || !isAdmin) && !isCompact && !hideFeedback && (
-        <div className="border-t bg-muted/30 p-4" onClick={(e) => e.stopPropagation()}>
-          <div className="space-y-3">
-            {post.comments.length === 0 && (
-              <p className="text-sm text-muted-foreground">{t("noComments")}</p>
+          {/* Tags e Deadline */}
+          <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+            {isAdmin ? (
+              <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
+            ) : (
+              <TagDisplay tagIds={post.tags} tags={tags} />
             )}
-            {post.comments.map((c) => (
-              <div key={c.id} className="rounded-lg bg-card p-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-foreground">{c.author}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {format(c.createdAt, "dd/MM/yyyy HH:mm")}
-                  </span>
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">{c.text}</p>
+
+            {post.deadline && (
+              <div
+                className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium w-fit ${isOverdue ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"}`}
+              >
+                <Calendar className="h-3.5 w-3.5" />
+                {isAdmin
+                  ? format(post.deadline, "dd/MM")
+                  : `${t("publishForecast") as any} ${format(post.deadline, "dd/MM/yyyy")}`}
               </div>
-            ))}
+            )}
           </div>
-          <div className="mt-3 flex gap-2">
-            <Textarea
-              placeholder={t("writeComment")}
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              className="min-h-[60px] resize-none text-sm"
-            />
-            <Button size="sm" onClick={handleAddComment} className="bg-accent text-accent-foreground hover:bg-accent/90 self-end">
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
+
+          {/* Ações Administrativas */}
+          {isAdmin && (
+            <div className="flex items-center gap-2 pt-1 border-t mt-2" onClick={(e) => e.stopPropagation()}>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="flex-1 flex items-center gap-1.5 rounded-md border border-muted-foreground/20 px-2 py-1.5 hover:bg-muted/50 transition-colors">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground">Status</span>
+                    <ChevronDown className="h-3 w-3 ml-auto" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-52 p-2">
+                  {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
+                    <button
+                      key={key}
+                      onClick={() =>
+                        onStatusChange?.(
+                          post.status.includes(key) ? post.status.filter((s) => s !== key) : [...post.status, key],
+                        )
+                      }
+                      className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted"
+                    >
+                      <Checkbox checked={post.status.includes(key)} className="h-3.5 w-3.5" />
+                      <span className={`px-1.5 py-0.5 rounded-full ${STATUS_CONFIG[key].color}`}>
+                        {t(STATUS_KEYS[key] as any)}
+                      </span>
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
+
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={invoiceStatus === "invoiced" ? "default" : "ghost"}
+                      size="icon"
+                      onClick={handleQuickInvoice}
+                      className={invoiceStatus === "invoiced" ? "bg-emerald-600 text-white" : ""}
+                    >
+                      {invoiceStatus === "invoiced" ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <DollarSign className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Faturar</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              <Button variant="ghost" size="icon" onClick={() => setInternalApprovalOpen(true)}>
+                <Users className="h-4 w-4 text-primary" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => onDelete?.()} className="text-destructive">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+
+              <InternalApprovalDialog
+                open={internalApprovalOpen}
+                onOpenChange={setInternalApprovalOpen}
+                postId={post.id}
+                postTitle={post.title}
+                clientId={clientId}
+              />
+            </div>
+          )}
+
+          {/* Seletor do Cliente */}
+          {!isAdmin && !hideFeedback && (
+            <div onClick={(e) => e.stopPropagation()} className="pt-2">
+              <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
+                <SelectTrigger className="h-11 w-full bg-indigo-50 text-indigo-700 border-indigo-200 font-bold">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="de_seu_feedback">💬 {t("labelGiveFeedback" as any)}</SelectItem>
+                  <SelectItem value="aprovado">✅ {t("labelApproved" as any)}</SelectItem>
+                  <SelectItem value="alteracao_solicitada">✏️ {t("labelChangeRequested" as any)}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Comentários */}
+          {!hideFeedback && (
+            <div className="pt-2 border-t mt-4" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-2"
+              >
+                <MessageCircle className="h-3.5 w-3.5" />
+                {post.comments.length} {t("comments" as any)}
+                {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+              </button>
+
+              {expanded && (
+                <div className="space-y-3 animate-in slide-in-from-top-2 duration-200">
+                  {post.comments.map((c) => (
+                    <div key={c.id} className="bg-muted/40 p-2 rounded-lg text-xs">
+                      <div className="flex justify-between font-bold mb-1">
+                        <span>{c.author}</span>
+                        <span className="opacity-50 font-normal">{format(c.createdAt, "dd/MM")}</span>
+                      </div>
+                      <p className="text-zinc-600">{c.text}</p>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <Textarea
+                      placeholder={t("writeComment" as any)}
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      className="min-h-[40px] text-xs resize-none"
+                    />
+                    <Button size="icon" className="h-10 w-10 shrink-0" onClick={handleAddComment}>
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      )}
-    </Card>
-  );
-});
+      </Card>
+    );
+  },
+);
 
 PostCard.displayName = "PostCard";
