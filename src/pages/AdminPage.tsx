@@ -340,7 +340,7 @@ const KanbanBoard = ({
                     post={post}
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
-                    onEdit={() => setEditPost(post)}
+                    onEdit={() => setDetailPost(post)}
                     selectionMode={selectionMode}
                     isSelected={selectedPostIds?.has(post.id)}
                     onToggleSelect={onToggleSelect}
