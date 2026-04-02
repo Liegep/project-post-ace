@@ -395,7 +395,7 @@ export function PostCardDialog({
                 </h4>
                 <div className="space-y-2 max-h-[200px] overflow-y-auto mb-2">
                   {post.comments.length === 0 && (
-                    <p className="text-xs text-muted-foreground italic">Nenhum comentário</p>
+                    <p className="text-xs text-white/50 italic">Nenhum comentário</p>
                   )}
                   {post.comments.map((c) => (
                     <div key={c.id} className="bg-white/15 backdrop-blur-md p-2 rounded-lg text-[11px] border border-white/15">
