@@ -1,10 +1,14 @@
-import { memo } from "react";
+import { memo, useState } from "react";
 import { Post, PostStatus, ClientLabel, STATUS_CONFIG, LABEL_CONFIG, TAG_TRANSLATION_KEYS } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
 import { useI18n } from "@/i18n/I18nContext";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar, Play } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { LinkedText } from "@/components/LinkedText";
+import { Calendar, Play, Send } from "lucide-react";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
 
@@ -38,6 +42,7 @@ interface PostCardProps {
   selectionMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
+  showInlineDetails?: boolean;
 }
 
 export const PostCard = memo(
@@ -48,9 +53,11 @@ export const PostCard = memo(
     selectionMode,
     isSelected,
     onToggleSelect,
+    showInlineDetails,
   }: PostCardProps) => {
-    const { tags } = usePosts();
+    const { tags, updateClientLabel, addComment } = usePosts();
     const { t } = useI18n();
+    const [commentText, setCommentText] = useState("");
 
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
@@ -181,6 +188,53 @@ export const PostCard = memo(
               <span className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${labelConfig.color}`}>
                 {t(LABEL_KEYS[post.clientLabel] as any)}
               </span>
+            </div>
+          )}
+
+          {/* Inline details when no columns visible */}
+          {showInlineDetails && !isAdmin && (
+            <div className="space-y-2 pt-1 border-t border-border mt-2" onClick={(e) => e.stopPropagation()}>
+              {/* Caption */}
+              {post.caption && (
+                <div className="text-xs text-foreground whitespace-pre-wrap leading-relaxed line-clamp-4">
+                  <LinkedText text={post.caption} />
+                </div>
+              )}
+
+              {/* Feedback dropdown */}
+              <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
+                <SelectTrigger className="h-8 w-full text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="de_seu_feedback">💬 {t("labelGiveFeedback" as any)}</SelectItem>
+                  <SelectItem value="aprovado">✅ {t("labelApproved" as any)}</SelectItem>
+                  <SelectItem value="alteracao_solicitada">✏️ {t("labelChangeRequested" as any)}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Comment field */}
+              <div className="flex gap-1">
+                <Textarea
+                  placeholder={t("writeComment" as any)}
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  className="min-h-[32px] text-[11px] resize-none flex-1"
+                  rows={1}
+                />
+                <Button
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => {
+                    if (!commentText.trim()) return;
+                    addComment(post.id, "Cliente", commentText.trim());
+                    setCommentText("");
+                  }}
+                  disabled={!commentText.trim()}
+                >
+                  <Send className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
           )}
         </div>
