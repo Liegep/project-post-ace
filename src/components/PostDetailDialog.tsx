@@ -149,7 +149,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
 
           {/* Client action buttons */}
           {(onApprove || onRequestChange) && post.clientLabel !== "aprovado" && (
-            <div className="border-t pt-4 mt-2 space-y-3">
+            <div className="border-t border-white/20 pt-4 mt-2 space-y-3">
               <p className="text-sm font-medium text-white">O que achou deste post?</p>
 
               
