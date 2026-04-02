@@ -14,7 +14,7 @@ import { PostsProvider, usePosts } from "@/context/PostsContext";
 import { Post } from "@/types/post";
 import { PostCard } from "@/components/PostCard";
 import { PostCardSkeleton } from "@/components/PostCardSkeleton";
-import { PostDetailDialog } from "@/components/PostDetailDialog";
+import { PostCardDialog } from "@/components/PostCardDialog";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
@@ -483,9 +483,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                               <div className="space-y-4">
                                 {sortByDate(colPosts).map((post) => (
                                   <ErrorBoundary key={post.id} fallbackTitle="Erro ao exibir post">
-                                    <div className="cursor-pointer" onClick={() => setDetailPost(post)}>
-                                      <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
-                                    </div>
+                                    <PostCard post={post} isAdmin={false} onEdit={() => setDetailPost(post)} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
                                   </ErrorBoundary>
                                 ))}
                               </div>
@@ -504,9 +502,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                           <div className="space-y-4 rounded-xl bg-muted/30 p-4">
                             {sortByDate(entradaPosts).map((post) => (
                               <ErrorBoundary key={post.id} fallbackTitle="Erro ao exibir post">
-                                <div className="cursor-pointer" onClick={() => setDetailPost(post)}>
-                                  <PostCard post={post} isAdmin={false} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
-                                </div>
+                                <PostCard post={post} isAdmin={false} onEdit={() => setDetailPost(post)} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
                               </ErrorBoundary>
                             ))}
                           </div>
@@ -519,9 +515,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                               {sortByDate(readyPosts).slice(0, visibleCount).map((post) => (
                                 <ErrorBoundary key={post.id} fallbackTitle="Erro ao exibir post">
-                                  <div className="cursor-pointer" onClick={() => setDetailPost(post)}>
-                                    <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
-                                  </div>
+                                  <PostCard post={post} isAdmin={false} onEdit={() => setDetailPost(post)} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
                                 </ErrorBoundary>
                               ))}
                             </div>
@@ -612,19 +606,13 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         />
       )}
 
-      <PostDetailDialog
+      <PostCardDialog
         post={detailPost}
         open={!!detailPost}
         onOpenChange={(v) => { if (!v) setDetailPost(null); }}
-        tags={tags}
-        t={t}
-        onApprove={(postId) => {
-          updateClientLabel(postId, "aprovado");
-        }}
-        onRequestChange={(postId, comment) => {
-          updateClientLabel(postId, "alteracao_solicitada");
-          addComment(postId, clientData.name, comment);
-        }}
+        isAdmin={false}
+        allowEditCaption={clientData.allow_client_edit_caption}
+        allowClientDownload={clientData.allow_client_download}
       />
     </div>
   );

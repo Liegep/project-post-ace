@@ -10,6 +10,7 @@ import { Post, PostStatus, STATUS_CONFIG } from "@/types/post";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { PostCard } from "@/components/PostCard";
+import { PostCardDialog } from "@/components/PostCardDialog";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { EditPostDialog } from "@/components/EditPostDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -114,7 +115,7 @@ interface KanbanBoardProps {
   handleDeleteColumn: (id: string) => void;
   updatePostStatus: (id: string, status: PostStatus[]) => void;
   deletePost: (id: string) => void;
-  setEditPost: (post: Post) => void;
+  setDetailPost: (post: Post) => void;
   setCreateInColumnId: (id: string | null) => void;
   setCreateOpen: (open: boolean) => void;
   addingColumn: boolean;
@@ -156,7 +157,7 @@ const SortableColumn = ({ col, children }: { col: { id: string }; children: Reac
 const KanbanBoard = ({
   posts, columns, unassignedPosts, editingColumnId, editingColumnName,
   setEditingColumnId, setEditingColumnName, editColumnInputRef, handleRenameColumn,
-  handleDeleteColumn, updatePostStatus, deletePost, setEditPost, setCreateInColumnId,
+  handleDeleteColumn, updatePostStatus, deletePost, setDetailPost, setCreateInColumnId,
   setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
   newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
   toggleColumnVisibility,
@@ -308,7 +309,7 @@ const KanbanBoard = ({
                         post={post}
                         onStatusChange={(s) => updatePostStatus(post.id, s)}
                         onDelete={() => deletePost(post.id)}
-                        onEdit={() => setEditPost(post)}
+                        onEdit={() => setDetailPost(post)}
                         selectionMode={selectionMode}
                         isSelected={selectedPostIds?.has(post.id)}
                         onToggleSelect={onToggleSelect}
@@ -339,7 +340,7 @@ const KanbanBoard = ({
                     post={post}
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
-                    onEdit={() => setEditPost(post)}
+                    onEdit={() => setDetailPost(post)}
                     selectionMode={selectionMode}
                     isSelected={selectedPostIds?.has(post.id)}
                     onToggleSelect={onToggleSelect}
@@ -506,6 +507,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [activeTab, setActiveTab] = useState<"board" | "archived" | "activity" | "texts">("board");
   const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
+  const [detailPost, setDetailPost] = useState<Post | null>(null);
   const [editingPeriod, setEditingPeriod] = useState(false);
   const [periodDraft, setPeriodDraft] = useState(postingPeriod);
   const periodInputRef = useRef<HTMLInputElement>(null);
@@ -539,7 +541,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     if (postId && posts.length > 0) {
       const found = posts.find((p) => p.id === postId);
       if (found) {
-        setEditPost(found);
+        setDetailPost(found);
         // Clean up the query param
         searchParams.delete("postId");
         setSearchParams(searchParams, { replace: true });
@@ -1094,7 +1096,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     handleDeleteColumn={handleDeleteColumn}
                     updatePostStatus={updatePostStatus}
                     deletePost={deletePost}
-                    setEditPost={setEditPost}
+                    setDetailPost={setDetailPost}
                     setCreateInColumnId={setCreateInColumnId}
                     setCreateOpen={setCreateOpen}
                     addingColumn={addingColumn}
@@ -1138,7 +1140,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     isAdmin
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
-                    onEdit={() => setEditPost(post)}
+                    onEdit={() => setDetailPost(post)}
                     selectionMode={selectionMode}
                     isSelected={selectedPostIds.has(post.id)}
                     onToggleSelect={toggleSelect}
@@ -1226,6 +1228,15 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
 
       <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} defaultColumnId={createInColumnId} />
       <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
+      <PostCardDialog
+        post={detailPost}
+        open={!!detailPost}
+        onOpenChange={(open) => { if (!open) setDetailPost(null); }}
+        isAdmin
+        onStatusChange={detailPost ? (s) => updatePostStatus(detailPost.id, s) : undefined}
+        onDelete={detailPost ? () => { deletePost(detailPost.id); setDetailPost(null); } : undefined}
+        onEdit={detailPost ? () => { setEditPost(detailPost); setDetailPost(null); } : undefined}
+      />
 
     </div>
   );
