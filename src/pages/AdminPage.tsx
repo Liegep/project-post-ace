@@ -157,7 +157,7 @@ const SortableColumn = ({ col, children }: { col: { id: string }; children: Reac
 const KanbanBoard = ({
   posts, columns, unassignedPosts, editingColumnId, editingColumnName,
   setEditingColumnId, setEditingColumnName, editColumnInputRef, handleRenameColumn,
-  handleDeleteColumn, updatePostStatus, deletePost, setEditPost, setCreateInColumnId,
+  handleDeleteColumn, updatePostStatus, deletePost, setDetailPost, setCreateInColumnId,
   setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
   newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
   toggleColumnVisibility,
