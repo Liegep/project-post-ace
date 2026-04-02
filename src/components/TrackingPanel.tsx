@@ -121,79 +121,57 @@ function SortableProjectGroup({
         </div>
       </div>
 
-      {/* Deliverables list grouped by column */}
-      <div className="space-y-2 pl-5">
-        {(() => {
-          // Group posts by column
-          const byColumn = new Map<string, Post[]>();
-          group.posts.forEach((post) => {
-            const colName = getColumnName(post, columns);
-            const key = colName || "__none__";
-            if (!byColumn.has(key)) byColumn.set(key, []);
-            byColumn.get(key)!.push(post);
-          });
-
-          return Array.from(byColumn.entries()).map(([colKey, colPosts]) => (
-            <div key={colKey}>
-              {colKey !== "__none__" && (
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">
-                  {colKey}
-                </p>
+      {/* Deliverables list */}
+      <div className="space-y-1 pl-5">
+        {group.posts.map((post) => {
+          const finished = isPostFinished(post, tags);
+          return (
+            <div
+              key={post.id}
+              className={cn(
+                "flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors",
+                finished ? "opacity-50" : "hover:bg-muted/50"
               )}
-              <div className="space-y-1">
-                {colPosts.map((post) => {
-                  const finished = isPostFinished(post, tags);
-                  return (
-                    <div
-                      key={post.id}
-                      className={cn(
-                        "flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors",
-                        finished ? "opacity-50" : "hover:bg-muted/50"
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          "flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors",
-                          finished
-                            ? "border-success bg-success"
-                            : "border-muted-foreground/40 bg-transparent"
-                        )}
-                      >
-                        {finished && <Check className="h-2.5 w-2.5 text-success-foreground" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span
-                          className={cn(
-                            "text-xs font-medium block truncate",
-                            finished
-                              ? "line-through text-muted-foreground"
-                              : "text-foreground"
-                          )}
-                        >
-                          {post.title}
-                        </span>
-                      </div>
-                      {!finished && (
-                        <Circle
-                          className={cn(
-                            "h-2 w-2 shrink-0 fill-current",
-                            post.status.includes("em_desenvolvimento")
-                              ? "text-warning"
-                              : post.status.includes("alteracao_solicitada")
-                              ? "text-destructive"
-                              : post.status.includes("pronto")
-                              ? "text-primary"
-                              : "text-muted-foreground/40"
-                          )}
-                        />
-                      )}
-                    </div>
-                  );
-                })}
+            >
+              <div
+                className={cn(
+                  "flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors",
+                  finished
+                    ? "border-success bg-success"
+                    : "border-muted-foreground/40 bg-transparent"
+                )}
+              >
+                {finished && <Check className="h-2.5 w-2.5 text-success-foreground" />}
               </div>
+              <div className="flex-1 min-w-0">
+                <span
+                  className={cn(
+                    "text-xs font-medium block truncate",
+                    finished
+                      ? "line-through text-muted-foreground"
+                      : "text-foreground"
+                  )}
+                >
+                  {post.title}
+                </span>
+              </div>
+              {!finished && (
+                <Circle
+                  className={cn(
+                    "h-2 w-2 shrink-0 fill-current",
+                    post.status.includes("em_desenvolvimento")
+                      ? "text-warning"
+                      : post.status.includes("alteracao_solicitada")
+                      ? "text-destructive"
+                      : post.status.includes("pronto")
+                      ? "text-primary"
+                      : "text-muted-foreground/40"
+                  )}
+                />
+              )}
             </div>
-          ));
-        })()}
+          );
+        })}
       </div>
     </div>
   );
