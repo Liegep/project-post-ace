@@ -292,8 +292,8 @@ export function PostCardDialog({
                           return <div className="flex items-center justify-center p-6 h-full"><ExternalLinkCard url={currentUrl} /></div>;
                         const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
                         return isVideo
-                          ? <LazyVideo src={currentUrl} className="h-full w-full object-contain" style={{ maxHeight: "45vh" }} />
-                          : <LazyImage src={currentUrl} alt={post.title} className="h-full w-full object-contain" style={{ maxHeight: "45vh" }} />;
+                      ? <LazyVideo src={currentUrl} className="h-full w-full object-contain max-h-[45vh]" />
+                      : <LazyImage src={currentUrl} alt={post.title} className="h-full w-full object-contain max-h-[45vh]" />;
                       })()}
                       {allMedia.length > 1 && (
                         <>
