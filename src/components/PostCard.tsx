@@ -42,6 +42,7 @@ interface PostCardProps {
   selectionMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
+  showInlineDetails?: boolean;
 }
 
 export const PostCard = memo(
