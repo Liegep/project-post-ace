@@ -370,9 +370,9 @@ export function PostCardDialog({
 
                       {/* Approval + Tags grouped */}
                       <div className="flex gap-2">
-                        <ApprovalLinkButton postId={post.id} clientId={clientId} postTitle={post.title} className="flex-1 h-10 bg-white text-black font-semibold rounded-lg hover:bg-zinc-100 hover:text-black border-0 text-xs" />
+                        <ApprovalLinkButton postId={post.id} clientId={clientId} postTitle={post.title} className="flex-1 h-10 bg-transparent text-white font-semibold rounded-lg border-2 border-white hover:bg-white/20 text-sm" />
                       </div>
-                      <div className="bg-white rounded-lg p-2">
+                      <div className="-mt-2">
                         <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
                       </div>
 
