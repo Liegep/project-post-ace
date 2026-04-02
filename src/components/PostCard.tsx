@@ -53,9 +53,11 @@ export const PostCard = memo(
     selectionMode,
     isSelected,
     onToggleSelect,
+    showInlineDetails,
   }: PostCardProps) => {
-    const { tags } = usePosts();
+    const { tags, updateClientLabel, addComment } = usePosts();
     const { t } = useI18n();
+    const [commentText, setCommentText] = useState("");
 
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
