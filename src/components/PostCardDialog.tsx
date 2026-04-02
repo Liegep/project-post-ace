@@ -283,7 +283,7 @@ export function PostCardDialog({
 
             {/* Caption / Description */}
             <div>
-              <h4 className="text-xs font-semibold text-zinc-700 uppercase tracking-wide mb-2">Legenda</h4>
+              <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">Legenda</h4>
               {(isAdmin || allowEditCaption) && isEditingCaption ? (
                 <div className="space-y-2">
                   <Textarea value={editedCaption} onChange={(e) => setEditedCaption(e.target.value)} className="min-h-[120px] text-sm" />
