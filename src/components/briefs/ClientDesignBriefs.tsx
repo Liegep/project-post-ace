@@ -79,7 +79,7 @@ export default function ClientDesignBriefs({ clientId }: Props) {
 
       {/* Detail Dialog */}
       <Dialog open={!!viewing} onOpenChange={() => setViewing(null)}>
-        <DialogContent className="max-w-lg max-h-[85vh] bg-card backdrop-blur-2xl border-border">
+        <DialogContent className="max-w-lg max-h-[85vh]">
           {viewing && (() => {
             const template = getTemplate(viewing.category);
             const questions = template?.questions || [];
