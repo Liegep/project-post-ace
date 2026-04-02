@@ -299,7 +299,7 @@ export function PostCardDialog({
                 >
                   {(isAdmin || allowEditCaption) && (
                     <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                      <Pencil className="h-3.5 w-3.5 text-zinc-600" />
                     </div>
                   )}
                   {post.caption ? <LinkedText text={post.caption} /> : <span className="text-muted-foreground italic">Sem legenda</span>}
