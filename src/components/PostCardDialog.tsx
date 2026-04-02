@@ -183,7 +183,7 @@ export function PostCardDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setShowHistory(false); setIsEditingCaption(false); setCommentText(""); } }}>
-      <DialogContent className="max-w-4xl p-0 overflow-hidden gap-0 max-h-[92vh] !rounded-xl bg-[hsl(var(--muted)/0.35)] backdrop-blur-2xl border border-white/20">
+      <DialogContent className="max-w-4xl p-0 overflow-hidden gap-0 max-h-[92vh] !rounded-xl bg-zinc-900/40 backdrop-blur-lg border border-white/15">
         {/* Two-column layout */}
         <div className="flex flex-col md:flex-row min-h-[400px] max-h-[88vh]">
           {/* LEFT COLUMN - 70% */}
