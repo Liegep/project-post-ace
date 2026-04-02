@@ -9,8 +9,9 @@ interface I18nContextType {
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
-export const I18nProvider: React.FC<{ children: React.ReactNode; defaultLocale?: Locale }> = ({ children, defaultLocale = "pt" }) => {
+export const I18nProvider: React.FC<{ children: React.ReactNode; defaultLocale?: Locale; forceLocale?: Locale }> = ({ children, defaultLocale = "pt", forceLocale }) => {
   const [locale, setLocaleState] = useState<Locale>(() => {
+    if (forceLocale) return forceLocale;
     const saved = localStorage.getItem("admin_locale");
     return (saved as Locale) || defaultLocale;
   });
