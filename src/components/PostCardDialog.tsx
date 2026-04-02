@@ -189,16 +189,16 @@ export function PostCardDialog({
           {/* LEFT COLUMN - 70% */}
           <div className="flex-1 md:w-[70%] overflow-y-auto p-6 space-y-4">
             {/* Title */}
-            <h2 className="text-xl font-bold text-zinc-950 leading-tight">{post.title}</h2>
+            <h2 className="text-xl font-bold text-white leading-tight">{post.title}</h2>
 
             {/* Status badges */}
             <div className="flex flex-wrap items-center gap-1.5">
               {isAdmin ? (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="flex items-center gap-1 rounded-md border border-zinc-400/50 px-2 py-1 text-xs hover:bg-white/20 transition-colors">
-                      <span className="font-medium text-zinc-800">Status</span>
-                      <ChevronDown className="h-3 w-3 text-zinc-700" />
+                    <button className="flex items-center gap-1 rounded-md border border-white/30 px-2 py-1 text-xs hover:bg-white/20 transition-colors">
+                      <span className="font-medium text-white">Status</span>
+                      <ChevronDown className="h-3 w-3 text-white/70" />
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-52 p-2" align="start">
@@ -246,8 +246,8 @@ export function PostCardDialog({
 
             {/* Deadline */}
             {post.deadline && (
-              <div className={`flex items-center gap-2 text-sm ${isOverdue ? "text-red-700 font-medium" : "text-zinc-700"}`}>
-                <Calendar className="h-4 w-4 text-zinc-700" />
+              <div className={`flex items-center gap-2 text-sm ${isOverdue ? "text-red-300 font-medium" : "text-white/80"}`}>
+                <Calendar className="h-4 w-4 text-white/70" />
                 <span>{t("publishForecast" as any)} {format(post.deadline, "dd/MM/yyyy")}</span>
               </div>
             )}
@@ -283,7 +283,7 @@ export function PostCardDialog({
 
             {/* Caption / Description */}
             <div>
-              <h4 className="text-xs font-semibold text-zinc-700 uppercase tracking-wide mb-2">Legenda</h4>
+              <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">Legenda</h4>
               {(isAdmin || allowEditCaption) && isEditingCaption ? (
                 <div className="space-y-2">
                   <Textarea value={editedCaption} onChange={(e) => setEditedCaption(e.target.value)} className="min-h-[120px] text-sm" />
@@ -294,7 +294,7 @@ export function PostCardDialog({
                 </div>
               ) : (
                 <div
-                  className={`text-sm whitespace-pre-wrap leading-relaxed max-h-[200px] overflow-y-auto rounded-lg p-3 bg-white/15 backdrop-blur-xl border border-white/20 text-zinc-950 ${(isAdmin || allowEditCaption) ? "cursor-text hover:border-white/40 group relative" : ""}`}
+                  className={`text-sm whitespace-pre-wrap leading-relaxed max-h-[200px] overflow-y-auto rounded-lg p-3 bg-white backdrop-blur-xl border border-white/20 text-zinc-900 ${(isAdmin || allowEditCaption) ? "cursor-text hover:border-white/40 group relative" : ""}`}
                   onClick={() => (isAdmin || allowEditCaption) && setIsEditingCaption(true)}
                 >
                   {(isAdmin || allowEditCaption) && (
@@ -312,7 +312,7 @@ export function PostCardDialog({
           <div className="md:w-[30%] md:min-w-[240px] border-t md:border-t-0 md:border-l border-white/20 bg-white/10 backdrop-blur-xl p-4 space-y-4 overflow-y-auto">
             {/* Actions section */}
             <div>
-              <h4 className="text-xs font-semibold text-zinc-800 uppercase tracking-wide mb-2">Ações</h4>
+              <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">Ações</h4>
               <div className="space-y-1.5">
                 {isAdmin && (
                   <>
@@ -372,7 +372,7 @@ export function PostCardDialog({
             {/* Client feedback */}
             {!isAdmin && !hideFeedback && (
               <div>
-                <h4 className="text-xs font-semibold text-zinc-800 uppercase tracking-wide mb-2">Seu Feedback</h4>
+                <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">Seu Feedback</h4>
                 <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
                   <SelectTrigger className="h-9 w-full text-xs">
                     <SelectValue />
@@ -389,16 +389,16 @@ export function PostCardDialog({
             {/* Comments */}
             {!hideFeedback && (
               <div>
-                <h4 className="text-xs font-semibold text-zinc-800 uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                  <MessageCircle className="h-3.5 w-3.5 text-zinc-700" />
+                <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                  <MessageCircle className="h-3.5 w-3.5 text-white/60" />
                   Comentários ({post.comments.length})
                 </h4>
                 <div className="space-y-2 max-h-[200px] overflow-y-auto mb-2">
                   {post.comments.length === 0 && (
-                    <p className="text-xs text-muted-foreground italic">Nenhum comentário</p>
+                    <p className="text-xs text-white/50 italic">Nenhum comentário</p>
                   )}
                   {post.comments.map((c) => (
-                    <div key={c.id} className="bg-white/15 backdrop-blur-md p-2 rounded-lg text-[11px] border border-white/15">
+                    <div key={c.id} className="bg-white p-2 rounded-lg text-[11px] border border-white/20">
                       <div className="flex justify-between font-semibold mb-0.5 text-zinc-900">
                         <span>{c.author}</span>
                         <span className="opacity-50 font-normal">{format(c.createdAt, "dd/MM")}</span>
@@ -425,9 +425,9 @@ export function PostCardDialog({
             <div>
               <button
                 onClick={() => setShowHistory(!showHistory)}
-                className="flex items-center gap-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                className="flex items-center gap-1.5 text-xs font-medium text-white/60 hover:text-white transition-colors"
               >
-                <History className="h-3.5 w-3.5 text-zinc-600" />
+                <History className="h-3.5 w-3.5 text-white/60" />
                 {showHistory ? "Ocultar histórico" : "Ver histórico"}
               </button>
               {showHistory && (
