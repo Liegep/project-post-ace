@@ -277,15 +277,15 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center gap-2">
-              <span className="font-mono text-muted-foreground">#{invoice.invoice_number}</span>
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <span className="font-mono text-white/60">#{invoice.invoice_number}</span>
               {invoice.title}
             </DialogTitle>
           </div>
         </DialogHeader>
 
         {/* Invoice info */}
-        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-white/70">
           <Badge variant="outline" className={cfg.color}>
             <Icon className="h-3 w-3 mr-1" /> {cfg.label}
           </Badge>
@@ -305,7 +305,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         </div>
 
         {/* Actions */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 border-t border-white/15 pt-3">
           {invStatus !== "paid" ? (
             <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleMarkPaid()}>
               <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Marcar como Paga
@@ -315,10 +315,10 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
               <Clock className="h-3.5 w-3.5 mr-1" /> Reverter para Aberta
             </Button>
           )}
-          <Button size="sm" variant="outline" onClick={() => setEditingInvoice(!editingInvoice)}>
+          <Button size="sm" variant="outline" onClick={() => setEditingInvoice(!editingInvoice)} className="border-white/30 text-white hover:bg-white/10 hover:text-white">
             <Pencil className="h-3.5 w-3.5 mr-1" /> Editar
           </Button>
-          <Button size="sm" variant="outline" onClick={handleDownloadPDF}>
+          <Button size="sm" variant="outline" onClick={handleDownloadPDF} className="border-white/30 text-white hover:bg-white/10 hover:text-white">
             <Download className="h-3.5 w-3.5 mr-1" /> Baixar PDF
           </Button>
           <Button size="sm" variant="destructive" onClick={handleDeleteInvoice}>
@@ -337,7 +337,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
 
         {/* Edit invoice section */}
         {editingInvoice && (
-          <div className="border rounded-lg p-3 space-y-3 bg-muted/30">
+          <div className="border border-white/20 rounded-lg p-3 space-y-3 bg-white/5">
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label className="text-xs">Status</Label>
