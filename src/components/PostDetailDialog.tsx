@@ -225,7 +225,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
           {onUpdateLabel && !onApprove && (
             <div className="border-t pt-4 mt-2 space-y-3">
               <div className="flex items-center gap-2">
-                <TagIcon className="h-4 w-4 text-muted-foreground" />
+                <TagIcon className="h-4 w-4 text-white/60" />
                 <span className="text-sm font-medium text-white">Etiqueta do Cliente</span>
               </div>
               <Select
