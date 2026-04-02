@@ -103,6 +103,12 @@ export const PostCard = memo(
                     {format(post.deadline, "dd/MM")}
                   </span>
                 )}
+                {post.deadline && !isAdmin && (
+                  <span className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[9px] font-bold bg-amber-400 text-black">
+                    <Calendar className="h-2.5 w-2.5" />
+                    {format(post.deadline, "dd/MM")}
+                  </span>
+                )}
                 {post.status.slice(0, 1).map((s) => (
                   <span key={s} className={`inline-flex rounded px-1.5 py-0.5 text-[8px] font-bold ${STATUS_CONFIG[s].color}`}>
                     {t(STATUS_KEYS[s] as any)}
