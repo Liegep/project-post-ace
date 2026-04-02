@@ -216,7 +216,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
               )}
 
               {post.clientLabel === "alteracao_solicitada" && (
-                <p className="text-xs text-destructive font-medium">Alteração já solicitada para este post.</p>
+                <p className="text-xs text-red-400 font-medium">Alteração já solicitada para este post.</p>
               )}
             </div>
           )}
