@@ -265,11 +265,11 @@ export function PostCardDialog({
                 })()}
                 {allMedia.length > 1 && (
                   <>
-                    <button onClick={() => setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length)} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 hover:bg-background shadow">
-                      <ChevronLeft className="h-4 w-4" />
+                    <button onClick={() => setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length)} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 hover:bg-black/70 shadow border border-white/10">
+                      <ChevronLeft className="h-5 w-5 text-white" />
                     </button>
-                    <button onClick={() => setMediaIndex((prev) => (prev + 1) % allMedia.length)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 hover:bg-background shadow">
-                      <ChevronRight className="h-4 w-4" />
+                    <button onClick={() => setMediaIndex((prev) => (prev + 1) % allMedia.length)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 hover:bg-black/70 shadow border border-white/10">
+                      <ChevronRight className="h-5 w-5 text-white" />
                     </button>
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                       {allMedia.map((_, i) => (
@@ -310,7 +310,7 @@ export function PostCardDialog({
           </div>
 
           {/* RIGHT COLUMN - 30% */}
-          <div className="md:w-[30%] md:min-w-[240px] border-t md:border-t-0 md:border-l border-white/10 bg-black/20 backdrop-blur-md p-4 space-y-4 overflow-y-auto">
+          <div className="md:w-[30%] md:min-w-[240px] border-t md:border-t-0 md:border-l border-border/30 bg-background p-4 space-y-4 overflow-y-auto">
             {/* Actions section */}
             <div>
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Ações</h4>
@@ -373,7 +373,7 @@ export function PostCardDialog({
             {/* Client feedback */}
             {!isAdmin && !hideFeedback && (
               <div>
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Seu Feedback</h4>
+                <h4 className="text-xs font-semibold text-foreground uppercase tracking-wide mb-2">Seu Feedback</h4>
                 <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
                   <SelectTrigger className="h-9 w-full text-xs">
                     <SelectValue />
@@ -390,7 +390,7 @@ export function PostCardDialog({
             {/* Comments */}
             {!hideFeedback && (
               <div>
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <h4 className="text-xs font-semibold text-foreground uppercase tracking-wide mb-2 flex items-center gap-1.5">
                   <MessageCircle className="h-3.5 w-3.5" />
                   Comentários ({post.comments.length})
                 </h4>
