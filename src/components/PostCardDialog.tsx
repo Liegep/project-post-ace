@@ -373,7 +373,7 @@ export function PostCardDialog({
             {/* Client feedback */}
             {!isAdmin && !hideFeedback && (
               <div>
-                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Seu Feedback</h4>
+                <h4 className="text-xs font-semibold text-foreground uppercase tracking-wide mb-2">Seu Feedback</h4>
                 <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
                   <SelectTrigger className="h-9 w-full text-xs">
                     <SelectValue />
