@@ -246,8 +246,8 @@ export function PostCardDialog({
 
             {/* Deadline */}
             {post.deadline && (
-              <div className={`flex items-center gap-2 text-sm ${isOverdue ? "text-destructive font-medium" : "text-muted-foreground"}`}>
-                <Calendar className="h-4 w-4" />
+              <div className={`flex items-center gap-2 text-sm ${isOverdue ? "text-red-700 font-medium" : "text-zinc-700"}`}>
+                <Calendar className="h-4 w-4 text-zinc-700" />
                 <span>{t("publishForecast" as any)} {format(post.deadline, "dd/MM/yyyy")}</span>
               </div>
             )}
