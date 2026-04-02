@@ -549,6 +549,17 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     }
   }, [searchParams, posts]);
 
+  useEffect(() => {
+    if (!detailPost) return;
+    const freshPost = posts.find((p) => p.id === detailPost.id);
+    if (freshPost && freshPost !== detailPost) {
+      setDetailPost(freshPost);
+    }
+    if (!freshPost) {
+      setDetailPost(null);
+    }
+  }, [detailPost, posts]);
+
   // Activity logs for this client
   const activityLogs = useActivityLogs({ clientId: ctxClientId, enabled: activeTab === "activity" });
 
