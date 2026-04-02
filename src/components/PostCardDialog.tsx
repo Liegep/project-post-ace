@@ -355,16 +355,17 @@ export function PostCardDialog({
                         </PopoverTrigger>
                         <PopoverContent className="w-52 p-2" align="start">
                           {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
-                            <button
+                            <div
                               key={key}
+                              role="button"
                               onClick={() => onStatusChange?.(post.status.includes(key) ? post.status.filter((s) => s !== key) : [...post.status, key])}
-                              className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted"
+                              className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted cursor-pointer"
                             >
-                              <Checkbox checked={post.status.includes(key)} className="h-3.5 w-3.5" />
+                              <Checkbox checked={post.status.includes(key)} className="h-3.5 w-3.5 pointer-events-none" />
                               <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${STATUS_CONFIG[key].color}`}>
                                 {t(STATUS_KEYS[key] as any)}
                               </span>
-                            </button>
+                            </div>
                           ))}
                         </PopoverContent>
                       </Popover>
