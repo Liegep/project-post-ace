@@ -1228,6 +1228,15 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
 
       <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} defaultColumnId={createInColumnId} />
       <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
+      <PostCardDialog
+        post={detailPost}
+        open={!!detailPost}
+        onOpenChange={(open) => { if (!open) setDetailPost(null); }}
+        isAdmin
+        onStatusChange={detailPost ? (s) => updatePostStatus(detailPost.id, s) : undefined}
+        onDelete={detailPost ? () => { deletePost(detailPost.id); setDetailPost(null); } : undefined}
+        onEdit={detailPost ? () => { setEditPost(detailPost); setDetailPost(null); } : undefined}
+      />
 
     </div>
   );
