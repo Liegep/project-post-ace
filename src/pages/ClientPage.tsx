@@ -483,9 +483,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                               <div className="space-y-4">
                                 {sortByDate(colPosts).map((post) => (
                                   <ErrorBoundary key={post.id} fallbackTitle="Erro ao exibir post">
-                                    <div className="cursor-pointer" onClick={() => setDetailPost(post)}>
-                                      <PostCard post={post} isAdmin={false} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
-                                    </div>
+                                    <PostCard post={post} isAdmin={false} onEdit={() => setDetailPost(post)} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
                                   </ErrorBoundary>
                                 ))}
                               </div>
