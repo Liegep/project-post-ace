@@ -115,7 +115,7 @@ interface KanbanBoardProps {
   handleDeleteColumn: (id: string) => void;
   updatePostStatus: (id: string, status: PostStatus[]) => void;
   deletePost: (id: string) => void;
-  setEditPost: (post: Post) => void;
+  setDetailPost: (post: Post) => void;
   setCreateInColumnId: (id: string | null) => void;
   setCreateOpen: (open: boolean) => void;
   addingColumn: boolean;
