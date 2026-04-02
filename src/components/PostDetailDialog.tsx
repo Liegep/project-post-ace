@@ -149,8 +149,8 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
 
           {/* Client action buttons */}
           {(onApprove || onRequestChange) && post.clientLabel !== "aprovado" && (
-            <div className="border-t pt-4 mt-2 space-y-3">
-              <p className="text-sm font-medium text-foreground">O que achou deste post?</p>
+            <div className="border-t border-white/20 pt-4 mt-2 space-y-3">
+              <p className="text-sm font-medium text-white">O que achou deste post?</p>
 
               
               {!showChangeForm ? (
@@ -216,17 +216,17 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
               )}
 
               {post.clientLabel === "alteracao_solicitada" && (
-                <p className="text-xs text-destructive font-medium">Alteração já solicitada para este post.</p>
+                <p className="text-xs text-red-400 font-medium">Alteração já solicitada para este post.</p>
               )}
             </div>
           )}
 
           {/* Admin label dropdown */}
           {onUpdateLabel && !onApprove && (
-            <div className="border-t pt-4 mt-2 space-y-3">
+            <div className="border-t border-white/20 pt-4 mt-2 space-y-3">
               <div className="flex items-center gap-2">
-                <TagIcon className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-foreground">Etiqueta do Cliente</span>
+                <TagIcon className="h-4 w-4 text-white/60" />
+                <span className="text-sm font-medium text-white">Etiqueta do Cliente</span>
               </div>
               <Select
                 value={post.clientLabel}
