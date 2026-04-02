@@ -346,11 +346,38 @@ export function PostCardDialog({
                 <div className="space-y-1.5">
                   {isAdmin && (
                     <>
+                      {/* Status dropdown */}
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white">
+                            <ChevronDown className="h-3.5 w-3.5" />
+                            Alterar Status
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-52 p-2" align="start">
+                          {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
+                            <button
+                              key={key}
+                              onClick={() => onStatusChange?.(post.status.includes(key) ? post.status.filter((s) => s !== key) : [...post.status, key])}
+                              className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted"
+                            >
+                              <Checkbox checked={post.status.includes(key)} className="h-3.5 w-3.5" />
+                              <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${STATUS_CONFIG[key].color}`}>
+                                {t(STATUS_KEYS[key] as any)}
+                              </span>
+                            </button>
+                          ))}
+                        </PopoverContent>
+                      </Popover>
+
+                      {/* Send to client */}
+                      <ApprovalLinkButton postId={post.id} clientId={clientId} postTitle={post.title} />
+
                       <TooltipProvider>
                         <Button
                           variant={invoiceStatus === "invoiced" ? "default" : "outline"}
                           size="sm"
-                          className={`w-full justify-start gap-2 text-xs h-8 ${invoiceStatus === "invoiced" ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
+                          className={`w-full justify-start gap-2 text-xs h-8 ${invoiceStatus === "invoiced" ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white"}`}
                           onClick={handleQuickInvoice}
                           disabled={invoicing || uninvoicing}
                         >
@@ -359,20 +386,20 @@ export function PostCardDialog({
                         </Button>
                       </TooltipProvider>
 
-                      <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8" onClick={() => setInternalApprovalOpen(true)}>
+                      <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white" onClick={() => setInternalApprovalOpen(true)}>
                         <Users className="h-3.5 w-3.5" />
                         Aprovação Interna
                       </Button>
 
                       {onEdit && (
-                        <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8" onClick={() => { onEdit(); onOpenChange(false); }}>
+                        <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white" onClick={() => { onEdit(); onOpenChange(false); }}>
                           <Pencil className="h-3.5 w-3.5" />
                           Editar Post
                         </Button>
                       )}
 
                       {onDelete && (
-                        <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30" onClick={() => { onDelete(); onOpenChange(false); }}>
+                        <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8 bg-red-500/20 border-red-400/40 text-red-300 hover:bg-red-500/30 hover:text-red-200" onClick={() => { onDelete(); onOpenChange(false); }}>
                           <Trash2 className="h-3.5 w-3.5" />
                           Excluir
                         </Button>
@@ -384,12 +411,12 @@ export function PostCardDialog({
                   {(isAdmin || allowClientDownload) && hasMedia && (
                     <>
                       {allMedia.length === 1 ? (
-                        <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8" onClick={() => downloadFile(allMedia[0], `${post.title}.${allMedia[0].split('.').pop()?.split('?')[0] || 'jpg'}`)}>
+                        <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white" onClick={() => downloadFile(allMedia[0], `${post.title}.${allMedia[0].split('.').pop()?.split('?')[0] || 'jpg'}`)}>
                           <Download className="h-3.5 w-3.5" />
                           Baixar arquivo
                         </Button>
                       ) : (
-                        <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8" onClick={() => downloadAllFiles(allMedia, post.title)}>
+                        <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white" onClick={() => downloadAllFiles(allMedia, post.title)}>
                           <DownloadCloud className="h-3.5 w-3.5" />
                           Baixar todos ({allMedia.length})
                         </Button>
