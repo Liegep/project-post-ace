@@ -196,9 +196,9 @@ export function PostCardDialog({
               {isAdmin ? (
                 <Popover>
                   <PopoverTrigger asChild>
-                    <button className="flex items-center gap-1 rounded-md border border-zinc-400/50 px-2 py-1 text-xs hover:bg-white/20 transition-colors">
-                      <span className="font-medium text-zinc-800">Status</span>
-                      <ChevronDown className="h-3 w-3 text-zinc-700" />
+                    <button className="flex items-center gap-1 rounded-md border border-white/30 px-2 py-1 text-xs hover:bg-white/20 transition-colors">
+                      <span className="font-medium text-white">Status</span>
+                      <ChevronDown className="h-3 w-3 text-white/70" />
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className="w-52 p-2" align="start">
