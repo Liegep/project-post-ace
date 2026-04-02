@@ -183,7 +183,7 @@ export function PostCardDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setShowHistory(false); setIsEditingCaption(false); setCommentText(""); } }}>
-      <DialogContent className="max-w-4xl p-0 overflow-hidden gap-0 max-h-[92vh] !rounded-xl bg-[hsl(var(--muted)/0.35)] backdrop-blur-2xl border border-white/20">
+      <DialogContent className="max-w-4xl p-0 overflow-hidden gap-0 max-h-[92vh] !rounded-xl bg-zinc-900/40 backdrop-blur-lg border border-white/15">
         {/* Two-column layout */}
         <div className="flex flex-col md:flex-row min-h-[400px] max-h-[88vh]">
           {/* LEFT COLUMN - 70% */}
@@ -254,7 +254,7 @@ export function PostCardDialog({
 
             {/* Media viewer */}
             {hasMedia && (
-              <div className="relative w-full rounded-lg overflow-hidden bg-black/80" style={{ aspectRatio: "16/9" }}>
+              <div className="relative w-full rounded-lg overflow-hidden bg-black/80" style={{ aspectRatio: "4/5", maxHeight: "60vh" }}>
                 {(() => {
                   if (isExternalLink(currentUrl))
                     return <div className="absolute inset-0 flex items-center justify-center p-6"><ExternalLinkCard url={currentUrl} /></div>;
@@ -294,7 +294,8 @@ export function PostCardDialog({
                 </div>
               ) : (
                 <div
-                  className={`text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed max-h-[200px] overflow-y-auto rounded-lg p-3 bg-background/50 border border-border/30 ${(isAdmin || allowEditCaption) ? "cursor-text hover:border-primary/30 group relative" : ""}`}
+                  className={`text-sm whitespace-pre-wrap leading-relaxed max-h-[200px] overflow-y-auto rounded-lg p-3 bg-black/30 backdrop-blur-md border border-white/10 text-white/90 ${(isAdmin || allowEditCaption) ? "cursor-text hover:border-white/25 group relative" : ""}`}
+                  style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}
                   onClick={() => (isAdmin || allowEditCaption) && setIsEditingCaption(true)}
                 >
                   {(isAdmin || allowEditCaption) && (
@@ -309,7 +310,7 @@ export function PostCardDialog({
           </div>
 
           {/* RIGHT COLUMN - 30% */}
-          <div className="md:w-[30%] md:min-w-[240px] border-t md:border-t-0 md:border-l border-border/30 bg-background/30 p-4 space-y-4 overflow-y-auto">
+          <div className="md:w-[30%] md:min-w-[240px] border-t md:border-t-0 md:border-l border-white/10 bg-black/20 backdrop-blur-md p-4 space-y-4 overflow-y-auto">
             {/* Actions section */}
             <div>
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Ações</h4>
