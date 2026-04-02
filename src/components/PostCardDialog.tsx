@@ -24,7 +24,7 @@ import { format } from "date-fns";
 import {
   Calendar, MessageCircle, Trash2, Send, ChevronLeft, ChevronRight,
   DollarSign, Check, Users, Pencil, History, X, ChevronDown,
-  Download, DownloadCloud, Play,
+  Download, DownloadCloud, Play, Tags,
 } from "lucide-react";
 
 const STATUS_KEYS: Record<PostStatus, string> = {
