@@ -697,7 +697,7 @@ const ClientPage = () => {
   return (
     <ErrorBoundary fallbackTitle="Erro ao carregar página do cliente">
       {isClient && <ContractGateModal />}
-      <I18nProvider key={clientLocale} defaultLocale={clientLocale}>
+      <I18nProvider key={clientLocale} forceLocale={clientLocale}>
         <PostsProvider clientId={clientData.id} clientLogo={clientData.logo_url} clientPostingPeriod={clientData.posting_period}>
           <ClientPageInner clientData={clientData} />
         </PostsProvider>
