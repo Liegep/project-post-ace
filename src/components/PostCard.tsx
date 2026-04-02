@@ -69,9 +69,9 @@ export const PostCard = memo(
         }`}
         onClick={() => (selectionMode ? onToggleSelect?.(post.id) : onEdit?.())}
       >
-        {/* Thumbnail */}
+        {/* Thumbnail 4:5 */}
         {hasMedia && (
-          <div className="relative w-full overflow-hidden" style={{ aspectRatio: "16/9" }}>
+          <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
             {(() => {
               if (isExternalLink(thumbUrl))
                 return (
@@ -86,11 +86,33 @@ export const PostCard = memo(
                 <img src={thumbUrl} alt={post.title} className="h-full w-full object-cover" loading="lazy" />
               );
             })()}
+
+            {/* Media count badge */}
             {allMedia.length > 1 && (
               <div className="absolute top-1.5 right-1.5 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
                 {allMedia.length}
               </div>
             )}
+
+            {/* Badges overlay at bottom of image */}
+            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent pt-6 pb-2 px-2">
+              <div className="flex items-center gap-1 flex-wrap">
+                {post.deadline && isAdmin && (
+                  <span className={`inline-flex items-center gap-0.5 text-[9px] font-semibold text-white/90 ${isOverdue ? "text-red-300" : ""}`} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+                    <Calendar className="h-2.5 w-2.5" />
+                    {format(post.deadline, "dd/MM")}
+                  </span>
+                )}
+                {post.status.slice(0, 1).map((s) => (
+                  <span key={s} className={`inline-flex rounded px-1.5 py-0.5 text-[8px] font-bold ${STATUS_CONFIG[s].color}`}>
+                    {t(STATUS_KEYS[s] as any)}
+                  </span>
+                ))}
+                <span className={`inline-flex rounded px-1.5 py-0.5 text-[8px] font-bold ${labelConfig.color}`}>
+                  {t(LABEL_KEYS[post.clientLabel] as any)}
+                </span>
+              </div>
+            </div>
           </div>
         )}
 
@@ -102,7 +124,7 @@ export const PostCard = memo(
                 <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect?.(post.id)} />
               </div>
             )}
-            <h3 className="text-sm font-semibold leading-snug text-foreground line-clamp-2 flex-1">
+            <h3 className="text-sm font-bold leading-snug text-foreground line-clamp-2 flex-1">
               {post.title}
             </h3>
           </div>
@@ -130,23 +152,25 @@ export const PostCard = memo(
             </div>
           )}
 
-          {/* Bottom row: deadline + status badges */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {post.deadline && isAdmin && (
-              <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${isOverdue ? "text-destructive" : "text-muted-foreground"}`}>
-                <Calendar className="h-3 w-3" />
-                {format(post.deadline, "dd/MM")}
+          {/* No-media fallback: show badges inline */}
+          {!hasMedia && (
+            <div className="flex items-center gap-1 flex-wrap">
+              {post.deadline && isAdmin && (
+                <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${isOverdue ? "text-destructive" : "text-muted-foreground"}`}>
+                  <Calendar className="h-3 w-3" />
+                  {format(post.deadline, "dd/MM")}
+                </span>
+              )}
+              {post.status.slice(0, 1).map((s) => (
+                <span key={s} className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CONFIG[s].color}`}>
+                  {t(STATUS_KEYS[s] as any)}
+                </span>
+              ))}
+              <span className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${labelConfig.color}`}>
+                {t(LABEL_KEYS[post.clientLabel] as any)}
               </span>
-            )}
-            {post.status.slice(0, 1).map((s) => (
-              <span key={s} className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CONFIG[s].color}`}>
-                {t(STATUS_KEYS[s] as any)}
-              </span>
-            ))}
-            <span className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${labelConfig.color}`}>
-              {t(LABEL_KEYS[post.clientLabel] as any)}
-            </span>
-          </div>
+            </div>
+          )}
         </div>
       </Card>
     );
