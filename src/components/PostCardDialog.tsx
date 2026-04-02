@@ -398,12 +398,12 @@ export function PostCardDialog({
                     <p className="text-xs text-muted-foreground italic">Nenhum comentário</p>
                   )}
                   {post.comments.map((c) => (
-                    <div key={c.id} className="bg-background/60 p-2 rounded-lg text-[11px] border border-border/20">
-                      <div className="flex justify-between font-semibold mb-0.5">
+                    <div key={c.id} className="bg-white/15 backdrop-blur-md p-2 rounded-lg text-[11px] border border-white/15">
+                      <div className="flex justify-between font-semibold mb-0.5 text-zinc-900">
                         <span>{c.author}</span>
                         <span className="opacity-50 font-normal">{format(c.createdAt, "dd/MM")}</span>
                       </div>
-                      <p className="text-muted-foreground leading-relaxed">{c.text}</p>
+                      <p className="text-zinc-700 leading-relaxed">{c.text}</p>
                     </div>
                   ))}
                 </div>
