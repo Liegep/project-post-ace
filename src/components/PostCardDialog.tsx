@@ -189,7 +189,7 @@ export function PostCardDialog({
           {/* LEFT COLUMN - 70% */}
           <div className="flex-1 md:w-[70%] overflow-y-auto p-6 space-y-4">
             {/* Title */}
-            <h2 className="text-xl font-bold text-zinc-950 leading-tight">{post.title}</h2>
+            <h2 className="text-xl font-bold text-white leading-tight">{post.title}</h2>
 
             {/* Status badges */}
             <div className="flex flex-wrap items-center gap-1.5">
