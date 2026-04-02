@@ -62,34 +62,34 @@ export default function BriefDetailDialog({ brief, open, onClose }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[85vh] bg-card backdrop-blur-2xl border-border">
+      <DialogContent className="max-w-lg max-h-[85vh]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-lg">
+          <DialogTitle className="flex items-center gap-2 text-lg text-white">
             {brief.title}
           </DialogTitle>
           <div className="flex items-center gap-2 pt-1 flex-wrap">
-            <Badge variant="secondary" className="text-[10px]">
+            <Badge variant="secondary" className="text-[10px] bg-white/10 text-white/80 border-white/20">
               {templateName}
             </Badge>
-            <Badge variant="outline" className="text-[10px] flex items-center gap-1">
+            <Badge variant="outline" className="text-[10px] flex items-center gap-1 border-white/20 text-white/70">
               <Globe className="h-3 w-3" />
               {localeName}
             </Badge>
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-[10px] text-white/50">
               {format(new Date(brief.updated_at), "dd/MM/yyyy 'às' HH:mm")}
             </span>
             {brief.respondent_name && (
-              <Badge variant="outline" className="text-[10px] flex items-center gap-1">
+              <Badge variant="outline" className="text-[10px] flex items-center gap-1 border-white/20 text-white/70">
                 Respondido por: {brief.respondent_name}
               </Badge>
             )}
           </div>
           <div className="flex gap-2 pt-2">
-            <Button size="sm" variant="outline" onClick={handleShareLink} className="text-xs h-7">
+            <Button size="sm" variant="outline" onClick={handleShareLink} className="text-xs h-7 border-white/30 text-white hover:bg-white/10 hover:text-white">
               {copied ? <Check className="h-3 w-3 mr-1" /> : <Link2 className="h-3 w-3 mr-1" />}
               {copied ? "Copiado!" : "Gerar link"}
             </Button>
-            <Button size="sm" variant="outline" onClick={() => downloadBriefPdf(brief)} className="text-xs h-7">
+            <Button size="sm" variant="outline" onClick={() => downloadBriefPdf(brief)} className="text-xs h-7 border-white/30 text-white hover:bg-white/10 hover:text-white">
               <Download className="h-3 w-3 mr-1" /> Exportar PDF
             </Button>
           </div>
@@ -139,11 +139,11 @@ export default function BriefDetailDialog({ brief, open, onClose }: Props) {
             }
 
             return (
-              <div key={q.id} className="rounded-xl bg-white/40 dark:bg-white/5 border border-white/15 p-3">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+              <div key={q.id} className="rounded-xl bg-white/95 border border-white/20 p-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">
                   {label}
                 </p>
-                {display}
+                <div className="text-black text-sm">{display}</div>
               </div>
             );
           })}

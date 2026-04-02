@@ -197,14 +197,14 @@ export function SocialPostDialog({ open, onOpenChange, post, pages, clientId, on
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{post ? "Editar Post" : "Novo Post Social"}</DialogTitle>
+          <DialogTitle className="text-white">{post ? "Editar Post" : "Novo Post Social"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-5 py-2">
           {/* Platform & Page */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Plataforma</Label>
+              <Label className="text-white/80">Plataforma</Label>
               <Select value={platform} onValueChange={(v) => { setPlatform(v); setPageId(""); }}>
                 <SelectTrigger>
                   <SelectValue />
@@ -220,7 +220,7 @@ export function SocialPostDialog({ open, onOpenChange, post, pages, clientId, on
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Página / Conta</Label>
+              <Label className="text-white/80">Página / Conta</Label>
               <Select value={pageId} onValueChange={setPageId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione..." />
@@ -242,7 +242,7 @@ export function SocialPostDialog({ open, onOpenChange, post, pages, clientId, on
 
           {/* Media type */}
           <div className="space-y-2">
-            <Label>Tipo de Publicação</Label>
+            <Label className="text-white/80">Tipo de Publicação</Label>
             <Select value={mediaType} onValueChange={setMediaType}>
               <SelectTrigger>
                 <SelectValue />
@@ -258,7 +258,7 @@ export function SocialPostDialog({ open, onOpenChange, post, pages, clientId, on
 
           {/* Caption */}
           <div className="space-y-2">
-            <Label>Legenda</Label>
+            <Label className="text-white/80">Legenda</Label>
             <Textarea
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
@@ -266,12 +266,12 @@ export function SocialPostDialog({ open, onOpenChange, post, pages, clientId, on
               rows={4}
               className="resize-none"
             />
-            <p className="text-xs text-muted-foreground text-right">{caption.length} caracteres</p>
+            <p className="text-xs text-white/50 text-right">{caption.length} caracteres</p>
           </div>
 
           {/* Media upload */}
           <div className="space-y-2">
-            <Label>Mídia</Label>
+            <Label className="text-white/80">Mídia</Label>
             <div className="flex flex-wrap gap-2">
               {mediaUrls.map((url, i) => (
                 <div key={i} className="relative group w-20 h-20 rounded-lg overflow-hidden bg-muted">
@@ -287,7 +287,7 @@ export function SocialPostDialog({ open, onOpenChange, post, pages, clientId, on
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="w-20 h-20 rounded-lg border-2 border-dashed border-border flex items-center justify-center hover:border-primary/50 transition-colors"
+                className="w-20 h-20 rounded-lg border-2 border-dashed border-white/30 flex items-center justify-center hover:border-primary/50 transition-colors"
               >
                 <ImagePlus className="h-5 w-5 text-muted-foreground" />
               </button>
@@ -300,13 +300,13 @@ export function SocialPostDialog({ open, onOpenChange, post, pages, clientId, on
                 className="hidden"
               />
             </div>
-            {uploading && <p className="text-xs text-muted-foreground">Enviando...</p>}
+            {uploading && <p className="text-xs text-white/50">Enviando...</p>}
           </div>
 
           {/* Schedule */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Data de Agendamento</Label>
+              <Label className="text-white/80">Data de Agendamento</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !scheduledDate && "text-muted-foreground")}>
@@ -326,14 +326,14 @@ export function SocialPostDialog({ open, onOpenChange, post, pages, clientId, on
               </Popover>
             </div>
             <div className="space-y-2">
-              <Label>Horário</Label>
+              <Label className="text-white/80">Horário</Label>
               <Input type="time" value={scheduledTime} onChange={(e) => setScheduledTime(e.target.value)} />
             </div>
           </div>
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label>Observações Internas</Label>
+            <Label className="text-white/80">Observações Internas</Label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -345,9 +345,9 @@ export function SocialPostDialog({ open, onOpenChange, post, pages, clientId, on
 
           {/* Preview */}
           {caption && (
-            <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
-              <p className="text-xs font-medium text-muted-foreground">📱 Preview</p>
-              <p className="text-sm whitespace-pre-wrap">{caption}</p>
+            <div className="rounded-lg border border-white/20 bg-white/95 p-4 space-y-2">
+              <p className="text-xs font-medium text-zinc-500">📱 Preview</p>
+              <p className="text-sm whitespace-pre-wrap text-black">{caption}</p>
               {mediaUrls.length > 0 && (
                 <div className="flex gap-1 overflow-x-auto">
                   {mediaUrls.map((url, i) => (
@@ -359,8 +359,8 @@ export function SocialPostDialog({ open, onOpenChange, post, pages, clientId, on
           )}
 
           {/* Actions */}
-          <div className="flex gap-2 justify-end pt-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <div className="flex gap-2 justify-end pt-2 border-t border-white/15">
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/30 text-white hover:bg-white/10 hover:text-white">Cancelar</Button>
             <Button variant="secondary" onClick={() => handleSave(true)} disabled={saving}>
               <FileText className="mr-2 h-4 w-4" /> Salvar Rascunho
             </Button>
