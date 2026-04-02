@@ -258,7 +258,7 @@ export function PostCardDialog({
                 <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">Legenda</h4>
                 {(isAdmin || allowEditCaption) && isEditingCaption ? (
                   <div className="space-y-2">
-                    <Textarea value={editedCaption} onChange={(e) => setEditedCaption(e.target.value)} className="min-h-[120px] text-sm" />
+                    <Textarea value={editedCaption} onChange={(e) => setEditedCaption(e.target.value)} className="min-h-[120px] text-sm bg-white text-black border-zinc-200 focus-visible:ring-zinc-400 placeholder:text-zinc-400" />
                     <div className="flex gap-2 justify-end">
                       <Button size="sm" variant="ghost" onClick={() => { setIsEditingCaption(false); setEditedCaption(post.caption); }}>Cancelar</Button>
                       <Button size="sm" onClick={handleSaveCaption}>Salvar</Button>
