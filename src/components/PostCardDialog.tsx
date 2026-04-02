@@ -469,7 +469,7 @@ export function PostCardDialog({
                       placeholder={t("writeComment" as any)}
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
-                      className="min-h-[36px] text-[11px] resize-none flex-1"
+                      className="min-h-[36px] text-[11px] resize-none flex-1 bg-white text-black border-zinc-200 focus-visible:ring-zinc-400 placeholder:text-zinc-400"
                     />
                     <Button size="icon" className="h-9 w-9 shrink-0" onClick={handleAddComment} disabled={!commentText.trim()}>
                       <Send className="h-3.5 w-3.5" />
