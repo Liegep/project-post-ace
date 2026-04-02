@@ -371,19 +371,9 @@ export function PostCardDialog({
                       {/* Approval + Tags grouped */}
                       <div className="flex gap-2">
                         <ApprovalLinkButton postId={post.id} clientId={clientId} postTitle={post.title} className="flex-1 h-10 bg-white text-black font-semibold rounded-lg hover:bg-zinc-100 hover:text-black border-0 text-xs" />
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className="flex-1 h-10 bg-white text-black font-semibold rounded-lg hover:bg-zinc-100 hover:text-black border-0 text-xs gap-1.5">
-                              <Tags className="h-4 w-4" />
-                              Tags
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-64 p-0" align="end">
-                            <div className="p-2">
-                              <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
-                            </div>
-                          </PopoverContent>
-                        </Popover>
+                      </div>
+                      <div className="bg-white rounded-lg p-2">
+                        <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
                       </div>
 
                       <TooltipProvider>
