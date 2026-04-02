@@ -389,8 +389,8 @@ export function PostCardDialog({
             {/* Comments */}
             {!hideFeedback && (
               <div>
-                <h4 className="text-xs font-semibold text-zinc-800 uppercase tracking-wide mb-2 flex items-center gap-1.5">
-                  <MessageCircle className="h-3.5 w-3.5 text-zinc-700" />
+                <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                  <MessageCircle className="h-3.5 w-3.5 text-white/60" />
                   Comentários ({post.comments.length})
                 </h4>
                 <div className="space-y-2 max-h-[200px] overflow-y-auto mb-2">
