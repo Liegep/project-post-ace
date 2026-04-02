@@ -228,12 +228,10 @@ export function PostCardDialog({
                 </span>
               </div>
 
-              {/* Tags */}
-              <div className="flex flex-wrap gap-1.5">
-                {isAdmin ? (
-                  <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
-                ) : (
-                  postTags.map((tag) => {
+              {/* Tags (client-only inline display) */}
+              {!isAdmin && postTags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {postTags.map((tag) => {
                     const translationKey = TAG_TRANSLATION_KEYS[tag.id];
                     const displayName = translationKey ? t(translationKey as any) : tag.name;
                     return (
@@ -241,9 +239,9 @@ export function PostCardDialog({
                         {displayName}
                       </span>
                     );
-                  })
-                )}
-              </div>
+                  })}
+                </div>
+              )}
 
               {/* Deadline */}
               {post.deadline && (
@@ -370,8 +368,13 @@ export function PostCardDialog({
                         </PopoverContent>
                       </Popover>
 
-                      {/* Send to client */}
-                      <ApprovalLinkButton postId={post.id} clientId={clientId} postTitle={post.title} />
+                      {/* Approval + Tags grouped */}
+                      <div className="flex gap-2">
+                        <ApprovalLinkButton postId={post.id} clientId={clientId} postTitle={post.title} className="flex-1 h-10 bg-white text-black font-semibold rounded-lg hover:bg-zinc-100 hover:text-black border-0 text-xs" />
+                      </div>
+                      <div className="bg-white rounded-lg p-2">
+                        <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
+                      </div>
 
                       <TooltipProvider>
                         <Button
