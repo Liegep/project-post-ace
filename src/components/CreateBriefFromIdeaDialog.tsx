@@ -116,8 +116,8 @@ export function CreateBriefFromIdeaDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-primary" />
+          <DialogTitle className="flex items-center gap-2 text-white">
+            <FileText className="h-4 w-4 text-white/70" />
             Criar Pauta
           </DialogTitle>
         </DialogHeader>
@@ -133,11 +133,11 @@ export function CreateBriefFromIdeaDialog({
 
         <div className="space-y-3">
           <div>
-            <Label className="text-xs">Cliente *</Label>
+            <Label className="text-xs text-white/70">Cliente *</Label>
             {loadingClients ? (
               <div className="h-9 rounded-md border bg-muted animate-pulse" />
             ) : clients.length === 0 ? (
-              <p className="text-xs text-muted-foreground py-2">Nenhum cliente disponível</p>
+              <p className="text-xs text-white/50 py-2">Nenhum cliente disponível</p>
             ) : (
               <Select value={selectedClient} onValueChange={setSelectedClient}>
                 <SelectTrigger><SelectValue placeholder="Selecione o cliente" /></SelectTrigger>
@@ -151,12 +151,12 @@ export function CreateBriefFromIdeaDialog({
           </div>
 
           <div>
-            <Label className="text-xs">Título da pauta</Label>
+            <Label className="text-xs text-white/70">Título da pauta</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
 
           <div>
-            <Label className="text-xs">Descrição</Label>
+            <Label className="text-xs text-white/70">Descrição</Label>
             <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
           </div>
 
@@ -170,7 +170,7 @@ export function CreateBriefFromIdeaDialog({
           />
 
           <div>
-            <Label className="text-xs">Data planejada (opcional)</Label>
+            <Label className="text-xs text-white/70">Data planejada (opcional)</Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button

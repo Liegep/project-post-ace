@@ -72,13 +72,13 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{mode === "edit" ? "Editar Conteúdo" : "Novo Conteúdo Textual"}</DialogTitle>
+          <DialogTitle className="text-white">{mode === "edit" ? "Editar Conteúdo" : "Novo Conteúdo Textual"}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs">Tipo de Conteúdo</Label>
+              <Label className="text-xs text-white/70">Tipo de Conteúdo</Label>
               <Select value={contentType} onValueChange={(v) => setContentType(v as TextContentType)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -89,7 +89,7 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
               </Select>
             </div>
             <div>
-              <Label className="text-xs">Status</Label>
+              <Label className="text-xs text-white/70">Status</Label>
               <Select value={status} onValueChange={(v) => setStatus(v as TextContentStatus)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -102,17 +102,17 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
           </div>
 
           <div>
-            <Label className="text-xs">Título *</Label>
+            <Label className="text-xs text-white/70">Título *</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Título do conteúdo" />
           </div>
 
           <div>
-            <Label className="text-xs">Subtítulo / Resumo</Label>
+            <Label className="text-xs text-white/70">Subtítulo / Resumo</Label>
             <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="Resumo curto do conteúdo" />
           </div>
 
           <div>
-            <Label className="text-xs">Texto Completo</Label>
+            <Label className="text-xs text-white/70">Texto Completo</Label>
             <RichTextEditor
               content={body}
               onChange={setBody}
@@ -121,12 +121,12 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
           </div>
 
           <div>
-            <Label className="text-xs">Data Planejada</Label>
+            <Label className="text-xs text-white/70">Data Planejada</Label>
             <Input type="date" value={plannedDate} onChange={(e) => setPlannedDate(e.target.value)} />
           </div>
 
           <div>
-            <Label className="text-xs">Observações</Label>
+            <Label className="text-xs text-white/70">Observações</Label>
             <Textarea
               value={observations}
               onChange={(e) => setObservations(e.target.value)}
@@ -135,8 +135,8 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/15 mt-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/30 text-white hover:bg-white/10 hover:text-white">Cancelar</Button>
             <Button onClick={handleSave} disabled={saving} className="bg-accent text-accent-foreground hover:bg-accent/90">
               {saving ? "Salvando..." : mode === "edit" ? "Salvar" : "Criar Conteúdo"}
             </Button>

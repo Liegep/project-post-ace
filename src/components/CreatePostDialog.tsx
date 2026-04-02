@@ -144,7 +144,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("createNewPost")}</DialogTitle>
         </DialogHeader>

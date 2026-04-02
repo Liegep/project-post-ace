@@ -131,19 +131,19 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{post ? "Editar Post" : "Novo Post"}</DialogTitle>
+          <DialogTitle className="text-white">{post ? "Editar Post" : "Novo Post"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label>Título *</Label>
+            <Label className="text-white/80">Título *</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Nome do post" />
           </div>
           <div>
-            <Label>Legenda</Label>
+            <Label className="text-white/80">Legenda</Label>
             <Textarea value={caption} onChange={(e) => setCaption(e.target.value)} rows={3} placeholder="Texto da legenda..." />
           </div>
           <div>
-            <Label>Cliente *</Label>
+            <Label className="text-white/80">Cliente *</Label>
             <Select value={clientId} onValueChange={setClientId}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecionar cliente" />
@@ -157,16 +157,16 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Data de Publicação *</Label>
+                <Label className="text-white/80">Data de Publicação *</Label>
               <Input type="date" value={publishDate} onChange={(e) => setPublishDate(e.target.value)} />
             </div>
             <div>
-              <Label>Horário</Label>
+                <Label className="text-white/80">Horário</Label>
               <Input type="time" value={publishTime} onChange={(e) => setPublishTime(e.target.value)} />
             </div>
           </div>
           <div>
-            <Label>Status</Label>
+            <Label className="text-white/80">Status</Label>
             <Select value={status} onValueChange={(v) => setStatus(v as CalendarPostStatus)}>
               <SelectTrigger>
                 <SelectValue />
@@ -184,7 +184,7 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
             </Select>
           </div>
           <div>
-            <Label>Mídia</Label>
+            <Label className="text-white/80">Mídia</Label>
             <div className="flex flex-wrap gap-2 mt-1">
               {mediaUrls.map((url, i) => (
                 <div key={i} className="relative group w-20 h-20 rounded-md overflow-hidden border">
@@ -206,9 +206,9 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
                 <ImagePlus className="h-5 w-5 text-muted-foreground" />
               </label>
             </div>
-            {uploading && <p className="text-xs text-muted-foreground mt-1">Enviando...</p>}
+            {uploading && <p className="text-xs text-white/50 mt-1">Enviando...</p>}
           </div>
-          <div className="flex justify-between pt-2">
+          <div className="flex justify-between pt-2 border-t border-white/15">
             <div>
               {post && onDelete && (
                 <Button variant="destructive" size="sm" onClick={handleDelete}>
@@ -218,6 +218,7 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+
               <Button onClick={handleSave} disabled={saving}>
                 {saving ? "Salvando..." : "Salvar"}
               </Button>

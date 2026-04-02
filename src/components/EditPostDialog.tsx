@@ -143,7 +143,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{t("editPost")}</DialogTitle>
         </DialogHeader>

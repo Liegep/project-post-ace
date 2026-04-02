@@ -108,16 +108,16 @@ export function InternalApprovalDialog({ open, onOpenChange, postId, postTitle, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Send className="h-4 w-4 text-primary" />
+          <DialogTitle className="flex items-center gap-2 text-white">
+            <Send className="h-4 w-4 text-white/70" />
             Enviar para Aprovação Interna
           </DialogTitle>
         </DialogHeader>
 
-        <p className="text-sm text-muted-foreground mb-2">
-          Selecione os membros da equipe que devem revisar <strong className="text-foreground">"{postTitle}"</strong>
+        <p className="text-sm text-white/60 mb-2">
+          Selecione os membros da equipe que devem revisar <strong className="text-white">"{postTitle}"</strong>
         </p>
 
         {loading ? (
@@ -125,13 +125,13 @@ export function InternalApprovalDialog({ open, onOpenChange, postId, postTitle, 
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         ) : members.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">Nenhum membro disponível</p>
+          <p className="text-sm text-white/50 text-center py-6">Nenhum membro disponível</p>
         ) : (
           <div className="space-y-1 max-h-48 overflow-y-auto">
             {members.map(m => (
               <label
                 key={m.id}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-muted cursor-pointer transition-colors"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10 cursor-pointer transition-colors"
               >
                 <Checkbox checked={selected.includes(m.id)} onCheckedChange={() => toggle(m.id)} />
                 <Avatar className="h-7 w-7">
@@ -141,8 +141,8 @@ export function InternalApprovalDialog({ open, onOpenChange, postId, postTitle, 
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium truncate">{m.full_name || m.email}</p>
-                  {m.full_name && <p className="text-[11px] text-muted-foreground truncate">{m.email}</p>}
+                  <p className="text-sm font-medium truncate text-white">{m.full_name || m.email}</p>
+                  {m.full_name && <p className="text-[11px] text-white/50 truncate">{m.email}</p>}
                 </div>
               </label>
             ))}

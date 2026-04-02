@@ -103,7 +103,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
 
         {/* Content area */}
         <div className="p-5 space-y-3">
-          <h2 className="text-xl font-bold text-foreground">{post.title}</h2>
+          <h2 className="text-xl font-bold text-white">{post.title}</h2>
 
           <div className="flex flex-wrap items-center gap-2">
             {post.status.map((s) => (
@@ -135,14 +135,14 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
           )}
 
           {post.deadline && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Calendar className="h-4 w-4" />
+            <div className="flex items-center gap-2 text-sm text-white/70">
+              <Calendar className="h-4 w-4 text-white/60" />
               <span>{t("publishForecast")} {format(post.deadline, "dd/MM/yyyy")}</span>
             </div>
           )}
 
           {post.caption && (
-            <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+            <div className="text-sm whitespace-pre-wrap leading-relaxed rounded-lg p-3 bg-white/95 text-black">
               <LinkedText text={post.caption} />
             </div>
           )}
@@ -151,6 +151,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
           {(onApprove || onRequestChange) && post.clientLabel !== "aprovado" && (
             <div className="border-t pt-4 mt-2 space-y-3">
               <p className="text-sm font-medium text-foreground">O que achou deste post?</p>
+
               
               {!showChangeForm ? (
                 <div className="flex flex-wrap gap-2">
@@ -294,16 +295,13 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
               )}
             </div>
           )}
-          <button
-            onClick={() => setShowHistory(!showHistory)}
-            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors pt-2"
-          >
-            <History className="h-3.5 w-3.5" />
+          <button onClick={() => setShowHistory(!showHistory)} className="flex items-center gap-1.5 text-xs font-medium text-white/60 hover:text-white transition-colors pt-2">
+            <History className="h-3.5 w-3.5 text-white/50" />
             {showHistory ? "Ocultar histórico" : "Ver histórico de atividades"}
           </button>
 
           {showHistory && (
-            <div className="border-t pt-3 mt-2">
+            <div className="border-t border-white/20 pt-3 mt-2">
               <ActivityTimeline
                 logs={activityLogs.logs}
                 loading={activityLogs.loading}
