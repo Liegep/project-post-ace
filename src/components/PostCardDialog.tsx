@@ -228,12 +228,10 @@ export function PostCardDialog({
                 </span>
               </div>
 
-              {/* Tags */}
-              <div className="flex flex-wrap gap-1.5">
-                {isAdmin ? (
-                  <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
-                ) : (
-                  postTags.map((tag) => {
+              {/* Tags (client-only inline display) */}
+              {!isAdmin && postTags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {postTags.map((tag) => {
                     const translationKey = TAG_TRANSLATION_KEYS[tag.id];
                     const displayName = translationKey ? t(translationKey as any) : tag.name;
                     return (
@@ -241,9 +239,9 @@ export function PostCardDialog({
                         {displayName}
                       </span>
                     );
-                  })
-                )}
-              </div>
+                  })}
+                </div>
+              )}
 
               {/* Deadline */}
               {post.deadline && (
