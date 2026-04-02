@@ -10,6 +10,7 @@ import { Post, PostStatus, STATUS_CONFIG } from "@/types/post";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { PostCard } from "@/components/PostCard";
+import { PostCardDialog } from "@/components/PostCardDialog";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { EditPostDialog } from "@/components/EditPostDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
