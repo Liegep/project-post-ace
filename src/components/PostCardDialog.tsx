@@ -425,9 +425,9 @@ export function PostCardDialog({
             <div>
               <button
                 onClick={() => setShowHistory(!showHistory)}
-                className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-1.5 text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
               >
-                <History className="h-3.5 w-3.5" />
+                <History className="h-3.5 w-3.5 text-zinc-600" />
                 {showHistory ? "Ocultar histórico" : "Ver histórico"}
               </button>
               {showHistory && (
