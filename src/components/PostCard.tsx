@@ -157,17 +157,14 @@ export const PostCard = memo(
     const { addComment, updateClientLabel, updatePost, tags, clientId } = usePosts();
     const { t } = useI18n();
 
-    // Estados de UI
     const [expanded, setExpanded] = useState(false);
     const [commentText, setCommentText] = useState("");
     const [mediaIndex, setMediaIndex] = useState(0);
     const [localMediaOrder, setLocalMediaOrder] = useState<string[] | null>(null);
 
-    // Novos Estados de Edição de Legenda
     const [isEditingCaption, setIsEditingCaption] = useState(false);
     const [editedCaption, setEditedCaption] = useState(post.caption);
 
-    // Invoice state
     const [invoiceStatus, setInvoiceStatus] = useState<"loading" | "not_invoiced" | "invoiced">("loading");
     const [invoicing, setInvoicing] = useState(false);
     const [uninvoicing, setUninvoicing] = useState(false);
@@ -252,7 +249,6 @@ export const PostCard = memo(
       updatePost(post.id, { mediaUrls: newOrder, imageUrl: newOrder[0] || "" });
     };
 
-    const primaryStatus = post.status[0] || "entrada";
     const labelConfig = LABEL_CONFIG[post.clientLabel];
     const isOverdue = post.deadline ? new Date() > post.deadline && !post.status.includes("pronto") : false;
 
@@ -277,7 +273,7 @@ export const PostCard = memo(
                 <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect?.(post.id)} />
               </div>
             )}
-            <h3 className={`font-bold leading-snug text-foreground ${isCompact ? "text-sm" : "text-lg"} flex-1`}>
+            <h3 className={`font-bold leading-snug text-foreground ${isCompact ? "text-sm" : "text-base"} flex-1`}>
               {post.title}
             </h3>
             {isAdmin && invoiceStatus === "invoiced" && (
@@ -334,17 +330,17 @@ export const PostCard = memo(
                 </>
               )}
 
-              <div className="absolute bottom-2 right-2 flex items-center gap-1.5 flex-wrap justify-end">
+              <div className="absolute bottom-2 right-2 flex items-center gap-1 flex-wrap justify-end max-w-[80%]">
                 {post.status.map((s) => (
                   <span
                     key={s}
-                    className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${STATUS_CONFIG[s].color}`}
+                    className={`inline-flex rounded-full px-2 py-0.5 text-[9px] font-semibold shadow-sm ${STATUS_CONFIG[s].color}`}
                   >
                     {t(STATUS_KEYS[s] as any)}
                   </span>
                 ))}
                 <span
-                  className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm ${labelConfig.color}`}
+                  className={`inline-flex rounded-full px-2 py-0.5 text-[9px] font-semibold shadow-sm ${labelConfig.color}`}
                 >
                   {t(LABEL_KEYS[post.clientLabel] as any)}
                 </span>
@@ -358,7 +354,7 @@ export const PostCard = memo(
                     items={allMedia.map((_, i) => `thumb-${i}`)}
                     strategy={horizontalListSortingStrategy}
                   >
-                    <div className="flex gap-1.5 overflow-x-auto">
+                    <div className="flex gap-1.5 overflow-x-auto pb-1">
                       {allMedia.map((url, i) => (
                         <SortableThumb key={`${url}-${i}`} url={url} index={i} isActive={i === mediaIndex} />
                       ))}
@@ -371,7 +367,7 @@ export const PostCard = memo(
         )}
 
         <div className={`px-4 space-y-3 ${isCompact ? "pb-3 pt-1" : "p-4 pt-3"}`}>
-          {/* Lógica da Legenda Unificada */}
+          {/* LEGENDA COM TRAVA DE ALTURA E SCROLL INTERNO */}
           {post.caption && (
             <div className="mt-1" onClick={(e) => e.stopPropagation()}>
               {(isAdmin || allowEditCaption) && isEditingCaption ? (
@@ -379,13 +375,14 @@ export const PostCard = memo(
                   <Textarea
                     value={editedCaption}
                     onChange={(e) => setEditedCaption(e.target.value)}
-                    className="min-h-[180px] text-sm bg-white border-primary/20 focus:ring-accent leading-relaxed resize-none shadow-inner"
-                    placeholder="Edite a legenda aqui..."
+                    className="min-h-[140px] text-[13px] bg-white border-primary/20 focus:ring-accent leading-snug resize-none"
+                    placeholder="Edite a legenda..."
                   />
                   <div className="flex gap-2 justify-end">
                     <Button
                       size="sm"
                       variant="ghost"
+                      className="h-7 text-xs"
                       onClick={() => {
                         setIsEditingCaption(false);
                         setEditedCaption(post.caption);
@@ -395,7 +392,7 @@ export const PostCard = memo(
                     </Button>
                     <Button
                       size="sm"
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+                      className="h-7 text-xs bg-indigo-600 hover:bg-indigo-700 text-white"
                       onClick={handleSaveCaption}
                     >
                       Salvar
@@ -404,20 +401,23 @@ export const PostCard = memo(
                 </div>
               ) : (
                 <div
-                  className={`group relative bg-zinc-50/80 rounded-xl p-4 border border-zinc-100 transition-all ${isAdmin || allowEditCaption ? "hover:border-indigo-200 cursor-text" : ""}`}
+                  className={`group relative bg-zinc-50/80 rounded-lg p-3 border border-zinc-100 transition-all ${isAdmin || allowEditCaption ? "hover:border-indigo-200 cursor-text" : ""}`}
                   onClick={() => (isAdmin || allowEditCaption) && setIsEditingCaption(true)}
                 >
                   {(isAdmin || allowEditCaption) && (
-                    <div className="absolute top-2 right-2 p-1.5 bg-white shadow-sm border rounded-md text-indigo-600 opacity-0 group-hover:opacity-100 transition-all hover:scale-110">
-                      <Pencil size={14} />
+                    <div className="absolute top-1 right-1 p-1 bg-white/80 shadow-sm border rounded text-indigo-600 opacity-0 group-hover:opacity-100 transition-all">
+                      <Pencil size={11} />
                     </div>
                   )}
-                  <div className="text-sm text-zinc-700 whitespace-pre-wrap leading-relaxed">
+
+                  {/* Scroll interno aqui - evita que o card cresça demais */}
+                  <div className="text-[13px] text-zinc-700 whitespace-pre-wrap leading-relaxed max-h-[160px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-200">
                     <LinkedText text={post.caption} />
                   </div>
+
                   {(isAdmin || allowEditCaption) && (
-                    <p className="text-[10px] text-zinc-400 mt-2 italic opacity-0 group-hover:opacity-100 transition-opacity">
-                      Clique para editar legenda
+                    <p className="text-[9px] text-zinc-400 mt-1.5 italic opacity-0 group-hover:opacity-100 transition-opacity">
+                      Clique para editar
                     </p>
                   )}
                 </div>
@@ -425,7 +425,6 @@ export const PostCard = memo(
             </div>
           )}
 
-          {/* Tags e Deadline */}
           <div className="flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
             {isAdmin ? (
               <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
@@ -445,17 +444,16 @@ export const PostCard = memo(
             )}
           </div>
 
-          {/* Ações Administrativas */}
           {isAdmin && (
             <div className="flex items-center gap-2 pt-1 border-t mt-2" onClick={(e) => e.stopPropagation()}>
               <Popover>
                 <PopoverTrigger asChild>
                   <button className="flex-1 flex items-center gap-1.5 rounded-md border border-muted-foreground/20 px-2 py-1.5 hover:bg-muted/50 transition-colors">
-                    <span className="text-[10px] font-bold uppercase text-muted-foreground">Status</span>
+                    <span className="text-[9px] font-bold uppercase text-muted-foreground">Status</span>
                     <ChevronDown className="h-3 w-3 ml-auto" />
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-52 p-2">
+                <PopoverContent className="w-52 p-2" align="start">
                   {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
                     <button
                       key={key}
@@ -467,7 +465,7 @@ export const PostCard = memo(
                       className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted"
                     >
                       <Checkbox checked={post.status.includes(key)} className="h-3.5 w-3.5" />
-                      <span className={`px-1.5 py-0.5 rounded-full ${STATUS_CONFIG[key].color}`}>
+                      <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${STATUS_CONFIG[key].color}`}>
                         {t(STATUS_KEYS[key] as any)}
                       </span>
                     </button>
@@ -481,8 +479,8 @@ export const PostCard = memo(
                     <Button
                       variant={invoiceStatus === "invoiced" ? "default" : "ghost"}
                       size="icon"
+                      className={`h-8 w-8 ${invoiceStatus === "invoiced" ? "bg-emerald-600 text-white" : ""}`}
                       onClick={handleQuickInvoice}
-                      className={invoiceStatus === "invoiced" ? "bg-emerald-600 text-white" : ""}
                     >
                       {invoiceStatus === "invoiced" ? (
                         <Check className="h-4 w-4" />
@@ -495,10 +493,10 @@ export const PostCard = memo(
                 </Tooltip>
               </TooltipProvider>
 
-              <Button variant="ghost" size="icon" onClick={() => setInternalApprovalOpen(true)}>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setInternalApprovalOpen(true)}>
                 <Users className="h-4 w-4 text-primary" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => onDelete?.()} className="text-destructive">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => onDelete?.()}>
                 <Trash2 className="h-4 w-4" />
               </Button>
 
@@ -512,11 +510,10 @@ export const PostCard = memo(
             </div>
           )}
 
-          {/* Seletor do Cliente */}
           {!isAdmin && !hideFeedback && (
             <div onClick={(e) => e.stopPropagation()} className="pt-2">
               <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
-                <SelectTrigger className="h-11 w-full bg-indigo-50 text-indigo-700 border-indigo-200 font-bold">
+                <SelectTrigger className="h-10 w-full bg-indigo-50 text-indigo-700 border-indigo-200 font-bold text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -528,12 +525,11 @@ export const PostCard = memo(
             </div>
           )}
 
-          {/* Comentários */}
           {!hideFeedback && (
-            <div className="pt-2 border-t mt-4" onClick={(e) => e.stopPropagation()}>
+            <div className="pt-2 border-t mt-3" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => setExpanded(!expanded)}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-2"
+                className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground"
               >
                 <MessageCircle className="h-3.5 w-3.5" />
                 {post.comments.length} {t("comments" as any)}
@@ -541,25 +537,27 @@ export const PostCard = memo(
               </button>
 
               {expanded && (
-                <div className="space-y-3 animate-in slide-in-from-top-2 duration-200">
-                  {post.comments.map((c) => (
-                    <div key={c.id} className="bg-muted/40 p-2 rounded-lg text-xs">
-                      <div className="flex justify-between font-bold mb-1">
-                        <span>{c.author}</span>
-                        <span className="opacity-50 font-normal">{format(c.createdAt, "dd/MM")}</span>
+                <div className="space-y-3 mt-3 animate-in slide-in-from-top-2 duration-200">
+                  <div className="max-h-[150px] overflow-y-auto pr-1 space-y-2">
+                    {post.comments.map((c) => (
+                      <div key={c.id} className="bg-muted/40 p-2 rounded-lg text-[11px]">
+                        <div className="flex justify-between font-bold mb-1">
+                          <span>{c.author}</span>
+                          <span className="opacity-50 font-normal">{format(c.createdAt, "dd/MM")}</span>
+                        </div>
+                        <p className="text-zinc-600 leading-relaxed">{c.text}</p>
                       </div>
-                      <p className="text-zinc-600">{c.text}</p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                   <div className="flex gap-2">
                     <Textarea
                       placeholder={t("writeComment" as any)}
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
-                      className="min-h-[40px] text-xs resize-none"
+                      className="min-h-[38px] text-[11px] resize-none"
                     />
-                    <Button size="icon" className="h-10 w-10 shrink-0" onClick={handleAddComment}>
-                      <Send className="h-4 w-4" />
+                    <Button size="icon" className="h-[38px] w-[38px] shrink-0 bg-indigo-600" onClick={handleAddComment}>
+                      <Send className="h-3.5 w-3.5 text-white" />
                     </Button>
                   </div>
                 </div>
