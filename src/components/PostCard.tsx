@@ -202,9 +202,9 @@ export const PostCard = memo(
               )}
 
               {/* Feedback dropdown */}
-              <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
+              <Select value={post.clientLabel === "pendente" ? "" : post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
                 <SelectTrigger className="h-8 w-full text-xs">
-                  <SelectValue />
+                  <SelectValue placeholder="Escolha um feedback" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="de_seu_feedback">💬 {t("labelGiveFeedback" as any)}</SelectItem>
