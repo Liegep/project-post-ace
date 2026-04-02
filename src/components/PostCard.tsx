@@ -190,6 +190,53 @@ export const PostCard = memo(
               </span>
             </div>
           )}
+
+          {/* Inline details when no columns visible */}
+          {showInlineDetails && !isAdmin && (
+            <div className="space-y-2 pt-1 border-t border-border mt-2" onClick={(e) => e.stopPropagation()}>
+              {/* Caption */}
+              {post.caption && (
+                <div className="text-xs text-foreground whitespace-pre-wrap leading-relaxed line-clamp-4">
+                  <LinkedText text={post.caption} />
+                </div>
+              )}
+
+              {/* Feedback dropdown */}
+              <Select value={post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
+                <SelectTrigger className="h-8 w-full text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="de_seu_feedback">💬 {t("labelGiveFeedback" as any)}</SelectItem>
+                  <SelectItem value="aprovado">✅ {t("labelApproved" as any)}</SelectItem>
+                  <SelectItem value="alteracao_solicitada">✏️ {t("labelChangeRequested" as any)}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Comment field */}
+              <div className="flex gap-1">
+                <Textarea
+                  placeholder={t("writeComment" as any)}
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  className="min-h-[32px] text-[11px] resize-none flex-1"
+                  rows={1}
+                />
+                <Button
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => {
+                    if (!commentText.trim()) return;
+                    addComment(post.id, "Cliente", commentText.trim());
+                    setCommentText("");
+                  }}
+                  disabled={!commentText.trim()}
+                >
+                  <Send className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </Card>
     );
