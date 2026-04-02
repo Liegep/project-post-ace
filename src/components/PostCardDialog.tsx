@@ -183,7 +183,7 @@ export function PostCardDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setShowHistory(false); setIsEditingCaption(false); setCommentText(""); } }}>
-      <DialogContent className="max-w-4xl p-0 overflow-hidden gap-0 max-h-[92vh] !rounded-xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl flex flex-col">
+      <DialogContent className="max-w-4xl p-0 overflow-hidden gap-0 max-h-[92vh] !rounded-xl flex flex-col">
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto">
           <div className="flex flex-col md:flex-row min-h-[400px]">
