@@ -310,7 +310,7 @@ export function PostCardDialog({
           </div>
 
           {/* RIGHT COLUMN - 30% */}
-          <div className="md:w-[30%] md:min-w-[240px] border-t md:border-t-0 md:border-l border-white/10 bg-black/20 backdrop-blur-md p-4 space-y-4 overflow-y-auto">
+          <div className="md:w-[30%] md:min-w-[240px] border-t md:border-t-0 md:border-l border-border/30 bg-background p-4 space-y-4 overflow-y-auto">
             {/* Actions section */}
             <div>
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Ações</h4>
