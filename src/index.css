@@ -150,43 +150,19 @@
   }
 
   .glass-modal {
-    background: hsl(0 0% 10% / 0.75);
+    background: hsl(0 0% 100% / 0.85);
     backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
-    border: 1.5px solid hsl(0 0% 100% / 0.18);
+    border: 1.5px solid hsl(220 50% 90% / 0.6);
     box-shadow:
-      0 24px 80px -12px hsl(0 0% 0% / 0.4),
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.15),
-      0 1px 4px 0 hsl(0 0% 0% / 0.2);
+      0 24px 80px -12px hsl(var(--primary) / 0.12),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.5),
+      0 1px 4px 0 hsl(220 40% 60% / 0.1);
     background-image: linear-gradient(
       155deg,
-      hsl(0 0% 100% / 0.08) 0%,
+      hsl(0 0% 100% / 0.4) 0%,
       hsl(0 0% 100% / 0) 35%
     );
-    color: hsl(0 0% 100%);
-  }
-
-  .glass-modal label,
-  .glass-modal h2,
-  .glass-modal h3,
-  .glass-modal h4,
-  .glass-modal p,
-  .glass-modal span:not([data-state]) {
-    color: hsl(0 0% 95%);
-  }
-
-  .glass-modal input,
-  .glass-modal textarea,
-  .glass-modal select,
-  .glass-modal [role="combobox"] {
-    background: hsl(0 0% 100%) !important;
-    color: hsl(0 0% 10%) !important;
-    border-color: hsl(0 0% 80%) !important;
-  }
-
-  .glass-modal input::placeholder,
-  .glass-modal textarea::placeholder {
-    color: hsl(0 0% 50%) !important;
   }
 
   .btn-gradient {
