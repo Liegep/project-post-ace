@@ -612,19 +612,13 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         />
       )}
 
-      <PostDetailDialog
+      <PostCardDialog
         post={detailPost}
         open={!!detailPost}
         onOpenChange={(v) => { if (!v) setDetailPost(null); }}
-        tags={tags}
-        t={t}
-        onApprove={(postId) => {
-          updateClientLabel(postId, "aprovado");
-        }}
-        onRequestChange={(postId, comment) => {
-          updateClientLabel(postId, "alteracao_solicitada");
-          addComment(postId, clientData.name, comment);
-        }}
+        isAdmin={false}
+        allowEditCaption={clientData.allow_client_edit_caption}
+        allowClientDownload={clientData.allow_client_download}
       />
     </div>
   );
