@@ -90,9 +90,10 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
           <button
             type="button"
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/30 px-2 py-0.5 text-[10px] text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+            className="inline-flex items-center gap-1.5 rounded-lg border-2 border-white px-3 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-white/20"
           >
-            <Tags className="h-3 w-3" />
+            <Tags className="h-4 w-4" />
+            Tags
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-56 p-0" align="start" onClick={(e) => e.stopPropagation()}>
