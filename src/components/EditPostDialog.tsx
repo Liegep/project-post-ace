@@ -15,7 +15,7 @@ import { Save, ShieldCheck } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 import { SortableMediaGrid, SortableMediaItem } from "@/components/SortableMediaGrid";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
+import { createPostDeadlineFromInput, formatPostDeadlineInput } from "@/lib/postDeadline";
 
 interface EditPostDialogProps {
   post: Post | null;
@@ -61,7 +61,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       const coverIdx = post.imageUrl ? urls.indexOf(post.imageUrl) : 0;
       setCoverIndex(coverIdx >= 0 ? coverIdx : 0);
       setCaption(post.caption);
-      setDeadline(post.deadline ? format(post.deadline, "yyyy-MM-dd") : "");
+      setDeadline(formatPostDeadlineInput(post.deadline));
       setStatus(Array.isArray(post.status) ? post.status : [post.status]);
       setColumnId(post.columnId);
       setSelectedTags(post.tags);
@@ -124,7 +124,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         mediaType: mediaItems[0]?.type || "image",
         mediaUrls: finalUrls,
         caption,
-        deadline: deadline ? new Date(deadline) : null,
+        deadline: deadline ? createPostDeadlineFromInput(deadline) : null,
         tags: selectedTags,
       });
       // Update retain_files flag
