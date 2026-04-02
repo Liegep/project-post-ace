@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { TagSelector } from "@/components/TagSelector";
 import { SortableMediaGrid, SortableMediaItem } from "@/components/SortableMediaGrid";
+import { createPostDeadlineFromInput } from "@/lib/postDeadline";
 
 interface CreatePostDialogProps {
   open: boolean;
@@ -111,7 +112,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
         mediaType: finalType,
         mediaUrls: finalUrls,
         caption,
-        deadline: deadline ? new Date(deadline) : undefined,
+        deadline: deadline ? createPostDeadlineFromInput(deadline) : undefined,
         status,
         tags: selectedTags,
         columnId,

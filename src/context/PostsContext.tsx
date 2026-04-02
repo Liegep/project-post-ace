@@ -3,6 +3,7 @@ import { Post, PostStatus, ClientLabel, Comment, Tag, MediaType, Column } from "
 import { supabase } from "@/integrations/supabase/client";
 import { pushToTrello } from "@/lib/trelloPush";
 import { logActivity } from "@/lib/activityLogger";
+import { parsePostDeadline, serializePostDeadline } from "@/lib/postDeadline";
 
 interface PostsContextType {
   clientId: string;
@@ -50,7 +51,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     mediaType: (row.media_type || "image") as MediaType,
     mediaUrls,
     caption: row.caption,
-    deadline: row.deadline ? new Date(row.deadline) : null,
+    deadline: parsePostDeadline(row.deadline),
     status: (Array.isArray(row.status) ? row.status : [row.status]) as PostStatus[],
     clientLabel: row.client_label as ClientLabel,
     comments,
@@ -186,7 +187,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       column_id: resolvedColumnId,
     };
     if (post.deadline) {
-      insertData.deadline = post.deadline.toISOString();
+      insertData.deadline = serializePostDeadline(post.deadline);
     }
     if (post.clientCreated) {
       insertData.client_created_at = new Date().toISOString();
@@ -314,6 +315,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, []);
 
   const updatePost = useCallback(async (id: string, updates: Partial<Post>) => {
+    const normalizedUpdates = {
+      ...updates,
+      ...(updates.deadline !== undefined ? { deadline: parsePostDeadline(updates.deadline) } : {}),
+    };
+
     // Auto-archive/unarchive based on "publicado" tag
     if (updates.tags !== undefined) {
       const currentPost = posts.find((p) => p.id === id);
@@ -328,14 +334,14 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       }
     }
 
-    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+    setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...normalizedUpdates } : p)));
     const dbUpdates: Record<string, any> = {};
     if (updates.title !== undefined) dbUpdates.title = updates.title;
     if (updates.imageUrl !== undefined) dbUpdates.image_url = updates.imageUrl;
     if (updates.mediaType !== undefined) dbUpdates.media_type = updates.mediaType;
     if (updates.mediaUrls !== undefined) dbUpdates.media_urls = updates.mediaUrls;
     if (updates.caption !== undefined) dbUpdates.caption = updates.caption;
-    if (updates.deadline !== undefined) dbUpdates.deadline = updates.deadline instanceof Date ? updates.deadline.toISOString() : updates.deadline;
+    if (updates.deadline !== undefined) dbUpdates.deadline = serializePostDeadline(updates.deadline);
     if (updates.tags !== undefined) {
       dbUpdates.tags = updates.tags;
       // Set published_at when "publicado" tag is added for retention tracking
