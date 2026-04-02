@@ -212,11 +212,12 @@ export const TrackingPanel = ({
   const [loaded, setLoaded] = useState(false);
   const savedOrderRef = useRef<string[]>([]);
 
-  // Group posts by title (project)
+  // Group posts by column (project)
   const projectGroups = useMemo(() => {
     const map = new Map<string, Post[]>();
     posts.forEach((post) => {
-      const key = post.title || "Sem título";
+      const col = columns.find((c) => c.id === post.columnId);
+      const key = col?.name || "Sem coluna";
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(post);
     });
@@ -225,7 +226,7 @@ export const TrackingPanel = ({
       groups.push({ projectTitle, posts: groupPosts });
     });
     return groups;
-  }, [posts]);
+  }, [posts, columns]);
 
   // Load saved order from DB
   useEffect(() => {
