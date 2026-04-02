@@ -254,7 +254,7 @@ export function PostCardDialog({
 
             {/* Media viewer */}
             {hasMedia && (
-              <div className="relative w-full rounded-lg overflow-hidden bg-black/80" style={{ aspectRatio: "16/9" }}>
+              <div className="relative w-full rounded-lg overflow-hidden bg-black/80" style={{ aspectRatio: "4/5", maxHeight: "60vh" }}>
                 {(() => {
                   if (isExternalLink(currentUrl))
                     return <div className="absolute inset-0 flex items-center justify-center p-6"><ExternalLinkCard url={currentUrl} /></div>;
