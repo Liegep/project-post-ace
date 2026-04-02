@@ -128,7 +128,7 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5" />
+            <UserPlus className="h-5 w-5 text-white/70" />
             {t("inviteMember")}
           </DialogTitle>
           <DialogDescription>{t("inviteMemberDesc")}</DialogDescription>
@@ -136,7 +136,7 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
 
         <form onSubmit={handleInvite} className="space-y-4">
           <div>
-            <Label htmlFor="invite-email">E-mail</Label>
+            <Label htmlFor="invite-email" className="text-white/80">E-mail</Label>
             <Input
               id="invite-email"
               type="email"
@@ -149,15 +149,15 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
 
           {/* Role selector */}
           <div>
-            <Label>{t("roleLabel")}</Label>
+            <Label className="text-white/80">{t("roleLabel")}</Label>
             <div className="mt-2 flex gap-2">
               <button
                 type="button"
                 onClick={() => setRole("admin")}
                 className={`flex-1 flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
                   role === "admin"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-background text-muted-foreground hover:bg-muted"
+                    ? "border-primary bg-primary/20 text-white"
+                    : "border-white/20 bg-white/5 text-white/60 hover:bg-white/10"
                 }`}
               >
                 <Users className="h-4 w-4" />
@@ -168,8 +168,8 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
                 onClick={() => setRole("colaborador")}
                 className={`flex-1 flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
                   role === "colaborador"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-background text-muted-foreground hover:bg-muted"
+                    ? "border-primary bg-primary/20 text-white"
+                    : "border-white/20 bg-white/5 text-white/60 hover:bg-white/10"
                 }`}
               >
                 <Users className="h-4 w-4" />
@@ -180,8 +180,8 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
                 onClick={() => setRole("super_admin")}
                 className={`flex-1 flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
                   role === "super_admin"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-background text-muted-foreground hover:bg-muted"
+                    ? "border-primary bg-primary/20 text-white"
+                    : "border-white/20 bg-white/5 text-white/60 hover:bg-white/10"
                 }`}
               >
                 <Shield className="h-4 w-4" />
@@ -193,15 +193,15 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
           {/* Client assignment for admin/colaborador */}
           {(role === "admin" || role === "colaborador") && clients.length > 0 && (
             <div>
-              <Label>{t("assignClients")}</Label>
-              <div className="mt-2 max-h-40 overflow-y-auto space-y-2 rounded-lg border p-3">
+              <Label className="text-white/80">{t("assignClients")}</Label>
+              <div className="mt-2 max-h-40 overflow-y-auto space-y-2 rounded-lg border border-white/20 p-3">
                 {clients.map(c => (
                   <label key={c.id} className="flex items-center gap-2 cursor-pointer">
                     <Checkbox
                       checked={selectedClientIds.has(c.id)}
                       onCheckedChange={() => toggleClient(c.id)}
                     />
-                    <span className="text-sm">{c.name}</span>
+                    <span className="text-sm text-white/80">{c.name}</span>
                   </label>
                 ))}
               </div>
@@ -217,14 +217,14 @@ const InviteAdminDialog = ({ open, onOpenChange }: InviteAdminDialogProps) => {
         {invitations.length > 0 && (
           <div className="space-y-2 mt-4">
             <h3 className="text-sm font-semibold text-foreground">{t("invitations")}</h3>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
+            <div className="space-y-2 max-h-48 overflow-y-auto text-white/80">
               {invitations.map((inv) => (
                 <div
                   key={inv.id}
-                  className="flex items-center gap-2 rounded-lg bg-muted/50 px-3 py-2 text-sm"
+                  className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-sm"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground truncate">{inv.email}</p>
+                    <p className="font-medium text-white truncate">{inv.email}</p>
                     <div className="flex items-center gap-2">
                       <span className={`inline-flex items-center gap-1 text-[10px] font-semibold rounded-full px-1.5 py-0.5 ${
                         inv.role === "admin"

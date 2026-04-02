@@ -167,28 +167,28 @@ export function InternalApprovalReviewDialog({ open, onOpenChange, postId }: Int
             {/* Content */}
             <div className="p-5 space-y-4">
               <div>
-                <Badge variant="outline" className="mb-2 text-xs bg-primary/10 text-primary border-primary/20">
+                <Badge variant="outline" className="mb-2 text-xs bg-primary/20 text-white border-primary/30">
                   Aprovação Interna
                 </Badge>
-                <h2 className="text-xl font-bold text-foreground">{post.title}</h2>
+                <h2 className="text-xl font-bold text-white">{post.title}</h2>
               </div>
 
               {post.deadline && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
+                <div className="flex items-center gap-2 text-sm text-white/70">
+                  <Calendar className="h-4 w-4 text-white/60" />
                   <span>Previsão: {format(new Date(post.deadline), "dd/MM/yyyy")}</span>
                 </div>
               )}
 
               {post.caption && (
-                <div className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                <div className="text-sm text-white/80 whitespace-pre-wrap leading-relaxed bg-white/95 rounded-lg p-3 text-black">
                   <LinkedText text={post.caption} />
                 </div>
               )}
 
               {/* Action area */}
-              <div className="border-t pt-4 space-y-3">
-                <p className="text-sm font-medium text-foreground">O que achou deste post?</p>
+              <div className="border-t border-white/20 pt-4 space-y-3">
+                <p className="text-sm font-medium text-white">O que achou deste post?</p>
 
                 <Textarea
                   placeholder="Adicione um comentário (opcional)..."
