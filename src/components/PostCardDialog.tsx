@@ -302,7 +302,7 @@ export function PostCardDialog({
                       <Pencil className="h-3.5 w-3.5 text-zinc-600" />
                     </div>
                   )}
-                  {post.caption ? <LinkedText text={post.caption} /> : <span className="text-muted-foreground italic">Sem legenda</span>}
+                  {post.caption ? <LinkedText text={post.caption} /> : <span className="text-zinc-500 italic">Sem legenda</span>}
                 </div>
               )}
             </div>
