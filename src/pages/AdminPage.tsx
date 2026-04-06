@@ -583,6 +583,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     await supabase.from("clients").update({ allow_client_download: checked } as any).eq("id", clientData.id);
   };
 
+  const toggleAllowClientCreateTags = async (checked: boolean) => {
+    setAllowClientCreateTags(checked);
+    await supabase.from("clients").update({ allow_client_create_tags: checked } as any).eq("id", clientData.id);
+  };
+
   const enableTracking = async () => {
     // Create default steps
     const defaultSteps = [
