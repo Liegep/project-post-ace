@@ -44,14 +44,38 @@ export const NotificationBell = () => {
 
   const fetchNotifications = async () => {
     if (!userId) return;
-    const { data } = await supabase
+
+    // Get user's allowed client IDs
+    const { data: assignments } = await supabase
+      .from("user_client_assignments")
+      .select("client_id")
+      .eq("user_id", userId);
+    const { data: ownedClients } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("owner_id", userId);
+    const allowedClientIds = [...new Set([
+      ...(assignments || []).map((a: any) => a.client_id),
+      ...(ownedClients || []).map((c: any) => c.id),
+    ])];
+
+    let query = supabase
       .from("admin_notifications")
       .select("*")
       .in("type", ["deadline_warning", "deadline_today", "deadline_overdue", "internal_approval"])
       .eq("read", false)
-      .or(`user_id.eq.${userId},user_id.is.null`)
       .order("created_at", { ascending: false })
       .limit(30);
+
+    if (allowedClientIds.length > 0) {
+      // Show notifications for user's clients OR addressed to this user specifically
+      query = query.or(`user_id.eq.${userId},client_id.in.(${allowedClientIds.join(",")})`);
+    } else {
+      // No assigned clients, only show notifications addressed to this user
+      query = query.eq("user_id", userId);
+    }
+
+    const { data } = await query;
 
     setNotifications(
       (data || []).map((n: any) => ({
