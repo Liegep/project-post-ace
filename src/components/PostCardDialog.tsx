@@ -107,6 +107,7 @@ export function PostCardDialog({
   const [invoicing, setInvoicing] = useState(false);
   const [uninvoicing, setUninvoicing] = useState(false);
   const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const activityLogs = useActivityLogs({ itemId: post?.id || "", enabled: open && showHistory && !!post });
 
