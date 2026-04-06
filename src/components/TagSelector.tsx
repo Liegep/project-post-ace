@@ -220,7 +220,7 @@ export const TagDisplay = ({ tagIds, tags }: TagDisplayProps) => {
           <span
             key={id}
             className="inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold"
-            style={{ backgroundColor: tag.color, color: "#fff" }}
+            style={{ backgroundColor: tag.color, color: getContrastColor(tag.color) }}
           >
             {displayName}
           </span>

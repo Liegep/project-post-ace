@@ -125,7 +125,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
                   <span
                     key={tag.id}
                     className="inline-flex rounded-full px-2.5 py-1 text-xs font-medium"
-                    style={{ backgroundColor: tag.color, color: "#fff" }}
+                    style={{ backgroundColor: tag.color, color: getContrastColor(tag.color) }}
                   >
                     {displayName}
                   </span>

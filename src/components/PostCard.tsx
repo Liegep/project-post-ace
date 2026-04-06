@@ -163,8 +163,8 @@ export const PostCard = memo(
                 return (
                   <span
                     key={tag.id}
-                    className="inline-block rounded px-1.5 py-0.5 text-[9px] font-semibold text-white"
-                    style={{ backgroundColor: tag.color }}
+                     className="inline-block rounded px-1.5 py-0.5 text-[9px] font-semibold"
+                     style={{ backgroundColor: tag.color, color: getContrastColor(tag.color) }}
                   >
                     {displayName}
                   </span>
