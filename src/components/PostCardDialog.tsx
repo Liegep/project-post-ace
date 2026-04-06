@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { LazyImage, LazyVideo } from "@/components/LazyImage";
 import { ExternalLinkCard, isExternalLink } from "@/components/ExternalLinkCard";
+import { MediaLightbox } from "@/components/MediaLightbox";
 import { LinkedText } from "@/components/LinkedText";
 import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
 import { InternalApprovalDialog } from "@/components/InternalApprovalDialog";
