@@ -121,7 +121,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
-  const { role, userId: currentUserId, isSuperAdmin, isAdmin } = useUserRole();
+  const { role, userId: currentUserId, isSuperAdmin, isAdmin, loading: roleLoading } = useUserRole();
   const navItemClass = (path: string) => cn(
     "flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors",
     currentPath === path
