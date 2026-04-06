@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/hooks/use-toast";
 import { Tags, Plus, Search, X } from "lucide-react";
 
 const getTagDisplayName = (tag: Tag, t: ReturnType<typeof useI18n>["t"]) => {
@@ -24,6 +25,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [creating, setCreating] = useState(false);
+  const [savingTag, setSavingTag] = useState(false);
   const [newName, setNewName] = useState("");
   const [newColor, setNewColor] = useState("#6366f1");
 
@@ -44,18 +46,32 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
     );
   };
 
-  const handleCreate = () => {
-    if (!newName.trim()) return;
-    // Check for duplicates (case-insensitive)
+  const handleCreate = async () => {
+    const trimmedName = newName.trim();
+    if (!trimmedName || savingTag) return;
+
     const exists = tags.some(
-      (tag) => getTagDisplayName(tag, t).toLowerCase() === newName.trim().toLowerCase()
+      (tag) => getTagDisplayName(tag, t).toLowerCase() === trimmedName.toLowerCase()
     );
     if (exists) return;
-    const tag = addTag(newName.trim(), newColor);
-    onChange([...selectedTagIds, tag.id]);
-    setNewName("");
-    setNewColor("#6366f1");
-    setCreating(false);
+
+    setSavingTag(true);
+    try {
+      const tag = await addTag(trimmedName, newColor);
+      onChange([...selectedTagIds, tag.id]);
+      setNewName("");
+      setNewColor("#6366f1");
+      setCreating(false);
+    } catch (error) {
+      console.error("[TagSelector] Failed to create tag", error);
+      toast({
+        title: "Erro ao criar etiqueta",
+        description: "A etiqueta não foi salva. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingTag(false);
+    }
   };
 
   const removeTag = (tagId: string, e: React.MouseEvent) => {
@@ -144,7 +160,12 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
                   placeholder={t("tagNamePlaceholder") || "Nome da etiqueta"}
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      void handleCreate();
+                    }
+                  }}
                   className="h-7 text-xs"
                   autoFocus
                 />
@@ -156,10 +177,10 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
                     className="h-6 w-6 cursor-pointer rounded border-0 bg-transparent p-0"
                   />
                   <span className="text-[10px] text-muted-foreground flex-1">{newColor}</span>
-                  <Button size="sm" onClick={handleCreate} className="h-6 text-[10px] px-2 bg-accent text-accent-foreground hover:bg-accent/90">
-                    {t("create") || "Criar"}
+                  <Button size="sm" type="button" onClick={() => void handleCreate()} disabled={savingTag} className="h-6 text-[10px] px-2 bg-accent text-accent-foreground hover:bg-accent/90">
+                    {savingTag ? "..." : t("create") || "Criar"}
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => setCreating(false)} className="h-6 text-[10px] px-2">
+                  <Button size="sm" type="button" variant="ghost" onClick={() => setCreating(false)} className="h-6 text-[10px] px-2">
                     <X className="h-3 w-3" />
                   </Button>
                 </div>
