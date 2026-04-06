@@ -614,6 +614,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         isAdmin={false}
         allowEditCaption={clientData.allow_client_edit_caption}
         allowClientDownload={clientData.allow_client_download}
+        allowClientCreateTags={clientData.allow_client_create_tags}
       />
     </div>
   );

@@ -81,6 +81,7 @@ interface PostCardDialogProps {
   allowEditCaption?: boolean;
   allowClientDownload?: boolean;
   hideFeedback?: boolean;
+  allowClientCreateTags?: boolean;
 }
 
 export function PostCardDialog({
@@ -94,6 +95,7 @@ export function PostCardDialog({
   allowEditCaption,
   allowClientDownload,
   hideFeedback,
+  allowClientCreateTags,
 }: PostCardDialogProps) {
   const { addComment, updateClientLabel, updatePost, tags, clientId } = usePosts();
   const { t } = useI18n();

@@ -913,6 +913,13 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               </div>
               <div className="flex items-center justify-between">
                 <label className="text-sm text-foreground flex items-center gap-2">
+                  <ClipboardList className="h-3.5 w-3.5 text-muted-foreground" />
+                  Criar tags
+                </label>
+                <Switch checked={allowClientCreateTags} onCheckedChange={toggleAllowClientCreateTags} />
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground flex items-center gap-2">
                   <Eye className="h-3.5 w-3.5 text-muted-foreground" />
                   Mostrar arquivados
                 </label>
