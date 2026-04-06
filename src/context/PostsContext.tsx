@@ -21,7 +21,7 @@ interface PostsContextType {
   addComment: (postId: string, author: string, text: string) => void;
   deletePost: (id: string) => void;
   updatePost: (id: string, updates: Partial<Post>) => void;
-  addTag: (name: string, color: string) => Tag;
+  addTag: (name: string, color: string) => Promise<Tag>;
   deleteTag: (id: string) => void;
   uploadMedia: (file: File) => Promise<string>;
   addColumn: (name: string) => Promise<Column>;
