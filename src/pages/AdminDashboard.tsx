@@ -121,7 +121,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
-  const { role, userId: currentUserId, isSuperAdmin, isAdmin } = useUserRole();
+  const { role, userId: currentUserId, isSuperAdmin, isAdmin, loading: roleLoading } = useUserRole();
   const navItemClass = (path: string) => cn(
     "flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors",
     currentPath === path
@@ -263,7 +263,7 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    if (role === null && currentUserId === null) return; // still loading
+    if (roleLoading || !currentUserId) return; // wait for role to fully load
     fetchClients().then(() => fetchClientUsers());
     fetchFeedbacks();
     fetchUnarchiveNotifs();
@@ -290,7 +290,7 @@ const AdminDashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [role, currentUserId]);
+  }, [roleLoading, role, currentUserId]);
 
   const fetchTodayPosts = async () => {
     const allowedIds = await getAllowedClientIds();
@@ -420,35 +420,8 @@ const AdminDashboard = () => {
   };
 
   const fetchFeedbacks = async () => {
-    if (!currentUserId) return;
-
-    // Get allowed client IDs (owned + assigned + shared)
-    const { data: assignments } = await supabase
-      .from("user_client_assignments")
-      .select("client_id")
-      .eq("user_id", currentUserId);
-    const assignedIds = (assignments || []).map((a: any) => a.client_id);
-
-    const { data: ownedClients } = await supabase
-      .from("clients")
-      .select("id")
-      .eq("owner_id", currentUserId);
-    const ownedIds = (ownedClients || []).map((c: any) => c.id);
-
-    let sharedIds: string[] = [];
-    if (isSuperAdmin) {
-      const { data: sharedClients } = await supabase
-        .from("clients")
-        .select("id")
-        .eq("shared", true);
-      sharedIds = (sharedClients || []).map((c: any) => c.id);
-    }
-
-    const allowedIds = [...new Set([...assignedIds, ...ownedIds, ...sharedIds])];
-    if (allowedIds.length === 0) {
-      setFeedbacks([]);
-      return;
-    }
+    const allowedIds = await getAllowedClientIds();
+    if (allowedIds.length === 0) { setFeedbacks([]); return; }
 
     // Fetch posts where client gave feedback (label != pendente)
     const { data: posts } = await supabase
