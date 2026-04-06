@@ -1131,7 +1131,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     isAdmin
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
-                    onEdit={() => setDetailPost(post)}
+                    onEdit={() => setEditPost(post)}
                     selectionMode={selectionMode}
                     isSelected={selectedPostIds.has(post.id)}
                     onToggleSelect={toggleSelect}
