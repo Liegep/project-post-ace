@@ -88,7 +88,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
         <span
           key={tag.id}
           className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold group/tag"
-          style={{ backgroundColor: tag.color, color: "#fff" }}
+           style={{ backgroundColor: tag.color, color: getContrastColor(tag.color) }}
         >
           {getTagDisplayName(tag, t)}
           <button
