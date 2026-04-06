@@ -1030,39 +1030,6 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
           )}
           {activeTab === "board" && (
             <div className="hidden md:flex items-center gap-4 ml-3">
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="allow-client-edit-caption"
-                  checked={allowClientEditCaption}
-                  onCheckedChange={toggleAllowClientEditCaption}
-                />
-                <label htmlFor="allow-client-edit-caption" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
-                  <Pencil className="h-3.5 w-3.5" />
-                  {allowClientEditCaption ? t("clientCanEditCaption") : t("clientCannotEditCaption")}
-                </label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="allow-client-create-post"
-                  checked={allowClientCreatePost}
-                  onCheckedChange={toggleAllowClientCreatePost}
-                />
-                <label htmlFor="allow-client-create-post" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
-                  <Plus className="h-3.5 w-3.5" />
-                  {allowClientCreatePost ? t("clientCanCreatePosts") : t("clientCannotCreatePosts")}
-                </label>
-              </div>
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="allow-client-download"
-                  checked={allowClientDownload}
-                  onCheckedChange={toggleAllowClientDownload}
-                />
-                <label htmlFor="allow-client-download" className="text-xs text-muted-foreground cursor-pointer flex items-center gap-1">
-                  <Download className="h-3.5 w-3.5" />
-                  {allowClientDownload ? "Cliente pode baixar" : "Cliente não pode baixar"}
-                </label>
-              </div>
               {trackingEnabled && (
                 <div className="flex items-center gap-2">
                   <Switch
