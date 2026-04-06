@@ -287,21 +287,27 @@ export function PostCardDialog({
 
                   {/* Lightbox: exibe a mídia selecionada */}
                   {mediaIndex >= 0 && (
-                    <div className="relative w-full rounded-lg overflow-hidden bg-black/80 mb-3" style={{ maxHeight: "45vh" }}>
+                    <div
+                      className="relative w-full rounded-lg overflow-hidden bg-black/80 mb-3 cursor-zoom-in"
+                      style={{ maxHeight: "45vh" }}
+                      onClick={() => {
+                        if (!isExternalLink(currentUrl)) setLightboxOpen(true);
+                      }}
+                    >
                       {(() => {
                         if (isExternalLink(currentUrl))
                           return <div className="flex items-center justify-center p-6 h-full"><ExternalLinkCard url={currentUrl} /></div>;
                         const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
                         return isVideo
-                      ? <LazyVideo src={currentUrl} className="h-full w-full object-contain max-h-[45vh]" />
+                      ? <LazyVideo src={currentUrl} className="h-full w-full object-contain max-h-[45vh] pointer-events-none" />
                       : <LazyImage src={currentUrl} alt={post.title} className="h-full w-full object-contain max-h-[45vh]" />;
                       })()}
                       {allMedia.length > 1 && (
                         <>
-                          <button onClick={() => setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length)} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 hover:bg-black/70 shadow border border-white/10">
+                          <button onClick={(e) => { e.stopPropagation(); setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length); }} className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 hover:bg-black/70 shadow border border-white/10">
                             <ChevronLeft className="h-5 w-5 text-white" />
                           </button>
-                          <button onClick={() => setMediaIndex((prev) => (prev + 1) % allMedia.length)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 hover:bg-black/70 shadow border border-white/10">
+                          <button onClick={(e) => { e.stopPropagation(); setMediaIndex((prev) => (prev + 1) % allMedia.length); }} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 hover:bg-black/70 shadow border border-white/10">
                             <ChevronRight className="h-5 w-5 text-white" />
                           </button>
                         </>
