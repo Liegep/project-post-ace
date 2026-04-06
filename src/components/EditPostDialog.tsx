@@ -143,94 +143,105 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{t("editPost")}</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="edit-title">{t("title")}</Label>
-            <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} />
-          </div>
-          <div>
-            <Label>{t("media")}</Label>
-            <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={handleFileChange} className="hidden" />
-            <SortableMediaGrid
-              items={mediaItems}
-              coverIndex={0}
-              onReorder={(newItems) => { setMediaItems(newItems); setCoverIndex(0); }}
-              onRemove={removeMedia}
-              onSetCover={(idx) => {
-                // Move the selected item to first position (making it the cover)
-                if (idx === 0) return;
-                const newItems = [...mediaItems];
-                const [moved] = newItems.splice(idx, 1);
-                newItems.unshift(moved);
-                setMediaItems(newItems);
-                setCoverIndex(0);
-              }}
-              onAddMore={() => fileInputRef.current?.click()}
-              emptyLabel={t("clickToSelectMedia")}
-            />
-            <div className="mt-2">
-              <Label htmlFor="edit-external-link" className="text-xs text-muted-foreground">Ou usar link</Label>
-              <Input
-                id="edit-external-link"
-                value={externalLink}
-                onChange={(e) => setExternalLink(e.target.value)}
-                placeholder="https://drive.google.com/..."
-                disabled={mediaItems.length > 0}
-              />
-              {mediaItems.length > 0 && externalLink && (
-                <p className="text-xs text-muted-foreground mt-1">Arquivos enviados têm prioridade sobre o link.</p>
-              )}
-            </div>
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <Label htmlFor="edit-caption">{t("caption")}</Label>
-              <HashtagManager clientId={clientId} onInsert={(h) => setCaption((prev) => prev ? `${prev}\n\n${h}` : h)} />
-            </div>
-            <Textarea id="edit-caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("captionPlaceholder")} className="min-h-[100px]" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="edit-deadline">{t("deadline")}</Label>
-              <Input id="edit-deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
-            </div>
-            <div>
-              <Label>{t("columnLabel")}</Label>
-              <Select value={columnId ?? "none"} onValueChange={(v) => setColumnId(v === "none" ? null : v)}>
-                <SelectTrigger><SelectValue placeholder="..." /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">{t("noColumn")}</SelectItem>
-                  {columns.map((col) => (
-                    <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div>
-            <Label>{t("tags")}</Label>
-            <div className="mt-1">
-              <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
-            </div>
-          </div>
-          {/* Retain files toggle */}
-          <div className="flex items-center justify-between rounded-lg border p-3">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-primary" />
+      <DialogContent className="sm:max-w-4xl max-h-[92vh] overflow-y-auto p-0 gap-0">
+        <form onSubmit={handleSubmit}>
+          <div className="flex flex-col md:flex-row">
+            {/* LEFT COLUMN — Title + Caption + Media */}
+            <div className="flex-1 md:w-[65%] p-6 space-y-4 border-r border-border">
               <div>
-                <p className="text-sm font-medium text-foreground">Manter arquivos</p>
-                <p className="text-[11px] text-muted-foreground">Impede a remoção automática após 30 dias</p>
+                <Label htmlFor="edit-title" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("title")}</Label>
+                <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} className="text-lg font-bold mt-1" />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <Label htmlFor="edit-caption" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("caption")}</Label>
+                  <HashtagManager clientId={clientId} onInsert={(h) => setCaption((prev) => prev ? `${prev}\n\n${h}` : h)} />
+                </div>
+                <Textarea id="edit-caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("captionPlaceholder")} className="min-h-[220px] text-sm" />
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("media")}</Label>
+                <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={handleFileChange} className="hidden" />
+                <div className="mt-1">
+                  <SortableMediaGrid
+                    items={mediaItems}
+                    coverIndex={0}
+                    onReorder={(newItems) => { setMediaItems(newItems); setCoverIndex(0); }}
+                    onRemove={removeMedia}
+                    onSetCover={(idx) => {
+                      if (idx === 0) return;
+                      const newItems = [...mediaItems];
+                      const [moved] = newItems.splice(idx, 1);
+                      newItems.unshift(moved);
+                      setMediaItems(newItems);
+                      setCoverIndex(0);
+                    }}
+                    onAddMore={() => fileInputRef.current?.click()}
+                    emptyLabel={t("clickToSelectMedia")}
+                  />
+                </div>
+                <div className="mt-2">
+                  <Label htmlFor="edit-external-link" className="text-xs text-muted-foreground">Ou usar link externo</Label>
+                  <Input
+                    id="edit-external-link"
+                    value={externalLink}
+                    onChange={(e) => setExternalLink(e.target.value)}
+                    placeholder="https://drive.google.com/..."
+                    disabled={mediaItems.length > 0}
+                  />
+                  {mediaItems.length > 0 && externalLink && (
+                    <p className="text-xs text-muted-foreground mt-1">Arquivos enviados têm prioridade sobre o link.</p>
+                  )}
+                </div>
               </div>
             </div>
-            <Switch checked={retainFiles} onCheckedChange={setRetainFiles} />
+
+            {/* RIGHT COLUMN — Settings */}
+            <div className="md:w-[35%] p-6 space-y-4">
+              <div>
+                <Label htmlFor="edit-deadline" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("deadline")}</Label>
+                <Input id="edit-deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="mt-1" />
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("columnLabel")}</Label>
+                <Select value={columnId ?? "none"} onValueChange={(v) => setColumnId(v === "none" ? null : v)}>
+                  <SelectTrigger className="mt-1"><SelectValue placeholder="..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t("noColumn")}</SelectItem>
+                    {columns.map((col) => (
+                      <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("tags")}</Label>
+                <div className="mt-1">
+                  <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
+                </div>
+              </div>
+
+              {/* Retain files toggle */}
+              <div className="flex items-center justify-between rounded-lg border p-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-primary" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Manter arquivos</p>
+                    <p className="text-[11px] text-muted-foreground">Impede remoção automática</p>
+                  </div>
+                </div>
+                <Switch checked={retainFiles} onCheckedChange={setRetainFiles} />
+              </div>
+
+              <Button type="submit" disabled={uploading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                <Save className="mr-2 h-4 w-4" /> {uploading ? "..." : t("saveChanges")}
+              </Button>
+            </div>
           </div>
-          <Button type="submit" disabled={uploading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-            <Save className="mr-2 h-4 w-4" /> {uploading ? "..." : t("saveChanges")}
-          </Button>
         </form>
       </DialogContent>
     </Dialog>
