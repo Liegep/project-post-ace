@@ -1015,15 +1015,21 @@ const AdminDashboard = () => {
               <button onClick={() => { setMobileMenuOpen(false); navigate("/briefs"); }} className={navItemClass("/briefs")}>
                 <FileText className={navIconClass("/briefs")} /> Pautas
               </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/reports"); }} className={navItemClass("/reports")}>
-                <FileBarChart className={navIconClass("/reports")} /> Relatórios
-              </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/billing"); }} className={navItemClass("/billing")}>
-                <DollarSign className={navIconClass("/billing")} /> Faturamento
-              </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/proposals"); }} className={navItemClass("/proposals")}>
-                <FileSignature className={navIconClass("/proposals")} /> Propostas
-              </button>
+              {isSuperAdmin && (
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/reports"); }} className={navItemClass("/reports")}>
+                  <FileBarChart className={navIconClass("/reports")} /> Relatórios
+                </button>
+              )}
+              {isSuperAdmin && (
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/billing"); }} className={navItemClass("/billing")}>
+                  <DollarSign className={navIconClass("/billing")} /> Faturamento
+                </button>
+              )}
+              {isSuperAdmin && (
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/proposals"); }} className={navItemClass("/proposals")}>
+                  <FileSignature className={navIconClass("/proposals")} /> Propostas
+                </button>
+              )}
               {isSuperAdmin && (
                 <button onClick={() => { setMobileMenuOpen(false); navigate("/contracts"); }} className={navItemClass("/contracts")}>
                   <FileText className={navIconClass("/contracts")} /> Contratos
