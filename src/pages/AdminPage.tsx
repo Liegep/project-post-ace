@@ -542,7 +542,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     if (postId && posts.length > 0) {
       const found = posts.find((p) => p.id === postId);
       if (found) {
-        setDetailPost(found);
+        setEditPost(found);
         // Clean up the query param
         searchParams.delete("postId");
         setSearchParams(searchParams, { replace: true });
@@ -560,6 +560,14 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
       setDetailPost(null);
     }
   }, [detailPost, posts]);
+
+  useEffect(() => {
+    if (!editPost) return;
+    const freshPost = posts.find((p) => p.id === editPost.id);
+    if (!freshPost) {
+      setEditPost(null);
+    }
+  }, [editPost, posts]);
 
   // Activity logs for this client
   const activityLogs = useActivityLogs({ clientId: ctxClientId, enabled: activeTab === "activity" });
@@ -1087,7 +1095,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     handleDeleteColumn={handleDeleteColumn}
                     updatePostStatus={updatePostStatus}
                     deletePost={deletePost}
-                    setDetailPost={setDetailPost}
+                    setDetailPost={setEditPost}
                     setCreateInColumnId={setCreateInColumnId}
                     setCreateOpen={setCreateOpen}
                     addingColumn={addingColumn}
@@ -1131,7 +1139,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     isAdmin
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
-                    onEdit={() => setDetailPost(post)}
+                    onEdit={() => setEditPost(post)}
                     selectionMode={selectionMode}
                     isSelected={selectedPostIds.has(post.id)}
                     onToggleSelect={toggleSelect}
