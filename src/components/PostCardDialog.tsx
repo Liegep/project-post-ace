@@ -460,8 +460,8 @@ export function PostCardDialog({
                       <p className="text-xs text-white/50 italic">Nenhum comentário</p>
                     )}
                     {post.comments.map((c) => (
-                      <div key={c.id} className="bg-white p-2 rounded-lg text-[11px] border border-white/20">
-                        <div className="flex justify-between font-semibold mb-0.5 text-zinc-900">
+                      <div key={c.id} className="bg-white p-2 rounded-lg text-[11px] border border-white/20 text-black">
+                        <div className="flex justify-between font-semibold mb-0.5 text-black">
                           <span>{c.author}</span>
                           <span className="opacity-50 font-normal">{format(c.createdAt, "dd/MM")}</span>
                         </div>
