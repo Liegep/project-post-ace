@@ -222,6 +222,13 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                 </div>
               </div>
 
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Hashtags</Label>
+                <div className="mt-1">
+                  <HashtagManager clientId={clientId} onInsert={(h) => setCaption((prev) => prev ? `${prev}\n\n${h}` : h)} />
+                </div>
+              </div>
+
               {/* Retain files toggle */}
               <div className="flex items-center justify-between rounded-lg border p-3">
                 <div className="flex items-center gap-2">
