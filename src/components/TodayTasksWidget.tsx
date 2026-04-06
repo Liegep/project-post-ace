@@ -30,7 +30,7 @@ const TYPE_CONFIG = {
 
 export const TodayTasksWidget = () => {
   const navigate = useNavigate();
-  const { userId } = useUserRole();
+  const { userId, isSuperAdmin } = useUserRole();
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"today" | "upcoming" | "overdue">("today");
@@ -45,12 +45,19 @@ export const TodayTasksWidget = () => {
     const now = new Date();
     const weekAhead = addDays(now, 7);
 
-    // Get user's client IDs
+    // Get user's client IDs (assigned + owned)
     const { data: assignments } = await supabase
       .from("user_client_assignments")
       .select("client_id")
       .eq("user_id", userId!);
-    const clientIds = (assignments || []).map((a: any) => a.client_id);
+    const { data: ownedClients } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("owner_id", userId!);
+    const clientIds = [...new Set([
+      ...(assignments || []).map((a: any) => a.client_id),
+      ...(ownedClients || []).map((c: any) => c.id),
+    ])];
 
     if (clientIds.length === 0) { setTasks([]); setLoading(false); return; }
 
