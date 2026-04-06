@@ -422,6 +422,13 @@ export function PostCardDialog({
                     </>
                   )}
 
+                  {/* Client tag creation */}
+                  {!isAdmin && allowClientCreateTags && (
+                    <div>
+                      <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
+                    </div>
+                  )}
+
                   {/* Download buttons */}
                   {(isAdmin || allowClientDownload) && hasMedia && (
                     <>
