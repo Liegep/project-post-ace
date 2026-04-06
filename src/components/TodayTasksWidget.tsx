@@ -175,16 +175,33 @@ export const TodayTasksWidget = () => {
       });
     });
 
+    // Deduplicate: if a post and calendar_post share same title+client, keep the post
+    const seen = new Map<string, number>();
+    const deduped: TaskItem[] = [];
+    for (const task of allTasks) {
+      const key = `${task.title.trim().toLowerCase()}::${task.clientSlug}`;
+      const existing = seen.get(key);
+      if (existing !== undefined) {
+        // Prefer "post" over "calendar_post"
+        if (task.type === "post" && deduped[existing].type === "calendar_post") {
+          deduped[existing] = task;
+        }
+        continue;
+      }
+      seen.set(key, deduped.length);
+      deduped.push(task);
+    }
+
     // Sort by urgency priority then deadline
     const urgencyOrder: Record<DeadlineUrgency, number> = { overdue: 0, urgent: 1, normal: 2, none: 3 };
-    allTasks.sort((a, b) => {
+    deduped.sort((a, b) => {
       const ua = urgencyOrder[a.urgency];
       const ub = urgencyOrder[b.urgency];
       if (ua !== ub) return ua - ub;
       return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
     });
 
-    setTasks(allTasks);
+    setTasks(deduped);
     setLoading(false);
   };
 
