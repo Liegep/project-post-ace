@@ -680,6 +680,7 @@ export type Database = {
       clients: {
         Row: {
           allow_client_create_post: boolean
+          allow_client_create_tags: boolean
           allow_client_download: boolean
           allow_client_edit_caption: boolean
           allow_quick_access: boolean
@@ -719,6 +720,7 @@ export type Database = {
         }
         Insert: {
           allow_client_create_post?: boolean
+          allow_client_create_tags?: boolean
           allow_client_download?: boolean
           allow_client_edit_caption?: boolean
           allow_quick_access?: boolean
@@ -758,6 +760,7 @@ export type Database = {
         }
         Update: {
           allow_client_create_post?: boolean
+          allow_client_create_tags?: boolean
           allow_client_download?: boolean
           allow_client_edit_caption?: boolean
           allow_quick_access?: boolean
