@@ -290,7 +290,7 @@ const AdminDashboard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [role, currentUserId]);
+  }, [roleLoading, role, currentUserId]);
 
   const fetchTodayPosts = async () => {
     const allowedIds = await getAllowedClientIds();
