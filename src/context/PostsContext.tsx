@@ -380,10 +380,20 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     return data.publicUrl;
   }, []);
 
-  const addTag = useCallback((name: string, color: string): Tag => {
-    const tag: Tag = { id: crypto.randomUUID(), name, color };
+  const addTag = useCallback(async (name: string, color: string): Promise<Tag> => {
+    const tagId = crypto.randomUUID();
+    const { data, error } = await supabase
+      .from("tags")
+      .insert({ id: tagId, name, color, client_id: clientId } as any)
+      .select("id, name, color")
+      .single();
+
+    if (error || !data) {
+      throw error ?? new Error("Failed to create tag");
+    }
+
+    const tag: Tag = { id: data.id, name: data.name, color: data.color };
     setTags((prev) => [...prev, tag]);
-    supabase.from("tags").insert({ id: tag.id, name, color, client_id: clientId } as any);
     return tag;
   }, [clientId]);
 
