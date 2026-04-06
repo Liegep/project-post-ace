@@ -22,6 +22,7 @@ import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { isPostInvoiced, invoicePostAuto, getPostInvoiceItem, deleteInvoiceItem } from "@/hooks/useInvoices";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { getContrastColor } from "@/lib/utils";
 import {
   Calendar, MessageCircle, Trash2, Send, ChevronLeft, ChevronRight,
   DollarSign, Check, Users, Pencil, History, X, ChevronDown,
@@ -240,7 +241,7 @@ export function PostCardDialog({
                     const translationKey = TAG_TRANSLATION_KEYS[tag.id];
                     const displayName = translationKey ? t(translationKey as any) : tag.name;
                     return (
-                      <span key={tag.id} className="inline-flex rounded-full px-2.5 py-1 text-[10px] font-medium text-white" style={{ backgroundColor: tag.color }}>
+                      <span key={tag.id} className="inline-flex rounded-full px-2.5 py-1 text-[10px] font-medium" style={{ backgroundColor: tag.color, color: getContrastColor(tag.color) }}>
                         {displayName}
                       </span>
                     );

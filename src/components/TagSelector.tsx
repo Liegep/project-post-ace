@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 import { Tags, Plus, Search, X } from "lucide-react";
+import { getContrastColor } from "@/lib/utils";
 
 const getTagDisplayName = (tag: Tag, t: ReturnType<typeof useI18n>["t"]) => {
   const translationKey = TAG_TRANSLATION_KEYS[tag.id];
@@ -88,7 +89,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
         <span
           key={tag.id}
           className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold group/tag"
-          style={{ backgroundColor: tag.color, color: "#fff" }}
+           style={{ backgroundColor: tag.color, color: getContrastColor(tag.color) }}
         >
           {getTagDisplayName(tag, t)}
           <button
@@ -220,7 +221,7 @@ export const TagDisplay = ({ tagIds, tags }: TagDisplayProps) => {
           <span
             key={id}
             className="inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold"
-            style={{ backgroundColor: tag.color, color: "#fff" }}
+            style={{ backgroundColor: tag.color, color: getContrastColor(tag.color) }}
           >
             {displayName}
           </span>
