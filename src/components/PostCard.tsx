@@ -157,7 +157,7 @@ export const PostCard = memo(
           {/* Tags row */}
           {postTags.length > 0 && (
             <div className="flex flex-wrap gap-1">
-              {postTags.slice(0, 3).map((tag) => {
+              {postTags.map((tag) => {
                 if (!tag) return null;
                 const translationKey = TAG_TRANSLATION_KEYS[tag.id];
                 const displayName = translationKey ? t(translationKey as any) : tag.name;
@@ -171,9 +171,6 @@ export const PostCard = memo(
                   </span>
                 );
               })}
-              {postTags.length > 3 && (
-                <span className="text-[9px] text-muted-foreground font-medium">+{postTags.length - 3}</span>
-              )}
             </div>
           )}
 
