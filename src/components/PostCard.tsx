@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { LinkedText } from "@/components/LinkedText";
+import { MediaLightbox } from "@/components/MediaLightbox";
 import { Calendar, Play, Send } from "lucide-react";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
@@ -58,6 +59,7 @@ export const PostCard = memo(
     const { tags, updateClientLabel, addComment } = usePosts();
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
+    const [lightboxOpen, setLightboxOpen] = useState(false);
 
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
@@ -78,7 +80,16 @@ export const PostCard = memo(
       >
         {/* Thumbnail 4:5 */}
         {hasMedia && (
-          <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/5" }}>
+          <div
+            className="relative w-full overflow-hidden cursor-zoom-in"
+            style={{ aspectRatio: "4/5" }}
+            onClick={(e) => {
+              if (!isExternalLink(thumbUrl)) {
+                e.stopPropagation();
+                setLightboxOpen(true);
+              }
+            }}
+          >
             {(() => {
               if (isExternalLink(thumbUrl))
                 return (
@@ -238,6 +249,11 @@ export const PostCard = memo(
             </div>
           )}
         </div>
+        <MediaLightbox
+          urls={allMedia.filter((u) => !isExternalLink(u))}
+          open={lightboxOpen}
+          onOpenChange={setLightboxOpen}
+        />
       </Card>
     );
   },
