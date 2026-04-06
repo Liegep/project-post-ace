@@ -59,6 +59,7 @@ export const PostCard = memo(
     const { tags, updateClientLabel, addComment } = usePosts();
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
+    const [lightboxOpen, setLightboxOpen] = useState(false);
 
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
