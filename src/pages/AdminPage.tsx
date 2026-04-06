@@ -529,6 +529,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [allowClientEditCaption, setAllowClientEditCaption] = useState((clientData as any).allow_client_edit_caption ?? false);
   const [allowClientCreatePost, setAllowClientCreatePost] = useState((clientData as any).allow_client_create_post ?? false);
   const [allowClientDownload, setAllowClientDownload] = useState((clientData as any).allow_client_download ?? false);
+  const [allowClientCreateTags, setAllowClientCreateTags] = useState((clientData as any).allow_client_create_tags ?? false);
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
   const [trackingVisibleToClient, setTrackingVisibleToClient] = useState(clientData.tracking_visible_to_client ?? false);
   const [showUpcomingPosts, setShowUpcomingPosts] = useState((clientData as any).show_upcoming_posts ?? false);
