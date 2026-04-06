@@ -7,17 +7,18 @@ import {
   Calendar, FileText, CalendarHeart, X, History, FileBarChart, Palette
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const NAV_ITEMS = [
-  { path: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { path: "/team-management", label: "Equipe", icon: Users },
-  { path: "/social", label: "Social", icon: CalendarClock },
-  { path: "/ideas", label: "Ideias", icon: Lightbulb },
-  { path: "/calendar", label: "Calendário", icon: Calendar },
-  { path: "/briefs", label: "Pautas", icon: FileText },
-  { path: "/commemorative-dates", label: "Datas Comemorativas", icon: CalendarHeart },
-  { path: "/reports", label: "Relatórios", icon: FileBarChart },
-  { path: "/design-briefs", label: "Briefs de Design", icon: Palette },
+  { path: "/admin", label: "Dashboard", icon: LayoutDashboard, superAdminOnly: false },
+  { path: "/team-management", label: "Equipe", icon: Users, superAdminOnly: false },
+  { path: "/social", label: "Social", icon: CalendarClock, superAdminOnly: false },
+  { path: "/ideas", label: "Ideias", icon: Lightbulb, superAdminOnly: false },
+  { path: "/calendar", label: "Calendário", icon: Calendar, superAdminOnly: false },
+  { path: "/briefs", label: "Pautas", icon: FileText, superAdminOnly: false },
+  { path: "/commemorative-dates", label: "Datas Comemorativas", icon: CalendarHeart, superAdminOnly: false },
+  { path: "/reports", label: "Relatórios", icon: FileBarChart, superAdminOnly: true },
+  { path: "/design-briefs", label: "Briefs de Design", icon: Palette, superAdminOnly: false },
 ];
 
 interface MobileNavProps {
@@ -29,6 +30,7 @@ export function MobileNav({ title, children }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { isSuperAdmin } = useUserRole();
 
   return (
     <>
@@ -43,7 +45,9 @@ export function MobileNav({ title, children }: MobileNavProps) {
           </SheetHeader>
           {children && <div className="border-b px-5 py-3">{children}</div>}
           <nav className="flex flex-col py-2">
-            {NAV_ITEMS.map((item) => {
+            {NAV_ITEMS
+              .filter((item) => !item.superAdminOnly || isSuperAdmin)
+              .map((item) => {
               const isActive = location.pathname === item.path;
               return (
                 <button

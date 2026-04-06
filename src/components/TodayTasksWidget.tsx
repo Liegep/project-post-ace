@@ -30,7 +30,7 @@ const TYPE_CONFIG = {
 
 export const TodayTasksWidget = () => {
   const navigate = useNavigate();
-  const { userId } = useUserRole();
+  const { userId, isSuperAdmin } = useUserRole();
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"today" | "upcoming" | "overdue">("today");
@@ -45,12 +45,19 @@ export const TodayTasksWidget = () => {
     const now = new Date();
     const weekAhead = addDays(now, 7);
 
-    // Get user's client IDs
+    // Get user's client IDs (assigned + owned)
     const { data: assignments } = await supabase
       .from("user_client_assignments")
       .select("client_id")
       .eq("user_id", userId!);
-    const clientIds = (assignments || []).map((a: any) => a.client_id);
+    const { data: ownedClients } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("owner_id", userId!);
+    const clientIds = [...new Set([
+      ...(assignments || []).map((a: any) => a.client_id),
+      ...(ownedClients || []).map((c: any) => c.id),
+    ])];
 
     if (clientIds.length === 0) { setTasks([]); setLoading(false); return; }
 
@@ -90,30 +97,32 @@ export const TodayTasksWidget = () => {
       });
     });
 
-    // 2. Invoices due
-    const { data: invoices } = await supabase
-      .from("invoices")
-      .select("id, title, client_id, due_date, status")
-      .in("client_id", clientIds)
-      .in("status", ["open", "overdue"])
-      .lte("due_date", format(weekAhead, "yyyy-MM-dd"))
-      .order("due_date", { ascending: true });
+    // 2. Invoices due (only for super_admin)
+    if (isSuperAdmin) {
+      const { data: invoices } = await supabase
+        .from("invoices")
+        .select("id, title, client_id, due_date, status")
+        .in("client_id", clientIds)
+        .in("status", ["open", "overdue"])
+        .lte("due_date", format(weekAhead, "yyyy-MM-dd"))
+        .order("due_date", { ascending: true });
 
-    (invoices || []).forEach((inv: any) => {
-      const client = clientMap[inv.client_id];
-      if (!client) return;
-      allTasks.push({
-        id: inv.id,
-        title: inv.title || `Fatura #${inv.invoice_number || ""}`,
-        clientName: client.name,
-        clientSlug: client.slug,
-        clientLogo: client.logo_url || "",
-        type: "invoice",
-        deadline: inv.due_date,
-        urgency: getDeadlineUrgency(inv.due_date),
-        status: inv.status,
+      (invoices || []).forEach((inv: any) => {
+        const client = clientMap[inv.client_id];
+        if (!client) return;
+        allTasks.push({
+          id: inv.id,
+          title: inv.title || `Fatura #${inv.invoice_number || ""}`,
+          clientName: client.name,
+          clientSlug: client.slug,
+          clientLogo: client.logo_url || "",
+          type: "invoice",
+          deadline: inv.due_date,
+          urgency: getDeadlineUrgency(inv.due_date),
+          status: inv.status,
+        });
       });
-    });
+    }
 
     // 3. Briefs with planned_date
     const { data: briefs } = await supabase

@@ -293,6 +293,9 @@ const AdminDashboard = () => {
   }, [role, currentUserId]);
 
   const fetchTodayPosts = async () => {
+    const allowedIds = await getAllowedClientIds();
+    if (allowedIds.length === 0) { setTodayPosts([]); return; }
+
     const today = new Date();
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
     const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
@@ -303,6 +306,7 @@ const AdminDashboard = () => {
       .gte("deadline", startOfDay)
       .lt("deadline", endOfDay)
       .eq("archived", false)
+      .in("client_id", allowedIds)
       .order("deadline", { ascending: true });
 
     if (!posts || posts.length === 0) {
@@ -486,11 +490,41 @@ const AdminDashboard = () => {
     );
   };
 
+  const getAllowedClientIds = async (): Promise<string[]> => {
+    if (!currentUserId) return [];
+    const { data: assignments } = await supabase
+      .from("user_client_assignments")
+      .select("client_id")
+      .eq("user_id", currentUserId);
+    const assignedIds = (assignments || []).map((a: any) => a.client_id);
+
+    const { data: ownedClients } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("owner_id", currentUserId);
+    const ownedIds = (ownedClients || []).map((c: any) => c.id);
+
+    let sharedIds: string[] = [];
+    if (isSuperAdmin) {
+      const { data: sharedClients } = await supabase
+        .from("clients")
+        .select("id")
+        .eq("shared", true);
+      sharedIds = (sharedClients || []).map((c: any) => c.id);
+    }
+
+    return [...new Set([...assignedIds, ...ownedIds, ...sharedIds])];
+  };
+
   const fetchUnarchiveNotifs = async () => {
+    const allowedIds = await getAllowedClientIds();
+    if (allowedIds.length === 0) { setUnarchiveNotifs([]); return; }
+
     const { data: posts } = await supabase
       .from("posts")
       .select("id, title, client_id, client_unarchived_at")
       .not("client_unarchived_at", "is", null)
+      .in("client_id", allowedIds)
       .order("client_unarchived_at", { ascending: false });
 
     if (!posts || posts.length === 0) {
@@ -590,10 +624,14 @@ const AdminDashboard = () => {
   };
 
   const fetchClientCreatedNotifs = async () => {
+    const allowedIds = await getAllowedClientIds();
+    if (allowedIds.length === 0) { setClientCreatedNotifs([]); return; }
+
     const { data: posts } = await supabase
       .from("posts")
       .select("id, title, client_id, client_created_at")
       .not("client_created_at", "is", null)
+      .in("client_id", allowedIds)
       .order("client_created_at", { ascending: false });
 
     if (!posts || posts.length === 0) {
@@ -977,15 +1015,21 @@ const AdminDashboard = () => {
               <button onClick={() => { setMobileMenuOpen(false); navigate("/briefs"); }} className={navItemClass("/briefs")}>
                 <FileText className={navIconClass("/briefs")} /> Pautas
               </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/reports"); }} className={navItemClass("/reports")}>
-                <FileBarChart className={navIconClass("/reports")} /> Relatórios
-              </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/billing"); }} className={navItemClass("/billing")}>
-                <DollarSign className={navIconClass("/billing")} /> Faturamento
-              </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/proposals"); }} className={navItemClass("/proposals")}>
-                <FileSignature className={navIconClass("/proposals")} /> Propostas
-              </button>
+              {isSuperAdmin && (
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/reports"); }} className={navItemClass("/reports")}>
+                  <FileBarChart className={navIconClass("/reports")} /> Relatórios
+                </button>
+              )}
+              {isSuperAdmin && (
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/billing"); }} className={navItemClass("/billing")}>
+                  <DollarSign className={navIconClass("/billing")} /> Faturamento
+                </button>
+              )}
+              {isSuperAdmin && (
+                <button onClick={() => { setMobileMenuOpen(false); navigate("/proposals"); }} className={navItemClass("/proposals")}>
+                  <FileSignature className={navIconClass("/proposals")} /> Propostas
+                </button>
+              )}
               {isSuperAdmin && (
                 <button onClick={() => { setMobileMenuOpen(false); navigate("/contracts"); }} className={navItemClass("/contracts")}>
                   <FileText className={navIconClass("/contracts")} /> Contratos

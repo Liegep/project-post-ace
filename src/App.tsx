@@ -64,11 +64,11 @@ const App = () => (
               <Route path="/briefs" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><BriefsPage /></AuthGuard>} />
               <Route path="/commemorative-dates" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><CommemorativeDatesPage /></AuthGuard>} />
               {/* activity-log route removed */}
-              <Route path="/reports" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><ReportsPage /></AuthGuard>} />
-              <Route path="/reports/new" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><CreateReportPage /></AuthGuard>} />
+              <Route path="/reports" element={<AuthGuard allowedRoles={["super_admin"]}><ReportsPage /></AuthGuard>} />
+              <Route path="/reports/new" element={<AuthGuard allowedRoles={["super_admin"]}><CreateReportPage /></AuthGuard>} />
               <Route path="/reports/:id" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ReportViewPage /></AuthGuard>} />
-              <Route path="/billing" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><BillingPage /></AuthGuard>} />
-              <Route path="/proposals" element={<AuthGuard allowedRoles={["super_admin", "admin"]}><ProposalsPage /></AuthGuard>} />
+              <Route path="/billing" element={<AuthGuard allowedRoles={["super_admin"]}><BillingPage /></AuthGuard>} />
+              <Route path="/proposals" element={<AuthGuard allowedRoles={["super_admin"]}><ProposalsPage /></AuthGuard>} />
               <Route path="/contracts" element={<AuthGuard allowedRoles={["super_admin"]}><ContractsPage /></AuthGuard>} />
               <Route path="/design-briefs" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><DesignBriefsPage /></AuthGuard>} />
               <Route path="/client/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ClientPage /></AuthGuard>} />
