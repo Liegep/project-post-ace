@@ -525,6 +525,13 @@ export function PostCardDialog({
           clientId={clientId}
         />
       </DialogContent>
+
+      <MediaLightbox
+        urls={allMedia.filter((u) => !isExternalLink(u))}
+        initialIndex={mediaIndex}
+        open={lightboxOpen}
+        onOpenChange={setLightboxOpen}
+      />
     </Dialog>
   );
 }
