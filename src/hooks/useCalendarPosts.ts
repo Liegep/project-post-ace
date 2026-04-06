@@ -41,7 +41,29 @@ export function useCalendarPosts() {
       .select("*, clients(name, logo_url)")
       .order("publish_date", { ascending: true })
       .order("publish_time", { ascending: true }) as any;
-    setPosts(data || []);
+
+    const fetched: CalendarPost[] = data || [];
+
+    // Auto-mark past posts as "published" if they're scheduled/approved
+    const now = new Date();
+    const toPublish = fetched.filter((p) => {
+      if (p.status !== "scheduled" && p.status !== "approved") return false;
+      const [hours, minutes] = (p.publish_time || "12:00").split(":").map(Number);
+      const postDate = new Date(p.publish_date + "T12:00:00");
+      postDate.setHours(hours, minutes, 0, 0);
+      return postDate <= now;
+    });
+
+    if (toPublish.length > 0) {
+      const ids = toPublish.map((p) => p.id);
+      await supabase
+        .from("calendar_posts")
+        .update({ status: "published" } as any)
+        .in("id", ids);
+      toPublish.forEach((p) => { p.status = "published"; });
+    }
+
+    setPosts(fetched);
     setLoading(false);
   }, []);
 
