@@ -61,6 +61,23 @@ export function useCalendarPosts() {
         .update({ status: "published" } as any)
         .in("id", ids);
       toPublish.forEach((p) => { p.status = "published"; });
+
+      // Auto-archive Kanban posts with matching title in the same client
+      for (const cp of toPublish) {
+        const { data: kanbanPosts } = await supabase
+          .from("posts")
+          .select("id")
+          .eq("client_id", cp.client_id)
+          .eq("title", cp.title)
+          .eq("archived", false);
+        if (kanbanPosts && kanbanPosts.length > 0) {
+          const kanbanIds = kanbanPosts.map((kp: any) => kp.id);
+          await supabase
+            .from("posts")
+            .update({ archived: true, archived_at: new Date().toISOString() } as any)
+            .in("id", kanbanIds);
+        }
+      }
     }
 
     setPosts(fetched);
