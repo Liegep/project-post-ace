@@ -486,11 +486,41 @@ const AdminDashboard = () => {
     );
   };
 
+  const getAllowedClientIds = async (): Promise<string[]> => {
+    if (!currentUserId) return [];
+    const { data: assignments } = await supabase
+      .from("user_client_assignments")
+      .select("client_id")
+      .eq("user_id", currentUserId);
+    const assignedIds = (assignments || []).map((a: any) => a.client_id);
+
+    const { data: ownedClients } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("owner_id", currentUserId);
+    const ownedIds = (ownedClients || []).map((c: any) => c.id);
+
+    let sharedIds: string[] = [];
+    if (isSuperAdmin) {
+      const { data: sharedClients } = await supabase
+        .from("clients")
+        .select("id")
+        .eq("shared", true);
+      sharedIds = (sharedClients || []).map((c: any) => c.id);
+    }
+
+    return [...new Set([...assignedIds, ...ownedIds, ...sharedIds])];
+  };
+
   const fetchUnarchiveNotifs = async () => {
+    const allowedIds = await getAllowedClientIds();
+    if (allowedIds.length === 0) { setUnarchiveNotifs([]); return; }
+
     const { data: posts } = await supabase
       .from("posts")
       .select("id, title, client_id, client_unarchived_at")
       .not("client_unarchived_at", "is", null)
+      .in("client_id", allowedIds)
       .order("client_unarchived_at", { ascending: false });
 
     if (!posts || posts.length === 0) {
