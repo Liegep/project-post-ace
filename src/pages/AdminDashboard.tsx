@@ -263,7 +263,7 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    if (role === null && currentUserId === null) return; // still loading
+    if (roleLoading || !currentUserId) return; // wait for role to fully load
     fetchClients().then(() => fetchClientUsers());
     fetchFeedbacks();
     fetchUnarchiveNotifs();
