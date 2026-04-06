@@ -529,6 +529,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [allowClientEditCaption, setAllowClientEditCaption] = useState((clientData as any).allow_client_edit_caption ?? false);
   const [allowClientCreatePost, setAllowClientCreatePost] = useState((clientData as any).allow_client_create_post ?? false);
   const [allowClientDownload, setAllowClientDownload] = useState((clientData as any).allow_client_download ?? false);
+  const [allowClientCreateTags, setAllowClientCreateTags] = useState((clientData as any).allow_client_create_tags ?? false);
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
   const [trackingVisibleToClient, setTrackingVisibleToClient] = useState(clientData.tracking_visible_to_client ?? false);
   const [showUpcomingPosts, setShowUpcomingPosts] = useState((clientData as any).show_upcoming_posts ?? false);
@@ -580,6 +581,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const toggleAllowClientDownload = async (checked: boolean) => {
     setAllowClientDownload(checked);
     await supabase.from("clients").update({ allow_client_download: checked } as any).eq("id", clientData.id);
+  };
+
+  const toggleAllowClientCreateTags = async (checked: boolean) => {
+    setAllowClientCreateTags(checked);
+    await supabase.from("clients").update({ allow_client_create_tags: checked } as any).eq("id", clientData.id);
   };
 
   const enableTracking = async () => {
@@ -904,6 +910,13 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   Baixar conteúdo
                 </label>
                 <Switch checked={allowClientDownload} onCheckedChange={toggleAllowClientDownload} />
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground flex items-center gap-2">
+                  <ClipboardList className="h-3.5 w-3.5 text-muted-foreground" />
+                  Criar tags
+                </label>
+                <Switch checked={allowClientCreateTags} onCheckedChange={toggleAllowClientCreateTags} />
               </div>
               <div className="flex items-center justify-between">
                 <label className="text-sm text-foreground flex items-center gap-2">

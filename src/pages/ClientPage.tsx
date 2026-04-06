@@ -45,6 +45,7 @@ interface ClientData {
   allow_client_edit_caption: boolean;
   allow_client_create_post: boolean;
   allow_client_download: boolean;
+  allow_client_create_tags: boolean;
   tracking_enabled: boolean;
   tracking_visible_to_client: boolean;
   show_upcoming_posts: boolean;
@@ -613,6 +614,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         isAdmin={false}
         allowEditCaption={clientData.allow_client_edit_caption}
         allowClientDownload={clientData.allow_client_download}
+        allowClientCreateTags={clientData.allow_client_create_tags}
       />
     </div>
   );

@@ -81,6 +81,7 @@ interface PostCardDialogProps {
   allowEditCaption?: boolean;
   allowClientDownload?: boolean;
   hideFeedback?: boolean;
+  allowClientCreateTags?: boolean;
 }
 
 export function PostCardDialog({
@@ -94,6 +95,7 @@ export function PostCardDialog({
   allowEditCaption,
   allowClientDownload,
   hideFeedback,
+  allowClientCreateTags,
 }: PostCardDialogProps) {
   const { addComment, updateClientLabel, updatePost, tags, clientId } = usePosts();
   const { t } = useI18n();
@@ -418,6 +420,13 @@ export function PostCardDialog({
                         </Button>
                       )}
                     </>
+                  )}
+
+                  {/* Client tag creation */}
+                  {!isAdmin && allowClientCreateTags && (
+                    <div>
+                      <TagSelector selectedTagIds={post.tags} onChange={(tagIds) => updatePost(post.id, { tags: tagIds })} />
+                    </div>
                   )}
 
                   {/* Download buttons */}
