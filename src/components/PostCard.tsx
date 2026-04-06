@@ -12,6 +12,7 @@ import { MediaLightbox } from "@/components/MediaLightbox";
 import { Calendar, Play, Send } from "lucide-react";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
+import { getContrastColor } from "@/lib/utils";
 
 const STATUS_KEYS: Record<PostStatus, string> = {
   entrada: "statusEntry",

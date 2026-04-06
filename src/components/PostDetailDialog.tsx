@@ -11,6 +11,7 @@ import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { LinkedText } from "@/components/LinkedText";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { toast } from "sonner";
+import { getContrastColor } from "@/lib/utils";
 
 interface PostDetailDialogProps {
   post: Post | null;

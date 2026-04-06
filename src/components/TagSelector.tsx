@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
 import { Tags, Plus, Search, X } from "lucide-react";
+import { getContrastColor } from "@/lib/utils";
 
 const getTagDisplayName = (tag: Tag, t: ReturnType<typeof useI18n>["t"]) => {
   const translationKey = TAG_TRANSLATION_KEYS[tag.id];

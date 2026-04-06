@@ -22,6 +22,7 @@ import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { isPostInvoiced, invoicePostAuto, getPostInvoiceItem, deleteInvoiceItem } from "@/hooks/useInvoices";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { getContrastColor } from "@/lib/utils";
 import {
   Calendar, MessageCircle, Trash2, Send, ChevronLeft, ChevronRight,
   DollarSign, Check, Users, Pencil, History, X, ChevronDown,
