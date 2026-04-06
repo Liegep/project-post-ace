@@ -420,35 +420,8 @@ const AdminDashboard = () => {
   };
 
   const fetchFeedbacks = async () => {
-    if (!currentUserId) return;
-
-    // Get allowed client IDs (owned + assigned + shared)
-    const { data: assignments } = await supabase
-      .from("user_client_assignments")
-      .select("client_id")
-      .eq("user_id", currentUserId);
-    const assignedIds = (assignments || []).map((a: any) => a.client_id);
-
-    const { data: ownedClients } = await supabase
-      .from("clients")
-      .select("id")
-      .eq("owner_id", currentUserId);
-    const ownedIds = (ownedClients || []).map((c: any) => c.id);
-
-    let sharedIds: string[] = [];
-    if (isSuperAdmin) {
-      const { data: sharedClients } = await supabase
-        .from("clients")
-        .select("id")
-        .eq("shared", true);
-      sharedIds = (sharedClients || []).map((c: any) => c.id);
-    }
-
-    const allowedIds = [...new Set([...assignedIds, ...ownedIds, ...sharedIds])];
-    if (allowedIds.length === 0) {
-      setFeedbacks([]);
-      return;
-    }
+    const allowedIds = await getAllowedClientIds();
+    if (allowedIds.length === 0) { setFeedbacks([]); return; }
 
     // Fetch posts where client gave feedback (label != pendente)
     const { data: posts } = await supabase
