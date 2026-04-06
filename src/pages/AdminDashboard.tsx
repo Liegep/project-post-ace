@@ -620,10 +620,14 @@ const AdminDashboard = () => {
   };
 
   const fetchClientCreatedNotifs = async () => {
+    const allowedIds = await getAllowedClientIds();
+    if (allowedIds.length === 0) { setClientCreatedNotifs([]); return; }
+
     const { data: posts } = await supabase
       .from("posts")
       .select("id, title, client_id, client_created_at")
       .not("client_created_at", "is", null)
+      .in("client_id", allowedIds)
       .order("client_created_at", { ascending: false });
 
     if (!posts || posts.length === 0) {
