@@ -293,6 +293,9 @@ const AdminDashboard = () => {
   }, [role, currentUserId]);
 
   const fetchTodayPosts = async () => {
+    const allowedIds = await getAllowedClientIds();
+    if (allowedIds.length === 0) { setTodayPosts([]); return; }
+
     const today = new Date();
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
     const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
@@ -303,6 +306,7 @@ const AdminDashboard = () => {
       .gte("deadline", startOfDay)
       .lt("deadline", endOfDay)
       .eq("archived", false)
+      .in("client_id", allowedIds)
       .order("deadline", { ascending: true });
 
     if (!posts || posts.length === 0) {
