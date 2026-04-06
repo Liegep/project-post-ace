@@ -154,11 +154,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <Label htmlFor="edit-caption" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("caption")}</Label>
-                  <HashtagManager clientId={clientId} onInsert={(h) => setCaption((prev) => prev ? `${prev}\n\n${h}` : h)} />
-                </div>
-                <Textarea id="edit-caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("captionPlaceholder")} className="min-h-[220px] text-sm" />
+                <Label htmlFor="edit-caption" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">{t("caption")}</Label>
+                <Textarea id="edit-caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("captionPlaceholder")} className="min-h-[350px] text-sm" />
               </div>
 
               <div>
@@ -222,6 +219,13 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                 <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("tags")}</Label>
                 <div className="mt-1">
                   <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Hashtags</Label>
+                <div className="mt-1">
+                  <HashtagManager clientId={clientId} onInsert={(h) => setCaption((prev) => prev ? `${prev}\n\n${h}` : h)} />
                 </div>
               </div>
 
