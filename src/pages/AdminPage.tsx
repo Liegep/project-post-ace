@@ -542,7 +542,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
     if (postId && posts.length > 0) {
       const found = posts.find((p) => p.id === postId);
       if (found) {
-        setDetailPost(found);
+        setEditPost(found);
         // Clean up the query param
         searchParams.delete("postId");
         setSearchParams(searchParams, { replace: true });
