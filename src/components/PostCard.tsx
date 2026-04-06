@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { LinkedText } from "@/components/LinkedText";
+import { MediaLightbox } from "@/components/MediaLightbox";
 import { Calendar, Play, Send } from "lucide-react";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
