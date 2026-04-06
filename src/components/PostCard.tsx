@@ -249,6 +249,11 @@ export const PostCard = memo(
             </div>
           )}
         </div>
+        <MediaLightbox
+          urls={allMedia.filter((u) => !isExternalLink(u))}
+          open={lightboxOpen}
+          onOpenChange={setLightboxOpen}
+        />
       </Card>
     );
   },
