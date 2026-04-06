@@ -97,30 +97,32 @@ export const TodayTasksWidget = () => {
       });
     });
 
-    // 2. Invoices due
-    const { data: invoices } = await supabase
-      .from("invoices")
-      .select("id, title, client_id, due_date, status")
-      .in("client_id", clientIds)
-      .in("status", ["open", "overdue"])
-      .lte("due_date", format(weekAhead, "yyyy-MM-dd"))
-      .order("due_date", { ascending: true });
+    // 2. Invoices due (only for super_admin)
+    if (isSuperAdmin) {
+      const { data: invoices } = await supabase
+        .from("invoices")
+        .select("id, title, client_id, due_date, status")
+        .in("client_id", clientIds)
+        .in("status", ["open", "overdue"])
+        .lte("due_date", format(weekAhead, "yyyy-MM-dd"))
+        .order("due_date", { ascending: true });
 
-    (invoices || []).forEach((inv: any) => {
-      const client = clientMap[inv.client_id];
-      if (!client) return;
-      allTasks.push({
-        id: inv.id,
-        title: inv.title || `Fatura #${inv.invoice_number || ""}`,
-        clientName: client.name,
-        clientSlug: client.slug,
-        clientLogo: client.logo_url || "",
-        type: "invoice",
-        deadline: inv.due_date,
-        urgency: getDeadlineUrgency(inv.due_date),
-        status: inv.status,
+      (invoices || []).forEach((inv: any) => {
+        const client = clientMap[inv.client_id];
+        if (!client) return;
+        allTasks.push({
+          id: inv.id,
+          title: inv.title || `Fatura #${inv.invoice_number || ""}`,
+          clientName: client.name,
+          clientSlug: client.slug,
+          clientLogo: client.logo_url || "",
+          type: "invoice",
+          deadline: inv.due_date,
+          urgency: getDeadlineUrgency(inv.due_date),
+          status: inv.status,
+        });
       });
-    });
+    }
 
     // 3. Briefs with planned_date
     const { data: briefs } = await supabase
