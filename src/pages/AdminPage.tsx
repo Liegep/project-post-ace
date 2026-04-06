@@ -1087,7 +1087,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     handleDeleteColumn={handleDeleteColumn}
                     updatePostStatus={updatePostStatus}
                     deletePost={deletePost}
-                    setDetailPost={setDetailPost}
+                    setDetailPost={setEditPost}
                     setCreateInColumnId={setCreateInColumnId}
                     setCreateOpen={setCreateOpen}
                     addingColumn={addingColumn}
