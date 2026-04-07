@@ -68,7 +68,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const selectedDayPosts = selectedDay ? (postsByDate[selectedDay] || []) : [];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-zinc-950">{/* Force dark text for modal readability */}
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
