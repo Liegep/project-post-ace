@@ -146,7 +146,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
             </Button>
           </div>
           {selectedDayPosts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Nenhum post agendado para este dia.</p>
+            <p className="text-sm text-zinc-500">Nenhum post agendado para este dia.</p>
           ) : (
             <div className="space-y-2">
               {selectedDayPosts.map(post => {
