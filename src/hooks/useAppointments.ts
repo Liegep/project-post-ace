@@ -139,7 +139,7 @@ export function useAppointments() {
       completed_at: null,
     };
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, cancelled, cancelledAt: cancelled ? new Date() : null, completed: false, completedAt: null } : a));
-    await supabase.from("appointments").update(updates).eq("id", id);
+    await supabase.from("appointments").update(updates as any).eq("id", id);
   }, []);
 
   const deleteAppointment = useCallback(async (id: string) => {
