@@ -242,6 +242,26 @@ type TranslationKeys = {
   goodMorning: string;
   goodAfternoon: string;
   goodEvening: string;
+  // Approval page (client-facing link)
+  approvalContentHeader: string;
+  approvalYourName: string;
+  approvalYourNamePlaceholder: string;
+  approvalNoPending: string;
+  approvalAllReviewed: string;
+  approvalApprove: string;
+  approvalRequestChange: string;
+  approvalCommentPlaceholder: string;
+  approvalApproved: string;
+  approvalChangeRequested: string;
+  approvalReviewed: string;
+  approvalInvalidLink: string;
+  approvalExpiredLink: string;
+  approvalErrorContact: string;
+  approvalLogin: string;
+  approvalLoadError: string;
+  approvalSuccessApproved: string;
+  approvalSuccessChange: string;
+  approvalActionError: string;
 };
 
 const pt: TranslationKeys = {
