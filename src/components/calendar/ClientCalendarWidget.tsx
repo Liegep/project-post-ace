@@ -136,9 +136,9 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
 
       {/* Selected day detail */}
       {selectedDay && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-lg border border-zinc-200 bg-white p-4">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold text-sm">
+            <h4 className="font-semibold text-sm text-zinc-900">
               {format(new Date(selectedDay + "T12:00:00"), "EEEE, d 'de' MMMM", { locale: ptBR })}
             </h4>
             <Button size="sm" variant="outline" onClick={() => openCreate(selectedDay)}>
