@@ -94,6 +94,7 @@ interface ClientData {
   tracking_enabled: boolean;
   tracking_visible_to_client: boolean;
   show_upcoming_posts: boolean;
+  client_portal_title: string;
   instagram_url: string;
   facebook_url: string;
   tiktok_url: string;
