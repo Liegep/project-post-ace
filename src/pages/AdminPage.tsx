@@ -19,7 +19,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings2, History, Download, CalendarClock, FileText } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings, History, Download, CalendarClock, FileText } from "lucide-react";
 import { ClientRightSidebar } from "@/components/ClientRightSidebar";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -808,7 +808,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               <Plus className="mr-2 h-4 w-4" /> {t("newPost")}
             </Button>
             <Button variant="outline" size="icon" onClick={() => setSettingsDrawerOpen(true)} title="Configurações">
-              <Settings2 className="h-4 w-4" />
+              <Settings className="h-4 w-4" />
             </Button>
           </div>
 
@@ -818,7 +818,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               <Plus className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setSettingsDrawerOpen(true)}>
-              <Settings2 className="h-4 w-4" />
+              <Settings className="h-4 w-4" />
             </Button>
           </div>
         </div>
