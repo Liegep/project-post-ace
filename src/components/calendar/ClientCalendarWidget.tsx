@@ -75,7 +75,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(prev => subMonths(prev, 1))}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <h3 className="text-lg font-semibold capitalize">
+          <h3 className="text-lg font-semibold capitalize text-zinc-950">
             {format(currentDate, "MMMM yyyy", { locale: ptBR })}
           </h3>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(prev => addMonths(prev, 1))}>
