@@ -49,6 +49,7 @@ interface ClientData {
   tracking_enabled: boolean;
   tracking_visible_to_client: boolean;
   show_upcoming_posts: boolean;
+  client_portal_title: string;
 }
 
 const POSTS_PER_PAGE = 6;
@@ -414,7 +415,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "board" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
               >
                 <LayoutGrid className="mr-1.5 inline h-4 w-4" />
-                {t("postsForApproval")}
+                {clientData.client_portal_title || t("postsForApproval")}
               </button>
               <button
                 onClick={() => setActiveTab("archived")}
@@ -435,7 +436,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         {activeTab === "board" || !clientData.show_archived_to_client ? (
           <>
             {!clientData.show_archived_to_client && (
-              <h2 className="mb-6 text-center text-3xl font-bold text-foreground">{t("postsForApproval")}</h2>
+              <h2 className="mb-6 text-center text-3xl font-bold text-foreground">{clientData.client_portal_title || t("postsForApproval")}</h2>
             )}
 
             {clientData.allow_client_create_post && (

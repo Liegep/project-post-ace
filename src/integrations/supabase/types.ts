@@ -691,6 +691,7 @@ export type Database = {
           billing_recurrence_active: boolean
           billing_start_date: string | null
           billing_type: string
+          client_portal_title: string
           client_type: string
           created_at: string
           facebook_url: string
@@ -731,6 +732,7 @@ export type Database = {
           billing_recurrence_active?: boolean
           billing_start_date?: string | null
           billing_type?: string
+          client_portal_title?: string
           client_type?: string
           created_at?: string
           facebook_url?: string
@@ -771,6 +773,7 @@ export type Database = {
           billing_recurrence_active?: boolean
           billing_start_date?: string | null
           billing_type?: string
+          client_portal_title?: string
           client_type?: string
           created_at?: string
           facebook_url?: string

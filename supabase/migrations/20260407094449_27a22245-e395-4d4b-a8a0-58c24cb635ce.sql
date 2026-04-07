@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN client_portal_title text NOT NULL DEFAULT '';
