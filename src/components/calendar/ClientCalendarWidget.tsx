@@ -166,8 +166,8 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                             {cfg.label}
                           </span>
                         </div>
-                        <p className="font-medium text-sm truncate">{post.title}</p>
-                        {post.caption && <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{post.caption}</p>}
+                        <p className="font-medium text-sm truncate text-zinc-900">{post.title}</p>
+                        {post.caption && <p className="text-xs text-zinc-500 line-clamp-2 mt-1">{post.caption}</p>}
                       </div>
                       {post.media_urls?.[0] && (
                         <img src={post.media_urls[0]} alt="" className="h-12 w-12 rounded object-cover shrink-0" />
