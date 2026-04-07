@@ -26,6 +26,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
 import ClientAccessPanel from "@/components/ClientAccessPanel";
 import { HybridAccessConfig } from "@/components/HybridAccessConfig";
+import { ClientCalendarWidget } from "@/components/calendar/ClientCalendarWidget";
 import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
