@@ -19,7 +19,7 @@ import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { format, startOfMonth, endOfMonth, addMonths, subMonths, isSameMonth } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { ptBR, it, enUS, es, sv } from "date-fns/locale";
 import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound, Menu, FileBarChart, ArrowRight, ChevronLeft, ChevronRight as ChevronRightIcon } from "lucide-react";
 import { ClientNewsWidget } from "@/components/ClientNewsWidget";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
