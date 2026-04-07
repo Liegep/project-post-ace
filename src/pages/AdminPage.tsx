@@ -505,7 +505,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const [view, setView] = useState<"kanban" | "list">("kanban");
-  const [activeTab, setActiveTab] = useState<"board" | "archived" | "activity" | "texts" | "calendar">("board");
+  const [activeTab, setActiveTab] = useState<"board" | "archived" | "activity" | "texts">("board");
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [detailPost, setDetailPost] = useState<Post | null>(null);
