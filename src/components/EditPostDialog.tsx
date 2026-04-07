@@ -3,19 +3,33 @@ import { usePosts } from "@/context/PostsContext";
 
 import { useI18n } from "@/i18n/I18nContext";
 import { HashtagManager } from "@/components/HashtagManager";
-import { Post, PostStatus, MediaType } from "@/types/post";
+import { Post, PostStatus, MediaType, STATUS_CONFIG } from "@/types/post";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Save, ShieldCheck } from "lucide-react";
+import { Save, ShieldCheck, ChevronDown, Users } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 import { SortableMediaGrid, SortableMediaItem } from "@/components/SortableMediaGrid";
+import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
+import { InternalApprovalDialog } from "@/components/InternalApprovalDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { createPostDeadlineFromInput, formatPostDeadlineInput } from "@/lib/postDeadline";
+
+const STATUS_KEYS: Record<PostStatus, string> = {
+  entrada: "statusEntry",
+  em_desenvolvimento: "statusInDevelopment",
+  escrevendo_legenda: "statusWritingCaption",
+  pronto: "statusReady",
+  finalizado: "statusFinalized",
+  alteracao_solicitada: "statusChangeRequested",
+  agendado: "statusScheduled",
+};
 
 interface EditPostDialogProps {
   post: Post | null;
@@ -39,6 +53,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [uploading, setUploading] = useState(false);
   const [retainFiles, setRetainFiles] = useState(false);
   const [externalLink, setExternalLink] = useState("");
+  const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -197,6 +212,34 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
             {/* RIGHT COLUMN — Settings */}
             <div className="md:w-[35%] p-6 space-y-4">
+              {/* Status dropdown */}
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="w-full justify-between mt-1 text-xs h-9">
+                      <span>{status.map((s) => t(STATUS_KEYS[s] as any)).join(", ") || "Selecionar"}</span>
+                      <ChevronDown className="h-3.5 w-3.5 ml-1 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-52 p-2" align="start">
+                    {(Object.keys(STATUS_CONFIG) as PostStatus[]).map((key) => (
+                      <div
+                        key={key}
+                        role="button"
+                        onClick={() => setStatus((prev) => prev.includes(key) ? prev.filter((s) => s !== key) : [...prev, key])}
+                        className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted cursor-pointer"
+                      >
+                        <Checkbox checked={status.includes(key)} className="h-3.5 w-3.5 pointer-events-none" />
+                        <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${STATUS_CONFIG[key].color}`}>
+                          {t(STATUS_KEYS[key] as any)}
+                        </span>
+                      </div>
+                    ))}
+                  </PopoverContent>
+                </Popover>
+              </div>
+
               <div>
                 <Label htmlFor="edit-deadline" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("deadline")}</Label>
                 <Input id="edit-deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="mt-1" />
@@ -244,9 +287,30 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               <Button type="submit" disabled={uploading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
                 <Save className="mr-2 h-4 w-4" /> {uploading ? "..." : t("saveChanges")}
               </Button>
+
+              {/* Approval & Internal actions */}
+              {post && (
+                <div className="space-y-2 pt-2 border-t border-border">
+                  <ApprovalLinkButton postId={post.id} clientId={clientId} postTitle={post.title} className="w-full" />
+                  <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs" onClick={() => setInternalApprovalOpen(true)}>
+                    <Users className="h-3.5 w-3.5" />
+                    Aprovação Interna
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </form>
+
+        {post && (
+          <InternalApprovalDialog
+            open={internalApprovalOpen}
+            onOpenChange={setInternalApprovalOpen}
+            postId={post.id}
+            postTitle={post.title}
+            clientId={clientId}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
