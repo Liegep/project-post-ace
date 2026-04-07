@@ -95,7 +95,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
           </div>
         ))}
         {Array.from({ length: startPad }).map((_, i) => (
-          <div key={`pad-${i}`} className="bg-card min-h-[80px]" />
+          <div key={`pad-${i}`} className="bg-white min-h-[80px]" />
         ))}
         {days.map(day => {
           const key = format(day, "yyyy-MM-dd");
