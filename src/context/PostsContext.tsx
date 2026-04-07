@@ -237,7 +237,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     }
 
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status, ...(newColumnId ? { columnId: newColumnId } : {}) } : p)));
-    await supabase.from("posts").update(updates).eq("id", id);
+    await supabase.from("posts").update(updates as any).eq("id", id);
     pushToTrello(id, "update");
 
 
