@@ -128,7 +128,7 @@ export function useAppointments() {
       cancelled_at: null,
     };
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, completed, completedAt: completed ? new Date() : null, cancelled: false, cancelledAt: null } : a));
-    await supabase.from("appointments").update(updates).eq("id", id);
+    await supabase.from("appointments").update(updates as any).eq("id", id);
   }, []);
 
   const toggleCancelled = useCallback(async (id: string, cancelled: boolean) => {
