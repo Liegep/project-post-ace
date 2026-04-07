@@ -19,7 +19,7 @@ import { CreatePostDialog } from "@/components/CreatePostDialog";
 import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { format, startOfMonth, endOfMonth, addMonths, subMonths, isSameMonth } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { ptBR, it, enUS, es, sv } from "date-fns/locale";
 import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound, Menu, FileBarChart, ArrowRight, ChevronLeft, ChevronRight as ChevronRightIcon } from "lucide-react";
 import { ClientNewsWidget } from "@/components/ClientNewsWidget";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
@@ -288,13 +288,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             {getGreeting()}{userName ? `, ${userName.split(" ")[0]}` : ""} 👋
           </h2>
         </div>
-        {postingPeriod && (
-          <div className="mb-4 flex justify-center">
-            <span className="rounded-full bg-primary px-6 py-2 text-lg font-bold text-primary-foreground shadow-md">
-              {postingPeriod}
-            </span>
-          </div>
-        )}
 
         {/* Month Selector */}
         <div className="mb-6 flex items-center justify-center gap-3">
@@ -310,7 +303,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             onClick={() => setSelectedMonth(new Date())}
             className="rounded-lg bg-muted px-4 py-1.5 text-sm font-semibold text-foreground capitalize hover:bg-muted/80 transition-colors"
           >
-            {format(selectedMonth, "MMMM yyyy", { locale: ptBR })}
+            {format(selectedMonth, "MMMM yyyy", { locale: { pt: ptBR, it, en: enUS, es, sv }[locale] || ptBR })}
           </button>
           <Button
             variant="ghost"
