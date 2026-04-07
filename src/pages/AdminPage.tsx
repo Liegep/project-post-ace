@@ -505,7 +505,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const [view, setView] = useState<"kanban" | "list">("kanban");
-  const [activeTab, setActiveTab] = useState<"board" | "archived" | "activity" | "texts" | "calendar">("board");
+  const [activeTab, setActiveTab] = useState<"board" | "archived" | "activity" | "texts">("board");
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [detailPost, setDetailPost] = useState<Post | null>(null);
@@ -1017,8 +1018,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               <FileText className="mr-1.5 inline h-4 w-4" /> Textos
             </button>
             <button
-              onClick={() => setActiveTab("calendar")}
-              className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "calendar" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+              onClick={() => setCalendarOpen(true)}
+              className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors text-muted-foreground hover:text-foreground"
             >
               <CalendarClock className="mr-1.5 inline h-4 w-4" /> Calendário
             </button>
@@ -1169,10 +1170,6 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
           <div className="mx-auto max-w-4xl">
             <TextContentsPanel clientId={clientData.id} clientName={clientData.name} isAdmin />
           </div>
-        ) : activeTab === "calendar" ? (
-          <div className="mx-auto max-w-5xl">
-            <ClientCalendarWidget clientId={clientData.id} clientName={clientData.name} />
-          </div>
         ) : (
           <div className="mx-auto max-w-2xl">
             <ActivityTimeline
@@ -1247,6 +1244,18 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
         onDelete={detailPost ? () => { deletePost(detailPost.id); setDetailPost(null); } : undefined}
         onEdit={detailPost ? () => { setEditPost(detailPost); setDetailPost(null); } : undefined}
       />
+
+      {/* Calendar Modal */}
+      <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarClock className="h-5 w-5" /> Calendário de Postagens — {clientData.name}
+            </DialogTitle>
+          </DialogHeader>
+          <ClientCalendarWidget clientId={clientData.id} clientName={clientData.name} />
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
