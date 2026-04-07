@@ -277,7 +277,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       const post = posts.find(p => p.id === id);
       setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, clientLabel: label, ...(newColumnId ? { columnId: newColumnId } : {}) } : p)));
-      await supabase.from("posts").update(dbUpdates).eq("id", id);
+      await supabase.from("posts").update(dbUpdates as any).eq("id", id);
 
       // Log approval or change request
       const action = label === "aprovado" ? "post_approved" : label === "alteracao_solicitada" ? "post_change_requested" : null;
