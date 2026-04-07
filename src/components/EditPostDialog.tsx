@@ -53,6 +53,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [uploading, setUploading] = useState(false);
   const [retainFiles, setRetainFiles] = useState(false);
   const [externalLink, setExternalLink] = useState("");
+  const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
