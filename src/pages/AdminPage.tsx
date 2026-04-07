@@ -1170,10 +1170,6 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
           <div className="mx-auto max-w-4xl">
             <TextContentsPanel clientId={clientData.id} clientName={clientData.name} isAdmin />
           </div>
-        ) : activeTab === "calendar" ? (
-          <div className="mx-auto max-w-5xl">
-            <ClientCalendarWidget clientId={clientData.id} clientName={clientData.name} />
-          </div>
         ) : (
           <div className="mx-auto max-w-2xl">
             <ActivityTimeline
