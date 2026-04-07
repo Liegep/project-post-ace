@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, MessageSquare, AlertTriangle, Lock, ChevronLeft, ChevronRight, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { translations, Locale } from "@/i18n/translations";
 
 interface ApprovalPost {
   id: string;
@@ -42,6 +43,12 @@ const ApprovalPage = () => {
   const [submitting, setSubmitting] = useState<Record<string, boolean>>({});
   const [completed, setCompleted] = useState<Record<string, string>>({});
   const [mediaIndexes, setMediaIndexes] = useState<Record<string, number>>({});
+  const [locale, setLocale] = useState<Locale>("pt");
+
+  const t = useCallback(
+    (key: keyof typeof translations.pt) => translations[locale][key] || key,
+    [locale]
+  );
 
   useEffect(() => {
     if (token) loadTokenData();
@@ -58,29 +65,32 @@ const ApprovalPage = () => {
         .maybeSingle();
 
       if (tokenErr || !td) {
-        setError("Link inválido ou expirado.");
+        setError("approvalInvalidLink");
         setLoading(false);
         return;
       }
 
       if (td.expires_at && new Date(td.expires_at) < new Date()) {
-        setError("Este link de aprovação expirou.");
+        setError("approvalExpiredLink");
         setLoading(false);
         return;
       }
 
       setTokenData(td as TokenData);
 
-      // Load client info
+      // Load client info including locale
       const { data: client } = await supabase
         .from("clients")
-        .select("name, logo_url")
+        .select("name, logo_url, locale")
         .eq("id", td.client_id)
         .maybeSingle();
 
       if (client) {
         setClientName(client.name);
         setClientLogo(client.logo_url || "");
+        if (client.locale && ["pt", "en", "it", "es", "sv"].includes(client.locale)) {
+          setLocale(client.locale as Locale);
+        }
       }
 
       // Load posts
@@ -111,7 +121,7 @@ const ApprovalPage = () => {
         setCompleted(comp);
       }
     } catch {
-      setError("Erro ao carregar dados.");
+      setError("approvalLoadError");
     }
     setLoading(false);
   };
@@ -156,9 +166,9 @@ const ApprovalPage = () => {
       });
 
       setCompleted(prev => ({ ...prev, [postId]: action }));
-      toast.success(action === "aprovado" ? "Post aprovado!" : "Ajuste solicitado!");
+      toast.success(action === "aprovado" ? t("approvalSuccessApproved") : t("approvalSuccessChange"));
     } catch {
-      toast.error("Erro ao processar ação.");
+      toast.error(t("approvalActionError"));
     }
     setSubmitting(prev => ({ ...prev, [postId]: false }));
   };
@@ -166,6 +176,13 @@ const ApprovalPage = () => {
   const getMediaIndex = (postId: string) => mediaIndexes[postId] || 0;
   const setMediaIndex = (postId: string, idx: number) =>
     setMediaIndexes(prev => ({ ...prev, [postId]: idx }));
+
+  // We need t() available for error display, but locale may not be loaded yet for error states
+  // So we use a helper that resolves the error key
+  const resolveError = (errKey: string) => {
+    const key = errKey as keyof typeof translations.pt;
+    return translations[locale][key] || errKey;
+  };
 
   if (loading) {
     return (
@@ -180,12 +197,12 @@ const ApprovalPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <Card className="max-w-md w-full p-8 text-center space-y-4">
           <Lock className="h-12 w-12 text-muted-foreground mx-auto" />
-          <h1 className="text-xl font-bold text-foreground">{error}</h1>
+          <h1 className="text-xl font-bold text-foreground">{resolveError(error)}</h1>
           <p className="text-sm text-muted-foreground">
-            Se você acredita que isso é um erro, entre em contato com a equipe responsável.
+            {t("approvalErrorContact")}
           </p>
           <Button variant="outline" onClick={() => window.location.href = "/login"}>
-            Fazer login
+            {t("approvalLogin")}
           </Button>
         </Card>
       </div>
@@ -204,11 +221,11 @@ const ApprovalPage = () => {
             )}
             <div>
               <h1 className="font-semibold text-foreground">{clientName}</h1>
-              <p className="text-xs text-muted-foreground">Aprovação de conteúdo</p>
+              <p className="text-xs text-muted-foreground">{t("approvalContentHeader")}</p>
             </div>
             {posts.length > 1 && (
               <Badge variant="secondary" className="ml-auto">
-                {Object.keys(completed).length}/{posts.length} revisados
+                {Object.keys(completed).length}/{posts.length} {t("approvalReviewed")}
               </Badge>
             )}
           </div>
@@ -217,12 +234,12 @@ const ApprovalPage = () => {
         {/* Actor name input */}
         <div className="max-w-3xl mx-auto px-4 pt-4">
           <div className="flex items-center gap-2 mb-4">
-            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">Seu nome:</label>
+            <label className="text-xs font-medium text-muted-foreground whitespace-nowrap">{t("approvalYourName")}</label>
             <input
               type="text"
               value={actorName}
               onChange={e => setActorName(e.target.value)}
-              placeholder="Digite seu nome (opcional)"
+              placeholder={t("approvalYourNamePlaceholder")}
               className="flex-1 h-8 rounded-md border bg-card px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
             />
           </div>
@@ -233,8 +250,8 @@ const ApprovalPage = () => {
           {posts.length === 0 ? (
             <Card className="p-8 text-center">
               <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-3" />
-              <h2 className="text-lg font-semibold text-foreground">Nenhum post pendente</h2>
-              <p className="text-sm text-muted-foreground">Todos os posts já foram revisados.</p>
+              <h2 className="text-lg font-semibold text-foreground">{t("approvalNoPending")}</h2>
+              <p className="text-sm text-muted-foreground">{t("approvalAllReviewed")}</p>
             </Card>
           ) : (
             posts.map(post => {
@@ -307,13 +324,13 @@ const ApprovalPage = () => {
                           <AlertTriangle className="h-5 w-5" />
                         )}
                         <span className="text-sm font-medium">
-                          {completed[post.id] === "aprovado" ? "Aprovado" : "Ajuste solicitado"}
+                          {completed[post.id] === "aprovado" ? t("approvalApproved") : t("approvalChangeRequested")}
                         </span>
                       </div>
                     ) : (
                       <>
                         <Textarea
-                          placeholder="Deixe um comentário (opcional)..."
+                          placeholder={t("approvalCommentPlaceholder")}
                           value={comments[post.id] || ""}
                           onChange={e => setComments(prev => ({ ...prev, [post.id]: e.target.value }))}
                           className="resize-none"
@@ -330,7 +347,7 @@ const ApprovalPage = () => {
                             ) : (
                               <Check className="h-4 w-4 mr-1" />
                             )}
-                            Aprovar
+                            {t("approvalApprove")}
                           </Button>
                           <Button
                             variant="outline"
@@ -343,7 +360,7 @@ const ApprovalPage = () => {
                             ) : (
                               <MessageSquare className="h-4 w-4 mr-1" />
                             )}
-                            Solicitar ajuste
+                            {t("approvalRequestChange")}
                           </Button>
                         </div>
                       </>
