@@ -436,7 +436,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         {activeTab === "board" || !clientData.show_archived_to_client ? (
           <>
             {!clientData.show_archived_to_client && (
-              <h2 className="mb-6 text-center text-3xl font-bold text-foreground">{t("postsForApproval")}</h2>
+              <h2 className="mb-6 text-center text-3xl font-bold text-foreground">{clientData.client_portal_title || t("postsForApproval")}</h2>
             )}
 
             {clientData.allow_client_create_post && (

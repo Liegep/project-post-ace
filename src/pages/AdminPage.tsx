@@ -969,7 +969,19 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               )}
             </div>
 
-            {/* Billing Config */}
+            {/* Portal Title */}
+            <div className="px-5 py-4 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Título do Portal</p>
+              <Input
+                placeholder="Ex: Post da approvare"
+                defaultValue={clientData.client_portal_title || ""}
+                onBlur={async (e) => {
+                  const val = e.target.value.trim();
+                  await supabase.from("clients").update({ client_portal_title: val } as any).eq("id", clientData.id);
+                }}
+              />
+              <p className="text-[11px] text-muted-foreground">Título exibido na área do cliente. Deixe vazio para usar o padrão.</p>
+            </div>
             <div className="px-5 py-4 border-t">
               <ClientBillingConfig clientId={clientData.id} />
             </div>
