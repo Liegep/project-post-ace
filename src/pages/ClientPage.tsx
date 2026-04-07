@@ -288,13 +288,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             {getGreeting()}{userName ? `, ${userName.split(" ")[0]}` : ""} 👋
           </h2>
         </div>
-        {postingPeriod && (
-          <div className="mb-4 flex justify-center">
-            <span className="rounded-full bg-primary px-6 py-2 text-lg font-bold text-primary-foreground shadow-md">
-              {postingPeriod}
-            </span>
-          </div>
-        )}
 
         {/* Month Selector */}
         <div className="mb-6 flex items-center justify-center gap-3">
