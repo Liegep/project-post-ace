@@ -15,16 +15,17 @@ interface Client {
   name: string;
 }
 
-interface CalendarPostDialogProps {
+export interface CalendarPostDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   post: CalendarPost | null;
   onSave: (data: Partial<CalendarPost>) => Promise<{ error: any }>;
   onDelete?: (id: string) => Promise<{ error: any }>;
   defaultDate?: string;
+  defaultClientId?: string;
 }
 
-export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete, defaultDate }: CalendarPostDialogProps) {
+export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete, defaultDate, defaultClientId }: CalendarPostDialogProps) {
   const [clients, setClients] = useState<Client[]>([]);
   const [title, setTitle] = useState("");
   const [caption, setCaption] = useState("");
