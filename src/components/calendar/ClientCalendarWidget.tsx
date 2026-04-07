@@ -88,7 +88,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
+      <div className="grid grid-cols-7 gap-px bg-zinc-300 rounded-lg overflow-hidden">
         {WEEKDAYS.map(d => (
           <div key={d} className="bg-muted px-1 py-2 text-center text-xs font-semibold text-muted-foreground">
             {d}
