@@ -3,19 +3,33 @@ import { usePosts } from "@/context/PostsContext";
 
 import { useI18n } from "@/i18n/I18nContext";
 import { HashtagManager } from "@/components/HashtagManager";
-import { Post, PostStatus, MediaType } from "@/types/post";
+import { Post, PostStatus, MediaType, STATUS_CONFIG } from "@/types/post";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Save, ShieldCheck } from "lucide-react";
+import { Save, ShieldCheck, ChevronDown, Users } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 import { SortableMediaGrid, SortableMediaItem } from "@/components/SortableMediaGrid";
+import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
+import { InternalApprovalDialog } from "@/components/InternalApprovalDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { createPostDeadlineFromInput, formatPostDeadlineInput } from "@/lib/postDeadline";
+
+const STATUS_KEYS: Record<PostStatus, string> = {
+  entrada: "statusEntry",
+  em_desenvolvimento: "statusInDevelopment",
+  escrevendo_legenda: "statusWritingCaption",
+  pronto: "statusReady",
+  finalizado: "statusFinalized",
+  alteracao_solicitada: "statusChangeRequested",
+  agendado: "statusScheduled",
+};
 
 interface EditPostDialogProps {
   post: Post | null;
