@@ -128,7 +128,7 @@ export function useAppointments() {
       cancelled_at: null,
     };
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, completed, completedAt: completed ? new Date() : null, cancelled: false, cancelledAt: null } : a));
-    await supabase.from("appointments").update(updates).eq("id", id);
+    await supabase.from("appointments").update(updates as any).eq("id", id);
   }, []);
 
   const toggleCancelled = useCallback(async (id: string, cancelled: boolean) => {
@@ -139,7 +139,7 @@ export function useAppointments() {
       completed_at: null,
     };
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, cancelled, cancelledAt: cancelled ? new Date() : null, completed: false, completedAt: null } : a));
-    await supabase.from("appointments").update(updates).eq("id", id);
+    await supabase.from("appointments").update(updates as any).eq("id", id);
   }, []);
 
   const deleteAppointment = useCallback(async (id: string) => {
@@ -157,7 +157,7 @@ export function useAppointments() {
     if (updates.tagId !== undefined) dbUpdates.tag_id = updates.tagId;
     
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
-    await supabase.from("appointments").update(dbUpdates).eq("id", id);
+    await supabase.from("appointments").update(dbUpdates as any).eq("id", id);
   }, []);
 
   // Tag CRUD

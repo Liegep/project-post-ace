@@ -237,7 +237,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     }
 
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status, ...(newColumnId ? { columnId: newColumnId } : {}) } : p)));
-    await supabase.from("posts").update(updates).eq("id", id);
+    await supabase.from("posts").update(updates as any).eq("id", id);
     pushToTrello(id, "update");
 
 
@@ -277,7 +277,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       const post = posts.find(p => p.id === id);
       setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, clientLabel: label, ...(newColumnId ? { columnId: newColumnId } : {}) } : p)));
-      await supabase.from("posts").update(dbUpdates).eq("id", id);
+      await supabase.from("posts").update(dbUpdates as any).eq("id", id);
 
       // Log approval or change request
       const action = label === "aprovado" ? "post_approved" : label === "alteracao_solicitada" ? "post_change_requested" : null;
@@ -358,7 +358,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.archived !== undefined) dbUpdates.archived = updates.archived;
     if (updates.archivedAt !== undefined) dbUpdates.archived_at = updates.archivedAt instanceof Date ? updates.archivedAt.toISOString() : updates.archivedAt;
     if (Object.keys(dbUpdates).length > 0) {
-      await supabase.from("posts").update(dbUpdates).eq("id", id);
+      await supabase.from("posts").update(dbUpdates as any).eq("id", id);
       pushToTrello(id, "update");
     }
   }, [posts]);
@@ -476,7 +476,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus[]) => {
     const updates: Record<string, any> = { status };
     setPosts((prev) => prev.map((p) => ids.includes(p.id) ? { ...p, status } : p));
-    await supabase.from("posts").update(updates).in("id", ids);
+    await supabase.from("posts").update(updates as any).in("id", ids);
   }, []);
 
   const bulkDeletePosts = useCallback(async (ids: string[]) => {
