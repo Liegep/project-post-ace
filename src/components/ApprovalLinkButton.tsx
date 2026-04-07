@@ -92,14 +92,14 @@ export const ApprovalLinkButton = ({
         onClick={handleGenerate}
         disabled={loading}
         className={className}
-        title={variant === "batch" ? "Enviar todos para aprovação" : "Enviar para aprovação"}
+        title={variant === "batch" ? "Enviar todos para aprovação" : "Enviar link para cliente"}
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <Send className="h-4 w-4" />
         )}
-        {variant === "batch" && <span className="ml-1 text-xs">Enviar para aprovação</span>}
+        <span className="ml-1 text-xs">{variant === "batch" ? "Enviar para aprovação" : "Enviar link para cliente"}</span>
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
