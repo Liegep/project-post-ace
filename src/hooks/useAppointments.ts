@@ -157,7 +157,7 @@ export function useAppointments() {
     if (updates.tagId !== undefined) dbUpdates.tag_id = updates.tagId;
     
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
-    await supabase.from("appointments").update(dbUpdates).eq("id", id);
+    await supabase.from("appointments").update(dbUpdates as any).eq("id", id);
   }, []);
 
   // Tag CRUD

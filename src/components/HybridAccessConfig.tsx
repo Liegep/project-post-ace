@@ -40,7 +40,7 @@ export const HybridAccessConfig = ({ clientId }: HybridAccessConfigProps) => {
   const updateConfig = async (field: string, value: any) => {
     const { error } = await supabase
       .from("clients")
-      .update({ [field]: value })
+      .update({ [field]: value } as any)
       .eq("id", clientId);
 
     if (error) {

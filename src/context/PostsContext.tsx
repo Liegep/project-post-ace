@@ -476,7 +476,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus[]) => {
     const updates: Record<string, any> = { status };
     setPosts((prev) => prev.map((p) => ids.includes(p.id) ? { ...p, status } : p));
-    await supabase.from("posts").update(updates).in("id", ids);
+    await supabase.from("posts").update(updates as any).in("id", ids);
   }, []);
 
   const bulkDeletePosts = useCallback(async (ids: string[]) => {
