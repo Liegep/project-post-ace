@@ -126,8 +126,8 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                         "bg-green-100 border-l-green-500"
                       }`}
                     >
-                      <span className="font-semibold text-zinc-900">{post.publish_time?.slice(0, 5)}</span>{" "}
-                      <span className="truncate text-zinc-700 font-medium">{post.title}</span>
+                      <span className="font-bold text-black">{post.publish_time?.slice(0, 5)}</span>{" "}
+                      <span className="truncate text-black font-semibold">{post.title}</span>
                     </button>
                   );
                 })}
