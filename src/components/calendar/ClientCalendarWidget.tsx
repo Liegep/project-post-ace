@@ -126,7 +126,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                   );
                 })}
                 {dayPosts.length > 3 && (
-                  <span className="text-[10px] text-muted-foreground pl-1">+{dayPosts.length - 3}</span>
+                  <span className="text-[10px] text-zinc-500 pl-1">+{dayPosts.length - 3}</span>
                 )}
               </div>
             </div>
