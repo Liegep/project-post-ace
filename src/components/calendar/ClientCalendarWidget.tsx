@@ -68,14 +68,14 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const selectedDayPosts = selectedDay ? (postsByDate[selectedDay] || []) : [];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 text-zinc-950">{/* Force dark text for modal readability */}
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(prev => subMonths(prev, 1))}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <h3 className="text-lg font-semibold capitalize">
+          <h3 className="text-lg font-semibold capitalize text-zinc-950">
             {format(currentDate, "MMMM yyyy", { locale: ptBR })}
           </h3>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate(prev => addMonths(prev, 1))}>
@@ -88,14 +88,14 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
+      <div className="grid grid-cols-7 gap-px bg-zinc-300 rounded-lg overflow-hidden">
         {WEEKDAYS.map(d => (
-          <div key={d} className="bg-muted px-1 py-2 text-center text-xs font-semibold text-muted-foreground">
+          <div key={d} className="bg-zinc-100 px-1 py-2 text-center text-xs font-semibold text-zinc-600">
             {d}
           </div>
         ))}
         {Array.from({ length: startPad }).map((_, i) => (
-          <div key={`pad-${i}`} className="bg-card min-h-[80px]" />
+          <div key={`pad-${i}`} className="bg-white min-h-[80px]" />
         ))}
         {days.map(day => {
           const key = format(day, "yyyy-MM-dd");
@@ -106,9 +106,9 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
             <div
               key={key}
               onClick={() => setSelectedDay(isSelected ? null : key)}
-              className={`bg-card min-h-[80px] p-1 cursor-pointer hover:bg-muted/30 transition-colors ${today ? "ring-2 ring-inset ring-primary/40" : ""} ${isSelected ? "bg-accent/20" : ""}`}
+              className={`bg-white min-h-[80px] p-1 cursor-pointer hover:bg-zinc-50 transition-colors ${today ? "ring-2 ring-inset ring-primary/40" : ""} ${isSelected ? "bg-blue-50" : ""}`}
             >
-              <span className={`text-xs font-medium ${today ? "bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center" : "text-foreground"}`}>
+              <span className={`text-xs font-medium ${today ? "bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center" : "text-zinc-900"}`}>
                 {format(day, "d")}
               </span>
               <div className="mt-0.5 space-y-0.5">
@@ -118,15 +118,15 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                     <button
                       key={post.id}
                       onClick={(e) => { e.stopPropagation(); openEdit(post); }}
-                      className={`w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate border-l-2 ${cfg.bgClass} ${cfg.borderClass} hover:opacity-80 transition-opacity`}
+                      className={`w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate border-l-2 ${cfg.bgClass} ${cfg.borderClass} hover:opacity-80 transition-opacity text-zinc-800`}
                     >
-                      <span className="font-medium">{post.publish_time?.slice(0, 5)}</span>{" "}
-                      <span className="truncate">{post.title}</span>
+                      <span className="font-medium text-zinc-900">{post.publish_time?.slice(0, 5)}</span>{" "}
+                      <span className="truncate text-zinc-700">{post.title}</span>
                     </button>
                   );
                 })}
                 {dayPosts.length > 3 && (
-                  <span className="text-[10px] text-muted-foreground pl-1">+{dayPosts.length - 3}</span>
+                  <span className="text-[10px] text-zinc-500 pl-1">+{dayPosts.length - 3}</span>
                 )}
               </div>
             </div>
@@ -136,9 +136,9 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
 
       {/* Selected day detail */}
       {selectedDay && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-lg border border-zinc-200 bg-white p-4">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold text-sm">
+            <h4 className="font-semibold text-sm text-zinc-900">
               {format(new Date(selectedDay + "T12:00:00"), "EEEE, d 'de' MMMM", { locale: ptBR })}
             </h4>
             <Button size="sm" variant="outline" onClick={() => openCreate(selectedDay)}>
@@ -146,7 +146,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
             </Button>
           </div>
           {selectedDayPosts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Nenhum post agendado para este dia.</p>
+            <p className="text-sm text-zinc-500">Nenhum post agendado para este dia.</p>
           ) : (
             <div className="space-y-2">
               {selectedDayPosts.map(post => {
@@ -160,14 +160,14 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                          <span className="text-sm font-semibold">{post.publish_time?.slice(0, 5)}</span>
+                          <Clock className="h-3.5 w-3.5 text-zinc-500 shrink-0" />
+                          <span className="text-sm font-semibold text-zinc-900">{post.publish_time?.slice(0, 5)}</span>
                           <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${cfg.dotClass} text-white font-medium`}>
                             {cfg.label}
                           </span>
                         </div>
-                        <p className="font-medium text-sm truncate">{post.title}</p>
-                        {post.caption && <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{post.caption}</p>}
+                        <p className="font-medium text-sm truncate text-zinc-900">{post.title}</p>
+                        {post.caption && <p className="text-xs text-zinc-500 line-clamp-2 mt-1">{post.caption}</p>}
                       </div>
                       {post.media_urls?.[0] && (
                         <img src={post.media_urls[0]} alt="" className="h-12 w-12 rounded object-cover shrink-0" />
