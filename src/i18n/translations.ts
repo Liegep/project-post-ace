@@ -242,6 +242,26 @@ type TranslationKeys = {
   goodMorning: string;
   goodAfternoon: string;
   goodEvening: string;
+  // Approval page (client-facing link)
+  approvalContentHeader: string;
+  approvalYourName: string;
+  approvalYourNamePlaceholder: string;
+  approvalNoPending: string;
+  approvalAllReviewed: string;
+  approvalApprove: string;
+  approvalRequestChange: string;
+  approvalCommentPlaceholder: string;
+  approvalApproved: string;
+  approvalChangeRequested: string;
+  approvalReviewed: string;
+  approvalInvalidLink: string;
+  approvalExpiredLink: string;
+  approvalErrorContact: string;
+  approvalLogin: string;
+  approvalLoadError: string;
+  approvalSuccessApproved: string;
+  approvalSuccessChange: string;
+  approvalActionError: string;
 };
 
 const pt: TranslationKeys = {
@@ -444,6 +464,25 @@ const pt: TranslationKeys = {
   goodMorning: "Bom dia",
   goodAfternoon: "Boa tarde",
   goodEvening: "Boa noite",
+  approvalContentHeader: "Aprovação de conteúdo",
+  approvalYourName: "Seu nome:",
+  approvalYourNamePlaceholder: "Digite seu nome (opcional)",
+  approvalNoPending: "Nenhum post pendente",
+  approvalAllReviewed: "Todos os posts já foram revisados.",
+  approvalApprove: "Aprovar",
+  approvalRequestChange: "Solicitar ajuste",
+  approvalCommentPlaceholder: "Deixe um comentário (opcional)...",
+  approvalApproved: "Aprovado",
+  approvalChangeRequested: "Ajuste solicitado",
+  approvalReviewed: "revisados",
+  approvalInvalidLink: "Link inválido ou expirado.",
+  approvalExpiredLink: "Este link de aprovação expirou.",
+  approvalErrorContact: "Se você acredita que isso é um erro, entre em contato com a equipe responsável.",
+  approvalLogin: "Fazer login",
+  approvalLoadError: "Erro ao carregar dados.",
+  approvalSuccessApproved: "Post aprovado!",
+  approvalSuccessChange: "Ajuste solicitado!",
+  approvalActionError: "Erro ao processar ação.",
 };
 
 const en: TranslationKeys = {
@@ -644,6 +683,25 @@ const en: TranslationKeys = {
   goodMorning: "Good morning",
   goodAfternoon: "Good afternoon",
   goodEvening: "Good evening",
+  approvalContentHeader: "Content approval",
+  approvalYourName: "Your name:",
+  approvalYourNamePlaceholder: "Enter your name (optional)",
+  approvalNoPending: "No pending posts",
+  approvalAllReviewed: "All posts have been reviewed.",
+  approvalApprove: "Approve",
+  approvalRequestChange: "Request change",
+  approvalCommentPlaceholder: "Leave a comment (optional)...",
+  approvalApproved: "Approved",
+  approvalChangeRequested: "Change requested",
+  approvalReviewed: "reviewed",
+  approvalInvalidLink: "Invalid or expired link.",
+  approvalExpiredLink: "This approval link has expired.",
+  approvalErrorContact: "If you believe this is an error, please contact the responsible team.",
+  approvalLogin: "Log in",
+  approvalLoadError: "Error loading data.",
+  approvalSuccessApproved: "Post approved!",
+  approvalSuccessChange: "Change requested!",
+  approvalActionError: "Error processing action.",
 };
 
 const it: TranslationKeys = {
@@ -844,6 +902,25 @@ const it: TranslationKeys = {
   goodMorning: "Buongiorno",
   goodAfternoon: "Buon pomeriggio",
   goodEvening: "Buonasera",
+  approvalContentHeader: "Approvazione contenuti",
+  approvalYourName: "Il tuo nome:",
+  approvalYourNamePlaceholder: "Inserisci il tuo nome (opzionale)",
+  approvalNoPending: "Nessun post in attesa",
+  approvalAllReviewed: "Tutti i post sono stati revisionati.",
+  approvalApprove: "Approva",
+  approvalRequestChange: "Richiedi modifica",
+  approvalCommentPlaceholder: "Lascia un commento (opzionale)...",
+  approvalApproved: "Approvato",
+  approvalChangeRequested: "Modifica richiesta",
+  approvalReviewed: "revisionati",
+  approvalInvalidLink: "Link non valido o scaduto.",
+  approvalExpiredLink: "Questo link di approvazione è scaduto.",
+  approvalErrorContact: "Se ritieni che si tratti di un errore, contatta il team responsabile.",
+  approvalLogin: "Accedi",
+  approvalLoadError: "Errore nel caricamento dei dati.",
+  approvalSuccessApproved: "Post approvato!",
+  approvalSuccessChange: "Modifica richiesta!",
+  approvalActionError: "Errore nell'elaborazione dell'azione.",
 };
 
 const es: TranslationKeys = {
@@ -1044,6 +1121,25 @@ const es: TranslationKeys = {
   goodMorning: "Buenos días",
   goodAfternoon: "Buenas tardes",
   goodEvening: "Buenas noches",
+  approvalContentHeader: "Aprobación de contenido",
+  approvalYourName: "Tu nombre:",
+  approvalYourNamePlaceholder: "Escribe tu nombre (opcional)",
+  approvalNoPending: "No hay posts pendientes",
+  approvalAllReviewed: "Todos los posts han sido revisados.",
+  approvalApprove: "Aprobar",
+  approvalRequestChange: "Solicitar cambio",
+  approvalCommentPlaceholder: "Deja un comentario (opcional)...",
+  approvalApproved: "Aprobado",
+  approvalChangeRequested: "Cambio solicitado",
+  approvalReviewed: "revisados",
+  approvalInvalidLink: "Enlace inválido o expirado.",
+  approvalExpiredLink: "Este enlace de aprobación ha expirado.",
+  approvalErrorContact: "Si crees que esto es un error, contacta al equipo responsable.",
+  approvalLogin: "Iniciar sesión",
+  approvalLoadError: "Error al cargar datos.",
+  approvalSuccessApproved: "¡Post aprobado!",
+  approvalSuccessChange: "¡Cambio solicitado!",
+  approvalActionError: "Error al procesar la acción.",
 };
 
 const sv: TranslationKeys = {
@@ -1244,6 +1340,25 @@ const sv: TranslationKeys = {
   goodMorning: "God morgon",
   goodAfternoon: "God eftermiddag",
   goodEvening: "God kväll",
+  approvalContentHeader: "Innehållsgodkännande",
+  approvalYourName: "Ditt namn:",
+  approvalYourNamePlaceholder: "Ange ditt namn (valfritt)",
+  approvalNoPending: "Inga väntande inlägg",
+  approvalAllReviewed: "Alla inlägg har granskats.",
+  approvalApprove: "Godkänn",
+  approvalRequestChange: "Begär ändring",
+  approvalCommentPlaceholder: "Lämna en kommentar (valfritt)...",
+  approvalApproved: "Godkänt",
+  approvalChangeRequested: "Ändring begärd",
+  approvalReviewed: "granskade",
+  approvalInvalidLink: "Ogiltig eller utgången länk.",
+  approvalExpiredLink: "Denna godkännandlänk har löpt ut.",
+  approvalErrorContact: "Om du tror att detta är ett fel, kontakta ansvarigt team.",
+  approvalLogin: "Logga in",
+  approvalLoadError: "Fel vid laddning av data.",
+  approvalSuccessApproved: "Inlägg godkänt!",
+  approvalSuccessChange: "Ändring begärd!",
+  approvalActionError: "Fel vid bearbetning av åtgärd.",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };
