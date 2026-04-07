@@ -106,7 +106,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
             <div
               key={key}
               onClick={() => setSelectedDay(isSelected ? null : key)}
-              className={`bg-card min-h-[80px] p-1 cursor-pointer hover:bg-muted/30 transition-colors ${today ? "ring-2 ring-inset ring-primary/40" : ""} ${isSelected ? "bg-accent/20" : ""}`}
+              className={`bg-white min-h-[80px] p-1 cursor-pointer hover:bg-zinc-50 transition-colors ${today ? "ring-2 ring-inset ring-primary/40" : ""} ${isSelected ? "bg-blue-50" : ""}`}
             >
               <span className={`text-xs font-medium ${today ? "bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center" : "text-foreground"}`}>
                 {format(day, "d")}
