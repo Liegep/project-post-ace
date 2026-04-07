@@ -272,6 +272,17 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                 </div>
               </div>
 
+              {/* Approval & Internal actions */}
+              {post && (
+                <div className="space-y-2">
+                  <ApprovalLinkButton postId={post.id} clientId={clientId} postTitle={post.title} className="w-full justify-start gap-2 text-xs border" />
+                  <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs" onClick={() => setInternalApprovalOpen(true)}>
+                    <Users className="h-3.5 w-3.5" />
+                    Aprovação Interna
+                  </Button>
+                </div>
+              )}
+
               {/* Retain files toggle */}
               <div className="flex items-center justify-between rounded-lg border p-3">
                 <div className="flex items-center gap-2">
@@ -287,17 +298,6 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               <Button type="submit" disabled={uploading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
                 <Save className="mr-2 h-4 w-4" /> {uploading ? "..." : t("saveChanges")}
               </Button>
-
-              {/* Approval & Internal actions */}
-              {post && (
-                <div className="space-y-2 pt-2 border-t border-border">
-                  <ApprovalLinkButton postId={post.id} clientId={clientId} postTitle={post.title} className="w-full" />
-                  <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs" onClick={() => setInternalApprovalOpen(true)}>
-                    <Users className="h-3.5 w-3.5" />
-                    Aprovação Interna
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
         </form>
