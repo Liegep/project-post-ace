@@ -358,7 +358,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.archived !== undefined) dbUpdates.archived = updates.archived;
     if (updates.archivedAt !== undefined) dbUpdates.archived_at = updates.archivedAt instanceof Date ? updates.archivedAt.toISOString() : updates.archivedAt;
     if (Object.keys(dbUpdates).length > 0) {
-      await supabase.from("posts").update(dbUpdates).eq("id", id);
+      await supabase.from("posts").update(dbUpdates as any).eq("id", id);
       pushToTrello(id, "update");
     }
   }, [posts]);
