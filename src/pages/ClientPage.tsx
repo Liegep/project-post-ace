@@ -415,7 +415,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "board" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
               >
                 <LayoutGrid className="mr-1.5 inline h-4 w-4" />
-                {t("postsForApproval")}
+                {clientData.client_portal_title || t("postsForApproval")}
               </button>
               <button
                 onClick={() => setActiveTab("archived")}
