@@ -118,10 +118,10 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                     <button
                       key={post.id}
                       onClick={(e) => { e.stopPropagation(); openEdit(post); }}
-                      className={`w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate border-l-2 ${cfg.bgClass} ${cfg.borderClass} hover:opacity-80 transition-opacity`}
+                      className={`w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate border-l-2 ${cfg.bgClass} ${cfg.borderClass} hover:opacity-80 transition-opacity text-zinc-800`}
                     >
-                      <span className="font-medium">{post.publish_time?.slice(0, 5)}</span>{" "}
-                      <span className="truncate">{post.title}</span>
+                      <span className="font-medium text-zinc-900">{post.publish_time?.slice(0, 5)}</span>{" "}
+                      <span className="truncate text-zinc-700">{post.title}</span>
                     </button>
                   );
                 })}
