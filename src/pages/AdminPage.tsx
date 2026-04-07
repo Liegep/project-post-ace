@@ -1245,6 +1245,18 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
         onEdit={detailPost ? () => { setEditPost(detailPost); setDetailPost(null); } : undefined}
       />
 
+      {/* Calendar Modal */}
+      <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarClock className="h-5 w-5" /> Calendário de Postagens — {clientData.name}
+            </DialogTitle>
+          </DialogHeader>
+          <ClientCalendarWidget clientId={clientData.id} clientName={clientData.name} />
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 };
