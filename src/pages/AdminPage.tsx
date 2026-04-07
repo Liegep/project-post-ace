@@ -808,7 +808,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               <Plus className="mr-2 h-4 w-4" /> {t("newPost")}
             </Button>
             <Button variant="outline" size="icon" onClick={() => setSettingsDrawerOpen(true)} title="Configurações">
-              <Settings2 className="h-4 w-4" />
+              <Settings className="h-4 w-4" />
             </Button>
           </div>
 
@@ -818,7 +818,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               <Plus className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setSettingsDrawerOpen(true)}>
-              <Settings2 className="h-4 w-4" />
+              <Settings className="h-4 w-4" />
             </Button>
           </div>
         </div>
