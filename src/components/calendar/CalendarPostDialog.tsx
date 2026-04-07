@@ -57,7 +57,7 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
     } else {
       setTitle("");
       setCaption("");
-      setClientId("");
+      setClientId(defaultClientId || "");
       setPublishDate(defaultDate || new Date().toISOString().split("T")[0]);
       setPublishTime("09:00");
       setStatus("draft");
