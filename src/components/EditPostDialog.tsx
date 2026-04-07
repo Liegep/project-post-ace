@@ -301,6 +301,16 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
             </div>
           </div>
         </form>
+
+        {post && (
+          <InternalApprovalDialog
+            open={internalApprovalOpen}
+            onOpenChange={setInternalApprovalOpen}
+            postId={post.id}
+            postTitle={post.title}
+            clientId={clientId}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
