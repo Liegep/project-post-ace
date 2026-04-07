@@ -160,8 +160,8 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                          <span className="text-sm font-semibold">{post.publish_time?.slice(0, 5)}</span>
+                          <Clock className="h-3.5 w-3.5 text-zinc-500 shrink-0" />
+                          <span className="text-sm font-semibold text-zinc-900">{post.publish_time?.slice(0, 5)}</span>
                           <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${cfg.dotClass} text-white font-medium`}>
                             {cfg.label}
                           </span>
