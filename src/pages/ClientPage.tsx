@@ -303,7 +303,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             onClick={() => setSelectedMonth(new Date())}
             className="rounded-lg bg-muted px-4 py-1.5 text-sm font-semibold text-foreground capitalize hover:bg-muted/80 transition-colors"
           >
-            {format(selectedMonth, "MMMM yyyy", { locale: ptBR })}
+            {format(selectedMonth, "MMMM yyyy", { locale: { pt: ptBR, it, en: enUS, es, sv }[locale] || ptBR })}
           </button>
           <Button
             variant="ghost"
