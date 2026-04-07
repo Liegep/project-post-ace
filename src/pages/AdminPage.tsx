@@ -1016,6 +1016,12 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               <FileText className="mr-1.5 inline h-4 w-4" /> Textos
             </button>
             <button
+              onClick={() => setActiveTab("calendar")}
+              className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "calendar" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+            >
+              <CalendarClock className="mr-1.5 inline h-4 w-4" /> Calendário
+            </button>
+            <button
               onClick={() => setActiveTab("activity")}
               className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "activity" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
