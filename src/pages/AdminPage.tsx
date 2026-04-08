@@ -388,7 +388,7 @@ const KanbanBoard = ({
             </button>
           )}
         </div>
-      </div>
+      </KanbanScrollWrapper>
 
       <DragOverlay>
         {activePost && (
