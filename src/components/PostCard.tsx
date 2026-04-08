@@ -155,16 +155,6 @@ export const PostCard = memo(
 
         {/* Content */}
         <div className="p-2.5 space-y-1.5">
-          <div className="flex items-start gap-1.5">
-            {selectionMode && (
-              <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
-                <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect?.(post.id)} />
-              </div>
-            )}
-            <h3 className="text-sm font-bold leading-snug text-foreground line-clamp-2 flex-1">
-              {post.title}
-            </h3>
-          </div>
 
           {/* Tags row */}
           {postTags.length > 0 && (
