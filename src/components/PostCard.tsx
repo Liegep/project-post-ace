@@ -52,6 +52,7 @@ export const PostCard = memo(
     post,
     isAdmin,
     onEdit,
+    onDelete,
     selectionMode,
     isSelected,
     onToggleSelect,
