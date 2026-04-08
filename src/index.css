@@ -261,12 +261,39 @@
     transform: translateY(-0.5px);
   }
 
-  /* Glow on click for ALL buttons */
+/* Glow on click for ALL buttons */
   button:active:not(:disabled),
   [role="button"]:active:not(:disabled) {
     box-shadow: var(--btn-glow);
     transition: box-shadow 0.1s ease;
   }
+}
+
+/* Mac-style scrollbar for Kanban */
+.kanban-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+.kanban-scroll:hover {
+  scrollbar-color: hsl(220 10% 70% / 0.45) transparent;
+}
+.kanban-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.kanban-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.kanban-scroll::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 9999px;
+  transition: background 0.3s ease;
+}
+.kanban-scroll:hover::-webkit-scrollbar-thumb {
+  background: hsl(220 10% 70% / 0.45);
+}
+.kanban-scroll:hover::-webkit-scrollbar-thumb:hover {
+  background: hsl(220 10% 60% / 0.65);
 }
 
 /* Tiptap editor styles */
