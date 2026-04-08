@@ -79,6 +79,18 @@ export const PostCard = memo(
         }`}
         onClick={() => (selectionMode ? onToggleSelect?.(post.id) : onEdit?.())}
       >
+        {/* Title above thumbnail */}
+        <div className="px-2.5 pt-2 pb-1 flex items-start gap-1.5">
+          {selectionMode && (
+            <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
+              <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect?.(post.id)} />
+            </div>
+          )}
+          <h3 className="text-sm font-bold leading-snug text-foreground line-clamp-2 flex-1">
+            {post.title}
+          </h3>
+        </div>
+
         {/* Thumbnail 4:5 */}
         {hasMedia && (
           <div
