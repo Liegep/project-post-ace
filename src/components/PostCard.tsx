@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { LinkedText } from "@/components/LinkedText";
 import { MediaLightbox } from "@/components/MediaLightbox";
-import { Calendar, Play, Send } from "lucide-react";
+import { Calendar, Play, Send, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
 import { getContrastColor } from "@/lib/utils";
@@ -52,6 +52,7 @@ export const PostCard = memo(
     post,
     isAdmin,
     onEdit,
+    onDelete,
     selectionMode,
     isSelected,
     onToggleSelect,
@@ -89,6 +90,15 @@ export const PostCard = memo(
           <h3 className="text-sm font-bold leading-snug text-foreground line-clamp-2 flex-1">
             {post.title}
           </h3>
+          {isAdmin && onDelete && (
+            <button
+              className="pt-0.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0"
+              onClick={(e) => { e.stopPropagation(); onDelete(); }}
+              title="Excluir"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
 
         {/* Thumbnail 4:5 */}
