@@ -256,7 +256,7 @@ const KanbanBoard = ({
             const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
             return (
               <SortableColumn key={col.id} col={col}>
-                <div className="mb-4 flex items-center justify-between gap-2 sticky top-0 z-10 rounded-lg bg-card/90 backdrop-blur-sm border px-3 py-2 shadow-sm">
+                <div className="mb-4 flex items-center justify-between gap-2 sticky top-0 z-10 rounded-lg bg-black backdrop-blur-sm border border-white/10 px-3 py-2 shadow-sm">
                   {editingColumnId === col.id ? (
                     <Input
                       ref={editColumnInputRef}
@@ -271,34 +271,34 @@ const KanbanBoard = ({
                     />
                   ) : (
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-foreground">{col.name}</span>
-                      <span className="text-xs text-muted-foreground">({columnPosts.length})</span>
+                      <span className="text-sm font-semibold text-white">{col.name}</span>
+                      <span className="text-xs text-white/60">({columnPosts.length})</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => toggleColumnVisibility(col.id, !col.visibleToClient)}
-                      className={`rounded p-1 transition-colors ${col.visibleToClient ? "text-primary hover:bg-primary/10" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                      className={`rounded p-1 transition-colors ${col.visibleToClient ? "text-white hover:bg-white/10" : "text-white/50 hover:bg-white/10 hover:text-white"}`}
                       title={col.visibleToClient ? t("visibleToClient") : t("hiddenFromClient")}
                     >
                       {col.visibleToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                     </button>
                     <button
                       onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
-                      className="rounded p-1 text-muted-foreground hover:bg-accent/10 hover:text-accent"
+                      className="rounded p-1 text-white/70 hover:bg-white/10 hover:text-white"
                       title={t("addPost")}
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}
-                      className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      className="rounded p-1 text-white/70 hover:bg-white/10 hover:text-white"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteColumn(col.id)}
-                      className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                      className="rounded p-1 text-white/70 hover:bg-red-500/20 hover:text-red-400"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
