@@ -487,7 +487,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                           ))}
                           {/* Spacer to prevent last column from being clipped */}
                           <div className="shrink-0 w-1" aria-hidden="true" />
-                        </div>
+                        </KanbanScrollWrapper>
                       </div>
                     )}
 
