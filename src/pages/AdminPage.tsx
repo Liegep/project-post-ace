@@ -28,6 +28,7 @@ import ClientAccessPanel from "@/components/ClientAccessPanel";
 import { HybridAccessConfig } from "@/components/HybridAccessConfig";
 import { ClientCalendarWidget } from "@/components/calendar/ClientCalendarWidget";
 import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
+import { KanbanScrollWrapper } from "@/components/KanbanScrollWrapper";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -249,7 +250,7 @@ const KanbanBoard = ({
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <KanbanScrollWrapper>
         <SortableContext items={columnSortIds} strategy={horizontalListSortingStrategy}>
           {columns.map((col) => {
             const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
@@ -388,7 +389,7 @@ const KanbanBoard = ({
             </button>
           )}
         </div>
-      </div>
+      </KanbanScrollWrapper>
 
       <DragOverlay>
         {activePost && (

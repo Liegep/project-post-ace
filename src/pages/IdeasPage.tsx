@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { KanbanScrollWrapper } from "@/components/KanbanScrollWrapper";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Plus, ArrowLeft, Trash2, MoreVertical, Pencil, FileText, CheckCircle2, Filter } from "lucide-react";
@@ -268,7 +269,7 @@ const IdeasPage = () => {
       </header>
 
       {/* Board */}
-      <div className="p-4 md:p-6 flex gap-4 overflow-x-auto min-h-[calc(100vh-73px)]">
+      <KanbanScrollWrapper className="p-4 md:p-6 min-h-[calc(100vh-73px)]">
         {columns.map((col) => {
           const colIdeas = filteredIdeas
             .filter(i => i.column_id === col.id)
@@ -381,7 +382,7 @@ const IdeasPage = () => {
           );
         })}
 
-      </div>
+      </KanbanScrollWrapper>
 
       {/* Add idea dialog */}
       <Dialog open={!!addingIdeaCol} onOpenChange={() => setAddingIdeaCol(null)}>
