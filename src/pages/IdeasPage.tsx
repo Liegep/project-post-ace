@@ -269,7 +269,7 @@ const IdeasPage = () => {
       </header>
 
       {/* Board */}
-      <div className="p-4 md:p-6 flex gap-4 overflow-x-auto min-h-[calc(100vh-73px)]">
+      <KanbanScrollWrapper className="p-4 md:p-6 min-h-[calc(100vh-73px)]">
         {columns.map((col) => {
           const colIdeas = filteredIdeas
             .filter(i => i.column_id === col.id)
