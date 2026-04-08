@@ -382,7 +382,7 @@ const IdeasPage = () => {
           );
         })}
 
-      </div>
+      </KanbanScrollWrapper>
 
       {/* Add idea dialog */}
       <Dialog open={!!addingIdeaCol} onOpenChange={() => setAddingIdeaCol(null)}>
