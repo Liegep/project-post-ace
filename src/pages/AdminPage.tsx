@@ -271,8 +271,8 @@ const KanbanBoard = ({
                     />
                   ) : (
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-foreground">{col.name}</span>
-                      <span className="text-xs text-muted-foreground">({columnPosts.length})</span>
+                      <span className="text-sm font-semibold text-white">{col.name}</span>
+                      <span className="text-xs text-white/60">({columnPosts.length})</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1">
