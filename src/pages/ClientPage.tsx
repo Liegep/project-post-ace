@@ -469,7 +469,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                     {/* Visible columns as horizontal board */}
                     {visibleColumnPosts.length > 0 && (
                       <div className="-mx-6 px-6">
-                        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin" style={{ WebkitOverflowScrolling: 'touch' }}>
+                        <KanbanScrollWrapper>
                           {visibleColumnPosts.map(({ column, posts: colPosts }) => (
                             <div key={column.id} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
                               <div className="mb-4 flex items-center gap-2 rounded-lg bg-background/80 backdrop-blur-sm px-3 py-2 shadow-sm border border-border/50">
