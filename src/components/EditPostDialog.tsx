@@ -58,6 +58,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
   const [commentHtml, setCommentHtml] = useState("");
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingCommentText, setEditingCommentText] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const EMOJI_LIST = ["😀","😂","❤️","👍","👏","🔥","🎉","💡","✅","⭐","🚀","💪","📌","📝","⚡","🎯","💬","🙌","👀","🤔"];
