@@ -42,7 +42,7 @@ interface EditPostDialogProps {
 let mediaIdCounter = 0;
 
 export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps) => {
-  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn, clientId, addComment, posts } = usePosts();
+  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn, clientId, addComment, deleteComment, updateComment, posts } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [mediaItems, setMediaItems] = useState<SortableMediaItem[]>([]);
