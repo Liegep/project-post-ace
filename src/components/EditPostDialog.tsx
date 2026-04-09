@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { usePosts } from "@/context/PostsContext";
 
 import { useI18n } from "@/i18n/I18nContext";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Smile, Send as SendIcon } from "lucide-react";
+import { Smile, Send as SendIcon, Pencil, Trash2 as CommentTrash, Check, X } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -42,7 +42,7 @@ interface EditPostDialogProps {
 let mediaIdCounter = 0;
 
 export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps) => {
-  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn, clientId, addComment, posts } = usePosts();
+  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn, clientId, addComment, deleteComment, updateComment, posts } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [mediaItems, setMediaItems] = useState<SortableMediaItem[]>([]);
@@ -58,6 +58,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
   const [commentHtml, setCommentHtml] = useState("");
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingCommentText, setEditingCommentText] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const EMOJI_LIST = ["😀","😂","❤️","👍","👏","🔥","🎉","💡","✅","⭐","🚀","💪","📌","📝","⚡","🎯","💬","🙌","👀","🤔"];
@@ -229,14 +231,69 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                     {comments.length > 0 && (
                       <div className="mt-2 space-y-2 max-h-[200px] overflow-y-auto">
                         {comments.map((c) => (
-                          <div key={c.id} className="rounded-lg border bg-muted/30 p-2.5">
+                          <div key={c.id} className="rounded-lg border bg-muted/30 p-2.5 group/comment">
                             <div className="flex items-center justify-between mb-1">
                               <span className="text-xs font-semibold text-foreground">{c.author}</span>
-                              <span className="text-[10px] text-muted-foreground">
-                                {c.createdAt.toLocaleDateString("pt-BR")} {c.createdAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
-                              </span>
+                              <div className="flex items-center gap-1">
+                                <span className="text-[10px] text-muted-foreground">
+                                  {c.createdAt.toLocaleDateString("pt-BR")} {c.createdAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                                </span>
+                                {editingCommentId !== c.id && (
+                                  <div className="flex items-center gap-0.5 opacity-0 group-hover/comment:opacity-100 transition-opacity">
+                                    <button
+                                      type="button"
+                                      className="h-5 w-5 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+                                      onClick={() => { setEditingCommentId(c.id); setEditingCommentText(c.text); }}
+                                      title="Editar"
+                                    >
+                                      <Pencil className="h-3 w-3" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="h-5 w-5 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-destructive"
+                                      onClick={() => deleteComment(post.id, c.id)}
+                                      title="Excluir"
+                                    >
+                                      <CommentTrash className="h-3 w-3" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                            <div className="text-xs text-foreground/80 whitespace-pre-wrap">{c.text}</div>
+                            {editingCommentId === c.id ? (
+                              <div className="flex items-center gap-1 mt-1">
+                                <Input
+                                  value={editingCommentText}
+                                  onChange={(e) => setEditingCommentText(e.target.value)}
+                                  className="h-7 text-xs"
+                                  autoFocus
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      updateComment(post.id, c.id, editingCommentText.trim());
+                                      setEditingCommentId(null);
+                                    } else if (e.key === "Escape") {
+                                      setEditingCommentId(null);
+                                    }
+                                  }}
+                                />
+                                <button
+                                  type="button"
+                                  className="h-5 w-5 flex items-center justify-center rounded hover:bg-muted text-green-600"
+                                  onClick={() => { updateComment(post.id, c.id, editingCommentText.trim()); setEditingCommentId(null); }}
+                                >
+                                  <Check className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  className="h-5 w-5 flex items-center justify-center rounded hover:bg-muted text-muted-foreground"
+                                  onClick={() => setEditingCommentId(null)}
+                                >
+                                  <X className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="text-xs text-foreground/80 whitespace-pre-wrap">{c.text}</div>
+                            )}
                           </div>
                         ))}
                       </div>
