@@ -507,7 +507,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   return (
     <PostsContext.Provider value={{
       clientId, posts: activePosts, archivedPosts, tags, columns, postingPeriod, companyLogo, setPostingPeriod, setCompanyLogo,
-      addPost, updatePostStatus, updateClientLabel, addComment, deletePost, updatePost,
+      addPost, updatePostStatus, updateClientLabel, addComment, deleteComment, updateComment, deletePost, updatePost,
       addTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns, toggleColumnVisibility,
       movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, loading,
     }}>
