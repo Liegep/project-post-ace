@@ -19,6 +19,8 @@ interface PostsContextType {
   updatePostStatus: (id: string, status: PostStatus[]) => void;
   updateClientLabel: (id: string, label: ClientLabel) => void;
   addComment: (postId: string, author: string, text: string) => void;
+  deleteComment: (postId: string, commentId: string) => void;
+  updateComment: (postId: string, commentId: string, text: string) => void;
   deletePost: (id: string) => void;
   updatePost: (id: string, updates: Partial<Post>) => void;
   addTag: (name: string, color: string) => Promise<Tag>;
