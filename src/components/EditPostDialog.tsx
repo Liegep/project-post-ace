@@ -8,9 +8,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/RichTextEditor";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Smile, Send as SendIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Save, ShieldCheck, ChevronDown, Users } from "lucide-react";
@@ -40,7 +42,7 @@ interface EditPostDialogProps {
 let mediaIdCounter = 0;
 
 export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps) => {
-  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn, clientId } = usePosts();
+  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn, clientId, addComment, posts } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [mediaItems, setMediaItems] = useState<SortableMediaItem[]>([]);
@@ -54,7 +56,11 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [retainFiles, setRetainFiles] = useState(false);
   const [externalLink, setExternalLink] = useState("");
   const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
+  const [commentHtml, setCommentHtml] = useState("");
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const EMOJI_LIST = ["😀","😂","❤️","👍","👏","🔥","🎉","💡","✅","⭐","🚀","💪","📌","📝","⚡","🎯","💬","🙌","👀","🤔"];
 
   useEffect(() => {
     if (post) {
@@ -208,6 +214,94 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                   )}
                 </div>
               </div>
+
+              {/* Comments section */}
+              {post && (() => {
+                const currentPost = posts.find(p => p.id === post.id);
+                const comments = currentPost?.comments || [];
+                return (
+                  <div>
+                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Comentários ({comments.length})
+                    </Label>
+
+                    {/* Existing comments */}
+                    {comments.length > 0 && (
+                      <div className="mt-2 space-y-2 max-h-[200px] overflow-y-auto">
+                        {comments.map((c) => (
+                          <div key={c.id} className="rounded-lg border bg-muted/30 p-2.5">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs font-semibold text-foreground">{c.author}</span>
+                              <span className="text-[10px] text-muted-foreground">
+                                {c.createdAt.toLocaleDateString("pt-BR")} {c.createdAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                              </span>
+                            </div>
+                            <div className="text-xs text-foreground/80 whitespace-pre-wrap">{c.text}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* New comment with rich text */}
+                    <div className="mt-2">
+                      <RichTextEditor
+                        content={commentHtml}
+                        onChange={setCommentHtml}
+                        placeholder="Escreva um comentário..."
+                        className="[&_.prose]:min-h-[80px]"
+                      />
+                      <div className="flex items-center justify-between mt-2">
+                        <Popover open={emojiPickerOpen} onOpenChange={setEmojiPickerOpen}>
+                          <PopoverTrigger asChild>
+                            <Button type="button" variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground">
+                              <Smile className="h-4 w-4" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-2" align="start">
+                            <div className="grid grid-cols-10 gap-1">
+                              {EMOJI_LIST.map((emoji) => (
+                                <button
+                                  key={emoji}
+                                  type="button"
+                                  className="h-8 w-8 flex items-center justify-center rounded hover:bg-muted text-lg"
+                                  onClick={() => {
+                                    setCommentHtml((prev) => {
+                                      const stripped = prev.replace(/<\/p>$/, "");
+                                      return stripped ? `${stripped}${emoji}</p>` : `<p>${emoji}</p>`;
+                                    });
+                                    setEmojiPickerOpen(false);
+                                  }}
+                                >
+                                  {emoji}
+                                </button>
+                              ))}
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="h-8 gap-1.5"
+                          disabled={!commentHtml || commentHtml === "<p></p>"}
+                          onClick={async () => {
+                            if (!commentHtml || commentHtml === "<p></p>") return;
+                            // Strip HTML tags for storage (comments table stores plain text)
+                            const div = document.createElement("div");
+                            div.innerHTML = commentHtml;
+                            const plainText = div.textContent || div.innerText || "";
+                            if (!plainText.trim()) return;
+                            await addComment(post.id, "Admin", plainText.trim());
+                            setCommentHtml("");
+                          }}
+                        >
+                          <SendIcon className="h-3.5 w-3.5" />
+                          Enviar
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* RIGHT COLUMN — Settings */}
