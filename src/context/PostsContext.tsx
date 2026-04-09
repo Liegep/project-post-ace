@@ -311,6 +311,16 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     }
   }, [posts, clientId]);
 
+  const deleteComment = useCallback(async (postId: string, commentId: string) => {
+    await supabase.from("comments").delete().eq("id", commentId);
+    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, comments: p.comments.filter((c) => c.id !== commentId) } : p));
+  }, []);
+
+  const updateComment = useCallback(async (postId: string, commentId: string, text: string) => {
+    await supabase.from("comments").update({ text }).eq("id", commentId);
+    setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, comments: p.comments.map((c) => c.id === commentId ? { ...c, text } : c) } : p));
+  }, []);
+
   const deletePost = useCallback(async (id: string) => {
     setPosts((prev) => prev.filter((p) => p.id !== id));
     await supabase.from("posts").delete().eq("id", id);
