@@ -248,7 +248,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                         content={commentHtml}
                         onChange={setCommentHtml}
                         placeholder="Escreva um comentário..."
-                        className="[&_.prose]:min-h-[80px]"
+                        className="[&_.prose]:min-h-[80px] [&_.ProseMirror]:text-black"
+                        placeholder="Escrever um comentário"
                       />
                       <div className="flex items-center justify-between mt-2">
                         <Popover open={emojiPickerOpen} onOpenChange={setEmojiPickerOpen}>
