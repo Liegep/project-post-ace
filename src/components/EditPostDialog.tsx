@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { usePosts } from "@/context/PostsContext";
 
 import { useI18n } from "@/i18n/I18nContext";
