@@ -56,7 +56,11 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [retainFiles, setRetainFiles] = useState(false);
   const [externalLink, setExternalLink] = useState("");
   const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
+  const [commentHtml, setCommentHtml] = useState("");
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const EMOJI_LIST = ["😀","😂","❤️","👍","👏","🔥","🎉","💡","✅","⭐","🚀","💪","📌","📝","⚡","🎯","💬","🙌","👀","🤔"];
 
   useEffect(() => {
     if (post) {
