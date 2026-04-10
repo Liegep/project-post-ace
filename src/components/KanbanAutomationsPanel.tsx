@@ -139,7 +139,8 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
       setActionValue("");
       fetchAutomations();
     } else {
-      toast({ title: "Erro ao criar automação", variant: "destructive" });
+      console.error("Automation insert error:", error);
+      toast({ title: "Erro ao criar automação", description: error.message, variant: "destructive" });
     }
     setAdding(false);
   };
