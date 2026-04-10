@@ -380,6 +380,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     }
   }, [clientId, executeAutomationAction]);
 
+  const updatePost = useCallback(async (id: string, updates: Partial<Post>) => {
     const normalizedUpdates = {
       ...updates,
       ...(updates.deadline !== undefined ? { deadline: parsePostDeadline(updates.deadline) } : {}),
