@@ -278,7 +278,7 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
                 </SelectTrigger>
                 <SelectContent>
                   {existingTags.map((tag) => (
-                    <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+                    <SelectItem key={tag.id} value={tag.name}>{tag.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
