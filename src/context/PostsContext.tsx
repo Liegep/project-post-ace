@@ -438,7 +438,13 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       await supabase.from("posts").update(dbUpdates as any).eq("id", id);
       pushToTrello(id, "update");
     }
-  }, [posts]);
+
+    // Run tag-based automations if tags changed
+    if (updates.tags !== undefined) {
+      const oldTags = posts.find((p) => p.id === id)?.tags || [];
+      await runTagAutomations(id, oldTags, updates.tags);
+    }
+  }, [posts, runTagAutomations]);
 
   // Execute a single automation action on a post
   const executeAutomationAction = useCallback(async (auto: any, postId: string) => {
