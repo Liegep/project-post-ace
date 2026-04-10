@@ -1169,6 +1169,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
                     onEdit={() => setEditPost(post)}
+                    onArchive={() => updatePost(post.id, { archived: true, archivedAt: new Date() })}
                     selectionMode={selectionMode}
                     isSelected={selectedPostIds.has(post.id)}
                     onToggleSelect={toggleSelect}
