@@ -53,7 +53,7 @@ const COLOR_OPTIONS = [
 export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsPanelProps) {
   const [automations, setAutomations] = useState<Automation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [existingTags, setExistingTags] = useState<string[]>([]);
+  const [existingTags, setExistingTags] = useState<{id: string; name: string}[]>([]);
 
   // New automation form
   const [name, setName] = useState("");
