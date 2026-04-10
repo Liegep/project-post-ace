@@ -29,6 +29,7 @@ import { HybridAccessConfig } from "@/components/HybridAccessConfig";
 import { ClientCalendarWidget } from "@/components/calendar/ClientCalendarWidget";
 import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
 import { KanbanScrollWrapper } from "@/components/KanbanScrollWrapper";
+import { KanbanAutomationsPanel } from "@/components/KanbanAutomationsPanel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
