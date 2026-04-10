@@ -274,7 +274,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
+      <DialogContent className="w-[96vw] max-w-6xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2 text-white">
@@ -406,12 +406,15 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
           ) : items.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">Nenhum item adicionado</p>
           ) : (
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {items.map(item => (
-                <div key={item.id} className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm">
-                  <div className="flex-1 min-w-0">
+                <div
+                  key={item.id}
+                  className="grid gap-3 rounded-lg border px-3 py-3 text-sm lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-start"
+                >
+                  <div className="min-w-0 space-y-2">
+                    <p className="font-medium leading-snug break-words">{item.name}</p>
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium break-words whitespace-normal">{item.name}</span>
                       <Badge variant="secondary" className="text-[10px] shrink-0">
                         {CATEGORIES.find(c => c.value === item.category)?.label || item.category}
                       </Badge>
@@ -425,13 +428,17 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
                         </Badge>
                       )}
                     </div>
-                    {item.description && <p className="text-xs text-muted-foreground truncate">{item.description}</p>}
+                    {item.description && (
+                      <p className="text-xs leading-relaxed text-muted-foreground whitespace-pre-wrap break-words">
+                        {item.description}
+                      </p>
+                    )}
                   </div>
-                   <div className="text-right shrink-0">
+                  <div className="flex flex-col gap-0.5 lg:items-end shrink-0">
                     <span className="text-xs text-muted-foreground">{item.quantity}x {formatCurrency(Number(item.unit_price), cur)}</span>
                     <p className="font-semibold text-sm">{formatCurrency(Number(item.total_price), cur)}</p>
                   </div>
-                  <div className="flex gap-1 shrink-0">
+                  <div className="flex gap-1 shrink-0 lg:justify-end">
                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleEditItem(item)}>
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
