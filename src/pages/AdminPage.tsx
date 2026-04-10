@@ -504,7 +504,7 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
 
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
-    posts, archivedPosts, columns, tags, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
+    posts, archivedPosts, columns, tags, updatePostStatus, deletePost, updatePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn, toggleColumnVisibility,
     movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, reorderColumns,
     clientId: ctxClientId,
@@ -1124,7 +1124,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     updatePostStatus={updatePostStatus}
                     deletePost={deletePost}
                     updatePost={updatePost}
-                    setDetailPost={setEditPost}
+                    setDetailPost={(p: Post) => setEditPost(p)}
                     setCreateInColumnId={setCreateInColumnId}
                     setCreateOpen={setCreateOpen}
                     addingColumn={addingColumn}
