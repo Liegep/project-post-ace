@@ -344,6 +344,71 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
         updates.archived = false;
         updates.archivedAt = null;
       }
+
+      // "Aprovado pela Boss" tag on Aplikasi client → move to column + notify
+      const APLIKASI_CLIENT_ID = "6ef3d8b4-6028-4e7a-9911-01918c624fff";
+      const BOSS_TAG = "aprovado pela boss";
+      const hadBossTag = currentPost?.tags.some(t => t.toLowerCase() === BOSS_TAG) ?? false;
+      const hasBossTag = updates.tags.some(t => t.toLowerCase() === BOSS_TAG);
+      if (!hadBossTag && hasBossTag && clientId === APLIKASI_CLIENT_ID) {
+        // Move to "Aprovados pela Boss" column
+        try {
+          const { data: existingCols } = await supabase
+            .from("columns")
+            .select("id, name")
+            .eq("client_id", clientId);
+          const bossCol = (existingCols || []).find((c: any) => c.name.toLowerCase() === "aprovados pela boss");
+          let bossColId: string;
+          if (bossCol) {
+            bossColId = bossCol.id;
+          } else {
+            const maxPos = (existingCols || []).length;
+            const { data: newCol } = await supabase
+              .from("columns")
+              .insert({ client_id: clientId, name: "Aprovados pela Boss", position: maxPos } as any)
+              .select()
+              .single();
+            bossColId = (newCol as any).id;
+            setColumns((prev) => [...prev, { id: bossColId, clientId, name: "Aprovados pela Boss", position: maxPos, visibleToClient: false }]);
+          }
+          updates.columnId = bossColId;
+          normalizedUpdates.columnId = bossColId;
+        } catch (e) {
+          console.error("Failed to move to Aprovados pela Boss column", e);
+        }
+
+        // Send notification to client users assigned to this client
+        try {
+          const { data: assignments } = await supabase
+            .from("user_client_assignments")
+            .select("user_id")
+            .eq("client_id", clientId);
+          const { data: clientUsers } = await supabase
+            .from("user_roles")
+            .select("user_id")
+            .eq("role", "client");
+          const clientUserIds = (clientUsers || []).map((u: any) => u.user_id);
+          const targetUsers = (assignments || [])
+            .filter((a: any) => clientUserIds.includes(a.user_id))
+            .map((a: any) => a.user_id);
+
+          const postTitle = currentPost?.title || updates.title || "";
+          if (targetUsers.length > 0) {
+            const notifs = targetUsers.map((uid: string) => ({
+              user_id: uid,
+              client_id: clientId,
+              post_id: id,
+              title: "Post aprovado pela Boss",
+              message: `O post "${postTitle}" foi aprovado pela Boss! 🎉`,
+              type: "boss_approval",
+              actor_avatar_url: "",
+            }));
+            await supabase.from("admin_notifications").insert(notifs);
+          }
+        } catch (e) {
+          console.error("Failed to send boss approval notification", e);
+        }
+      }
     }
 
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...normalizedUpdates } : p)));
