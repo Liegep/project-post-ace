@@ -120,6 +120,7 @@ interface KanbanBoardProps {
   handleDeleteColumn: (id: string) => void;
   updatePostStatus: (id: string, status: PostStatus[]) => void;
   deletePost: (id: string) => void;
+  updatePost: (id: string, updates: Partial<Post>) => void;
   setDetailPost: (post: Post) => void;
   setCreateInColumnId: (id: string | null) => void;
   setCreateOpen: (open: boolean) => void;
@@ -163,6 +164,7 @@ const KanbanBoard = ({
   posts, columns, unassignedPosts, editingColumnId, editingColumnName,
   setEditingColumnId, setEditingColumnName, editColumnInputRef, handleRenameColumn,
   handleDeleteColumn, updatePostStatus, deletePost, setDetailPost, setCreateInColumnId,
+  updatePost,
   setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
   newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
   toggleColumnVisibility,
@@ -1121,6 +1123,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     handleDeleteColumn={handleDeleteColumn}
                     updatePostStatus={updatePostStatus}
                     deletePost={deletePost}
+                    updatePost={updatePost}
                     setDetailPost={setEditPost}
                     setCreateInColumnId={setCreateInColumnId}
                     setCreateOpen={setCreateOpen}
