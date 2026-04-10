@@ -76,12 +76,11 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
 
   const fetchTags = async () => {
     const { data } = await supabase
-      .from("posts")
-      .select("tags")
-      .eq("client_id", clientId);
-    const allTags = new Set<string>();
-    (data || []).forEach((p: any) => (p.tags || []).forEach((t: string) => allTags.add(t)));
-    setExistingTags(Array.from(allTags).sort());
+      .from("tags" as any)
+      .select("id, name")
+      .eq("client_id", clientId)
+      .order("name");
+    setExistingTags((data as any[])?.map((t: any) => ({ id: t.id, name: t.name })) || []);
   };
 
   useEffect(() => {
