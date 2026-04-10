@@ -440,11 +440,49 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     }
   }, [posts]);
 
+  // Run kanban automations for a post moving to a column
+  const runAutomations = useCallback(async (postId: string, columnId: string | null) => {
+    if (!columnId || !clientId) return;
+    const { data: automations } = await supabase
+      .from("kanban_automations")
+      .select("*")
+      .eq("client_id", clientId)
+      .eq("trigger_column_id", columnId)
+      .eq("active", true);
+    if (!automations || automations.length === 0) return;
+
+    for (const auto of automations as any[]) {
+      switch (auto.action_type) {
+        case "add_tag": {
+          const post = posts.find((p) => p.id === postId);
+          if (post && !post.tags.includes(auto.action_value)) {
+            const newTags = [...post.tags, auto.action_value];
+            setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, tags: newTags } : p));
+            await supabase.from("posts").update({ tags: newTags } as any).eq("id", postId);
+          }
+          break;
+        }
+        case "change_color": {
+          // Store color in client_label field as a custom value
+          setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, clientLabel: `color:${auto.action_value}` as any } : p));
+          await supabase.from("posts").update({ client_label: `color:${auto.action_value}` } as any).eq("id", postId);
+          break;
+        }
+        case "mark_done": {
+          setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, archived: true, archivedAt: new Date() } : p));
+          await supabase.from("posts").update({ archived: true, archived_at: new Date().toISOString() } as any).eq("id", postId);
+          break;
+        }
+      }
+    }
+  }, [clientId, posts]);
+
   const movePostToColumn = useCallback(async (postId: string, columnId: string | null) => {
     setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, columnId } : p)));
     await supabase.from("posts").update({ column_id: columnId } as any).eq("id", postId);
     pushToTrello(postId, "move_column");
-  }, []);
+    await runAutomations(postId, columnId);
+  }, [runAutomations]);
 
   const uploadMedia = useCallback(async (file: File): Promise<string> => {
     const { compressImage } = await import("@/lib/imageCompressor");
@@ -519,6 +557,12 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, []);
 
   const reorderPostsInColumn = useCallback(async (columnId: string | null, orderedPostIds: string[]) => {
+    // Detect posts that changed column
+    const movedPostIds = orderedPostIds.filter((id) => {
+      const post = posts.find((p) => p.id === id);
+      return post && post.columnId !== columnId;
+    });
+
     setPosts((prev) => {
       const updated = [...prev];
       orderedPostIds.forEach((id, index) => {
@@ -532,7 +576,12 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     for (let i = 0; i < orderedPostIds.length; i++) {
       await supabase.from("posts").update({ position: i, column_id: columnId } as any).eq("id", orderedPostIds[i]);
     }
-  }, []);
+
+    // Run automations for moved posts
+    for (const id of movedPostIds) {
+      await runAutomations(id, columnId);
+    }
+  }, [posts, runAutomations]);
 
   const setCompanyLogo = useCallback(async (url: string) => {
     setCompanyLogoState(url);
