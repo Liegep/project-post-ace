@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { LinkedText } from "@/components/LinkedText";
 import { MediaLightbox } from "@/components/MediaLightbox";
-import { Calendar, Play, Send, Trash2 } from "lucide-react";
+import { Archive, Calendar, Play, Send, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
 import { getContrastColor } from "@/lib/utils";
@@ -41,6 +41,7 @@ interface PostCardProps {
   onStatusChange?: (status: PostStatus[]) => void;
   onDelete?: () => void;
   onEdit?: () => void;
+  onArchive?: () => void;
   selectionMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
@@ -53,6 +54,7 @@ export const PostCard = memo(
     isAdmin,
     onEdit,
     onDelete,
+    onArchive,
     selectionMode,
     isSelected,
     onToggleSelect,
@@ -91,13 +93,24 @@ export const PostCard = memo(
             {post.title}
           </h3>
           {isAdmin && onDelete && (
-            <button
-              className="pt-0.5 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0"
-              onClick={(e) => { e.stopPropagation(); onDelete(); }}
-              title="Excluir"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
+            <div className="flex items-center gap-0.5 pt-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+              {onArchive && (
+                <button
+                  className="text-muted-foreground hover:text-amber-500 transition-colors"
+                  onClick={(e) => { e.stopPropagation(); onArchive(); }}
+                  title="Arquivar"
+                >
+                  <Archive className="h-3.5 w-3.5" />
+                </button>
+              )}
+              <button
+                className="text-muted-foreground hover:text-destructive transition-colors"
+                onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                title="Excluir"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
           )}
         </div>
 

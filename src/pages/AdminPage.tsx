@@ -49,11 +49,12 @@ const DroppableColumn = ({ id, children }: { id: string; children: React.ReactNo
   );
 };
 
-const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: {
+const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, onArchive, selectionMode, isSelected, onToggleSelect }: {
   post: Post;
   onStatusChange: (s: PostStatus[]) => void;
   onDelete: () => void;
   onEdit: () => void;
+  onArchive: () => void;
   selectionMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
@@ -76,6 +77,7 @@ const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, selectionMo
         onStatusChange={onStatusChange}
         onDelete={onDelete}
         onEdit={onEdit}
+        onArchive={onArchive}
         selectionMode={selectionMode}
         isSelected={isSelected}
         onToggleSelect={onToggleSelect}
@@ -118,6 +120,7 @@ interface KanbanBoardProps {
   handleDeleteColumn: (id: string) => void;
   updatePostStatus: (id: string, status: PostStatus[]) => void;
   deletePost: (id: string) => void;
+  updatePost: (id: string, updates: Partial<Post>) => void;
   setDetailPost: (post: Post) => void;
   setCreateInColumnId: (id: string | null) => void;
   setCreateOpen: (open: boolean) => void;
@@ -161,6 +164,7 @@ const KanbanBoard = ({
   posts, columns, unassignedPosts, editingColumnId, editingColumnName,
   setEditingColumnId, setEditingColumnName, editColumnInputRef, handleRenameColumn,
   handleDeleteColumn, updatePostStatus, deletePost, setDetailPost, setCreateInColumnId,
+  updatePost,
   setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
   newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
   toggleColumnVisibility,
@@ -313,6 +317,7 @@ const KanbanBoard = ({
                         onStatusChange={(s) => updatePostStatus(post.id, s)}
                         onDelete={() => deletePost(post.id)}
                         onEdit={() => setDetailPost(post)}
+                        onArchive={() => updatePost(post.id, { archived: true, archivedAt: new Date() })}
                         selectionMode={selectionMode}
                         isSelected={selectedPostIds?.has(post.id)}
                         onToggleSelect={onToggleSelect}
@@ -344,6 +349,7 @@ const KanbanBoard = ({
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
                     onEdit={() => setDetailPost(post)}
+                    onArchive={() => updatePost(post.id, { archived: true, archivedAt: new Date() })}
                     selectionMode={selectionMode}
                     isSelected={selectedPostIds?.has(post.id)}
                     onToggleSelect={onToggleSelect}
@@ -498,7 +504,7 @@ const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode,
 
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
-    posts, archivedPosts, columns, tags, updatePostStatus, deletePost, postingPeriod, setPostingPeriod,
+    posts, archivedPosts, columns, tags, updatePostStatus, deletePost, updatePost, postingPeriod, setPostingPeriod,
     companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn, toggleColumnVisibility,
     movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, reorderColumns,
     clientId: ctxClientId,
@@ -1117,7 +1123,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     handleDeleteColumn={handleDeleteColumn}
                     updatePostStatus={updatePostStatus}
                     deletePost={deletePost}
-                    setDetailPost={setEditPost}
+                    updatePost={updatePost}
+                    setDetailPost={(p: Post) => setEditPost(p)}
                     setCreateInColumnId={setCreateInColumnId}
                     setCreateOpen={setCreateOpen}
                     addingColumn={addingColumn}
@@ -1162,6 +1169,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
                     onEdit={() => setEditPost(post)}
+                    onArchive={() => updatePost(post.id, { archived: true, archivedAt: new Date() })}
                     selectionMode={selectionMode}
                     isSelected={selectedPostIds.has(post.id)}
                     onToggleSelect={toggleSelect}
