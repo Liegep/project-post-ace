@@ -1479,6 +1479,57 @@ export type Database = {
           },
         ]
       }
+      kanban_automations: {
+        Row: {
+          action_type: string
+          action_value: string
+          active: boolean
+          client_id: string
+          created_at: string
+          id: string
+          name: string
+          trigger_column_id: string
+          updated_at: string
+        }
+        Insert: {
+          action_type: string
+          action_value?: string
+          active?: boolean
+          client_id: string
+          created_at?: string
+          id?: string
+          name?: string
+          trigger_column_id: string
+          updated_at?: string
+        }
+        Update: {
+          action_type?: string
+          action_value?: string
+          active?: boolean
+          client_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          trigger_column_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kanban_automations_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kanban_automations_trigger_column_id_fkey"
+            columns: ["trigger_column_id"]
+            isOneToOne: false
+            referencedRelation: "columns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meta_accounts: {
         Row: {
           access_token: string
