@@ -976,6 +976,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               )}
             </div>
 
+            {/* Automations */}
+            <div className="px-5 py-4 space-y-2">
+              <KanbanAutomationsPanel clientId={clientData.id} columns={columns} />
+            </div>
+
             {/* Portal Title */}
             <div className="px-5 py-4 space-y-2">
               <p className="text-xs font-medium text-muted-foreground mb-2">Título do Portal</p>
