@@ -500,39 +500,6 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     }
   }, [posts, runTagAutomations]);
 
-  // Execute a single automation action on a post
-  const executeAutomationAction = useCallback(async (auto: any, postId: string) => {
-    switch (auto.action_type) {
-      case "add_tag": {
-        const post = posts.find((p) => p.id === postId);
-        if (post && !post.tags.includes(auto.action_value)) {
-          const newTags = [...post.tags, auto.action_value];
-          setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, tags: newTags } : p));
-          await supabase.from("posts").update({ tags: newTags } as any).eq("id", postId);
-        }
-        break;
-      }
-      case "change_color": {
-        setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, clientLabel: `color:${auto.action_value}` as any } : p));
-        await supabase.from("posts").update({ client_label: `color:${auto.action_value}` } as any).eq("id", postId);
-        break;
-      }
-      case "mark_done": {
-        setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, archived: true, archivedAt: new Date() } : p));
-        await supabase.from("posts").update({ archived: true, archived_at: new Date().toISOString() } as any).eq("id", postId);
-        break;
-      }
-      case "move_to_column": {
-        const targetColId = auto.action_value;
-        if (targetColId) {
-          setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, columnId: targetColId } : p));
-          await supabase.from("posts").update({ column_id: targetColId } as any).eq("id", postId);
-        }
-        break;
-      }
-    }
-  }, [posts]);
-
   // Run kanban automations for a post moving to a column
   const runAutomations = useCallback(async (postId: string, columnId: string | null) => {
     if (!columnId || !clientId) return;
@@ -546,27 +513,6 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (!automations || automations.length === 0) return;
     for (const auto of automations as any[]) {
       await executeAutomationAction(auto, postId);
-    }
-  }, [clientId, executeAutomationAction]);
-
-  // Run tag-based automations when tags change
-  const runTagAutomations = useCallback(async (postId: string, oldTags: string[], newTags: string[]) => {
-    if (!clientId) return;
-    const addedTags = newTags.filter((t) => !oldTags.includes(t));
-    if (addedTags.length === 0) return;
-
-    const { data: automations } = await supabase
-      .from("kanban_automations")
-      .select("*")
-      .eq("client_id", clientId)
-      .eq("trigger_type", "tag_added")
-      .eq("active", true);
-    if (!automations || automations.length === 0) return;
-
-    for (const auto of automations as any[]) {
-      if (addedTags.includes(auto.trigger_value)) {
-        await executeAutomationAction(auto, postId);
-      }
     }
   }, [clientId, executeAutomationAction]);
 
