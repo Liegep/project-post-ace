@@ -49,11 +49,12 @@ const DroppableColumn = ({ id, children }: { id: string; children: React.ReactNo
   );
 };
 
-const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, selectionMode, isSelected, onToggleSelect }: {
+const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, onArchive, selectionMode, isSelected, onToggleSelect }: {
   post: Post;
   onStatusChange: (s: PostStatus[]) => void;
   onDelete: () => void;
   onEdit: () => void;
+  onArchive: () => void;
   selectionMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
@@ -76,6 +77,7 @@ const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, selectionMo
         onStatusChange={onStatusChange}
         onDelete={onDelete}
         onEdit={onEdit}
+        onArchive={onArchive}
         selectionMode={selectionMode}
         isSelected={isSelected}
         onToggleSelect={onToggleSelect}
@@ -313,6 +315,7 @@ const KanbanBoard = ({
                         onStatusChange={(s) => updatePostStatus(post.id, s)}
                         onDelete={() => deletePost(post.id)}
                         onEdit={() => setDetailPost(post)}
+                        onArchive={() => updatePost(post.id, { archived: true, archivedAt: new Date() })}
                         selectionMode={selectionMode}
                         isSelected={selectedPostIds?.has(post.id)}
                         onToggleSelect={onToggleSelect}
@@ -344,6 +347,7 @@ const KanbanBoard = ({
                     onStatusChange={(s) => updatePostStatus(post.id, s)}
                     onDelete={() => deletePost(post.id)}
                     onEdit={() => setDetailPost(post)}
+                    onArchive={() => updatePost(post.id, { archived: true, archivedAt: new Date() })}
                     selectionMode={selectionMode}
                     isSelected={selectedPostIds?.has(post.id)}
                     onToggleSelect={onToggleSelect}
