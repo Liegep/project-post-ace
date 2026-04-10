@@ -1,0 +1,2 @@
+ALTER TABLE public.kanban_automations DROP CONSTRAINT kanban_automations_action_type_check;
+ALTER TABLE public.kanban_automations ADD CONSTRAINT kanban_automations_action_type_check CHECK (action_type = ANY (ARRAY['add_tag'::text, 'change_color'::text, 'mark_done'::text, 'move_to_column'::text]));
