@@ -1488,7 +1488,9 @@ export type Database = {
           created_at: string
           id: string
           name: string
-          trigger_column_id: string
+          trigger_column_id: string | null
+          trigger_type: string
+          trigger_value: string
           updated_at: string
         }
         Insert: {
@@ -1499,7 +1501,9 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
-          trigger_column_id: string
+          trigger_column_id?: string | null
+          trigger_type?: string
+          trigger_value?: string
           updated_at?: string
         }
         Update: {
@@ -1510,7 +1514,9 @@ export type Database = {
           created_at?: string
           id?: string
           name?: string
-          trigger_column_id?: string
+          trigger_column_id?: string | null
+          trigger_type?: string
+          trigger_value?: string
           updated_at?: string
         }
         Relationships: [

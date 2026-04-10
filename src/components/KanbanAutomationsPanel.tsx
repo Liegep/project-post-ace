@@ -14,7 +14,9 @@ interface Automation {
   id: string;
   client_id: string;
   name: string;
-  trigger_column_id: string;
+  trigger_type: string;
+  trigger_column_id: string | null;
+  trigger_value: string;
   action_type: string;
   action_value: string;
   active: boolean;
@@ -25,10 +27,16 @@ interface KanbanAutomationsPanelProps {
   columns: Column[];
 }
 
+const TRIGGER_TYPES = [
+  { value: "column_move", label: "Quando mover para a coluna..." },
+  { value: "tag_added", label: "Quando adicionar a tag..." },
+];
+
 const ACTION_TYPES = [
   { value: "add_tag", label: "Adicionar tag" },
   { value: "change_color", label: "Mudar cor do card" },
   { value: "mark_done", label: "Marcar como finalizado (arquivar)" },
+  { value: "move_to_column", label: "Mover para a coluna..." },
 ];
 
 const COLOR_OPTIONS = [
@@ -45,10 +53,13 @@ const COLOR_OPTIONS = [
 export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsPanelProps) {
   const [automations, setAutomations] = useState<Automation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [existingTags, setExistingTags] = useState<string[]>([]);
 
   // New automation form
   const [name, setName] = useState("");
+  const [triggerType, setTriggerType] = useState("column_move");
   const [triggerColumnId, setTriggerColumnId] = useState("");
+  const [triggerValue, setTriggerValue] = useState("");
   const [actionType, setActionType] = useState("add_tag");
   const [actionValue, setActionValue] = useState("");
   const [adding, setAdding] = useState(false);
@@ -63,17 +74,48 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
     setLoading(false);
   };
 
+  const fetchTags = async () => {
+    const { data } = await supabase
+      .from("posts")
+      .select("tags")
+      .eq("client_id", clientId);
+    const allTags = new Set<string>();
+    (data || []).forEach((p: any) => (p.tags || []).forEach((t: string) => allTags.add(t)));
+    setExistingTags(Array.from(allTags).sort());
+  };
+
   useEffect(() => {
     fetchAutomations();
+    fetchTags();
   }, [clientId]);
 
   const handleAdd = async () => {
-    if (!name.trim() || !triggerColumnId || !actionType) {
+    if (!name.trim() || !actionType) {
       toast({ title: "Preencha todos os campos", variant: "destructive" });
       return;
     }
-    if (actionType !== "mark_done" && !actionValue.trim()) {
-      toast({ title: "Informe o valor da ação", variant: "destructive" });
+
+    // Validate trigger
+    if (triggerType === "column_move" && !triggerColumnId) {
+      toast({ title: "Selecione a coluna de gatilho", variant: "destructive" });
+      return;
+    }
+    if (triggerType === "tag_added" && !triggerValue.trim()) {
+      toast({ title: "Informe a tag de gatilho", variant: "destructive" });
+      return;
+    }
+
+    // Validate action value
+    if (actionType === "add_tag" && !actionValue.trim()) {
+      toast({ title: "Informe o nome da tag", variant: "destructive" });
+      return;
+    }
+    if (actionType === "change_color" && !actionValue.trim()) {
+      toast({ title: "Selecione uma cor", variant: "destructive" });
+      return;
+    }
+    if (actionType === "move_to_column" && !actionValue.trim()) {
+      toast({ title: "Selecione a coluna de destino", variant: "destructive" });
       return;
     }
 
@@ -81,7 +123,9 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
     const { error } = await supabase.from("kanban_automations").insert({
       client_id: clientId,
       name: name.trim(),
-      trigger_column_id: triggerColumnId,
+      trigger_type: triggerType,
+      trigger_column_id: triggerType === "column_move" ? triggerColumnId : null,
+      trigger_value: triggerType === "tag_added" ? triggerValue.trim() : "",
       action_type: actionType,
       action_value: actionType === "mark_done" ? "true" : actionValue.trim(),
     } as any);
@@ -89,7 +133,9 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
     if (!error) {
       toast({ title: "Automação criada!" });
       setName("");
+      setTriggerType("column_move");
       setTriggerColumnId("");
+      setTriggerValue("");
       setActionType("add_tag");
       setActionValue("");
       fetchAutomations();
@@ -114,6 +160,13 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
 
   const getColumnName = (colId: string) => columns.find((c) => c.id === colId)?.name || "—";
 
+  const getTriggerLabel = (auto: Automation) => {
+    if (auto.trigger_type === "tag_added") {
+      return <>Quando adicionar tag <span className="font-medium text-foreground">"{auto.trigger_value}"</span></>;
+    }
+    return <>Quando mover para <span className="font-medium text-foreground">"{getColumnName(auto.trigger_column_id || "")}"</span></>;
+  };
+
   const getActionLabel = (type: string, value: string) => {
     switch (type) {
       case "add_tag": return `Adicionar tag "${value}"`;
@@ -123,6 +176,7 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
         </span>
       );
       case "mark_done": return "Arquivar card";
+      case "move_to_column": return `Mover para "${getColumnName(value)}"`;
       default: return value;
     }
   };
@@ -148,8 +202,7 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
                   <div className="min-w-0 flex-1 space-y-1">
                     <p className="text-sm font-medium truncate">{a.name}</p>
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap">
-                      <span>Quando mover para</span>
-                      <span className="font-medium text-foreground">"{getColumnName(a.trigger_column_id)}"</span>
+                      <span>{getTriggerLabel(a)}</span>
                       <ArrowRight className="h-3 w-3" />
                       <span className="font-medium text-foreground">{getActionLabel(a.action_type, a.action_value)}</span>
                     </div>
@@ -184,20 +237,72 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
           />
         </div>
 
+        {/* Trigger type */}
         <div>
-          <Label className="text-xs">Quando mover para a coluna</Label>
-          <Select value={triggerColumnId} onValueChange={setTriggerColumnId}>
+          <Label className="text-xs">Gatilho</Label>
+          <Select value={triggerType} onValueChange={(v) => { setTriggerType(v); setTriggerColumnId(""); setTriggerValue(""); }}>
             <SelectTrigger className="mt-1">
-              <SelectValue placeholder="Selecione a coluna" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {columns.map((col) => (
-                <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
+              {TRIGGER_TYPES.map((t) => (
+                <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
+        {/* Trigger value - column or tag */}
+        {triggerType === "column_move" && (
+          <div>
+            <Label className="text-xs">Coluna de gatilho</Label>
+            <Select value={triggerColumnId} onValueChange={setTriggerColumnId}>
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Selecione a coluna" />
+              </SelectTrigger>
+              <SelectContent>
+                {columns.map((col) => (
+                  <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {triggerType === "tag_added" && (
+          <div>
+            <Label className="text-xs">Tag de gatilho</Label>
+            {existingTags.length > 0 ? (
+              <Select value={triggerValue} onValueChange={setTriggerValue}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Selecione ou digite a tag" />
+                </SelectTrigger>
+                <SelectContent>
+                  {existingTags.map((tag) => (
+                    <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                value={triggerValue}
+                onChange={(e) => setTriggerValue(e.target.value)}
+                placeholder="Nome da tag"
+                className="mt-1"
+              />
+            )}
+            {existingTags.length > 0 && (
+              <Input
+                value={triggerValue}
+                onChange={(e) => setTriggerValue(e.target.value)}
+                placeholder="Ou digite uma tag personalizada"
+                className="mt-1.5 text-xs"
+              />
+            )}
+          </div>
+        )}
+
+        {/* Action */}
         <div>
           <Label className="text-xs">Ação</Label>
           <Select value={actionType} onValueChange={(v) => { setActionType(v); setActionValue(""); }}>
@@ -212,6 +317,7 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
           </Select>
         </div>
 
+        {/* Action value fields */}
         {actionType === "add_tag" && (
           <div>
             <Label className="text-xs">Nome da tag</Label>
@@ -238,6 +344,22 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
                 />
               ))}
             </div>
+          </div>
+        )}
+
+        {actionType === "move_to_column" && (
+          <div>
+            <Label className="text-xs">Coluna de destino</Label>
+            <Select value={actionValue} onValueChange={setActionValue}>
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Selecione a coluna" />
+              </SelectTrigger>
+              <SelectContent>
+                {columns.map((col) => (
+                  <SelectItem key={col.id} value={col.id}>{col.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
 
