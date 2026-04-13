@@ -220,10 +220,10 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
               >
                 <div className="flex items-center justify-center mb-1">
                   <span
-                    className={`text-sm font-bold leading-none ${
+                    className={`text-sm font-bold leading-none w-7 h-7 flex items-center justify-center ${
                       today
-                        ? "bg-primary text-white rounded-full w-7 h-7 flex items-center justify-center"
-                        : "text-zinc-900 w-7 h-7 flex items-center justify-center"
+                        ? "bg-primary text-white rounded-full"
+                        : "text-black"
                     }`}
                   >
                     {format(day, "d")}
