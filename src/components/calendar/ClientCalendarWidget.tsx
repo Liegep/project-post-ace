@@ -218,11 +218,11 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                 onClick={() => setSelectedDay(isSelected ? null : key)}
                 className={`bg-white min-h-[90px] p-1.5 cursor-pointer hover:bg-zinc-50 transition-colors ${today ? "ring-2 ring-inset ring-primary/40" : ""} ${isSelected ? "bg-blue-50" : ""}`}
               >
-                <div className="flex items-center justify-center mb-1">
+                <div className="mb-1">
                   <span
-                    className={`text-sm font-bold leading-none w-7 h-7 flex items-center justify-center ${
+                    className={`text-xs font-bold leading-none inline-flex items-center justify-center ${
                       today
-                        ? "bg-primary text-white rounded-full"
+                        ? "bg-primary text-white rounded-full w-6 h-6"
                         : "text-black"
                     }`}
                   >
@@ -247,22 +247,17 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                           <span className="truncate text-black font-semibold">{post.title}</span>
                         </button>
                       </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-[280px] p-3 z-[9999]">
-                        <div className="space-y-1.5">
-                          <div className="flex items-center gap-2">
-                            <span className={`w-2 h-2 rounded-full shrink-0 ${getStatusDot(post)}`} />
-                            <span className="font-semibold text-sm">{post.title}</span>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {getStatusLabel(post)}{post.time ? ` • ${post.time.slice(0, 5)}` : ""}
-                          </div>
-                          {post.caption && (
-                            <p className="text-xs line-clamp-3">{post.caption}</p>
-                          )}
-                          {post.media_urls?.[0] && (
-                            <img src={post.media_urls[0]} alt="" className="h-16 w-full rounded object-cover mt-1" />
-                          )}
-                        </div>
+                      <TooltipContent side="top" className="max-w-[240px] p-2 z-[9999]">
+                        <p className="font-semibold text-xs">{post.title}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          {getStatusLabel(post)}{post.time ? ` • ${post.time.slice(0, 5)}` : ""}
+                        </p>
+                        {post.caption && (
+                          <p className="text-[11px] line-clamp-2 mt-1">{post.caption}</p>
+                        )}
+                        {post.media_urls?.[0] && (
+                          <img src={post.media_urls[0]} alt="" className="h-14 w-full rounded object-cover mt-1.5" />
+                        )}
                       </TooltipContent>
                     </Tooltip>
                   ))}
