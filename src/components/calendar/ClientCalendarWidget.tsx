@@ -247,16 +247,16 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                           <span className="truncate text-black font-semibold">{post.title}</span>
                         </button>
                       </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-[240px] p-2 z-[9999]">
-                        <p className="font-semibold text-xs">{post.title}</p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                      <TooltipContent side="top" className="max-w-[220px] p-2 z-[9999] bg-white border border-zinc-200 shadow-lg text-zinc-950">
+                        <p className="font-semibold text-xs text-zinc-900">{post.title}</p>
+                        <p className="text-[11px] text-zinc-500 mt-0.5">
                           {getStatusLabel(post)}{post.time ? ` • ${post.time.slice(0, 5)}` : ""}
                         </p>
                         {post.caption && (
-                          <p className="text-[11px] line-clamp-2 mt-1">{post.caption}</p>
+                          <p className="text-[11px] text-zinc-600 line-clamp-2 mt-1">{post.caption}</p>
                         )}
                         {post.media_urls?.[0] && (
-                          <img src={post.media_urls[0]} alt="" className="h-14 w-full rounded object-cover mt-1.5" />
+                          <img src={post.media_urls[0]} alt="" className="h-12 w-full rounded object-cover mt-1.5" />
                         )}
                       </TooltipContent>
                     </Tooltip>
