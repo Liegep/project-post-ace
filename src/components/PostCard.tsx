@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { LinkedText } from "@/components/LinkedText";
 import { MediaLightbox } from "@/components/MediaLightbox";
-import { Archive, Calendar, Play, Send, Trash2 } from "lucide-react";
+import { Archive, Calendar, Download, Play, Send, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
 import { getContrastColor } from "@/lib/utils";
@@ -92,8 +92,30 @@ export const PostCard = memo(
           <h3 className="text-sm font-bold leading-snug text-foreground line-clamp-2 flex-1">
             {post.title}
           </h3>
-          {isAdmin && onDelete && (
+          {isAdmin && (
             <div className="flex items-center gap-0.5 pt-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+              {hasMedia && (
+                <button
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const url = allMedia[0];
+                    if (!url || isExternalLink(url)) return;
+                    fetch(url)
+                      .then((res) => res.blob())
+                      .then((blob) => {
+                        const a = document.createElement("a");
+                        a.href = URL.createObjectURL(blob);
+                        a.download = post.title || "download";
+                        a.click();
+                        URL.revokeObjectURL(a.href);
+                      });
+                  }}
+                  title="Baixar imagem"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                </button>
+              )}
               {onArchive && (
                 <button
                   className="text-muted-foreground hover:text-amber-500 transition-colors"
@@ -103,13 +125,15 @@ export const PostCard = memo(
                   <Archive className="h-3.5 w-3.5" />
                 </button>
               )}
-              <button
-                className="text-muted-foreground hover:text-destructive transition-colors"
-                onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                title="Excluir"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              {onDelete && (
+                <button
+                  className="text-muted-foreground hover:text-destructive transition-colors"
+                  onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                  title="Excluir"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
           )}
         </div>
