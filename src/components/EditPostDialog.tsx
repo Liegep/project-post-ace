@@ -3,7 +3,7 @@ import { usePosts } from "@/context/PostsContext";
 
 import { useI18n } from "@/i18n/I18nContext";
 import { HashtagManager } from "@/components/HashtagManager";
-import { Post, PostStatus, MediaType, STATUS_CONFIG } from "@/types/post";
+import { Post, PostStatus, MediaType, STATUS_CONFIG, ClientLabel } from "@/types/post";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +42,7 @@ interface EditPostDialogProps {
 let mediaIdCounter = 0;
 
 export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps) => {
-  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn, clientId, addComment, deleteComment, updateComment, posts } = usePosts();
+  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn, clientId, addComment, deleteComment, updateComment, posts, updateClientLabel } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [mediaItems, setMediaItems] = useState<SortableMediaItem[]>([]);
@@ -389,6 +389,28 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                     ))}
                   </PopoverContent>
                 </Popover>
+              </div>
+
+              {/* Client Feedback dropdown (admin can reset to pending) */}
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Feedback do Cliente
+                </Label>
+                <Select
+                  value={post?.clientLabel ?? "pendente"}
+                  onValueChange={(v) => post && updateClientLabel(post.id, v as ClientLabel)}
+                >
+                  <SelectTrigger className="mt-1 h-9 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pendente">⏳ Pendente (resetar)</SelectItem>
+                    <SelectItem value="de_seu_feedback">💬 Aguardando Feedback</SelectItem>
+                    <SelectItem value="aprovado">✅ Aprovado</SelectItem>
+                    <SelectItem value="alteracao_solicitada">✏️ Alteração Solicitada</SelectItem>
+                    <SelectItem value="leia_comentario">📩 Leia Comentário</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
