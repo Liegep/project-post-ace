@@ -1101,7 +1101,57 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
           )}
         </div>
 
-        {activeTab === "board" ? (
+        {/* Global card search (active + archived) */}
+        <div className="mb-6 mx-auto max-w-md">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t("searchCards") || "Buscar cards (ativos + arquivados)..."}
+              className="pl-9 pr-9 h-10"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {normalizedQuery ? (
+          <div className="mx-auto max-w-7xl">
+            <p className="mb-4 text-sm text-muted-foreground text-center">
+              {searchResults.length} {searchResults.length === 1 ? "resultado" : "resultados"} para "{searchQuery}"
+            </p>
+            {searchResults.length === 0 ? (
+              <div className="rounded-lg border border-dashed bg-muted/20 p-12 text-center">
+                <Search className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">Nenhum card encontrado.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                {searchResults.map(({ post, archived }) => (
+                  <div key={post.id} className="relative">
+                    {archived && (
+                      <span className="absolute top-2 right-2 z-10 rounded-full bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 shadow-md flex items-center gap-1">
+                        <Archive className="h-2.5 w-2.5" /> {t("archived")}
+                      </span>
+                    )}
+                    <PostCard
+                      post={post}
+                      isAdmin
+                      onEdit={() => setEditPost(post)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : activeTab === "board" ? (
           <>
             <div className="mb-8 flex items-center justify-center gap-2">
               {editingPeriod ? (
