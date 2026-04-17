@@ -14,21 +14,30 @@ export function VideoPreviewCard({ video, originalUrl, className = "" }: VideoPr
   const [modalOpen, setModalOpen] = useState(false);
   const [thumbError, setThumbError] = useState(false);
   const hasThumbnail = video.thumbnailUrl && !thumbError;
+  // Drive blocks iframe embeds → always open in new tab. YouTube/Vimeo can embed.
+  const forceNewTab = video.type === "drive";
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (forceNewTab) return; // <a> handles navigation
     setModalOpen(true);
   };
 
-  const handleFallback = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    window.open(originalUrl, "_blank", "noopener");
-  };
+  const Wrapper: any = forceNewTab ? "a" : "div";
+  const wrapperProps = forceNewTab
+    ? {
+        href: originalUrl,
+        target: "_blank",
+        rel: "noopener noreferrer",
+        referrerPolicy: "no-referrer" as const,
+      }
+    : {};
 
   return (
     <>
-      <div
-        className={`relative w-full overflow-hidden rounded-xl cursor-pointer group ${className}`}
+      <Wrapper
+        {...wrapperProps}
+        className={`relative w-full overflow-hidden rounded-xl cursor-pointer group block no-underline ${className}`}
         style={{ aspectRatio: "16/9" }}
         onClick={handleClick}
       >
