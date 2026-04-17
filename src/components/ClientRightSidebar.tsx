@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
-import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink } from "lucide-react";
+import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const ClientNotes = lazy(() => import("@/components/ClientNotes").then(m => ({ default: m.ClientNotes })));
 const ClientLinksPanel = lazy(() => import("@/components/ClientLinksPanel").then(m => ({ default: m.ClientLinksPanel })));
+const QuickLinksPanel = lazy(() => import("@/components/QuickLinksPanel").then(m => ({ default: m.QuickLinksPanel })));
 
-type Tab = "notes" | "links" | null;
+type Tab = "notes" | "links" | "quick" | null;
 
 interface Props {
   clientId: string;
@@ -64,7 +65,35 @@ export function ClientRightSidebar({ clientId }: Props) {
       textColor: "text-blue-500",
       bgLight: "bg-blue-50 dark:bg-blue-500/10",
     },
+    {
+      id: "quick" as const,
+      label: "Rápidos",
+      icon: Link2,
+      count: 0,
+      color: "bg-emerald-500",
+      hoverColor: "hover:bg-emerald-400",
+      textColor: "text-emerald-500",
+      bgLight: "bg-emerald-50 dark:bg-emerald-500/10",
+    },
   ];
+
+  const headerBg = activeTab === "notes"
+    ? "bg-amber-50 dark:bg-amber-500/10"
+    : activeTab === "links"
+    ? "bg-blue-50 dark:bg-blue-500/10"
+    : "bg-emerald-50 dark:bg-emerald-500/10";
+
+  const headerIcon = activeTab === "notes"
+    ? <StickyNote className="h-5 w-5 text-amber-500" />
+    : activeTab === "links"
+    ? <LinkIcon className="h-5 w-5 text-blue-500" />
+    : <Link2 className="h-5 w-5 text-emerald-500" />;
+
+  const headerTitle = activeTab === "notes"
+    ? "Recados"
+    : activeTab === "links"
+    ? "Links do Cliente"
+    : "Links Rápidos";
 
   // Mobile: use Sheet
   if (isMobile) {
@@ -101,19 +130,10 @@ export function ClientRightSidebar({ clientId }: Props) {
           <SheetContent side="right" className="w-full sm:w-[380px] p-0">
             <div className="flex h-full flex-col">
               {/* Header */}
-              <div className={cn(
-                "flex items-center justify-between px-5 py-4 border-b",
-                activeTab === "notes" ? "bg-amber-50 dark:bg-amber-500/10" : "bg-blue-50 dark:bg-blue-500/10"
-              )}>
+              <div className={cn("flex items-center justify-between px-5 py-4 border-b", headerBg)}>
                 <div className="flex items-center gap-2">
-                  {activeTab === "notes" ? (
-                    <StickyNote className="h-5 w-5 text-amber-500" />
-                  ) : (
-                    <LinkIcon className="h-5 w-5 text-blue-500" />
-                  )}
-                  <h2 className="font-semibold text-foreground">
-                    {activeTab === "notes" ? "Recados" : "Links Rápidos"}
-                  </h2>
+                  {headerIcon}
+                  <h2 className="font-semibold text-foreground">{headerTitle}</h2>
                 </div>
                 <button onClick={close} className="rounded-full p-1.5 hover:bg-black/10 transition-colors">
                   <X className="h-4 w-4" />
@@ -154,6 +174,7 @@ export function ClientRightSidebar({ clientId }: Props) {
                   {activeTab === "links" && (
                     <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
                   )}
+                  {activeTab === "quick" && <QuickLinksPanel />}
                 </Suspense>
               </div>
             </div>
@@ -217,19 +238,10 @@ export function ClientRightSidebar({ clientId }: Props) {
       >
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className={cn(
-            "flex items-center justify-between px-5 py-4 border-b",
-            activeTab === "notes" ? "bg-amber-50 dark:bg-amber-500/10" : "bg-blue-50 dark:bg-blue-500/10"
-          )}>
+          <div className={cn("flex items-center justify-between px-5 py-4 border-b", headerBg)}>
             <div className="flex items-center gap-2">
-              {activeTab === "notes" ? (
-                <StickyNote className="h-5 w-5 text-amber-500" />
-              ) : (
-                <LinkIcon className="h-5 w-5 text-blue-500" />
-              )}
-              <h2 className="font-semibold text-foreground">
-                {activeTab === "notes" ? "Recados" : "Links Rápidos"}
-              </h2>
+              {headerIcon}
+              <h2 className="font-semibold text-foreground">{headerTitle}</h2>
             </div>
             <button onClick={close} className="rounded-full p-1.5 hover:bg-muted transition-colors">
               <X className="h-4 w-4" />
@@ -270,6 +282,7 @@ export function ClientRightSidebar({ clientId }: Props) {
               {activeTab === "links" && (
                 <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
               )}
+              {activeTab === "quick" && <QuickLinksPanel />}
             </Suspense>
           </div>
         </div>
