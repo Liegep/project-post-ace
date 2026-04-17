@@ -74,7 +74,9 @@ export const PostCard = memo(
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
     const thumbUrl = allMedia[0];
-    const labelConfig = LABEL_CONFIG[post.clientLabel];
+    const FALLBACK_CONFIG = { label: "—", color: "bg-muted text-muted-foreground" };
+    const labelConfig = LABEL_CONFIG[post.clientLabel] ?? FALLBACK_CONFIG;
+    const getStatusConfig = (s: PostStatus) => STATUS_CONFIG[s] ?? FALLBACK_CONFIG;
     const isOverdue = post.deadline ? new Date() > post.deadline && !post.status.includes("pronto") : false;
 
     const postTags = post.tags
@@ -194,8 +196,8 @@ export const PostCard = memo(
                   </span>
                 )}
                 {post.status.slice(0, 1).map((s) => (
-                  <span key={s} className={`inline-flex rounded px-1.5 py-0.5 text-[8px] font-bold ${STATUS_CONFIG[s].color}`}>
-                    {t(STATUS_KEYS[s] as any)}
+                  <span key={s} className={`inline-flex rounded px-1.5 py-0.5 text-[8px] font-bold ${getStatusConfig(s).color}`}>
+                    {t((STATUS_KEYS[s] ?? "statusEntrada") as any)}
                   </span>
                 ))}
                 <span className={`inline-flex rounded px-1.5 py-0.5 text-[8px] font-bold ${labelConfig.color}`}>
@@ -245,8 +247,8 @@ export const PostCard = memo(
                 </span>
               )}
               {post.status.slice(0, 1).map((s) => (
-                <span key={s} className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CONFIG[s].color}`}>
-                  {t(STATUS_KEYS[s] as any)}
+                <span key={s} className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${getStatusConfig(s).color}`}>
+                  {t((STATUS_KEYS[s] ?? "statusEntrada") as any)}
                 </span>
               ))}
               <span className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${labelConfig.color}`}>
