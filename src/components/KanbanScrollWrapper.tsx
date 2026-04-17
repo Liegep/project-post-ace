@@ -5,9 +5,14 @@ import { cn } from "@/lib/utils";
 interface KanbanScrollWrapperProps {
   children: ReactNode;
   className?: string;
+  /**
+   * When true, makes the wrapper fill its parent height and prevents
+   * vertical page scroll: each column should manage its own internal scroll.
+   */
+  fillHeight?: boolean;
 }
 
-export function KanbanScrollWrapper({ children, className }: KanbanScrollWrapperProps) {
+export function KanbanScrollWrapper({ children, className, fillHeight }: KanbanScrollWrapperProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -75,7 +80,7 @@ export function KanbanScrollWrapper({ children, className }: KanbanScrollWrapper
     "absolute top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-background/60 backdrop-blur-md border border-border/50 shadow-lg text-foreground/70 hover:text-foreground hover:bg-background/80 transition-all duration-200 cursor-pointer";
 
   return (
-    <div className={cn("relative group/kanban", className)}>
+    <div className={cn("relative group/kanban", fillHeight && "h-full flex flex-col min-h-0", className)}>
       {/* Left arrow */}
       {canScrollLeft && (
         <button
@@ -103,6 +108,7 @@ export function KanbanScrollWrapper({ children, className }: KanbanScrollWrapper
         ref={scrollRef}
         className={cn(
           "kanban-scroll flex gap-4 overflow-x-auto pb-4",
+          fillHeight && "h-full items-stretch",
           isDragging && "cursor-grabbing select-none"
         )}
         onPointerDown={onPointerDown}

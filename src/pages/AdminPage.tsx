@@ -45,7 +45,7 @@ const UNASSIGNED_COLUMN_ID = "__unassigned__";
 const DroppableColumn = ({ id, children }: { id: string; children: React.ReactNode }) => {
   const { setNodeRef, isOver } = useDroppable({ id });
   return (
-    <div ref={setNodeRef} className={`space-y-3 min-h-[60px] rounded-lg transition-colors ${isOver ? "bg-accent/10 ring-2 ring-accent/30" : ""}`}>
+    <div ref={setNodeRef} className={`space-y-3 min-h-[60px] flex-1 overflow-y-auto pr-1 -mr-1 rounded-lg transition-colors ${isOver ? "bg-accent/10 ring-2 ring-accent/30" : ""}`}>
       {children}
     </div>
   );
@@ -153,8 +153,8 @@ const SortableColumn = ({ col, children }: { col: { id: string }; children: Reac
     opacity: isDragging ? 0.5 : 1,
   };
   return (
-    <div ref={setNodeRef} style={style} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
-      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing mb-1 flex justify-center">
+    <div ref={setNodeRef} style={style} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4 flex flex-col h-full min-h-0">
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing mb-1 flex justify-center shrink-0">
         <GripVertical className="h-4 w-4 text-muted-foreground/50 rotate-90" />
       </div>
       {children}
@@ -256,13 +256,13 @@ const KanbanBoard = ({
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <KanbanScrollWrapper>
+      <KanbanScrollWrapper fillHeight>
         <SortableContext items={columnSortIds} strategy={horizontalListSortingStrategy}>
           {columns.map((col) => {
             const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
             return (
               <SortableColumn key={col.id} col={col}>
-                <div className="mb-4 flex items-center justify-between gap-2 sticky top-0 z-10 rounded-lg bg-black backdrop-blur-sm border border-white/10 px-3 py-2 shadow-sm">
+                <div className="mb-4 flex items-center justify-between gap-2 shrink-0 z-10 rounded-lg bg-black backdrop-blur-sm border border-white/10 px-3 py-2 shadow-sm">
                   {editingColumnId === col.id ? (
                     <Input
                       ref={editColumnInputRef}
@@ -337,8 +337,8 @@ const KanbanBoard = ({
 
         {/* Unassigned posts column */}
         {unassignedPosts.length > 0 && (
-          <div className="w-80 shrink-0 rounded-xl border bg-muted/30 p-4">
-            <div className="mb-4 flex items-center gap-2">
+          <div className="w-80 shrink-0 rounded-xl border bg-muted/30 p-4 flex flex-col h-full min-h-0">
+            <div className="mb-4 flex items-center gap-2 shrink-0">
               <span className="text-sm font-semibold text-muted-foreground">{t("noColumn")}</span>
               <span className="text-xs text-muted-foreground">({unassignedPosts.length})</span>
             </div>
@@ -1191,8 +1191,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </div>
 
             {view === "kanban" ? (
-              <div className="flex gap-4">
-                <div className="flex-1 min-w-0 overflow-x-auto">
+              <div className="flex gap-4 h-[calc(100dvh-260px)] min-h-[500px]">
+                <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
                   <KanbanBoard
                     posts={posts}
                     columns={columns}
