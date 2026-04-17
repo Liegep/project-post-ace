@@ -21,6 +21,7 @@ export interface Comment {
   author: string;
   text: string;
   createdAt: Date;
+  userId?: string | null;
 }
 
 export type MediaType = "image" | "video";
