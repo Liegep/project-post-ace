@@ -153,8 +153,8 @@ const SortableColumn = ({ col, children }: { col: { id: string }; children: Reac
     opacity: isDragging ? 0.5 : 1,
   };
   return (
-    <div ref={setNodeRef} style={style} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
-      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing mb-1 flex justify-center">
+    <div ref={setNodeRef} style={style} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4 flex flex-col h-full min-h-0">
+      <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing mb-1 flex justify-center shrink-0">
         <GripVertical className="h-4 w-4 text-muted-foreground/50 rotate-90" />
       </div>
       {children}
