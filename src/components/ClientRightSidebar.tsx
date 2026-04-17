@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
-import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink, Link2 } from "lucide-react";
+import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink } from "lucide-react";
+import { GradientHeartIcon } from "@/components/GradientHeartIcon";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
