@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
-import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink, Link2 } from "lucide-react";
+import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink } from "lucide-react";
+import { GradientHeartIcon } from "@/components/GradientHeartIcon";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -68,12 +69,12 @@ export function ClientRightSidebar({ clientId }: Props) {
     {
       id: "quick" as const,
       label: "Rápidos",
-      icon: Link2,
+      icon: GradientHeartIcon,
       count: 0,
-      color: "bg-emerald-500",
-      hoverColor: "hover:bg-emerald-400",
-      textColor: "text-emerald-500",
-      bgLight: "bg-emerald-50 dark:bg-emerald-500/10",
+      color: "bg-transparent",
+      hoverColor: "hover:bg-muted",
+      textColor: "text-foreground",
+      bgLight: "bg-muted/40",
     },
   ];
 
@@ -81,13 +82,13 @@ export function ClientRightSidebar({ clientId }: Props) {
     ? "bg-amber-50 dark:bg-amber-500/10"
     : activeTab === "links"
     ? "bg-blue-50 dark:bg-blue-500/10"
-    : "bg-emerald-50 dark:bg-emerald-500/10";
+    : "bg-muted/40";
 
   const headerIcon = activeTab === "notes"
     ? <StickyNote className="h-5 w-5 text-amber-500" />
     : activeTab === "links"
     ? <LinkIcon className="h-5 w-5 text-blue-500" />
-    : <Link2 className="h-5 w-5 text-emerald-500" />;
+    : <GradientHeartIcon className="h-5 w-5" />;
 
   const headerTitle = activeTab === "notes"
     ? "Recados"
