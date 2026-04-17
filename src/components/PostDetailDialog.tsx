@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriang
 import { useState } from "react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useI18n } from "@/i18n/I18nContext";
 import { LinkedText } from "@/components/LinkedText";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { toast } from "sonner";
@@ -65,6 +66,8 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
   const [showChangeForm, setShowChangeForm] = useState(false);
   const [changeComment, setChangeComment] = useState("");
   const activityLogs = useActivityLogs({ itemId: post?.id || "", enabled: open && showHistory && !!post });
+  const { isAdmin } = useUserRole();
+  const { locale } = useI18n();
 
   if (!post) return null;
 
