@@ -6,6 +6,15 @@ import { logActivity } from "@/lib/activityLogger";
 import { parsePostDeadline, serializePostDeadline } from "@/lib/postDeadline";
 import { runAutomationsForPost, type AutomationResult } from "@/lib/automationEngine";
 
+export interface CommentAuthorInfo {
+  userId: string;
+  fullName: string;
+  email: string;
+  avatarUrl: string;
+  role: string;
+  clientLogoUrl?: string;
+}
+
 interface PostsContextType {
   clientId: string;
   posts: Post[];
@@ -14,6 +23,7 @@ interface PostsContextType {
   columns: Column[];
   postingPeriod: string;
   companyLogo: string;
+  commentAuthors: Record<string, CommentAuthorInfo>;
   setPostingPeriod: (period: string) => void;
   setCompanyLogo: (url: string) => void;
   addPost: (post: Omit<Post, "id" | "comments" | "createdAt" | "clientLabel" | "position" | "archived" | "archivedAt" | "trelloCardId"> & { deadline?: Date; clientCreated?: boolean }) => Promise<boolean>;
