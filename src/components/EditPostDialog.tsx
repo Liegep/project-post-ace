@@ -231,7 +231,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                     {comments.length > 0 && (
                       <div className="mt-2 space-y-2 max-h-[200px] overflow-y-auto">
                         {comments.map((c) => (
-                          <div key={c.id} className="rounded-lg border bg-muted/30 p-2.5 group/comment">
+                          <div key={c.id} className="rounded-lg border p-2.5 group/comment bg-[sidebar-primary-foreground] bg-secondary text-[sidebar-primary-foreground] text-zinc-950">
                             <div className="flex items-center justify-between mb-1">
                               <span className="text-xs font-semibold text-foreground">{c.author}</span>
                               <div className="flex items-center gap-1">
@@ -292,7 +292,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                                 </button>
                               </div>
                             ) : (
-                              <div className="text-xs whitespace-pre-wrap text-primary-foreground">{c.text}</div>
+                              <div className="text-xs whitespace-pre-wrap text-neutral-950">{c.text}</div>
                             )}
                           </div>
                         ))}
