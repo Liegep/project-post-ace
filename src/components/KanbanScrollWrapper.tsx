@@ -80,7 +80,7 @@ export function KanbanScrollWrapper({ children, className, fillHeight }: KanbanS
     "absolute top-1/2 -translate-y-1/2 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-background/60 backdrop-blur-md border border-border/50 shadow-lg text-foreground/70 hover:text-foreground hover:bg-background/80 transition-all duration-200 cursor-pointer";
 
   return (
-    <div className={cn("relative group/kanban", className)}>
+    <div className={cn("relative group/kanban", fillHeight && "h-full flex flex-col min-h-0", className)}>
       {/* Left arrow */}
       {canScrollLeft && (
         <button
