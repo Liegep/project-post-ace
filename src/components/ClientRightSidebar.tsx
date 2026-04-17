@@ -130,19 +130,10 @@ export function ClientRightSidebar({ clientId }: Props) {
           <SheetContent side="right" className="w-full sm:w-[380px] p-0">
             <div className="flex h-full flex-col">
               {/* Header */}
-              <div className={cn(
-                "flex items-center justify-between px-5 py-4 border-b",
-                activeTab === "notes" ? "bg-amber-50 dark:bg-amber-500/10" : "bg-blue-50 dark:bg-blue-500/10"
-              )}>
+              <div className={cn("flex items-center justify-between px-5 py-4 border-b", headerBg)}>
                 <div className="flex items-center gap-2">
-                  {activeTab === "notes" ? (
-                    <StickyNote className="h-5 w-5 text-amber-500" />
-                  ) : (
-                    <LinkIcon className="h-5 w-5 text-blue-500" />
-                  )}
-                  <h2 className="font-semibold text-foreground">
-                    {activeTab === "notes" ? "Recados" : "Links Rápidos"}
-                  </h2>
+                  {headerIcon}
+                  <h2 className="font-semibold text-foreground">{headerTitle}</h2>
                 </div>
                 <button onClick={close} className="rounded-full p-1.5 hover:bg-black/10 transition-colors">
                   <X className="h-4 w-4" />
@@ -183,6 +174,7 @@ export function ClientRightSidebar({ clientId }: Props) {
                   {activeTab === "links" && (
                     <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
                   )}
+                  {activeTab === "quick" && <QuickLinksPanel />}
                 </Suspense>
               </div>
             </div>
