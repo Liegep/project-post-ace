@@ -74,7 +74,9 @@ export const PostCard = memo(
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
     const thumbUrl = allMedia[0];
-    const labelConfig = LABEL_CONFIG[post.clientLabel];
+    const FALLBACK_CONFIG = { label: "—", color: "bg-muted text-muted-foreground" };
+    const labelConfig = LABEL_CONFIG[post.clientLabel] ?? FALLBACK_CONFIG;
+    const getStatusConfig = (s: PostStatus) => STATUS_CONFIG[s] ?? FALLBACK_CONFIG;
     const isOverdue = post.deadline ? new Date() > post.deadline && !post.status.includes("pronto") : false;
 
     const postTags = post.tags
