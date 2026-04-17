@@ -93,8 +93,8 @@ export function StorageCleanupButton() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} disabled={deleting}>
+            <AlertDialogCancel disabled={deleting} className="text-white">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} disabled={deleting} className="text-white">
               {deleting ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
               Excluir {orphanCount} arquivos
             </AlertDialogAction>
