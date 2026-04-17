@@ -143,81 +143,87 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
           )}
 
           {post.caption && (
-            <div className="text-sm whitespace-pre-wrap leading-relaxed rounded-lg p-3 bg-white/95 text-black">
-              <LinkedText text={post.caption} />
+            <div className="rounded-xl p-4 sm:p-5 bg-white text-black shadow-sm border border-white/20">
+              <p className="text-[11px] uppercase tracking-wider font-semibold text-black/50 mb-2">
+                {t("fullCaption")}
+              </p>
+              <div className="text-[18px] sm:text-[19px] leading-[1.6] whitespace-pre-wrap font-medium">
+                <LinkedText text={post.caption} />
+              </div>
             </div>
           )}
 
           {/* Client action buttons */}
           {(onApprove || onRequestChange) && post.clientLabel !== "aprovado" && (
             <div className="border-t border-white/20 pt-4 mt-2 space-y-3">
-              <p className="text-sm font-medium text-white">O que achou deste post?</p>
+              <p className="text-sm font-medium text-white">{t("whatDidYouThink")}</p>
 
-              
               {!showChangeForm ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   {onApprove && (
                     <Button
-                      size="sm"
-                      className="bg-success text-success-foreground hover:bg-success/90 gap-1.5"
+                      size="lg"
+                      className="bg-success text-success-foreground hover:bg-success/90 gap-2 h-12 text-base font-semibold flex-1"
                       onClick={() => {
                         onApprove(post.id);
-                        toast.success("Post aprovado com sucesso!");
+                        toast.success(t("approvedSuccess"));
                         onOpenChange(false);
                       }}
                     >
-                      <CheckCircle2 className="h-4 w-4" />
-                      Aprovado pela Boss
+                      <CheckCircle2 className="h-5 w-5" />
+                      {t("approvedByBoss")}
                     </Button>
                   )}
                   {onRequestChange && (
                     <Button
-                      size="sm"
+                      size="lg"
                       variant="destructive"
-                      className="gap-1.5"
+                      className="gap-2 h-12 text-base font-semibold flex-1"
                       onClick={() => setShowChangeForm(true)}
                     >
-                      <AlertTriangle className="h-4 w-4" />
-                      Solicitar Alteração
+                      <AlertTriangle className="h-5 w-5" />
+                      {t("requestChanges")}
                     </Button>
                   )}
                 </div>
               ) : (
                 <div className="space-y-2">
                   <Textarea
-                    placeholder="Descreva a alteração desejada..."
+                    placeholder={t("describeChange")}
                     value={changeComment}
                     onChange={(e) => setChangeComment(e.target.value)}
-                    className="min-h-[80px] text-sm"
+                    className="min-h-[96px] text-base bg-white text-black"
                   />
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button
-                      size="sm"
+                      size="lg"
                       variant="destructive"
+                      className="h-12 text-base font-semibold flex-1"
                       disabled={!changeComment.trim()}
                       onClick={() => {
                         onRequestChange!(post.id, changeComment.trim());
-                        toast.success("Alteração solicitada com sucesso!");
+                        toast.success(t("changeRequestedSuccess"));
                         setChangeComment("");
                         setShowChangeForm(false);
                         onOpenChange(false);
                       }}
                     >
-                      Enviar solicitação
+                      {t("sendRequest")}
                     </Button>
                     <Button
-                      size="sm"
+                      size="lg"
                       variant="ghost"
+                      className="h-12 text-base text-white hover:bg-white/10"
                       onClick={() => { setShowChangeForm(false); setChangeComment(""); }}
                     >
-                      Cancelar
+                      {t("cancel")}
                     </Button>
                   </div>
                 </div>
               )}
 
               {post.clientLabel === "alteracao_solicitada" && (
-                <p className="text-xs text-red-400 font-medium">Alteração já solicitada para este post.</p>
+                <p className="text-xs text-red-400 font-medium">{t("changeAlreadyRequested")}</p>
               )}
             </div>
           )}
@@ -227,7 +233,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
             <div className="border-t border-white/20 pt-4 mt-2 space-y-3">
               <div className="flex items-center gap-2">
                 <TagIcon className="h-4 w-4 text-white/60" />
-                <span className="text-sm font-medium text-white">Etiqueta do Cliente</span>
+                <span className="text-sm font-medium text-white">{t("clientLabelTitle")}</span>
               </div>
               <Select
                 value={post.clientLabel}
@@ -236,7 +242,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
                     setShowChangeForm(true);
                   } else {
                     onUpdateLabel(post.id, value);
-                    toast.success("Etiqueta atualizada!");
+                    toast.success(t("labelUpdated"));
                   }
                 }}
               >
@@ -245,19 +251,19 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="pendente">
-                    <span className="flex items-center gap-2">⏳ Pendente</span>
+                    <span className="flex items-center gap-2">⏳ {t("labelPending")}</span>
                   </SelectItem>
                   <SelectItem value="aprovado">
-                    <span className="flex items-center gap-2">✅ Aprovado pela Boss</span>
+                    <span className="flex items-center gap-2">✅ {t("approvedByBoss")}</span>
                   </SelectItem>
                   <SelectItem value="alteracao_solicitada">
-                    <span className="flex items-center gap-2">⚠️ Solicitar Alteração</span>
+                    <span className="flex items-center gap-2">⚠️ {t("requestChanges")}</span>
                   </SelectItem>
                   <SelectItem value="de_seu_feedback">
-                    <span className="flex items-center gap-2">💬 Dê seu Feedback</span>
+                    <span className="flex items-center gap-2">💬 {t("labelGiveFeedback")}</span>
                   </SelectItem>
                   <SelectItem value="leia_comentario">
-                    <span className="flex items-center gap-2">📖 Leia o Comentário</span>
+                    <span className="flex items-center gap-2">📖 {t("labelReadComment")}</span>
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -265,31 +271,33 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
               {showChangeForm && (
                 <div className="space-y-2">
                   <Textarea
-                    placeholder="Descreva a alteração desejada..."
+                    placeholder={t("describeChange")}
                     value={changeComment}
                     onChange={(e) => setChangeComment(e.target.value)}
-                    className="min-h-[80px] text-sm"
+                    className="min-h-[96px] text-base bg-white text-black"
                   />
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button
-                      size="sm"
+                      size="lg"
                       variant="destructive"
+                      className="h-12 text-base font-semibold flex-1"
                       disabled={!changeComment.trim()}
                       onClick={() => {
                         onUpdateLabel(post.id, "alteracao_solicitada", changeComment.trim());
-                        toast.success("Alteração solicitada!");
+                        toast.success(t("changeRequestedSuccess"));
                         setChangeComment("");
                         setShowChangeForm(false);
                       }}
                     >
-                      Enviar solicitação
+                      {t("sendRequest")}
                     </Button>
                     <Button
-                      size="sm"
+                      size="lg"
                       variant="ghost"
+                      className="h-12 text-base text-white hover:bg-white/10"
                       onClick={() => { setShowChangeForm(false); setChangeComment(""); }}
                     >
-                      Cancelar
+                      {t("cancel")}
                     </Button>
                   </div>
                 </div>
@@ -298,7 +306,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
           )}
           <button onClick={() => setShowHistory(!showHistory)} className="flex items-center gap-1.5 text-xs font-medium text-white/60 hover:text-white transition-colors pt-2">
             <History className="h-3.5 w-3.5 text-white/50" />
-            {showHistory ? "Ocultar histórico" : "Ver histórico de atividades"}
+            {showHistory ? t("hideHistory") : t("viewActivityHistory")}
           </button>
 
           {showHistory && (
