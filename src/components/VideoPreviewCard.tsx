@@ -14,21 +14,30 @@ export function VideoPreviewCard({ video, originalUrl, className = "" }: VideoPr
   const [modalOpen, setModalOpen] = useState(false);
   const [thumbError, setThumbError] = useState(false);
   const hasThumbnail = video.thumbnailUrl && !thumbError;
+  // Drive blocks iframe embeds → always open in new tab. YouTube/Vimeo can embed.
+  const forceNewTab = video.type === "gdrive";
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (forceNewTab) return; // <a> handles navigation
     setModalOpen(true);
   };
 
-  const handleFallback = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    window.open(originalUrl, "_blank", "noopener");
-  };
+  const Wrapper: any = forceNewTab ? "a" : "div";
+  const wrapperProps = forceNewTab
+    ? {
+        href: originalUrl,
+        target: "_blank",
+        rel: "noopener noreferrer",
+        referrerPolicy: "no-referrer" as const,
+      }
+    : {};
 
   return (
     <>
-      <div
-        className={`relative w-full overflow-hidden rounded-xl cursor-pointer group ${className}`}
+      <Wrapper
+        {...wrapperProps}
+        className={`relative w-full overflow-hidden rounded-xl cursor-pointer group block no-underline ${className}`}
         style={{ aspectRatio: "16/9" }}
         onClick={handleClick}
       >
@@ -65,15 +74,14 @@ export function VideoPreviewCard({ video, originalUrl, className = "" }: VideoPr
           </span>
         </div>
 
-        {/* External link fallback */}
-        <button
-          onClick={handleFallback}
-          className="absolute top-2.5 right-2.5 rounded-md bg-background/80 backdrop-blur-sm p-1.5 text-foreground opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-background"
+        {/* External link indicator */}
+        <div
+          className="absolute top-2.5 right-2.5 rounded-md bg-background/80 backdrop-blur-sm p-1.5 text-foreground shadow-sm"
           title="Abrir em nova aba"
         >
           <ExternalLink className="h-3.5 w-3.5" />
-        </button>
-      </div>
+        </div>
+      </Wrapper>
 
       <VideoEmbedModal open={modalOpen} onOpenChange={setModalOpen} video={video} />
     </>
