@@ -700,9 +700,22 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, [posts, clientId]);
 
   const bulkMoveToColumn = useCallback(async (ids: string[], columnId: string | null) => {
+    // Capture previous columns BEFORE local mutation so the engine can detect actual moves.
+    const previousByPost = new Map(
+      ids.map((id) => [id, posts.find((p) => p.id === id)?.columnId ?? null] as const)
+    );
     setPosts((prev) => prev.map((p) => ids.includes(p.id) ? { ...p, columnId } : p));
     await supabase.from("posts").update({ column_id: columnId } as any).in("id", ids);
-  }, []);
+    // Fan out automations through the centralized engine.
+    for (const id of ids) {
+      await triggerAutomations({
+        postId: id,
+        newColumnId: columnId,
+        previousColumnId: previousByPost.get(id) ?? null,
+      });
+    }
+  }, [posts, triggerAutomations]);
+
 
   const activePosts = posts.filter((p) => !p.archived);
   const archivedPosts = posts.filter((p) => p.archived);
