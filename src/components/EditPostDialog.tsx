@@ -316,7 +316,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                               <div className="text-xs whitespace-pre-wrap text-neutral-950">{c.text}</div>
                             )}
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
 
