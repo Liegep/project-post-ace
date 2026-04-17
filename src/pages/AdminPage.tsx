@@ -262,7 +262,7 @@ const KanbanBoard = ({
             const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
             return (
               <SortableColumn key={col.id} col={col}>
-                <div className="mb-4 flex items-center justify-between gap-2 sticky top-0 z-10 rounded-lg bg-black backdrop-blur-sm border border-white/10 px-3 py-2 shadow-sm">
+                <div className="mb-4 flex items-center justify-between gap-2 shrink-0 z-10 rounded-lg bg-black backdrop-blur-sm border border-white/10 px-3 py-2 shadow-sm">
                   {editingColumnId === col.id ? (
                     <Input
                       ref={editColumnInputRef}
