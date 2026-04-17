@@ -65,7 +65,35 @@ export function ClientRightSidebar({ clientId }: Props) {
       textColor: "text-blue-500",
       bgLight: "bg-blue-50 dark:bg-blue-500/10",
     },
+    {
+      id: "quick" as const,
+      label: "Rápidos",
+      icon: Link2,
+      count: 0,
+      color: "bg-emerald-500",
+      hoverColor: "hover:bg-emerald-400",
+      textColor: "text-emerald-500",
+      bgLight: "bg-emerald-50 dark:bg-emerald-500/10",
+    },
   ];
+
+  const headerBg = activeTab === "notes"
+    ? "bg-amber-50 dark:bg-amber-500/10"
+    : activeTab === "links"
+    ? "bg-blue-50 dark:bg-blue-500/10"
+    : "bg-emerald-50 dark:bg-emerald-500/10";
+
+  const headerIcon = activeTab === "notes"
+    ? <StickyNote className="h-5 w-5 text-amber-500" />
+    : activeTab === "links"
+    ? <LinkIcon className="h-5 w-5 text-blue-500" />
+    : <Link2 className="h-5 w-5 text-emerald-500" />;
+
+  const headerTitle = activeTab === "notes"
+    ? "Recados"
+    : activeTab === "links"
+    ? "Links do Cliente"
+    : "Links Rápidos";
 
   // Mobile: use Sheet
   if (isMobile) {
