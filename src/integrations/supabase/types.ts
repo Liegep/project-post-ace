@@ -2549,6 +2549,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_orphaned_media_files: {
+        Args: { older_than_hours?: number }
+        Returns: number
+      }
+      extract_media_storage_paths: {
+        Args: { urls: string[] }
+        Returns: string[]
+      }
       get_user_client_ids: { Args: { _user_id: string }; Returns: string[] }
       has_role: {
         Args: {
@@ -2558,6 +2566,14 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      list_orphaned_media_files: {
+        Args: { older_than_hours?: number }
+        Returns: {
+          created_at: string
+          name: string
+          size: number
+        }[]
+      }
     }
     Enums: {
       app_role:
