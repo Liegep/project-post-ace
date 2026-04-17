@@ -1191,8 +1191,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </div>
 
             {view === "kanban" ? (
-              <div className="flex gap-4">
-                <div className="flex-1 min-w-0 overflow-x-auto">
+              <div className="flex gap-4 h-[calc(100dvh-260px)] min-h-[500px]">
+                <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
                   <KanbanBoard
                     posts={posts}
                     columns={columns}
