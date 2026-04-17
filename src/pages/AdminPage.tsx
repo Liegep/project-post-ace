@@ -1108,7 +1108,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t("searchCards") || "Buscar cards (ativos + arquivados)..."}
+              placeholder="Buscar cards (ativos + arquivados)..."
               className="pl-9 pr-9 h-10"
             />
             {searchQuery && (
