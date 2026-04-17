@@ -75,10 +75,11 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
   };
 
   const fetchTags = async () => {
+    // Include client-specific tags AND legacy tags without client_id (shared seed tags)
     const { data } = await supabase
       .from("tags" as any)
-      .select("id, name")
-      .eq("client_id", clientId)
+      .select("id, name, client_id")
+      .or(`client_id.eq.${clientId},client_id.is.null`)
       .order("name");
     setExistingTags((data as any[])?.map((t: any) => ({ id: t.id, name: t.name })) || []);
   };
