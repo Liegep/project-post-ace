@@ -516,35 +516,24 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       pushToTrello(id, "update");
     }
 
-    // Run tag-based automations if tags changed
+    // Run tag-based automations via centralized engine if tags changed
     if (updates.tags !== undefined) {
       const oldTags = posts.find((p) => p.id === id)?.tags || [];
-      await runTagAutomations(id, oldTags, updates.tags);
+      const addedTagIds = updates.tags.filter((t) => !oldTags.includes(t));
+      if (addedTagIds.length > 0) {
+        await triggerAutomations({ postId: id, addedTagIds });
+      }
     }
-  }, [posts, runTagAutomations]);
-
-  // Run kanban automations for a post moving to a column
-  const runAutomations = useCallback(async (postId: string, columnId: string | null) => {
-    if (!columnId || !clientId) return;
-    const { data: automations } = await supabase
-      .from("kanban_automations")
-      .select("*")
-      .eq("client_id", clientId)
-      .eq("trigger_type", "column_move")
-      .eq("trigger_column_id", columnId)
-      .eq("active", true);
-    if (!automations || automations.length === 0) return;
-    for (const auto of automations as any[]) {
-      await executeAutomationAction(auto, postId);
-    }
-  }, [clientId, executeAutomationAction]);
+  }, [posts, triggerAutomations]);
 
   const movePostToColumn = useCallback(async (postId: string, columnId: string | null) => {
+    const previousColumnId = posts.find((p) => p.id === postId)?.columnId ?? null;
     setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, columnId } : p)));
     await supabase.from("posts").update({ column_id: columnId } as any).eq("id", postId);
     pushToTrello(postId, "move_column");
-    await runAutomations(postId, columnId);
-  }, [runAutomations]);
+    await triggerAutomations({ postId, newColumnId: columnId, previousColumnId });
+  }, [posts, triggerAutomations]);
+
 
   const uploadMedia = useCallback(async (file: File): Promise<string> => {
     const { compressImage } = await import("@/lib/imageCompressor");
