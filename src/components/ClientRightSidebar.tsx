@@ -82,7 +82,7 @@ export function ClientRightSidebar({ clientId }: Props) {
     ? "bg-amber-50 dark:bg-amber-500/10"
     : activeTab === "links"
     ? "bg-blue-50 dark:bg-blue-500/10"
-    : "bg-lime-100 opacity-60";
+    : "opacity-60 bg-lime-100";
 
   const headerIcon = activeTab === "notes"
     ? <StickyNote className="h-5 w-5 text-amber-500" />
