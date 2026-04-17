@@ -42,7 +42,7 @@ interface EditPostDialogProps {
 let mediaIdCounter = 0;
 
 export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps) => {
-  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn, clientId, addComment, deleteComment, updateComment, posts, updateClientLabel } = usePosts();
+  const { updatePost, updatePostStatus, uploadMedia, columns, movePostToColumn, clientId, addComment, deleteComment, updateComment, posts, updateClientLabel, commentAuthors } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [mediaItems, setMediaItems] = useState<SortableMediaItem[]>([]);
@@ -230,31 +230,52 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                     {/* Existing comments */}
                     {comments.length > 0 && (
                       <div className="mt-2 space-y-2 max-h-[200px] overflow-y-auto">
-                        {comments.map((c) => (
-                          <div key={c.id} className="rounded-lg border p-2.5 group/comment bg-[sidebar-primary-foreground] bg-secondary text-[sidebar-primary-foreground] text-zinc-950">
-                            <div className="flex items-center justify-between mb-1 text-pink-600">
-                              <span className="text-xs font-semibold text-black">{c.author}</span>
-                              <div className="flex items-center gap-1">
-                                <span className="text-[10px] text-black">
+                        {comments.map((c) => {
+                          const author = c.userId ? commentAuthors[c.userId] : undefined;
+                          const isClient = author?.role === "client" || c.author === "Cliente";
+                          const displayName = author?.fullName || c.author;
+                          const photoUrl = isClient ? (author?.clientLogoUrl || author?.avatarUrl) : author?.avatarUrl;
+                          const initial = (displayName || "?").charAt(0).toUpperCase();
+                          const roleLabel = isClient ? "Cliente" : "Admin";
+                          return (
+                          <div key={c.id} className="rounded-lg border p-2.5 group/comment bg-secondary text-zinc-950">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <div className="h-7 w-7 rounded-full overflow-hidden bg-muted flex items-center justify-center flex-shrink-0 border border-border">
+                                  {photoUrl ? (
+                                    <img src={photoUrl} alt={displayName} className="h-full w-full object-cover" />
+                                  ) : (
+                                    <span className="text-xs font-semibold text-muted-foreground">{initial}</span>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <span className="text-xs font-semibold text-black truncate">{displayName}</span>
+                                  <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full uppercase tracking-wide ${isClient ? "bg-info/15 text-info" : "bg-primary/15 text-primary"}`}>
+                                    {roleLabel}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <span className="text-[10px] text-black/70">
                                   {c.createdAt.toLocaleDateString("pt-BR")} {c.createdAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                                 </span>
                                 {editingCommentId !== c.id && (
                                   <div className="flex items-center gap-0.5 opacity-0 group-hover/comment:opacity-100 transition-opacity">
                                     <button
                                       type="button"
-                                      className="h-5 w-5 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+                                      className="h-5 w-5 flex items-center justify-center rounded hover:bg-muted text-black/70 hover:text-foreground"
                                       onClick={() => { setEditingCommentId(c.id); setEditingCommentText(c.text); }}
                                       title="Editar"
                                     >
-                                      <Pencil className="h-3 w-3 text-black border-black" />
+                                      <Pencil className="h-3 w-3" />
                                     </button>
                                     <button
                                       type="button"
-                                      className="h-5 w-5 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-destructive"
+                                      className="h-5 w-5 flex items-center justify-center rounded hover:bg-muted text-black/70 hover:text-destructive"
                                       onClick={() => deleteComment(post.id, c.id)}
                                       title="Excluir"
                                     >
-                                      <CommentTrash className="h-3 w-3 border-black bg-transparent text-black" />
+                                      <CommentTrash className="h-3 w-3" />
                                     </button>
                                   </div>
                                 )}
@@ -295,7 +316,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                               <div className="text-xs whitespace-pre-wrap text-neutral-950">{c.text}</div>
                             )}
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
 

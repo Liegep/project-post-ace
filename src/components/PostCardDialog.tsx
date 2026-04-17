@@ -98,7 +98,7 @@ export function PostCardDialog({
   hideFeedback,
   allowClientCreateTags,
 }: PostCardDialogProps) {
-  const { addComment, updateClientLabel, updatePost, tags, clientId } = usePosts();
+  const { addComment, updateClientLabel, updatePost, tags, clientId, commentAuthors } = usePosts();
   const { t } = useI18n();
 
   const [mediaIndex, setMediaIndex] = useState(0);
@@ -477,15 +477,35 @@ export function PostCardDialog({
                     {post.comments.length === 0 && (
                       <p className="text-xs text-white/50 italic">Nenhum comentário</p>
                     )}
-                    {post.comments.map((c) => (
+                    {post.comments.map((c) => {
+                      const author = c.userId ? commentAuthors[c.userId] : undefined;
+                      const isClient = author?.role === "client" || c.author === "Cliente";
+                      const displayName = author?.fullName || c.author;
+                      const photoUrl = isClient ? (author?.clientLogoUrl || author?.avatarUrl) : author?.avatarUrl;
+                      const initial = (displayName || "?").charAt(0).toUpperCase();
+                      const roleLabel = isClient ? "Cliente" : "Admin";
+                      return (
                       <div key={c.id} className="bg-white p-2 rounded-lg text-[11px] border border-white/20 text-black">
-                        <div className="flex justify-between font-semibold mb-0.5 text-black">
-                          <span>{c.author}</span>
-                          <span className="opacity-50 font-normal">{format(c.createdAt, "dd/MM")}</span>
+                        <div className="flex items-center justify-between mb-1 gap-2">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <div className="h-5 w-5 rounded-full overflow-hidden bg-zinc-200 flex items-center justify-center flex-shrink-0">
+                              {photoUrl ? (
+                                <img src={photoUrl} alt={displayName} className="h-full w-full object-cover" />
+                              ) : (
+                                <span className="text-[9px] font-semibold text-zinc-600">{initial}</span>
+                              )}
+                            </div>
+                            <span className="font-semibold text-black truncate">{displayName}</span>
+                            <span className={`text-[8px] font-medium px-1 py-0.5 rounded uppercase ${isClient ? "bg-blue-100 text-blue-700" : "bg-zinc-200 text-zinc-700"}`}>
+                              {roleLabel}
+                            </span>
+                          </div>
+                          <span className="opacity-50 font-normal flex-shrink-0">{format(c.createdAt, "dd/MM")}</span>
                         </div>
                         <p className="text-zinc-700 leading-relaxed">{c.text}</p>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                   <div className="flex gap-1.5">
                     <Textarea
