@@ -1069,6 +1069,41 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               <History className="mr-1.5 inline h-4 w-4" /> Atividades
             </button>
           </div>
+          {/* Compact search popover */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                className={`relative flex items-center justify-center h-9 w-9 rounded-md border bg-muted/50 hover:bg-muted transition-colors ${searchQuery ? "ring-2 ring-accent" : ""}`}
+                title="Buscar cards"
+                aria-label="Buscar cards"
+              >
+                <Search className="h-4 w-4 text-muted-foreground" />
+                {searchQuery && (
+                  <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-accent" />
+                )}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  autoFocus
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Buscar cards (ativos + arquivados)..."
+                  className="pl-9 pr-9 h-9"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
           {/* Desktop-only permission toggles */}
           {activeTab === "archived" && (
             <div className="hidden md:flex items-center gap-2 ml-3">
