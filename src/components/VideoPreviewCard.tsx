@@ -74,15 +74,14 @@ export function VideoPreviewCard({ video, originalUrl, className = "" }: VideoPr
           </span>
         </div>
 
-        {/* External link fallback */}
-        <button
-          onClick={handleFallback}
-          className="absolute top-2.5 right-2.5 rounded-md bg-background/80 backdrop-blur-sm p-1.5 text-foreground opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-background"
+        {/* External link indicator */}
+        <div
+          className="absolute top-2.5 right-2.5 rounded-md bg-background/80 backdrop-blur-sm p-1.5 text-foreground shadow-sm"
           title="Abrir em nova aba"
         >
           <ExternalLink className="h-3.5 w-3.5" />
-        </button>
-      </div>
+        </div>
+      </Wrapper>
 
       <VideoEmbedModal open={modalOpen} onOpenChange={setModalOpen} video={video} />
     </>
