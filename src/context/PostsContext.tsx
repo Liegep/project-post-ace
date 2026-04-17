@@ -114,11 +114,45 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       ]);
 
       const commentsMap: Record<string, Comment[]> = {};
+      const userIds = new Set<string>();
       (commentsRes.data || []).forEach((c: any) => {
-        const comment: Comment = { id: c.id, postId: c.post_id, author: c.author, text: c.text, createdAt: new Date(c.created_at) };
+        const comment: Comment = { id: c.id, postId: c.post_id, author: c.author, text: c.text, createdAt: new Date(c.created_at), userId: c.user_id || null };
+        if (c.user_id) userIds.add(c.user_id);
         if (!commentsMap[c.post_id]) commentsMap[c.post_id] = [];
         commentsMap[c.post_id].push(comment);
       });
+
+      // Fetch profiles for comment authors
+      if (userIds.size > 0) {
+        const { data: profilesData } = await supabase
+          .from("profiles")
+          .select("id, full_name, email, avatar_url, role")
+          .in("id", Array.from(userIds));
+        // Get client logos for client-role authors
+        const clientUserIds = (profilesData || []).filter((p: any) => p.role === "client").map((p: any) => p.id);
+        let clientLogoByUser: Record<string, string> = {};
+        if (clientUserIds.length > 0) {
+          const { data: assignments } = await supabase
+            .from("user_client_assignments")
+            .select("user_id, client_id, clients(logo_url)")
+            .in("user_id", clientUserIds);
+          (assignments || []).forEach((a: any) => {
+            if (a.clients?.logo_url) clientLogoByUser[a.user_id] = a.clients.logo_url;
+          });
+        }
+        const authorsMap: Record<string, CommentAuthorInfo> = {};
+        (profilesData || []).forEach((p: any) => {
+          authorsMap[p.id] = {
+            userId: p.id,
+            fullName: p.full_name || p.email || "Usuário",
+            email: p.email || "",
+            avatarUrl: p.avatar_url || "",
+            role: p.role || "",
+            clientLogoUrl: clientLogoByUser[p.id] || "",
+          };
+        });
+        setCommentAuthors(authorsMap);
+      }
 
       const fetchedPosts = (postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || []));
       
