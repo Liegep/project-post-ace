@@ -338,67 +338,53 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     }
   }, [posts]);
 
-  // Execute a single automation action on a post
-  const executeAutomationAction = useCallback(async (auto: any, postId: string) => {
-    switch (auto.action_type) {
-      case "add_tag": {
-        const post = posts.find((p) => p.id === postId);
-        if (post && !post.tags.includes(auto.action_value)) {
-          const newTags = [...post.tags, auto.action_value];
-          setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, tags: newTags } : p));
-          await supabase.from("posts").update({ tags: newTags } as any).eq("id", postId);
-        }
-        break;
-      }
-      case "change_color": {
-        setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, clientLabel: `color:${auto.action_value}` as any } : p));
-        await supabase.from("posts").update({ client_label: `color:${auto.action_value}` } as any).eq("id", postId);
-        break;
-      }
-      case "mark_done": {
-        setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, archived: true, archivedAt: new Date() } : p));
-        await supabase.from("posts").update({ archived: true, archived_at: new Date().toISOString() } as any).eq("id", postId);
-        break;
-      }
-      case "move_to_column": {
-        const targetColId = auto.action_value;
-        if (targetColId) {
-          setPosts((prev) => prev.map((p) => p.id === postId ? { ...p, columnId: targetColId } : p));
-          await supabase.from("posts").update({ column_id: targetColId } as any).eq("id", postId);
-        }
-        break;
-      }
-    }
-  }, [posts]);
+  /**
+   * After the automation engine writes to the DB, re-fetch the affected post
+   * row so local state mirrors persisted state on every device.
+   */
+  const refreshPostFromDb = useCallback(async (postId: string) => {
+    const { data } = await supabase.from("posts").select("*").eq("id", postId).maybeSingle();
+    if (!data) return;
+    setPosts((prev) => {
+      const idx = prev.findIndex((p) => p.id === postId);
+      if (idx === -1) return prev;
+      const existing = prev[idx];
+      const refreshed = dbPostToPost(data, existing.comments);
+      const next = [...prev];
+      next[idx] = refreshed;
+      return next;
+    });
+  }, []);
 
-  // Run tag-based automations when tags change
-  const runTagAutomations = useCallback(async (postId: string, oldTags: string[], newTags: string[]) => {
-    if (!clientId) return;
-    const addedTagIds = newTags.filter((t) => !oldTags.includes(t));
-    if (addedTagIds.length === 0) return;
-
-    // Resolve added tag IDs to their names (lowercased) for comparison.
-    // Stored tags can be UUIDs (from tags table) or legacy string identifiers.
-    const tagsById = new Map(tags.map((t) => [t.id, t.name.toLowerCase()]));
-    const addedNames = new Set<string>(
-      addedTagIds.map((id) => tagsById.get(id) ?? id.toLowerCase())
-    );
-
-    const { data: automations } = await supabase
-      .from("kanban_automations")
-      .select("*")
-      .eq("client_id", clientId)
-      .eq("trigger_type", "tag_added")
-      .eq("active", true);
-    if (!automations || automations.length === 0) return;
-
-    for (const auto of automations as any[]) {
-      const triggerName = (auto.trigger_value || "").toLowerCase().trim();
-      if (triggerName && addedNames.has(triggerName)) {
-        await executeAutomationAction(auto, postId);
+  /**
+   * Centralized invocation of the automation engine. Used by every mutation
+   * site that adds tags or moves a card between columns.
+   */
+  const triggerAutomations = useCallback(
+    async (params: {
+      postId: string;
+      addedTagIds?: string[];
+      newColumnId?: string | null;
+      previousColumnId?: string | null;
+    }): Promise<AutomationResult | null> => {
+      if (!clientId) return null;
+      const tagIdToName = new Map(tags.map((t) => [t.id, t.name]));
+      const result = await runAutomationsForPost({
+        ctx: { clientId, tagIdToName },
+        postId: params.postId,
+        addedTagIds: params.addedTagIds,
+        newColumnId: params.newColumnId,
+        previousColumnId: params.previousColumnId,
+      });
+      // Step 4 — refresh UI from persisted state if any action mutated the row.
+      if (result.appliedActions.some((a) => a.success)) {
+        await refreshPostFromDb(params.postId);
       }
-    }
-  }, [clientId, tags, executeAutomationAction]);
+      return result;
+    },
+    [clientId, tags, refreshPostFromDb]
+  );
+
 
   const updatePost = useCallback(async (id: string, updates: Partial<Post>) => {
     const normalizedUpdates = {
