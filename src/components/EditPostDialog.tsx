@@ -3,7 +3,7 @@ import { usePosts } from "@/context/PostsContext";
 
 import { useI18n } from "@/i18n/I18nContext";
 import { HashtagManager } from "@/components/HashtagManager";
-import { Post, PostStatus, MediaType, STATUS_CONFIG } from "@/types/post";
+import { Post, PostStatus, MediaType, STATUS_CONFIG, ClientLabel } from "@/types/post";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
