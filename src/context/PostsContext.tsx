@@ -91,6 +91,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   const [columns, setColumns] = useState<Column[]>([]);
   const [postingPeriod, setPostingPeriodState] = useState(clientPostingPeriod);
   const [companyLogo, setCompanyLogoState] = useState(clientLogo);
+  const [commentAuthors, setCommentAuthors] = useState<Record<string, CommentAuthorInfo>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
