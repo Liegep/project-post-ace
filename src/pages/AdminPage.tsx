@@ -337,8 +337,8 @@ const KanbanBoard = ({
 
         {/* Unassigned posts column */}
         {unassignedPosts.length > 0 && (
-          <div className="w-80 shrink-0 rounded-xl border bg-muted/30 p-4">
-            <div className="mb-4 flex items-center gap-2">
+          <div className="w-80 shrink-0 rounded-xl border bg-muted/30 p-4 flex flex-col h-full min-h-0">
+            <div className="mb-4 flex items-center gap-2 shrink-0">
               <span className="text-sm font-semibold text-muted-foreground">{t("noColumn")}</span>
               <span className="text-xs text-muted-foreground">({unassignedPosts.length})</span>
             </div>
