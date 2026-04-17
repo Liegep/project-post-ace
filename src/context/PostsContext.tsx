@@ -465,6 +465,23 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       }
     }
 
+    // If media is being replaced/removed, delete old storage files that are no longer referenced
+    if (updates.mediaUrls !== undefined || updates.imageUrl !== undefined) {
+      const prevPost = posts.find((p) => p.id === id);
+      if (prevPost) {
+        const oldUrls = [
+          ...(prevPost.mediaUrls || []),
+          ...(prevPost.imageUrl ? [prevPost.imageUrl] : []),
+        ];
+        const newUrls = [
+          ...(updates.mediaUrls ?? prevPost.mediaUrls ?? []),
+          ...((updates.imageUrl ?? prevPost.imageUrl) ? [updates.imageUrl ?? prevPost.imageUrl] : []),
+        ];
+        const { deleteRemovedMedia } = await import("@/lib/mediaCleanup");
+        deleteRemovedMedia(oldUrls, newUrls).catch((e) => console.error(e));
+      }
+    }
+
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...normalizedUpdates } : p)));
     const dbUpdates: Record<string, any> = {};
     if (updates.title !== undefined) dbUpdates.title = updates.title;
