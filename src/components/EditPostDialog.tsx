@@ -202,8 +202,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                     emptyLabel={t("clickToSelectMedia")}
                   />
                 </div>
-                <div className="mt-2">
-                  <Label htmlFor="edit-external-link" className="text-xs text-muted-foreground">Ou usar link externo</Label>
+                <div className="mt-2 border-primary-foreground text-black bg-info-foreground">
+                  <Label htmlFor="edit-external-link" className="font-medium peer-disabled:cursor-not-allowed text-xs text-primary-foreground opacity-100">Ou usar link externo</Label>
                   <Input
                     id="edit-external-link"
                     value={externalLink}
