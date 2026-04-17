@@ -88,6 +88,20 @@ type TranslationKeys = {
   readLess: string;
   // Publish forecast
   publishForecast: string;
+  // Post detail dialog
+  fullCaption: string;
+  whatDidYouThink: string;
+  approvedByBoss: string;
+  requestChanges: string;
+  describeChange: string;
+  sendRequest: string;
+  changeAlreadyRequested: string;
+  clientLabelTitle: string;
+  viewActivityHistory: string;
+  hideHistory: string;
+  approvedSuccess: string;
+  changeRequestedSuccess: string;
+  labelUpdated: string;
   // Admin Dashboard
   selectOrCreateClient: string;
   postsForToday: string;
@@ -321,6 +335,19 @@ const pt: TranslationKeys = {
   readMore: "Ver mais",
   readLess: "Ver menos",
   publishForecast: "Previsão de Publicação",
+  fullCaption: "Legenda completa",
+  whatDidYouThink: "O que achou deste post?",
+  approvedByBoss: "Aprovado pela Boss",
+  requestChanges: "Solicitar Alteração",
+  describeChange: "Descreva a alteração desejada...",
+  sendRequest: "Enviar solicitação",
+  changeAlreadyRequested: "Alteração já solicitada para este post.",
+  clientLabelTitle: "Etiqueta do Cliente",
+  viewActivityHistory: "Ver histórico de atividades",
+  hideHistory: "Ocultar histórico",
+  approvedSuccess: "Post aprovado com sucesso!",
+  changeRequestedSuccess: "Alteração solicitada com sucesso!",
+  labelUpdated: "Etiqueta atualizada!",
   // Admin Dashboard
   selectOrCreateClient: "Selecione ou crie um cliente",
   postsForToday: "Posts para Hoje",
@@ -542,6 +569,19 @@ const en: TranslationKeys = {
   readMore: "Read more",
   readLess: "Read less",
   publishForecast: "Publish Forecast",
+  fullCaption: "Full caption",
+  whatDidYouThink: "What did you think of this post?",
+  approvedByBoss: "Approved by Boss",
+  requestChanges: "Request Changes",
+  describeChange: "Describe the desired change...",
+  sendRequest: "Send request",
+  changeAlreadyRequested: "Change already requested for this post.",
+  clientLabelTitle: "Client Label",
+  viewActivityHistory: "View activity history",
+  hideHistory: "Hide history",
+  approvedSuccess: "Post approved successfully!",
+  changeRequestedSuccess: "Change requested successfully!",
+  labelUpdated: "Label updated!",
   selectOrCreateClient: "Select or create a client",
   postsForToday: "Posts for Today",
   clientFeedbacks: "Client Feedbacks",
@@ -761,6 +801,19 @@ const it: TranslationKeys = {
   readMore: "Leggi di più",
   readLess: "Leggi meno",
   publishForecast: "Previsione di Pubblicazione",
+  fullCaption: "Didascalia completa",
+  whatDidYouThink: "Cosa ne pensi di questo post?",
+  approvedByBoss: "Approvato dalla Boss",
+  requestChanges: "Richiedi Modifica",
+  describeChange: "Descrivi la modifica desiderata...",
+  sendRequest: "Invia richiesta",
+  changeAlreadyRequested: "Modifica già richiesta per questo post.",
+  clientLabelTitle: "Etichetta del Cliente",
+  viewActivityHistory: "Vedi cronologia attività",
+  hideHistory: "Nascondi cronologia",
+  approvedSuccess: "Post approvato con successo!",
+  changeRequestedSuccess: "Modifica richiesta con successo!",
+  labelUpdated: "Etichetta aggiornata!",
   selectOrCreateClient: "Seleziona o crea un cliente",
   postsForToday: "Post per Oggi",
   clientFeedbacks: "Feedback dei Clienti",
@@ -980,6 +1033,19 @@ const es: TranslationKeys = {
   readMore: "Leer más",
   readLess: "Leer menos",
   publishForecast: "Previsión de Publicación",
+  fullCaption: "Leyenda completa",
+  whatDidYouThink: "¿Qué te pareció este post?",
+  approvedByBoss: "Aprobado por la Boss",
+  requestChanges: "Solicitar Cambio",
+  describeChange: "Describe el cambio deseado...",
+  sendRequest: "Enviar solicitud",
+  changeAlreadyRequested: "Cambio ya solicitado para este post.",
+  clientLabelTitle: "Etiqueta del Cliente",
+  viewActivityHistory: "Ver historial de actividades",
+  hideHistory: "Ocultar historial",
+  approvedSuccess: "¡Post aprobado con éxito!",
+  changeRequestedSuccess: "¡Cambio solicitado con éxito!",
+  labelUpdated: "¡Etiqueta actualizada!",
   selectOrCreateClient: "Selecciona o crea un cliente",
   postsForToday: "Posts para Hoy",
   clientFeedbacks: "Feedbacks de Clientes",
@@ -1199,6 +1265,19 @@ const sv: TranslationKeys = {
   readMore: "Läs mer",
   readLess: "Läs mindre",
   publishForecast: "Publiceringsförhandsvisning",
+  fullCaption: "Fullständig bildtext",
+  whatDidYouThink: "Vad tyckte du om detta inlägg?",
+  approvedByBoss: "Godkänd av Boss",
+  requestChanges: "Begär ändring",
+  describeChange: "Beskriv önskad ändring...",
+  sendRequest: "Skicka begäran",
+  changeAlreadyRequested: "Ändring redan begärd för detta inlägg.",
+  clientLabelTitle: "Kundetikett",
+  viewActivityHistory: "Visa aktivitetshistorik",
+  hideHistory: "Dölj historik",
+  approvedSuccess: "Inlägget godkänt!",
+  changeRequestedSuccess: "Ändring begärd!",
+  labelUpdated: "Etikett uppdaterad!",
   selectOrCreateClient: "Välj eller skapa en klient",
   postsForToday: "Inlägg för Idag",
   clientFeedbacks: "Kundfeedback",
