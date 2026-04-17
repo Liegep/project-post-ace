@@ -232,10 +232,10 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                       <div className="mt-2 space-y-2 max-h-[200px] overflow-y-auto">
                         {comments.map((c) => (
                           <div key={c.id} className="rounded-lg border p-2.5 group/comment bg-[sidebar-primary-foreground] bg-secondary text-[sidebar-primary-foreground] text-zinc-950">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs font-semibold text-foreground">{c.author}</span>
+                            <div className="flex items-center justify-between mb-1 text-pink-600">
+                              <span className="text-xs font-semibold text-black">{c.author}</span>
                               <div className="flex items-center gap-1">
-                                <span className="text-[10px] text-muted-foreground">
+                                <span className="text-[10px] text-black">
                                   {c.createdAt.toLocaleDateString("pt-BR")} {c.createdAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                                 </span>
                                 {editingCommentId !== c.id && (
@@ -246,7 +246,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                                       onClick={() => { setEditingCommentId(c.id); setEditingCommentText(c.text); }}
                                       title="Editar"
                                     >
-                                      <Pencil className="h-3 w-3" />
+                                      <Pencil className="h-3 w-3 text-black border-black" />
                                     </button>
                                     <button
                                       type="button"
@@ -254,7 +254,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                                       onClick={() => deleteComment(post.id, c.id)}
                                       title="Excluir"
                                     >
-                                      <CommentTrash className="h-3 w-3" />
+                                      <CommentTrash className="h-3 w-3 border-black bg-transparent text-black" />
                                     </button>
                                   </div>
                                 )}
