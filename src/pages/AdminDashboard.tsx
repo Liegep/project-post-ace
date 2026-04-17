@@ -907,7 +907,7 @@ const AdminDashboard = () => {
                 <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
               </Button>
             )}
-            {isAdmin && <StorageCleanupButton />}
+            
             <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)} title="Menu">
               <Menu className="h-5 w-5" />
             </Button>
@@ -1017,6 +1017,11 @@ const AdminDashboard = () => {
                 <Palette className={navIconClass("/design-briefs")} /> Briefs de Design
               </button>
               {/* Activity log link removed */}
+              {isAdmin && (
+                <div className="border-t mt-2 pt-2 px-5">
+                  <StorageCleanupButton />
+                </div>
+              )}
             </nav>
           </div>
         </SheetContent>
