@@ -292,7 +292,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                                 </button>
                               </div>
                             ) : (
-                              <div className="text-xs text-foreground/80 whitespace-pre-wrap">{c.text}</div>
+                              <div className="text-xs whitespace-pre-wrap text-primary-foreground">{c.text}</div>
                             )}
                           </div>
                         ))}
