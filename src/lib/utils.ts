@@ -5,6 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** Identifies the origin of a tag based on its id format */
+export type TagOrigin = "trello" | "app" | "legacy";
+
+export function getTagOrigin(id: string): TagOrigin {
+  if (/^[a-f0-9]{24}$/i.test(id)) return "trello";
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return "app";
+  return "legacy";
+}
+
 /** Returns a contrasting text color (black or white) for a given hex background color */
 export function getContrastColor(hex: string): string {
   const c = hex.replace("#", "");
