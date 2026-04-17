@@ -79,6 +79,11 @@ export const PostCard = memo(
     const getStatusConfig = (s: PostStatus) => STATUS_CONFIG[s] ?? FALLBACK_CONFIG;
     const isOverdue = post.deadline ? new Date() > post.deadline && !post.status.includes("pronto") : false;
 
+    // Cor customizada vinda da automação "Mudar cor do card" (formato: "color:#hex")
+    const customColor = typeof post.clientLabel === "string" && post.clientLabel.startsWith("color:")
+      ? post.clientLabel.slice(6)
+      : null;
+
     const postTags = post.tags
       .map((tagId) => tags.find((t) => t.id === tagId))
       .filter(Boolean);
@@ -88,6 +93,7 @@ export const PostCard = memo(
         className={`overflow-hidden transition-all duration-150 hover:shadow-md hover:translate-y-[-1px] cursor-pointer group ${
           selectionMode && isSelected ? "ring-2 ring-accent shadow-lg" : ""
         }`}
+        style={customColor ? { borderColor: customColor, borderWidth: 2, boxShadow: `0 0 0 1px ${customColor}40` } : undefined}
         onClick={() => (selectionMode ? onToggleSelect?.(post.id) : onEdit?.())}
       >
         {/* Title above thumbnail */}
