@@ -247,8 +247,8 @@ export const PostCard = memo(
                 </span>
               )}
               {post.status.slice(0, 1).map((s) => (
-                <span key={s} className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CONFIG[s].color}`}>
-                  {t(STATUS_KEYS[s] as any)}
+                <span key={s} className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${getStatusConfig(s).color}`}>
+                  {t((STATUS_KEYS[s] ?? "statusEntrada") as any)}
                 </span>
               ))}
               <span className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${labelConfig.color}`}>
