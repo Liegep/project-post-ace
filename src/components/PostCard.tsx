@@ -334,10 +334,10 @@ export const PostCard = memo(
             }}
           >
             <DrawerContent
-              className="bg-[hsl(0_0%_10%/0.85)] backdrop-blur-2xl border-white/10 text-white"
+              className="bg-[hsl(0_0%_10%/0.85)] backdrop-blur-2xl border-white/10 text-white max-h-[90vh] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
-              <DrawerHeader className="text-left flex-row items-center justify-between gap-2 pr-4">
+              <DrawerHeader className="text-left flex-row items-center justify-between gap-2 pr-4 shrink-0">
                 <DrawerTitle className="text-white text-lg flex-1 truncate">{post.title}</DrawerTitle>
                 {allowEditCaption && !editingCaption && (
                   <button
@@ -355,54 +355,55 @@ export const PostCard = memo(
                   </button>
                 )}
               </DrawerHeader>
-              <div className="px-4 pb-8 max-h-[70vh] overflow-y-auto">
+              <div className="px-4 flex-1 overflow-y-auto min-h-0">
                 {editingCaption ? (
-                  <div className="space-y-3">
-                    <Textarea
-                      value={draftCaption}
-                      onChange={(e) => setDraftCaption(e.target.value)}
-                      autoFocus
-                      className="min-h-[220px] text-[16px] leading-[1.6] bg-white text-black resize-y"
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        size="lg"
-                        className="h-12 text-base font-semibold flex-1 gap-2"
-                        disabled={savingCaption || draftCaption === post.caption}
-                        onClick={async () => {
-                          setSavingCaption(true);
-                          try {
-                            await updatePost(post.id, { caption: draftCaption });
-                            setEditingCaption(false);
-                          } finally {
-                            setSavingCaption(false);
-                          }
-                        }}
-                      >
-                        <Check className="h-4 w-4" />
-                        {savingCaption ? t("saving") : t("save")}
-                      </Button>
-                      <Button
-                        size="lg"
-                        variant="ghost"
-                        className="h-12 text-base text-white hover:bg-white/10 gap-2"
-                        disabled={savingCaption}
-                        onClick={() => {
-                          setEditingCaption(false);
-                          setDraftCaption(post.caption);
-                        }}
-                      >
-                        <X className="h-4 w-4" />
-                        {t("cancel")}
-                      </Button>
-                    </div>
-                  </div>
+                  <Textarea
+                    value={draftCaption}
+                    onChange={(e) => setDraftCaption(e.target.value)}
+                    autoFocus
+                    className="min-h-[220px] text-[16px] leading-[1.6] bg-white text-black resize-none w-full"
+                  />
                 ) : (
                   <div className="rounded-xl bg-white text-black p-4 sm:p-5 text-[18px] leading-[1.6] whitespace-pre-wrap font-medium">
                     <LinkedText text={post.caption} />
                   </div>
                 )}
               </div>
+              {editingCaption && (
+                <div className="shrink-0 flex gap-2 px-4 py-3 border-t border-white/10 bg-[hsl(0_0%_10%/0.95)]">
+                  <Button
+                    size="lg"
+                    className="h-12 text-base font-semibold flex-1 gap-2"
+                    disabled={savingCaption || draftCaption === post.caption}
+                    onClick={async () => {
+                      setSavingCaption(true);
+                      try {
+                        await updatePost(post.id, { caption: draftCaption });
+                        setEditingCaption(false);
+                        setCaptionDrawerOpen(false);
+                      } finally {
+                        setSavingCaption(false);
+                      }
+                    }}
+                  >
+                    <Check className="h-4 w-4" />
+                    {savingCaption ? t("saving") : t("save")}
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="ghost"
+                    className="h-12 text-base text-white hover:bg-white/10 gap-2"
+                    disabled={savingCaption}
+                    onClick={() => {
+                      setEditingCaption(false);
+                      setDraftCaption(post.caption);
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                    {t("cancel")}
+                  </Button>
+                </div>
+              )}
             </DrawerContent>
           </Drawer>
         )}
