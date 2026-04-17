@@ -608,11 +608,16 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, []);
 
   const reorderPostsInColumn = useCallback(async (columnId: string | null, orderedPostIds: string[]) => {
-    // Detect posts that changed column
-    const movedPostIds = orderedPostIds.filter((id) => {
-      const post = posts.find((p) => p.id === id);
-      return post && post.columnId !== columnId;
-    });
+    // Detect posts that changed column and capture their previous column for the engine
+    const movedPosts = orderedPostIds
+      .map((id) => {
+        const post = posts.find((p) => p.id === id);
+        if (post && post.columnId !== columnId) {
+          return { id, previousColumnId: post.columnId };
+        }
+        return null;
+      })
+      .filter((m): m is { id: string; previousColumnId: string | null } => m !== null);
 
     setPosts((prev) => {
       const updated = [...prev];
@@ -628,11 +633,16 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       await supabase.from("posts").update({ position: i, column_id: columnId } as any).eq("id", orderedPostIds[i]);
     }
 
-    // Run automations for moved posts
-    for (const id of movedPostIds) {
-      await runAutomations(id, columnId);
+    // Run automations via centralized engine for moved posts
+    for (const moved of movedPosts) {
+      await triggerAutomations({
+        postId: moved.id,
+        newColumnId: columnId,
+        previousColumnId: moved.previousColumnId,
+      });
     }
-  }, [posts, runAutomations]);
+  }, [posts, triggerAutomations]);
+
 
   const setCompanyLogo = useCallback(async (url: string) => {
     setCompanyLogoState(url);
