@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { LinkedText } from "@/components/LinkedText";
 import { MediaLightbox } from "@/components/MediaLightbox";
-import { Archive, Calendar, Download, Play, Send, Trash2 } from "lucide-react";
+import { Archive, Calendar, Download, Pencil, Play, Send, Trash2, X, Check } from "lucide-react";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
 import { getContrastColor } from "@/lib/utils";
@@ -60,12 +60,16 @@ export const PostCard = memo(
     isSelected,
     onToggleSelect,
     showInlineDetails,
+    allowEditCaption,
   }: PostCardProps) => {
-    const { tags, updateClientLabel, addComment } = usePosts();
+    const { tags, updateClientLabel, addComment, updatePost } = usePosts();
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [captionDrawerOpen, setCaptionDrawerOpen] = useState(false);
+    const [editingCaption, setEditingCaption] = useState(false);
+    const [draftCaption, setDraftCaption] = useState(post.caption);
+    const [savingCaption, setSavingCaption] = useState(false);
 
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
