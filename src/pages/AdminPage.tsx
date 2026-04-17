@@ -1137,27 +1137,6 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
           )}
         </div>
 
-        {/* Global card search (active + archived) */}
-        <div className="mb-6 mx-auto max-w-md">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar cards (ativos + arquivados)..."
-              className="pl-9 pr-9 h-10"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
-        </div>
-
         {normalizedQuery ? (
           <div className="mx-auto max-w-7xl">
             <p className="mb-4 text-sm text-muted-foreground text-center">
