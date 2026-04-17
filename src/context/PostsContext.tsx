@@ -362,8 +362,15 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   // Run tag-based automations when tags change
   const runTagAutomations = useCallback(async (postId: string, oldTags: string[], newTags: string[]) => {
     if (!clientId) return;
-    const addedTags = newTags.filter((t) => !oldTags.includes(t));
-    if (addedTags.length === 0) return;
+    const addedTagIds = newTags.filter((t) => !oldTags.includes(t));
+    if (addedTagIds.length === 0) return;
+
+    // Resolve added tag IDs to their names (lowercased) for comparison.
+    // Stored tags can be UUIDs (from tags table) or legacy string identifiers.
+    const tagsById = new Map(tags.map((t) => [t.id, t.name.toLowerCase()]));
+    const addedNames = new Set<string>(
+      addedTagIds.map((id) => tagsById.get(id) ?? id.toLowerCase())
+    );
 
     const { data: automations } = await supabase
       .from("kanban_automations")
@@ -374,11 +381,12 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (!automations || automations.length === 0) return;
 
     for (const auto of automations as any[]) {
-      if (addedTags.includes(auto.trigger_value)) {
+      const triggerName = (auto.trigger_value || "").toLowerCase().trim();
+      if (triggerName && addedNames.has(triggerName)) {
         await executeAutomationAction(auto, postId);
       }
     }
-  }, [clientId, executeAutomationAction]);
+  }, [clientId, tags, executeAutomationAction]);
 
   const updatePost = useCallback(async (id: string, updates: Partial<Post>) => {
     const normalizedUpdates = {
