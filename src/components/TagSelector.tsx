@@ -25,19 +25,24 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [originFilter, setOriginFilter] = useState<"all" | TagOrigin>("all");
   const [creating, setCreating] = useState(false);
   const [savingTag, setSavingTag] = useState(false);
   const [newName, setNewName] = useState("");
   const [newColor, setNewColor] = useState("#6366f1");
 
   const filteredTags = useMemo(() => {
-    if (!search.trim()) return tags;
+    let list = tags;
+    if (originFilter !== "all") {
+      list = list.filter((tag) => getTagOrigin(tag.id) === originFilter);
+    }
+    if (!search.trim()) return list;
     const q = search.toLowerCase().trim();
-    return tags.filter((tag) => {
+    return list.filter((tag) => {
       const name = getTagDisplayName(tag, t).toLowerCase();
       return name.includes(q);
     });
-  }, [tags, search, t]);
+  }, [tags, search, t, originFilter]);
 
   const toggleTag = (tagId: string) => {
     onChange(
