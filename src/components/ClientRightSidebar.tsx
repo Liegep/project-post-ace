@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
-import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink } from "lucide-react";
+import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const ClientNotes = lazy(() => import("@/components/ClientNotes").then(m => ({ default: m.ClientNotes })));
 const ClientLinksPanel = lazy(() => import("@/components/ClientLinksPanel").then(m => ({ default: m.ClientLinksPanel })));
+const QuickLinksPanel = lazy(() => import("@/components/QuickLinksPanel").then(m => ({ default: m.QuickLinksPanel })));
 
-type Tab = "notes" | "links" | null;
+type Tab = "notes" | "links" | "quick" | null;
 
 interface Props {
   clientId: string;
