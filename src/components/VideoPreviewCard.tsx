@@ -15,7 +15,7 @@ export function VideoPreviewCard({ video, originalUrl, className = "" }: VideoPr
   const [thumbError, setThumbError] = useState(false);
   const hasThumbnail = video.thumbnailUrl && !thumbError;
   // Drive blocks iframe embeds → always open in new tab. YouTube/Vimeo can embed.
-  const forceNewTab = video.type === "drive";
+  const forceNewTab = video.type === "gdrive";
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
