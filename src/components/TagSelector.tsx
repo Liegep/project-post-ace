@@ -120,7 +120,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
         </PopoverTrigger>
         <PopoverContent className="w-56 p-0" align="start" onClick={(e) => e.stopPropagation()}>
           {/* Search */}
-          <div className="p-2 border-b">
+          <div className="p-2 border-b space-y-2">
             <div className="relative">
               <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
               <Input
@@ -129,6 +129,23 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
                 onChange={(e) => setSearch(e.target.value)}
                 className="h-8 pl-7 text-xs"
               />
+            </div>
+            {/* Origin filter */}
+            <div className="flex gap-1">
+              {(["all", "app", "trello", "legacy"] as const).map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => setOriginFilter(opt)}
+                  className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
+                    originFilter === opt
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  {opt === "all" ? "Todas" : opt === "app" ? "App" : opt === "trello" ? "Trello" : "Sistema"}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -141,6 +158,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
             )}
             {filteredTags.map((tag) => {
               const isSelected = selectedTagIds.includes(tag.id);
+              const origin = getTagOrigin(tag.id);
               return (
                 <button
                   key={tag.id}
@@ -152,7 +170,17 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
                     className="h-3 w-3 rounded-full shrink-0"
                     style={{ backgroundColor: tag.color }}
                   />
-                  <span className="truncate text-foreground">{getTagDisplayName(tag, t)}</span>
+                  <span className="truncate text-foreground flex-1 text-left">{getTagDisplayName(tag, t)}</span>
+                  {origin === "trello" && (
+                    <span className="rounded px-1 py-0.5 text-[9px] font-semibold bg-blue-500/15 text-blue-600 dark:text-blue-400 shrink-0">
+                      Trello
+                    </span>
+                  )}
+                  {origin === "legacy" && (
+                    <span className="rounded px-1 py-0.5 text-[9px] font-semibold bg-muted text-muted-foreground shrink-0">
+                      Sistema
+                    </span>
+                  )}
                 </button>
               );
             })}
