@@ -22,6 +22,7 @@ import { format, startOfMonth, endOfMonth, addMonths, subMonths, isSameMonth } f
 import { ptBR, it, enUS, es, sv } from "date-fns/locale";
 import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound, Menu, FileBarChart, ArrowRight, ChevronLeft, ChevronRight as ChevronRightIcon } from "lucide-react";
 import { ClientNewsWidget } from "@/components/ClientNewsWidget";
+import { UpcomingPostsWidget } from "@/components/UpcomingPostsWidget";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -406,7 +407,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           </div>
         )}
 
-        {/* Upcoming Posts Widget removed for optimization */}
+        {clientData.show_upcoming_posts && (
+          <div className="mb-6">
+            <UpcomingPostsWidget posts={posts} locale={clientData.locale} />
+          </div>
+        )}
 
         {clientData.show_archived_to_client && (
           <div className="mb-6 flex items-center justify-center">
