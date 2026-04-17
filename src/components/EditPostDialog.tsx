@@ -391,6 +391,28 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                 </Popover>
               </div>
 
+              {/* Client Feedback dropdown (admin can reset to pending) */}
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {t("clientFeedback") !== "clientFeedback" ? t("clientFeedback") : "Feedback do Cliente"}
+                </Label>
+                <Select
+                  value={post?.clientLabel ?? "pendente"}
+                  onValueChange={(v) => post && updateClientLabel(post.id, v as ClientLabel)}
+                >
+                  <SelectTrigger className="mt-1 h-9 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pendente">⏳ Pendente (resetar)</SelectItem>
+                    <SelectItem value="de_seu_feedback">💬 Aguardando Feedback</SelectItem>
+                    <SelectItem value="aprovado">✅ Aprovado</SelectItem>
+                    <SelectItem value="alteracao_solicitada">✏️ Alteração Solicitada</SelectItem>
+                    <SelectItem value="leia_comentario">📩 Leia Comentário</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div>
                 <Label htmlFor="edit-deadline" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("deadline")}</Label>
                 <Input id="edit-deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="mt-1" />
