@@ -256,7 +256,7 @@ const KanbanBoard = ({
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <KanbanScrollWrapper>
+      <KanbanScrollWrapper fillHeight>
         <SortableContext items={columnSortIds} strategy={horizontalListSortingStrategy}>
           {columns.map((col) => {
             const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
