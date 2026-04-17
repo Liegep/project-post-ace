@@ -186,6 +186,8 @@ interface RunAutomationsArgs {
   postId: string;
   /** Tag-added trigger: identifiers (UUID or slug) that were newly added. */
   addedTagIds?: string[];
+  /** Tags that were just removed. Used to revert reversible actions (e.g. change_color). */
+  removedTagIds?: string[];
   /** Column-move trigger: the destination column id, if changed. */
   newColumnId?: string | null;
   /** The previous column id, to detect actual moves. */
@@ -241,6 +243,36 @@ export async function runAutomationsForPost(args: RunAutomationsArgs): Promise<A
         triggerColumnId: args.newColumnId,
       });
       matched.push(...colAutomations);
+    }
+
+    // ─── Reversal: tag removed → undo reversible actions (change_color) ──
+    if (args.removedTagIds && args.removedTagIds.length > 0) {
+      const removedNames = args.removedTagIds.map((id) =>
+        normalizeTagValue(resolveTagName(id, ctx.tagIdToName))
+      );
+      const tagAutomations = await fetchAutomations(ctx.clientId, "tag_added");
+      const shouldRevertColor = tagAutomations.some(
+        (a) =>
+          a.action_type === "change_color" &&
+          removedNames.includes(normalizeTagValue(a.trigger_value))
+      );
+      if (shouldRevertColor) {
+        const { data, error } = await supabase
+          .from("posts")
+          .update({ client_label: "pendente" } as any)
+          .eq("id", postId)
+          .select("id");
+        if (!error && data && data.length > 0) {
+          result.mutatedFields.add("client_label");
+          result.appliedActions.push({
+            automationId: "revert-color",
+            automationName: "Reverter cor (tag removida)",
+            actionType: "change_color",
+            actionValue: "pendente",
+            success: true,
+          });
+        }
+      }
     }
 
     if (matched.length === 0) return result;

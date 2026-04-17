@@ -364,6 +364,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     async (params: {
       postId: string;
       addedTagIds?: string[];
+      removedTagIds?: string[];
       newColumnId?: string | null;
       previousColumnId?: string | null;
     }): Promise<AutomationResult | null> => {
@@ -373,6 +374,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
         ctx: { clientId, tagIdToName },
         postId: params.postId,
         addedTagIds: params.addedTagIds,
+        removedTagIds: params.removedTagIds,
         newColumnId: params.newColumnId,
         previousColumnId: params.previousColumnId,
       });
@@ -520,8 +522,9 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.tags !== undefined) {
       const oldTags = posts.find((p) => p.id === id)?.tags || [];
       const addedTagIds = updates.tags.filter((t) => !oldTags.includes(t));
-      if (addedTagIds.length > 0) {
-        await triggerAutomations({ postId: id, addedTagIds });
+      const removedTagIds = oldTags.filter((t) => !updates.tags!.includes(t));
+      if (addedTagIds.length > 0 || removedTagIds.length > 0) {
+        await triggerAutomations({ postId: id, addedTagIds, removedTagIds });
       }
     }
   }, [posts, triggerAutomations]);
