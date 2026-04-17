@@ -322,9 +322,20 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, []);
 
   const deletePost = useCallback(async (id: string) => {
+    const prevSnapshot = posts;
     setPosts((prev) => prev.filter((p) => p.id !== id));
-    await supabase.from("posts").delete().eq("id", id);
-  }, []);
+    const { data, error } = await supabase
+      .from("posts")
+      .delete()
+      .eq("id", id)
+      .select("id");
+    if (error || !data || data.length === 0) {
+      console.error("[deletePost] Falha ao excluir post:", { id, error, deletedRows: data?.length ?? 0 });
+      // Reverte estado local para refletir realidade do banco
+      setPosts(prevSnapshot);
+      throw new Error(error?.message || "Não foi possível excluir o post (sem permissão ou já removido).");
+    }
+  }, [posts]);
 
   // Execute a single automation action on a post
   const executeAutomationAction = useCallback(async (auto: any, postId: string) => {
@@ -670,9 +681,37 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, []);
 
   const bulkDeletePosts = useCallback(async (ids: string[]) => {
+    const prevSnapshot = posts;
     setPosts((prev) => prev.filter((p) => !ids.includes(p.id)));
-    await supabase.from("posts").delete().in("id", ids);
-  }, []);
+    const { data, error } = await supabase
+      .from("posts")
+      .delete()
+      .in("id", ids)
+      .select("id");
+    const deletedCount = data?.length ?? 0;
+    if (error || deletedCount < ids.length) {
+      console.error("[bulkDeletePosts] Falha parcial/total ao excluir posts:", {
+        requested: ids.length,
+        deleted: deletedCount,
+        error,
+      });
+      // Recarrega do banco para refletir o estado real
+      const { data: fresh } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("client_id", clientId)
+        .order("position", { ascending: true })
+        .order("created_at", { ascending: false });
+      if (fresh) {
+        const commentsMap = new Map<string, Comment[]>();
+        prevSnapshot.forEach((p) => commentsMap.set(p.id, p.comments));
+        setPosts(fresh.map((row: any) => dbPostToPost(row, commentsMap.get(row.id) || [])));
+      } else {
+        setPosts(prevSnapshot);
+      }
+      if (error) throw new Error(error.message);
+    }
+  }, [posts, clientId]);
 
   const bulkMoveToColumn = useCallback(async (ids: string[], columnId: string | null) => {
     setPosts((prev) => prev.map((p) => ids.includes(p.id) ? { ...p, columnId } : p));
