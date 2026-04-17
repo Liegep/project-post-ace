@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Post } from "@/types/post";
-import { format, isAfter, addDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isSameWeek, isSameMonth } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { format, isAfter, addDays, startOfWeek, endOfWeek, isSameWeek, isSameMonth } from "date-fns";
+import { ptBR, it as itLocale, enUS, es as esLocale, sv as svLocale, Locale as DfnsLocale } from "date-fns/locale";
 import { CalendarClock, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
 import { getDeadlineUrgency, URGENCY_STYLES } from "@/lib/deadlineColors";
 import { cn } from "@/lib/utils";
@@ -13,10 +13,35 @@ interface UpcomingPostsWidgetProps {
 
 type ViewMode = "week" | "month";
 
+const DATE_LOCALES: Record<string, DfnsLocale> = {
+  pt: ptBR,
+  en: enUS,
+  it: itLocale,
+  es: esLocale,
+  sv: svLocale,
+};
+
+const STRINGS: Record<string, {
+  title: string;
+  week: string;
+  month: string;
+  thisWeek: string;
+  thisMonth: string;
+  posted: string;
+  dayMonthFormat: string;
+}> = {
+  pt: { title: "Próximos Posts", week: "Semana", month: "Mês", thisWeek: "esta semana", thisMonth: "este mês", posted: "Postado", dayMonthFormat: "EEEE, dd 'de' MMM" },
+  en: { title: "Upcoming Posts", week: "Week", month: "Month", thisWeek: "this week", thisMonth: "this month", posted: "Posted", dayMonthFormat: "EEEE, MMM dd" },
+  it: { title: "Prossimi Post", week: "Settimana", month: "Mese", thisWeek: "questa settimana", thisMonth: "questo mese", posted: "Pubblicato", dayMonthFormat: "EEEE, dd MMM" },
+  es: { title: "Próximas Publicaciones", week: "Semana", month: "Mes", thisWeek: "esta semana", thisMonth: "este mes", posted: "Publicado", dayMonthFormat: "EEEE, dd 'de' MMM" },
+  sv: { title: "Kommande Inlägg", week: "Vecka", month: "Månad", thisWeek: "denna vecka", thisMonth: "denna månad", posted: "Publicerat", dayMonthFormat: "EEEE, dd MMM" },
+};
+
 export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidgetProps) => {
   const [viewMode, setViewMode] = useState<ViewMode>("week");
+  const t = STRINGS[locale] ?? STRINGS.pt;
+  const dfnsLocale = DATE_LOCALES[locale] ?? ptBR;
 
-  // Posts with deadline only, sorted by date
   const scheduledPosts = useMemo(() => {
     return posts
       .filter((p) => p.deadline)
@@ -26,7 +51,6 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
   const now = new Date();
   const isPosted = (deadline: Date) => isAfter(now, addDays(deadline, 1));
 
-  // Group posts by week or month
   const groupedPosts = useMemo(() => {
     const groups: { label: string; posts: Post[] }[] = [];
     const groupMap = new Map<string, Post[]>();
@@ -38,22 +62,18 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
       if (viewMode === "week") {
         const weekStart = startOfWeek(date, { weekStartsOn: 1 });
         const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
-        key = `${format(weekStart, "dd/MM", { locale: ptBR })} - ${format(weekEnd, "dd/MM", { locale: ptBR })}`;
-
-        // Add current week indicator
+        key = `${format(weekStart, "dd/MM", { locale: dfnsLocale })} - ${format(weekEnd, "dd/MM", { locale: dfnsLocale })}`;
         if (isSameWeek(date, now, { weekStartsOn: 1 })) {
-          key = `📍 ${key} (esta semana)`;
+          key = `📍 ${key} (${t.thisWeek})`;
         }
       } else {
-        key = format(date, "MMMM yyyy", { locale: ptBR });
+        key = format(date, "MMMM yyyy", { locale: dfnsLocale });
         if (isSameMonth(date, now)) {
-          key = `📍 ${key} (este mês)`;
+          key = `📍 ${key} (${t.thisMonth})`;
         }
       }
 
-      if (!groupMap.has(key)) {
-        groupMap.set(key, []);
-      }
+      if (!groupMap.has(key)) groupMap.set(key, []);
       groupMap.get(key)!.push(post);
     });
 
@@ -62,7 +82,7 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
     });
 
     return groups;
-  }, [scheduledPosts, viewMode]);
+  }, [scheduledPosts, viewMode, dfnsLocale, t]);
 
   if (scheduledPosts.length === 0) return null;
 
@@ -71,7 +91,7 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <CalendarClock className="h-5 w-5 text-primary" />
-          <h3 className="font-bold text-foreground">Próximos Posts</h3>
+          <h3 className="font-bold text-foreground">{t.title}</h3>
           <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
             {scheduledPosts.length}
           </span>
@@ -81,13 +101,13 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
             onClick={() => setViewMode("week")}
             className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${viewMode === "week" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
           >
-            Semana
+            {t.week}
           </button>
           <button
             onClick={() => setViewMode("month")}
             className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${viewMode === "month" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
           >
-            Mês
+            {t.month}
           </button>
         </div>
       </div>
@@ -115,12 +135,10 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
                         : cn(urgencyStyle.bg, urgencyStyle.border, "hover:opacity-80")
                     )}
                   >
-                    {/* Urgency dot */}
                     {!posted && (
                       <div className={cn("h-2.5 w-2.5 rounded-full shrink-0", urgencyStyle.dot)} />
                     )}
 
-                    {/* Media thumbnail */}
                     {post.imageUrl && (
                       <img
                         src={post.imageUrl}
@@ -134,14 +152,14 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
                         {post.title}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {format(deadline, "EEEE, dd 'de' MMM", { locale: ptBR })}
+                        {format(deadline, t.dayMonthFormat, { locale: dfnsLocale })}
                       </p>
                     </div>
 
                     {posted ? (
                       <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600 shrink-0">
                         <CheckCircle2 className="h-3.5 w-3.5" />
-                        Postado
+                        {t.posted}
                       </span>
                     ) : (
                       <span className={cn("flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold shrink-0", urgencyStyle.bg, urgencyStyle.text)}>
