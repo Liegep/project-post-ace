@@ -325,6 +325,7 @@ export const PostCard = memo(
         {post.caption && (
           <Drawer
             open={captionDrawerOpen}
+            repositionInputs={false}
             onOpenChange={(open) => {
               setCaptionDrawerOpen(open);
               if (!open) {
@@ -335,6 +336,7 @@ export const PostCard = memo(
           >
             <DrawerContent
               className="bg-[hsl(0_0%_10%/0.85)] backdrop-blur-2xl border-white/10 text-white max-h-[90vh] flex flex-col"
+              style={{ maxHeight: "92dvh" }}
               onClick={(e) => e.stopPropagation()}
             >
               <DrawerHeader className="text-left flex-row items-center justify-between gap-2 pr-4 shrink-0">
@@ -355,14 +357,15 @@ export const PostCard = memo(
                   </button>
                 )}
               </DrawerHeader>
-              <div className="px-4 flex-1 overflow-y-auto min-h-0">
+              <div className="px-4 flex-1 overflow-y-auto overscroll-contain min-h-0">
                 {editingCaption ? (
-                  <Textarea
-                    value={draftCaption}
-                    onChange={(e) => setDraftCaption(e.target.value)}
-                    autoFocus
-                    className="min-h-[220px] text-[16px] leading-[1.6] bg-white text-black resize-none w-full"
-                  />
+                  <div className="rounded-xl bg-white text-black p-4 sm:p-5 shadow-sm">
+                    <Textarea
+                      value={draftCaption}
+                      onChange={(e) => setDraftCaption(e.target.value)}
+                      className="min-h-[220px] w-full resize-none border-0 bg-transparent p-0 text-[18px] leading-[1.6] text-black shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                    />
+                  </div>
                 ) : (
                   <div className="rounded-xl bg-white text-black p-4 sm:p-5 text-[18px] leading-[1.6] whitespace-pre-wrap font-medium">
                     <LinkedText text={post.caption} />
@@ -370,7 +373,7 @@ export const PostCard = memo(
                 )}
               </div>
               {editingCaption && (
-                <div className="shrink-0 flex gap-2 px-4 py-3 border-t border-white/10 bg-[hsl(0_0%_10%/0.95)]">
+                <div className="sticky bottom-0 shrink-0 flex gap-2 px-4 py-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] border-t border-white/10 bg-[hsl(0_0%_10%/0.95)] backdrop-blur-2xl">
                   <Button
                     size="lg"
                     className="h-12 text-base font-semibold flex-1 gap-2"
