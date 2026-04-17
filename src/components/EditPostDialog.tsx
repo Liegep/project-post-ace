@@ -394,7 +394,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               {/* Client Feedback dropdown (admin can reset to pending) */}
               <div>
                 <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {t("clientFeedback") !== "clientFeedback" ? t("clientFeedback") : "Feedback do Cliente"}
+                  Feedback do Cliente
                 </Label>
                 <Select
                   value={post?.clientLabel ?? "pendente"}
