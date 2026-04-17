@@ -522,8 +522,9 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.tags !== undefined) {
       const oldTags = posts.find((p) => p.id === id)?.tags || [];
       const addedTagIds = updates.tags.filter((t) => !oldTags.includes(t));
-      if (addedTagIds.length > 0) {
-        await triggerAutomations({ postId: id, addedTagIds });
+      const removedTagIds = oldTags.filter((t) => !updates.tags!.includes(t));
+      if (addedTagIds.length > 0 || removedTagIds.length > 0) {
+        await triggerAutomations({ postId: id, addedTagIds, removedTagIds });
       }
     }
   }, [posts, triggerAutomations]);
