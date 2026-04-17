@@ -5,13 +5,31 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle, Tag as TagIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle, Tag as TagIcon, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useI18n } from "@/i18n/I18nContext";
 import { LinkedText } from "@/components/LinkedText";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { toast } from "sonner";
 import { getContrastColor } from "@/lib/utils";
+
+const RESET_LABEL: Record<string, string> = {
+  pt: "Resetar para Pendente",
+  en: "Reset to Pending",
+  it: "Ripristina in Attesa",
+  es: "Restablecer a Pendiente",
+  sv: "Återställ till Väntande",
+};
+
+const RESET_TOAST: Record<string, string> = {
+  pt: "Post resetado para pendente",
+  en: "Post reset to pending",
+  it: "Post ripristinato in attesa",
+  es: "Publicación restablecida a pendiente",
+  sv: "Inlägg återställt till väntande",
+};
 
 interface PostDetailDialogProps {
   post: Post | null;
@@ -48,6 +66,8 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
   const [showChangeForm, setShowChangeForm] = useState(false);
   const [changeComment, setChangeComment] = useState("");
   const activityLogs = useActivityLogs({ itemId: post?.id || "", enabled: open && showHistory && !!post });
+  const { isAdmin } = useUserRole();
+  const { locale } = useI18n();
 
   if (!post) return null;
 
@@ -115,6 +135,20 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
             <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${labelConfig.color}`}>
               {t(LABEL_KEYS[post.clientLabel])}
             </span>
+            {isAdmin && onUpdateLabel && post.clientLabel === "aprovado" && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 gap-1.5 text-xs ml-auto"
+                onClick={() => {
+                  onUpdateLabel(post.id, "pendente");
+                  toast.success(RESET_TOAST[locale] ?? RESET_TOAST.pt);
+                }}
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                {RESET_LABEL[locale] ?? RESET_LABEL.pt}
+              </Button>
+            )}
           </div>
 
           {postTags.length > 0 && (
