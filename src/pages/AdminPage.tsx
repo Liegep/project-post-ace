@@ -45,7 +45,7 @@ const UNASSIGNED_COLUMN_ID = "__unassigned__";
 const DroppableColumn = ({ id, children }: { id: string; children: React.ReactNode }) => {
   const { setNodeRef, isOver } = useDroppable({ id });
   return (
-    <div ref={setNodeRef} className={`space-y-3 min-h-[60px] rounded-lg transition-colors ${isOver ? "bg-accent/10 ring-2 ring-accent/30" : ""}`}>
+    <div ref={setNodeRef} className={`space-y-3 min-h-[60px] flex-1 overflow-y-auto pr-1 -mr-1 rounded-lg transition-colors ${isOver ? "bg-accent/10 ring-2 ring-accent/30" : ""}`}>
       {children}
     </div>
   );
