@@ -135,6 +135,20 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
             <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${labelConfig.color}`}>
               {t(LABEL_KEYS[post.clientLabel])}
             </span>
+            {isAdmin && onUpdateLabel && post.clientLabel === "aprovado" && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 gap-1.5 text-xs ml-auto"
+                onClick={() => {
+                  onUpdateLabel(post.id, "pendente");
+                  toast.success(RESET_TOAST[locale] ?? RESET_TOAST.pt);
+                }}
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                {RESET_LABEL[locale] ?? RESET_LABEL.pt}
+              </Button>
+            )}
           </div>
 
           {postTags.length > 0 && (
