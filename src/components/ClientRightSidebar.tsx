@@ -72,7 +72,7 @@ export function ClientRightSidebar({ clientId }: Props) {
       icon: GradientHeartIcon,
       count: 0,
       color: "bg-transparent",
-      hoverColor: "hover:bg-muted",
+      hoverColor: "hover:bg-emerald-500 hover:text-white",
       textColor: "text-foreground",
       bgLight: "bg-muted/40",
     },
