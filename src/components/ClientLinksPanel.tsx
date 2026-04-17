@@ -90,6 +90,7 @@ function SortableItem({ link, onUpdate, onRemove }: {
       href={link.url ? (link.url.startsWith("http") ? link.url : `https://${link.url}`) : undefined}
       target="_blank"
       rel="noopener noreferrer"
+      referrerPolicy="no-referrer"
       className="flex items-center gap-2 rounded-lg border p-3 group bg-card hover:border-primary/40 hover:shadow-sm transition-all cursor-pointer no-underline"
       onClick={(e) => {
         // Prevent navigation when interacting with inputs or buttons

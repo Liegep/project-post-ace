@@ -146,6 +146,7 @@ export function QuickLinksPanel() {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                referrerPolicy="no-referrer"
                 className="flex-1 text-sm text-foreground truncate hover:text-primary transition-colors"
               >
                 {link.title}
