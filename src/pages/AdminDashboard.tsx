@@ -15,6 +15,7 @@ import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign, Eye, FileSignature, Link2, Palette } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { StorageCleanupButton } from "@/components/StorageCleanupButton";
 import { toast } from "@/hooks/use-toast";
 
 import { cn } from "@/lib/utils";
@@ -906,6 +907,7 @@ const AdminDashboard = () => {
                 <CalendarClock className="mr-1 h-4 w-4" /> {t("social")}
               </Button>
             )}
+            {isAdmin && <StorageCleanupButton />}
             <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)} title="Menu">
               <Menu className="h-5 w-5" />
             </Button>
