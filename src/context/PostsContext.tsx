@@ -346,16 +346,49 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, [clientId, posts]);
 
   const addComment = useCallback(async (postId: string, author: string, text: string) => {
+    const { data: userRes } = await supabase.auth.getUser();
+    const userId = userRes?.user?.id || null;
     const { data, error } = await supabase.from("comments").insert({
       post_id: postId,
       author,
       text,
-    }).select().single();
+      user_id: userId,
+    } as any).select().single();
     if (data && !error) {
-      const comment: Comment = { id: data.id, postId: data.post_id, author: data.author, text: data.text, createdAt: new Date(data.created_at) };
+      const comment: Comment = { id: data.id, postId: data.post_id, author: data.author, text: data.text, createdAt: new Date(data.created_at), userId: (data as any).user_id || null };
       setPosts((prev) => prev.map((p) => (p.id === postId ? { ...p, comments: [...p.comments, comment] } : p)));
+      // Cache author info for immediate display
+      if (userId && !commentAuthors[userId]) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("id, full_name, email, avatar_url, role")
+          .eq("id", userId)
+          .maybeSingle();
+        if (profile) {
+          let clientLogoUrl = "";
+          if (profile.role === "client") {
+            const { data: assignment } = await supabase
+              .from("user_client_assignments")
+              .select("clients(logo_url)")
+              .eq("user_id", userId)
+              .maybeSingle();
+            clientLogoUrl = (assignment as any)?.clients?.logo_url || "";
+          }
+          setCommentAuthors((prev) => ({
+            ...prev,
+            [userId]: {
+              userId,
+              fullName: profile.full_name || profile.email || "Usuário",
+              email: profile.email || "",
+              avatarUrl: profile.avatar_url || "",
+              role: profile.role || "",
+              clientLogoUrl,
+            },
+          }));
+        }
+      }
     }
-  }, [posts, clientId]);
+  }, [posts, clientId, commentAuthors]);
 
   const deleteComment = useCallback(async (postId: string, commentId: string) => {
     await supabase.from("comments").delete().eq("id", commentId);
