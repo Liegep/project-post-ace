@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Post } from "@/types/post";
-import { format, isAfter, addDays, startOfWeek, endOfWeek, isSameWeek, isSameMonth } from "date-fns";
+import { format, isAfter, startOfDay, addDays, startOfWeek, endOfWeek, isSameWeek, isSameMonth } from "date-fns";
 import { ptBR, it as itLocale, enUS, es as esLocale, sv as svLocale, Locale as DfnsLocale } from "date-fns/locale";
 import { CalendarClock, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
 import { getDeadlineUrgency, URGENCY_STYLES } from "@/lib/deadlineColors";
@@ -49,7 +49,8 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
   }, [posts]);
 
   const now = new Date();
-  const isPosted = (deadline: Date) => isAfter(now, addDays(deadline, 1));
+  // Considera "Postado" apenas a partir das 00:00 do dia seguinte ao prazo
+  const isPosted = (deadline: Date) => isAfter(now, startOfDay(addDays(deadline, 1)));
 
   const groupedPosts = useMemo(() => {
     const groups: { label: string; posts: Post[] }[] = [];
