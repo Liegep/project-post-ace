@@ -348,9 +348,20 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   const addComment = useCallback(async (postId: string, author: string, text: string) => {
     const { data: userRes } = await supabase.auth.getUser();
     const userId = userRes?.user?.id || null;
+    // Try to use the real user name as the author label (fallback to provided role label)
+    let authorLabel = author;
+    if (userId) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name, email")
+        .eq("id", userId)
+        .maybeSingle();
+      const realName = profile?.full_name || profile?.email;
+      if (realName) authorLabel = realName;
+    }
     const { data, error } = await supabase.from("comments").insert({
       post_id: postId,
-      author,
+      author: authorLabel,
       text,
       user_id: userId,
     } as any).select().single();
