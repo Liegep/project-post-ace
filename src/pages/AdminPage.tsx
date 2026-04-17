@@ -532,6 +532,18 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [createInColumnId, setCreateInColumnId] = useState<string | null>(null);
 
    const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
+   const [searchQuery, setSearchQuery] = useState("");
+
+   const normalizedQuery = searchQuery.trim().toLowerCase();
+   const searchResults = normalizedQuery
+     ? [
+         ...posts.map((p) => ({ post: p, archived: false })),
+         ...archivedPosts.map((p) => ({ post: p, archived: true })),
+       ].filter(({ post }) =>
+         (post.title || "").toLowerCase().includes(normalizedQuery) ||
+         (post.caption || "").toLowerCase().includes(normalizedQuery)
+       )
+     : [];
 
   // Selection mode state
   const [selectionMode, setSelectionMode] = useState(false);
