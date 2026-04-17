@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { LinkedText } from "@/components/LinkedText";
 import { MediaLightbox } from "@/components/MediaLightbox";
-import { Archive, Calendar, Download, Play, Send, Trash2 } from "lucide-react";
+import { Archive, Calendar, Download, Pencil, Play, Send, Trash2, X, Check } from "lucide-react";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
 import { getContrastColor } from "@/lib/utils";
@@ -60,12 +60,16 @@ export const PostCard = memo(
     isSelected,
     onToggleSelect,
     showInlineDetails,
+    allowEditCaption,
   }: PostCardProps) => {
-    const { tags, updateClientLabel, addComment } = usePosts();
+    const { tags, updateClientLabel, addComment, updatePost } = usePosts();
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [captionDrawerOpen, setCaptionDrawerOpen] = useState(false);
+    const [editingCaption, setEditingCaption] = useState(false);
+    const [draftCaption, setDraftCaption] = useState(post.caption);
+    const [savingCaption, setSavingCaption] = useState(false);
 
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
@@ -317,18 +321,85 @@ export const PostCard = memo(
 
         {/* Glassmorphism caption drawer */}
         {post.caption && (
-          <Drawer open={captionDrawerOpen} onOpenChange={setCaptionDrawerOpen}>
+          <Drawer
+            open={captionDrawerOpen}
+            onOpenChange={(open) => {
+              setCaptionDrawerOpen(open);
+              if (!open) {
+                setEditingCaption(false);
+                setDraftCaption(post.caption);
+              }
+            }}
+          >
             <DrawerContent
               className="bg-[hsl(0_0%_10%/0.85)] backdrop-blur-2xl border-white/10 text-white"
               onClick={(e) => e.stopPropagation()}
             >
-              <DrawerHeader className="text-left">
-                <DrawerTitle className="text-white text-lg">{post.title}</DrawerTitle>
+              <DrawerHeader className="text-left flex-row items-center justify-between gap-2 pr-4">
+                <DrawerTitle className="text-white text-lg flex-1 truncate">{post.title}</DrawerTitle>
+                {allowEditCaption && !editingCaption && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDraftCaption(post.caption);
+                      setEditingCaption(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium px-3 py-2 transition-colors shrink-0"
+                    title={t("editPost")}
+                    aria-label={t("editPost")}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                    {t("editPost")}
+                  </button>
+                )}
               </DrawerHeader>
               <div className="px-4 pb-8 max-h-[70vh] overflow-y-auto">
-                <div className="rounded-xl bg-white text-black p-4 sm:p-5 text-[18px] leading-[1.6] whitespace-pre-wrap font-medium">
-                  <LinkedText text={post.caption} />
-                </div>
+                {editingCaption ? (
+                  <div className="space-y-3">
+                    <Textarea
+                      value={draftCaption}
+                      onChange={(e) => setDraftCaption(e.target.value)}
+                      autoFocus
+                      className="min-h-[220px] text-[16px] leading-[1.6] bg-white text-black resize-y"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="lg"
+                        className="h-12 text-base font-semibold flex-1 gap-2"
+                        disabled={savingCaption || draftCaption === post.caption}
+                        onClick={async () => {
+                          setSavingCaption(true);
+                          try {
+                            await updatePost(post.id, { caption: draftCaption });
+                            setEditingCaption(false);
+                          } finally {
+                            setSavingCaption(false);
+                          }
+                        }}
+                      >
+                        <Check className="h-4 w-4" />
+                        {savingCaption ? t("saving") : t("save")}
+                      </Button>
+                      <Button
+                        size="lg"
+                        variant="ghost"
+                        className="h-12 text-base text-white hover:bg-white/10 gap-2"
+                        disabled={savingCaption}
+                        onClick={() => {
+                          setEditingCaption(false);
+                          setDraftCaption(post.caption);
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                        {t("cancel")}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-xl bg-white text-black p-4 sm:p-5 text-[18px] leading-[1.6] whitespace-pre-wrap font-medium">
+                    <LinkedText text={post.caption} />
+                  </div>
+                )}
               </div>
             </DrawerContent>
           </Drawer>
