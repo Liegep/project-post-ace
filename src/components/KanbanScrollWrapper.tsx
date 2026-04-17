@@ -5,9 +5,14 @@ import { cn } from "@/lib/utils";
 interface KanbanScrollWrapperProps {
   children: ReactNode;
   className?: string;
+  /**
+   * When true, makes the wrapper fill its parent height and prevents
+   * vertical page scroll: each column should manage its own internal scroll.
+   */
+  fillHeight?: boolean;
 }
 
-export function KanbanScrollWrapper({ children, className }: KanbanScrollWrapperProps) {
+export function KanbanScrollWrapper({ children, className, fillHeight }: KanbanScrollWrapperProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -103,6 +108,7 @@ export function KanbanScrollWrapper({ children, className }: KanbanScrollWrapper
         ref={scrollRef}
         className={cn(
           "kanban-scroll flex gap-4 overflow-x-auto pb-4",
+          fillHeight && "h-full items-stretch",
           isDragging && "cursor-grabbing select-none"
         )}
         onPointerDown={onPointerDown}
