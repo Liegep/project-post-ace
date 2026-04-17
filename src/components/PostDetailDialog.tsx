@@ -5,13 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle, Tag as TagIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle, Tag as TagIcon, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
+import { useUserRole } from "@/hooks/useUserRole";
 import { LinkedText } from "@/components/LinkedText";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { toast } from "sonner";
 import { getContrastColor } from "@/lib/utils";
+
+const RESET_LABEL: Record<string, string> = {
+  pt: "Resetar para Pendente",
+  en: "Reset to Pending",
+  it: "Ripristina in Attesa",
+  es: "Restablecer a Pendiente",
+  sv: "Återställ till Väntande",
+};
+
+const RESET_TOAST: Record<string, string> = {
+  pt: "Post resetado para pendente",
+  en: "Post reset to pending",
+  it: "Post ripristinato in attesa",
+  es: "Publicación restablecida a pendiente",
+  sv: "Inlägg återställt till väntande",
+};
 
 interface PostDetailDialogProps {
   post: Post | null;
