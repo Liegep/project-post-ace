@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { LinkedText } from "@/components/LinkedText";
 import { MediaLightbox } from "@/components/MediaLightbox";
 import { Archive, Calendar, Download, Play, Send, Trash2 } from "lucide-react";
@@ -64,6 +65,7 @@ export const PostCard = memo(
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [captionDrawerOpen, setCaptionDrawerOpen] = useState(false);
 
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
@@ -252,37 +254,48 @@ export const PostCard = memo(
           {/* Inline details when no columns visible */}
           {showInlineDetails && !isAdmin && (
             <div className="space-y-2 pt-1 border-t border-border mt-2" onClick={(e) => e.stopPropagation()}>
-              {/* Caption */}
+              {/* Caption preview + Read More */}
               {post.caption && (
-                <div className="text-xs text-foreground whitespace-pre-wrap leading-relaxed line-clamp-4">
-                  <LinkedText text={post.caption} />
+                <div className="space-y-1.5">
+                  <div className="text-xs text-foreground whitespace-pre-wrap leading-relaxed line-clamp-3">
+                    <LinkedText text={post.caption} />
+                  </div>
+                  {post.caption.length > 120 && (
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setCaptionDrawerOpen(true); }}
+                      className="text-[11px] font-semibold text-primary hover:underline"
+                    >
+                      {t("readMore")}
+                    </button>
+                  )}
                 </div>
               )}
 
               {/* Feedback dropdown */}
               <Select value={post.clientLabel === "pendente" ? "" : post.clientLabel} onValueChange={(v) => updateClientLabel(post.id, v as ClientLabel)}>
-                <SelectTrigger className="h-8 w-full text-xs">
-                  <SelectValue placeholder="Escolha um feedback" />
+                <SelectTrigger className="h-10 w-full text-sm">
+                  <SelectValue placeholder={t("labelGiveFeedback")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="de_seu_feedback">💬 {t("labelGiveFeedback" as any)}</SelectItem>
-                  <SelectItem value="aprovado">✅ {t("labelApproved" as any)}</SelectItem>
-                  <SelectItem value="alteracao_solicitada">✏️ {t("labelChangeRequested" as any)}</SelectItem>
+                  <SelectItem value="de_seu_feedback">💬 {t("labelGiveFeedback")}</SelectItem>
+                  <SelectItem value="aprovado">✅ {t("labelApproved")}</SelectItem>
+                  <SelectItem value="alteracao_solicitada">✏️ {t("labelChangeRequested")}</SelectItem>
                 </SelectContent>
               </Select>
 
               {/* Comment field */}
-              <div className="flex gap-1">
+              <div className="flex gap-1.5">
                 <Textarea
-                  placeholder={t("writeComment" as any)}
+                  placeholder={t("writeComment")}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  className="min-h-[32px] text-[11px] resize-none flex-1"
+                  className="min-h-[40px] text-sm resize-none flex-1 bg-white text-black"
                   rows={1}
                 />
                 <Button
                   size="icon"
-                  className="h-8 w-8 shrink-0"
+                  className="h-10 w-10 shrink-0"
                   onClick={() => {
                     if (!commentText.trim()) return;
                     addComment(post.id, "Cliente", commentText.trim());
@@ -290,7 +303,7 @@ export const PostCard = memo(
                   }}
                   disabled={!commentText.trim()}
                 >
-                  <Send className="h-3 w-3" />
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -301,6 +314,25 @@ export const PostCard = memo(
           open={lightboxOpen}
           onOpenChange={setLightboxOpen}
         />
+
+        {/* Glassmorphism caption drawer */}
+        {post.caption && (
+          <Drawer open={captionDrawerOpen} onOpenChange={setCaptionDrawerOpen}>
+            <DrawerContent
+              className="bg-[hsl(0_0%_10%/0.85)] backdrop-blur-2xl border-white/10 text-white"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <DrawerHeader className="text-left">
+                <DrawerTitle className="text-white text-lg">{post.title}</DrawerTitle>
+              </DrawerHeader>
+              <div className="px-4 pb-8 max-h-[70vh] overflow-y-auto">
+                <div className="rounded-xl bg-white text-black p-4 sm:p-5 text-[18px] leading-[1.6] whitespace-pre-wrap font-medium">
+                  <LinkedText text={post.caption} />
+                </div>
+              </div>
+            </DrawerContent>
+          </Drawer>
+        )}
       </Card>
     );
   },
