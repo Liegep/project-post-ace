@@ -364,6 +364,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     async (params: {
       postId: string;
       addedTagIds?: string[];
+      removedTagIds?: string[];
       newColumnId?: string | null;
       previousColumnId?: string | null;
     }): Promise<AutomationResult | null> => {
@@ -373,6 +374,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
         ctx: { clientId, tagIdToName },
         postId: params.postId,
         addedTagIds: params.addedTagIds,
+        removedTagIds: params.removedTagIds,
         newColumnId: params.newColumnId,
         previousColumnId: params.previousColumnId,
       });
