@@ -128,7 +128,7 @@ export function ClientRightSidebar({ clientId }: Props) {
         </div>
 
         <Sheet open={open} onOpenChange={(v) => !v && close()}>
-          <SheetContent side="right" className="w-full sm:w-[380px] p-0">
+          <SheetContent side="right" className="w-full sm:w-[380px] p-0 bg-card">
             <div className="flex h-full flex-col">
               {/* Header */}
               <div className={cn("flex items-center justify-between px-5 py-4 border-b", headerBg)}>
@@ -191,7 +191,7 @@ export function ClientRightSidebar({ clientId }: Props) {
       {/* Backdrop when open */}
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px] transition-opacity duration-200"
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-200"
           onClick={close}
         />
       )}
