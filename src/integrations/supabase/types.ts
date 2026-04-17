@@ -890,6 +890,7 @@ export type Database = {
           id: string
           post_id: string
           text: string
+          user_id: string | null
         }
         Insert: {
           author: string
@@ -897,6 +898,7 @@ export type Database = {
           id?: string
           post_id: string
           text: string
+          user_id?: string | null
         }
         Update: {
           author?: string
@@ -904,6 +906,7 @@ export type Database = {
           id?: string
           post_id?: string
           text?: string
+          user_id?: string | null
         }
         Relationships: [
           {
