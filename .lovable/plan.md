@@ -1,53 +1,63 @@
 
 
-## Drag & Drop para Reagendar Compromissos
+## Expandir o editor de templates de Brief (estilo Google Forms)
 
-Vou adicionar arrastar-e-soltar na sua agenda pessoal para você reagendar compromissos rapidamente, sem precisar abrir o diálogo de edição.
+Vou turbinar o `TemplateEditor.tsx` que já existe para ficar parecido com Google Forms, com mais tipos de campo, configurações por pergunta, seções e pré-visualização.
 
-### Como vai funcionar
+### Novos tipos de pergunta
 
-**Visualização Mês**
-- Arrasta um compromisso de um dia para outro dia da grade
-- Solta no dia destino → a data é atualizada (horário preservado)
-- Feedback visual: a célula do dia destino fica destacada enquanto você arrasta
+Hoje já temos: texto curto, texto longo, sim/não, escolha única, múltipla escolha, upload, link.
 
-**Visualização Semana**
-- Arrasta um compromisso entre os 7 dias da semana
-- Mesmo comportamento: nova data, mesmo horário
+Vou adicionar:
+- **Dropdown** (select) — lista suspensa com opções
+- **Escala linear** (1 a 5, 1 a 10) — com rótulos nas pontas (ex: "Ruim" → "Ótimo")
+- **Data** — date picker
+- **Hora** — time picker
+- **Número** — input numérico com min/max opcional
+- **Email** — com validação
+- **Grade de múltipla escolha** — linhas × colunas (ex: avaliar vários itens)
+- **Seção/Quebra** — divisor com título e descrição (organiza o formulário em blocos)
 
-**Visualização Dia**
-- Drag-and-drop não se aplica (apenas um dia visível) — fica como está
+### Configurações por pergunta (painel expandido)
 
-**Toque (mobile)**
-- Pressionar e segurar (~250ms) ativa o arrasto, evitando conflito com scroll
+Cada pergunta vai ter um card expansível com:
+- Texto da pergunta
+- Texto de ajuda/descrição (subtítulo opcional)
+- Tipo de campo (dropdown com ícones)
+- Obrigatória (switch)
+- Opções dinâmicas (adicionar/remover/reordenar uma a uma, em vez de lista separada por vírgula)
+- "Outro" como opção (para escolha única / múltipla / dropdown)
+- Placeholder (para campos de texto)
+- Limites (min/max para número e escala)
 
-### Detalhes de UX
+### UX do editor
 
-- Cursor muda para "grab" ao passar sobre o card; "grabbing" ao arrastar
-- Card fica semi-transparente (opacity 50%) durante o arrasto
-- Dia destino ganha borda destacada (ring) enquanto o card paira sobre ele
-- Atualização **otimista**: a UI move o compromisso instantaneamente; se o backend falhar, reverte e mostra toast
-- Compromissos completados ou cancelados também podem ser arrastados (mantêm o estado)
+- **Drag & drop** real entre perguntas (substituir setas ↑↓ por @dnd-kit que já está no projeto)
+- **Duplicar pergunta** (botão de cópia ao lado de excluir)
+- **Aba "Pré-visualizar"** dentro do editor — mostra como o cliente verá o formulário, sem salvar nada
+- **Contador de perguntas obrigatórias** no rodapé
+- **Auto-save indicator** (apenas visual; salvamento continua manual via botão)
 
-### Detalhes técnicos
+### Renderização no formulário do cliente
 
-- Biblioteca: `@dnd-kit/core` (já usada no projeto, ex: `ClientLinksPanel`, kanban). Sem dependência nova.
-- Sensores: `PointerSensor` (distância 5px) + `TouchSensor` (delay 250ms, tolerance 5px)
-- Estrutura:
-  - `DndContext` envolve `MonthView` e `DayListView` (semana)
-  - Cada card de compromisso vira `useDraggable` com `id = appointment.id`
-  - Cada célula de dia vira `useDroppable` com `id = "yyyy-MM-dd"`
-  - `onDragEnd`: extrai o `id` do droppable, chama `updateAppointment(appointmentId, { appointmentDate: newDate })`
-- `updateAppointment` já existe em `useAppointments.ts` e faz update otimista + persiste no Supabase
+Atualizar `FillBriefDialog.tsx` para suportar todos os novos tipos:
+- Dropdown → `<Select>`
+- Escala → botões 1..N com rótulos
+- Data/hora → componentes existentes (`Calendar`, input time)
+- Número/email → input com validação
+- Grade → tabela de radios
+- Seção → renderiza título grande + descrição, sem campo de resposta
 
-### Fora do escopo (posso fazer depois se quiser)
+### Arquivos a alterar
 
-- Arrastar para mudar **horário** (exigiria visualização com timeline horária)
-- Duplicar com Alt+drag (copiar em vez de mover)
-- Arrastar séries recorrentes inteiras (hoje cada ocorrência é uma linha independente)
+- `src/hooks/useBriefTemplates.ts` — expandir o tipo `FieldType` e `BriefQuestion` (adicionar `helpText`, `placeholder`, `min`, `max`, `scaleLabels`, `gridRows`, `gridCols`, `allowOther`)
+- `src/components/briefs/TemplateEditor.tsx` — reescrever painel de pergunta com card expansível, drag & drop, opções dinâmicas, aba de preview
+- `src/components/briefs/FillBriefDialog.tsx` — adicionar renderização para os novos tipos
+- (sem mudanças de schema — o campo `questions` já é JSONB e aceita qualquer estrutura)
 
-### Arquivos afetados
+### Não vou mexer
 
-- `src/pages/AgendaPage.tsx` — envolve as views em `DndContext`, adiciona handler `onDragEnd`
-- Componentes internos `MonthView` e `DayListView` (mesmo arquivo) — cards viram draggable, células viram droppable
+- Visual geral / glassmorphism / cores
+- Tabelas do banco (a estrutura JSONB atual já comporta tudo)
+- Fluxo de envio/resposta/reabertura
 
