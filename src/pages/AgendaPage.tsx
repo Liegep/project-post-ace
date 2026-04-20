@@ -54,10 +54,7 @@ const AgendaPage = () => {
     const newDate = String(over.id);
     const apt = appointments.find(a => a.id === appointmentId);
     if (!apt || apt.appointmentDate === newDate) return;
-    const ok = await updateAppointment(appointmentId, { appointmentDate: newDate });
-    if (ok === false) {
-      toast({ title: "Erro ao reagendar", description: "Não foi possível atualizar a data.", variant: "destructive" });
-    }
+    await updateAppointment(appointmentId, { appointmentDate: newDate });
   };
 
   const [viewMode, setViewMode] = useState<ViewMode>("day");
