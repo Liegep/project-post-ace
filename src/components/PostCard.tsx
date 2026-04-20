@@ -103,7 +103,7 @@ export const PostCard = memo(
               <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect?.(post.id)} />
             </div>
           )}
-          <h3 className="text-sm font-bold leading-snug text-foreground line-clamp-2 flex-1">
+          <h3 className="text-sm font-bold leading-snug text-foreground break-words flex-1">
             {post.title}
           </h3>
           {isAdmin && (
