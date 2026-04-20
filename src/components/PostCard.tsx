@@ -97,13 +97,14 @@ export const PostCard = memo(
         onClick={() => (selectionMode ? onToggleSelect?.(post.id) : onEdit?.())}
       >
         {/* Title above thumbnail */}
-        <div className="px-2.5 pt-2 pb-1 flex items-start gap-1.5">
+        {/* Title above thumbnail */}
+        <div className="bg-muted/40 px-2.5 pt-2 pb-1.5 flex items-start gap-1.5">
           {selectionMode && (
             <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
               <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect?.(post.id)} />
             </div>
           )}
-          <h3 className="text-sm font-bold leading-snug text-foreground break-words flex-1 bg-muted/40 rounded-md px-2 py-1">
+          <h3 className="text-sm font-bold leading-snug text-foreground break-words flex-1">
             {post.title}
           </h3>
           {isAdmin && (
