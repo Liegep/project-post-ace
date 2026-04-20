@@ -230,6 +230,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                 {dayPosts.slice(0, Math.max(0, maxVisible - dayKanban.length)).map((p) => {
                   const previewUrl = p.media_urls?.[0] || null;
                   const isSelected = selectedItem?.type === "social" && selectedItem.post.id === p.id;
+                  const isPublished = p.status === "published";
 
                   return (
                     <Tooltip key={p.id}>
@@ -246,6 +247,8 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                           className={`w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate transition-colors flex items-center gap-1 ${
                             isSelected
                               ? "bg-primary/15 ring-1 ring-primary text-primary"
+                              : isPublished
+                              ? "bg-success/20 text-success border border-success/30 hover:bg-success/30"
                               : "hover:bg-muted"
                           }`}
                         >
