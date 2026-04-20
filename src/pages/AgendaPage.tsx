@@ -293,7 +293,7 @@ const AgendaPage = () => {
               currentDate={currentDate}
               appointmentsByDate={appointmentsByDate}
               tags={tags}
-              onDayClick={(d) => { setCurrentDate(d); setViewMode("day"); }}
+              onDayClick={(d) => openCreateForDate(d)}
               onCreateClick={(d) => openCreateForDate(d)}
             />
           </DndContext>
