@@ -392,7 +392,7 @@ const AgendaPage = () => {
                     className={cn(
                       "rounded-full px-3 py-1 text-xs font-medium border transition-all",
                       formTagId === null
-                        ? "ring-2 ring-primary ring-offset-1 bg-muted text-foreground"
+                        ? "ring-2 ring-primary ring-offset-1 bg-muted text-primary"
                         : "bg-muted/50 text-muted-foreground hover:bg-muted"
                     )}
                   >
