@@ -2,7 +2,22 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
-export type FieldType = 'short_text' | 'long_text' | 'yes_no' | 'multiple_choice' | 'checkbox' | 'file_upload' | 'link';
+export type FieldType =
+  | 'short_text'
+  | 'long_text'
+  | 'yes_no'
+  | 'multiple_choice'
+  | 'checkbox'
+  | 'file_upload'
+  | 'link'
+  | 'dropdown'
+  | 'scale'
+  | 'date'
+  | 'time'
+  | 'number'
+  | 'email'
+  | 'grid'
+  | 'section';
 
 export interface BriefQuestion {
   id: string;
@@ -10,6 +25,15 @@ export interface BriefQuestion {
   type: FieldType;
   options?: string[];
   required?: boolean;
+  helpText?: string;
+  placeholder?: string;
+  min?: number;
+  max?: number;
+  scaleMinLabel?: string;
+  scaleMaxLabel?: string;
+  gridRows?: string[];
+  gridCols?: string[];
+  allowOther?: boolean;
 }
 
 export interface BriefTemplateRow {
