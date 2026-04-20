@@ -329,7 +329,7 @@ const AgendaPage = () => {
           <DialogHeader>
             <DialogTitle>Novo compromisso</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-2">
+          <div className="space-y-4 pt-2 text-primary-foreground">
             <Input
               placeholder="Título do compromisso"
               value={formTitle}
@@ -342,7 +342,7 @@ const AgendaPage = () => {
               onChange={e => setFormDesc(e.target.value)}
               className="resize-none min-h-[60px]"
             />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 text-primary-foreground">
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="justify-start text-left font-normal">
@@ -375,7 +375,7 @@ const AgendaPage = () => {
                     "rounded-full px-3 py-1 text-xs font-medium border transition-all",
                     formCategory === cat
                       ? "ring-2 ring-primary ring-offset-1 " + getCategoryStyle(cat)
-                      : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      : "bg-muted/50 hover:bg-muted text-black"
                   )}
                 >
                   {cat || "Geral"}
@@ -437,7 +437,7 @@ const AgendaPage = () => {
                       "rounded-full px-3 py-1 text-xs font-medium border transition-all",
                       formRepeat === mode
                         ? "ring-2 ring-primary ring-offset-1 bg-primary/10 text-primary"
-                        : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                        : "bg-muted/50 hover:bg-muted text-black"
                     )}
                   >
                     {label}
