@@ -8,12 +8,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+  ContextMenuCheckboxItem,
+} from "@/components/ui/context-menu";
 import { LinkedText } from "@/components/LinkedText";
 import { MediaLightbox } from "@/components/MediaLightbox";
-import { Archive, Calendar, Download, Pencil, Play, Send, Trash2, X, Check } from "lucide-react";
+import { Archive, Calendar, Copy, Download, Pencil, Play, Send, Tag as TagIcon, Trash2, X, Check, ListChecks } from "lucide-react";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
 import { getContrastColor } from "@/lib/utils";
+import { toast } from "sonner";
 
 const STATUS_KEYS: Record<PostStatus, string> = {
   entrada: "statusEntry",
@@ -62,7 +74,7 @@ export const PostCard = memo(
     showInlineDetails,
     allowEditCaption,
   }: PostCardProps) => {
-    const { tags, updateClientLabel, addComment, updatePost } = usePosts();
+    const { tags, updateClientLabel, addComment, updatePost, addPost, updatePostStatus } = usePosts();
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -88,7 +100,38 @@ export const PostCard = memo(
       .map((tagId) => tags.find((t) => t.id === tagId))
       .filter(Boolean);
 
-    return (
+    const ALL_STATUSES: PostStatus[] = ["entrada", "em_desenvolvimento", "escrevendo_legenda", "pronto", "finalizado", "alteracao_solicitada", "agendado"];
+
+    const handleToggleStatus = (s: PostStatus) => {
+      const next = post.status.includes(s)
+        ? post.status.filter((x) => x !== s)
+        : [...post.status, s];
+      updatePostStatus(post.id, next.length > 0 ? next : [s]);
+    };
+
+    const handleToggleTag = (tagId: string) => {
+      const next = post.tags.includes(tagId)
+        ? post.tags.filter((x) => x !== tagId)
+        : [...post.tags, tagId];
+      updatePost(post.id, { tags: next });
+    };
+
+    const handleDuplicate = async () => {
+      const ok = await addPost({
+        title: `${post.title} (cópia)`,
+        imageUrl: post.imageUrl,
+        mediaType: post.mediaType,
+        mediaUrls: post.mediaUrls,
+        caption: post.caption,
+        status: post.status,
+        tags: post.tags,
+        columnId: post.columnId,
+        deadline: post.deadline ?? undefined,
+      } as any);
+      toast[ok ? "success" : "error"](ok ? "Card duplicado" : "Erro ao duplicar");
+    };
+
+    const cardEl = (
       <Card
         className={`overflow-hidden transition-all duration-150 hover:shadow-md hover:translate-y-[-1px] cursor-pointer group ${
           selectionMode && isSelected ? "ring-2 ring-accent shadow-lg" : ""
@@ -418,6 +461,85 @@ export const PostCard = memo(
           </Drawer>
         )}
       </Card>
+    );
+
+    if (!isAdmin) return cardEl;
+
+    return (
+      <ContextMenu>
+        <ContextMenuTrigger asChild>{cardEl}</ContextMenuTrigger>
+        <ContextMenuContent className="w-56">
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>
+              <ListChecks className="h-4 w-4 mr-2" />
+              Status
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-56">
+              {ALL_STATUSES.map((s) => (
+                <ContextMenuCheckboxItem
+                  key={s}
+                  checked={post.status.includes(s)}
+                  onCheckedChange={() => handleToggleStatus(s)}
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  {t((STATUS_KEYS[s] ?? "statusEntrada") as any)}
+                </ContextMenuCheckboxItem>
+              ))}
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>
+              <TagIcon className="h-4 w-4 mr-2" />
+              Etiquetas
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-56 max-h-72 overflow-y-auto">
+              {tags.length === 0 ? (
+                <ContextMenuItem disabled>Nenhuma etiqueta</ContextMenuItem>
+              ) : (
+                tags.map((tag) => (
+                  <ContextMenuCheckboxItem
+                    key={tag.id}
+                    checked={post.tags.includes(tag.id)}
+                    onCheckedChange={() => handleToggleTag(tag.id)}
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <span
+                      className="inline-block h-2.5 w-2.5 rounded-full mr-2"
+                      style={{ backgroundColor: tag.color }}
+                    />
+                    {TAG_TRANSLATION_KEYS[tag.id] ? t(TAG_TRANSLATION_KEYS[tag.id] as any) : tag.name}
+                  </ContextMenuCheckboxItem>
+                ))
+              )}
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+
+          <ContextMenuSeparator />
+
+          <ContextMenuItem onSelect={handleDuplicate}>
+            <Copy className="h-4 w-4 mr-2" />
+            Copiar card
+          </ContextMenuItem>
+
+          {onArchive && (
+            <ContextMenuItem onSelect={() => onArchive()}>
+              <Archive className="h-4 w-4 mr-2" />
+              Arquivar
+            </ContextMenuItem>
+          )}
+
+          {onDelete && (
+            <>
+              <ContextMenuSeparator />
+              <ContextMenuItem onSelect={() => onDelete()} className="text-destructive focus:text-destructive">
+                <Trash2 className="h-4 w-4 mr-2" />
+                Excluir
+              </ContextMenuItem>
+            </>
+          )}
+        </ContextMenuContent>
+      </ContextMenu>
     );
   },
 );
