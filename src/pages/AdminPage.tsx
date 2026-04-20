@@ -12,6 +12,7 @@ import { ptBR } from "date-fns/locale";
 import { PostCard } from "@/components/PostCard";
 import { PostCardDialog } from "@/components/PostCardDialog";
 import { CreatePostDialog } from "@/components/CreatePostDialog";
+import { QuickAddCard } from "@/components/QuickAddCard";
 import { EditPostDialog } from "@/components/EditPostDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
