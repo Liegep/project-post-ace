@@ -8,12 +8,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+  ContextMenuCheckboxItem,
+} from "@/components/ui/context-menu";
 import { LinkedText } from "@/components/LinkedText";
 import { MediaLightbox } from "@/components/MediaLightbox";
-import { Archive, Calendar, Download, Pencil, Play, Send, Trash2, X, Check } from "lucide-react";
+import { Archive, Calendar, Copy, Download, Pencil, Play, Send, Tag as TagIcon, Trash2, X, Check, ListChecks } from "lucide-react";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
 import { getContrastColor } from "@/lib/utils";
+import { toast } from "sonner";
 
 const STATUS_KEYS: Record<PostStatus, string> = {
   entrada: "statusEntry",
