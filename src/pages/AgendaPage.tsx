@@ -288,19 +288,31 @@ const AgendaPage = () => {
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           </div>
         ) : viewMode === "month" ? (
-          <MonthView
-            currentDate={currentDate}
-            appointmentsByDate={appointmentsByDate}
-            tags={tags}
-            onDayClick={(d) => { setCurrentDate(d); setViewMode("day"); }}
-            onCreateClick={(d) => openCreateForDate(d)}
-          />
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+            <MonthView
+              currentDate={currentDate}
+              appointmentsByDate={appointmentsByDate}
+              tags={tags}
+              onDayClick={(d) => { setCurrentDate(d); setViewMode("day"); }}
+              onCreateClick={(d) => openCreateForDate(d)}
+            />
+          </DndContext>
+        ) : viewMode === "week" ? (
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+            <DayListView
+              dates={eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: 1 }), end: endOfWeek(currentDate, { weekStartsOn: 1 }) })}
+              appointmentsByDate={appointmentsByDate}
+              tags={tags}
+              onToggle={toggleComplete}
+              onCancel={toggleCancelled}
+              onDelete={deleteAppointment}
+              onCreateClick={(d) => openCreateForDate(d)}
+              draggable
+            />
+          </DndContext>
         ) : (
           <DayListView
-            dates={viewMode === "day"
-              ? [currentDate]
-              : eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: 1 }), end: endOfWeek(currentDate, { weekStartsOn: 1 }) })
-            }
+            dates={[currentDate]}
             appointmentsByDate={appointmentsByDate}
             tags={tags}
             onToggle={toggleComplete}
