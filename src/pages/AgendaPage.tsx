@@ -587,9 +587,19 @@ interface DayListViewProps {
   onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
   onCreateClick: (date: Date) => void;
+  draggable?: boolean;
 }
 
-const DayListView = ({ dates, appointmentsByDate, tags, onToggle, onCancel, onDelete, onCreateClick }: DayListViewProps) => {
+const DroppableDay = ({ dateStr, children, enabled }: { dateStr: string; children: React.ReactNode; enabled: boolean }) => {
+  const { setNodeRef, isOver } = useDroppable({ id: dateStr, disabled: !enabled });
+  return (
+    <div ref={enabled ? setNodeRef : undefined} className={cn("rounded-xl transition-shadow", isOver && "ring-2 ring-primary ring-offset-2")}>
+      {children}
+    </div>
+  );
+};
+
+const DayListView = ({ dates, appointmentsByDate, tags, onToggle, onCancel, onDelete, onCreateClick, draggable = false }: DayListViewProps) => {
   return (
     <div className="space-y-4">
       {dates.map(date => {
@@ -598,47 +608,49 @@ const DayListView = ({ dates, appointmentsByDate, tags, onToggle, onCancel, onDe
         const today = isToday(date);
 
         return (
-          <div key={dateStr} className={cn("rounded-xl border transition-colors", today ? "border-accent/50 bg-amber-50/80 dark:bg-amber-950/20" : "bg-white dark:bg-card")}>
-            {/* Day header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b">
-              <div className="flex items-center gap-3">
-                <div className={cn(
-                  "flex flex-col items-center justify-center h-12 w-12 rounded-xl font-bold",
-                  today ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground"
-                )}>
-                  <span className="text-lg leading-none">{format(date, "dd")}</span>
-                  <span className="text-[10px] uppercase leading-none mt-0.5">{format(date, "EEE", { locale: ptBR })}</span>
+          <DroppableDay key={dateStr} dateStr={dateStr} enabled={draggable}>
+            <div className={cn("rounded-xl border transition-colors", today ? "border-accent/50 bg-amber-50/80 dark:bg-amber-950/20" : "bg-white dark:bg-card")}>
+              {/* Day header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b">
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "flex flex-col items-center justify-center h-12 w-12 rounded-xl font-bold",
+                    today ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground"
+                  )}>
+                    <span className="text-lg leading-none">{format(date, "dd")}</span>
+                    <span className="text-[10px] uppercase leading-none mt-0.5">{format(date, "EEE", { locale: ptBR })}</span>
+                  </div>
+                  {today && <Badge className="bg-accent text-accent-foreground text-[10px]">HOJE</Badge>}
+                  {dates.length > 1 && (
+                    <span className="text-sm text-muted-foreground capitalize">{format(date, "EEEE", { locale: ptBR })}</span>
+                  )}
                 </div>
-                {today && <Badge className="bg-accent text-accent-foreground text-[10px]">HOJE</Badge>}
-                {dates.length > 1 && (
-                  <span className="text-sm text-muted-foreground capitalize">{format(date, "EEEE", { locale: ptBR })}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1 text-xs text-muted-foreground hover:text-foreground"
+                  onClick={() => onCreateClick(date)}
+                >
+                  <Plus className="h-3.5 w-3.5" /> Adicionar
+                </Button>
+              </div>
+
+              {/* Appointments */}
+              <div className="p-2">
+                {dayAppointments.length === 0 ? (
+                  <div className="py-8 text-center text-sm text-muted-foreground">
+                    Nenhum compromisso para este dia
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {dayAppointments.map(apt => (
+                      <AppointmentCard key={apt.id} appointment={apt} tags={tags} onToggle={onToggle} onCancel={onCancel} onDelete={onDelete} draggable={draggable} />
+                    ))}
+                  </div>
                 )}
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-1 text-xs text-muted-foreground hover:text-foreground"
-                onClick={() => onCreateClick(date)}
-              >
-                <Plus className="h-3.5 w-3.5" /> Adicionar
-              </Button>
             </div>
-
-            {/* Appointments */}
-            <div className="p-2">
-              {dayAppointments.length === 0 ? (
-                <div className="py-8 text-center text-sm text-muted-foreground">
-                  Nenhum compromisso para este dia
-                </div>
-              ) : (
-                <div className="space-y-1.5">
-                  {dayAppointments.map(apt => (
-                    <AppointmentCard key={apt.id} appointment={apt} tags={tags} onToggle={onToggle} onCancel={onCancel} onDelete={onDelete} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          </DroppableDay>
         );
       })}
     </div>
