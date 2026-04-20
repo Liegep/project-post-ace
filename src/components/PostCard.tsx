@@ -470,8 +470,10 @@ export const PostCard = memo(
                 <ContextMenuCheckboxItem
                   key={s}
                   checked={post.status.includes(s)}
-                  onCheckedChange={() => handleToggleStatus(s)}
-                  onSelect={(e) => e.preventDefault()}
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    handleToggleStatus(s);
+                  }}
                 >
                   {t((STATUS_KEYS[s] ?? "statusEntrada") as any)}
                 </ContextMenuCheckboxItem>
@@ -492,8 +494,10 @@ export const PostCard = memo(
                   <ContextMenuCheckboxItem
                     key={tag.id}
                     checked={post.tags.includes(tag.id)}
-                    onCheckedChange={() => handleToggleTag(tag.id)}
-                    onSelect={(e) => e.preventDefault()}
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      handleToggleTag(tag.id);
+                    }}
                   >
                     <span
                       className="inline-block h-2.5 w-2.5 rounded-full mr-2"
