@@ -122,7 +122,15 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!post || !title) return;
+    e.stopPropagation();
+    if (!post) {
+      console.warn("[EditPostDialog] Submit aborted: no post");
+      return;
+    }
+    if (!title.trim()) {
+      toast({ title: "Título obrigatório", description: "Preencha o título antes de salvar.", variant: "destructive" });
+      return;
+    }
 
     setUploading(true);
     try {
@@ -157,8 +165,15 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         await movePostToColumn(post.id, columnId);
       }
 
-
+      toast({ title: "Alterações salvas" });
       onOpenChange(false);
+    } catch (err: any) {
+      console.error("[EditPostDialog] Save failed:", err);
+      toast({
+        title: "Erro ao salvar",
+        description: err?.message || "Não foi possível salvar as alterações.",
+        variant: "destructive",
+      });
     } finally {
       setUploading(false);
     }
