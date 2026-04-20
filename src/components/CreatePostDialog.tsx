@@ -219,9 +219,20 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
               <TagSelector selectedTagIds={selectedTags} onChange={setSelectedTags} />
             </div>
           </div>
-          <Button type="submit" disabled={uploading} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-            {uploading ? "..." : t("createPost")}
-          </Button>
+          <div className="flex gap-2">
+            <Button type="submit" disabled={uploading} className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
+              {uploading ? "..." : t("createPost")}
+            </Button>
+            <Button
+              type="button"
+              disabled={uploading}
+              variant="outline"
+              onClick={() => submitPost(true)}
+              title="Criar e adicionar outro card nesta coluna"
+            >
+              + Outro
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
