@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, addMonths, subMonths, addWeeks, subWeeks, getDaysInMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { DndContext, DragEndEvent, PointerSensor, TouchSensor, useSensor, useSensors, useDraggable, useDroppable } from "@dnd-kit/core";
+import { toast } from "@/hooks/use-toast";
 
 type RepeatMode = "none" | "daily" | "weekly" | "weekdays" | "custom_days";
 type ViewMode = "day" | "week" | "month";
