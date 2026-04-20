@@ -462,6 +462,85 @@ export const PostCard = memo(
         )}
       </Card>
     );
+
+    if (!isAdmin) return cardEl;
+
+    return (
+      <ContextMenu>
+        <ContextMenuTrigger asChild>{cardEl}</ContextMenuTrigger>
+        <ContextMenuContent className="w-56">
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>
+              <ListChecks className="h-4 w-4 mr-2" />
+              Status
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-56">
+              {ALL_STATUSES.map((s) => (
+                <ContextMenuCheckboxItem
+                  key={s}
+                  checked={post.status.includes(s)}
+                  onCheckedChange={() => handleToggleStatus(s)}
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  {t((STATUS_KEYS[s] ?? "statusEntrada") as any)}
+                </ContextMenuCheckboxItem>
+              ))}
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+
+          <ContextMenuSub>
+            <ContextMenuSubTrigger>
+              <TagIcon className="h-4 w-4 mr-2" />
+              Etiquetas
+            </ContextMenuSubTrigger>
+            <ContextMenuSubContent className="w-56 max-h-72 overflow-y-auto">
+              {tags.length === 0 ? (
+                <ContextMenuItem disabled>Nenhuma etiqueta</ContextMenuItem>
+              ) : (
+                tags.map((tag) => (
+                  <ContextMenuCheckboxItem
+                    key={tag.id}
+                    checked={post.tags.includes(tag.id)}
+                    onCheckedChange={() => handleToggleTag(tag.id)}
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <span
+                      className="inline-block h-2.5 w-2.5 rounded-full mr-2"
+                      style={{ backgroundColor: tag.color }}
+                    />
+                    {TAG_TRANSLATION_KEYS[tag.id] ? t(TAG_TRANSLATION_KEYS[tag.id] as any) : tag.name}
+                  </ContextMenuCheckboxItem>
+                ))
+              )}
+            </ContextMenuSubContent>
+          </ContextMenuSub>
+
+          <ContextMenuSeparator />
+
+          <ContextMenuItem onSelect={handleDuplicate}>
+            <Copy className="h-4 w-4 mr-2" />
+            Copiar card
+          </ContextMenuItem>
+
+          {onArchive && (
+            <ContextMenuItem onSelect={() => onArchive()}>
+              <Archive className="h-4 w-4 mr-2" />
+              Arquivar
+            </ContextMenuItem>
+          )}
+
+          {onDelete && (
+            <>
+              <ContextMenuSeparator />
+              <ContextMenuItem onSelect={() => onDelete()} className="text-destructive focus:text-destructive">
+                <Trash2 className="h-4 w-4 mr-2" />
+                Excluir
+              </ContextMenuItem>
+            </>
+          )}
+        </ContextMenuContent>
+      </ContextMenu>
+    );
   },
 );
 
