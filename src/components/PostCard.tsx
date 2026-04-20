@@ -470,8 +470,10 @@ export const PostCard = memo(
                 <ContextMenuCheckboxItem
                   key={s}
                   checked={post.status.includes(s)}
-                  onCheckedChange={() => handleToggleStatus(s)}
-                  onSelect={(e) => e.preventDefault()}
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    handleToggleStatus(s);
+                  }}
                 >
                   {t((STATUS_KEYS[s] ?? "statusEntrada") as any)}
                 </ContextMenuCheckboxItem>
