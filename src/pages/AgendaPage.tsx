@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isBefore, addMonths, subMonths, addWeeks, subWeeks, getDaysInMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { DndContext, DragEndEvent, PointerSensor, TouchSensor, useSensor, useSensors, useDraggable, useDroppable } from "@dnd-kit/core";
+import { toast } from "@/hooks/use-toast";
 
 type RepeatMode = "none" | "daily" | "weekly" | "weekdays" | "custom_days";
 type ViewMode = "day" | "week" | "month";
@@ -38,7 +40,22 @@ const getCategoryStyle = (cat: string) => CATEGORY_COLORS[cat.toLowerCase()] || 
 const AgendaPage = () => {
   const navigate = useNavigate();
   const { t } = useI18n();
-  const { appointments, tags, loading, createAppointment, createBatch, toggleComplete, toggleCancelled, deleteAppointment, createTag, deleteTag } = useAppointments();
+  const { appointments, tags, loading, createAppointment, createBatch, toggleComplete, toggleCancelled, deleteAppointment, updateAppointment, createTag, deleteTag } = useAppointments();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+    const appointmentId = String(active.id);
+    const newDate = String(over.id);
+    const apt = appointments.find(a => a.id === appointmentId);
+    if (!apt || apt.appointmentDate === newDate) return;
+    await updateAppointment(appointmentId, { appointmentDate: newDate });
+  };
 
   const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -271,19 +288,31 @@ const AgendaPage = () => {
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           </div>
         ) : viewMode === "month" ? (
-          <MonthView
-            currentDate={currentDate}
-            appointmentsByDate={appointmentsByDate}
-            tags={tags}
-            onDayClick={(d) => { setCurrentDate(d); setViewMode("day"); }}
-            onCreateClick={(d) => openCreateForDate(d)}
-          />
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+            <MonthView
+              currentDate={currentDate}
+              appointmentsByDate={appointmentsByDate}
+              tags={tags}
+              onDayClick={(d) => { setCurrentDate(d); setViewMode("day"); }}
+              onCreateClick={(d) => openCreateForDate(d)}
+            />
+          </DndContext>
+        ) : viewMode === "week" ? (
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+            <DayListView
+              dates={eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: 1 }), end: endOfWeek(currentDate, { weekStartsOn: 1 }) })}
+              appointmentsByDate={appointmentsByDate}
+              tags={tags}
+              onToggle={toggleComplete}
+              onCancel={toggleCancelled}
+              onDelete={deleteAppointment}
+              onCreateClick={(d) => openCreateForDate(d)}
+              draggable
+            />
+          </DndContext>
         ) : (
           <DayListView
-            dates={viewMode === "day"
-              ? [currentDate]
-              : eachDayOfInterval({ start: startOfWeek(currentDate, { weekStartsOn: 1 }), end: endOfWeek(currentDate, { weekStartsOn: 1 }) })
-            }
+            dates={[currentDate]}
             appointmentsByDate={appointmentsByDate}
             tags={tags}
             onToggle={toggleComplete}
@@ -558,9 +587,19 @@ interface DayListViewProps {
   onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
   onCreateClick: (date: Date) => void;
+  draggable?: boolean;
 }
 
-const DayListView = ({ dates, appointmentsByDate, tags, onToggle, onCancel, onDelete, onCreateClick }: DayListViewProps) => {
+const DroppableDay = ({ dateStr, children, enabled }: { dateStr: string; children: React.ReactNode; enabled: boolean }) => {
+  const { setNodeRef, isOver } = useDroppable({ id: dateStr, disabled: !enabled });
+  return (
+    <div ref={enabled ? setNodeRef : undefined} className={cn("rounded-xl transition-shadow", isOver && "ring-2 ring-primary ring-offset-2")}>
+      {children}
+    </div>
+  );
+};
+
+const DayListView = ({ dates, appointmentsByDate, tags, onToggle, onCancel, onDelete, onCreateClick, draggable = false }: DayListViewProps) => {
   return (
     <div className="space-y-4">
       {dates.map(date => {
@@ -569,47 +608,49 @@ const DayListView = ({ dates, appointmentsByDate, tags, onToggle, onCancel, onDe
         const today = isToday(date);
 
         return (
-          <div key={dateStr} className={cn("rounded-xl border transition-colors", today ? "border-accent/50 bg-amber-50/80 dark:bg-amber-950/20" : "bg-white dark:bg-card")}>
-            {/* Day header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b">
-              <div className="flex items-center gap-3">
-                <div className={cn(
-                  "flex flex-col items-center justify-center h-12 w-12 rounded-xl font-bold",
-                  today ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground"
-                )}>
-                  <span className="text-lg leading-none">{format(date, "dd")}</span>
-                  <span className="text-[10px] uppercase leading-none mt-0.5">{format(date, "EEE", { locale: ptBR })}</span>
+          <DroppableDay key={dateStr} dateStr={dateStr} enabled={draggable}>
+            <div className={cn("rounded-xl border transition-colors", today ? "border-accent/50 bg-amber-50/80 dark:bg-amber-950/20" : "bg-white dark:bg-card")}>
+              {/* Day header */}
+              <div className="flex items-center justify-between px-4 py-3 border-b">
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "flex flex-col items-center justify-center h-12 w-12 rounded-xl font-bold",
+                    today ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground"
+                  )}>
+                    <span className="text-lg leading-none">{format(date, "dd")}</span>
+                    <span className="text-[10px] uppercase leading-none mt-0.5">{format(date, "EEE", { locale: ptBR })}</span>
+                  </div>
+                  {today && <Badge className="bg-accent text-accent-foreground text-[10px]">HOJE</Badge>}
+                  {dates.length > 1 && (
+                    <span className="text-sm text-muted-foreground capitalize">{format(date, "EEEE", { locale: ptBR })}</span>
+                  )}
                 </div>
-                {today && <Badge className="bg-accent text-accent-foreground text-[10px]">HOJE</Badge>}
-                {dates.length > 1 && (
-                  <span className="text-sm text-muted-foreground capitalize">{format(date, "EEEE", { locale: ptBR })}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1 text-xs text-muted-foreground hover:text-foreground"
+                  onClick={() => onCreateClick(date)}
+                >
+                  <Plus className="h-3.5 w-3.5" /> Adicionar
+                </Button>
+              </div>
+
+              {/* Appointments */}
+              <div className="p-2">
+                {dayAppointments.length === 0 ? (
+                  <div className="py-8 text-center text-sm text-muted-foreground">
+                    Nenhum compromisso para este dia
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {dayAppointments.map(apt => (
+                      <AppointmentCard key={apt.id} appointment={apt} tags={tags} onToggle={onToggle} onCancel={onCancel} onDelete={onDelete} draggable={draggable} />
+                    ))}
+                  </div>
                 )}
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-1 text-xs text-muted-foreground hover:text-foreground"
-                onClick={() => onCreateClick(date)}
-              >
-                <Plus className="h-3.5 w-3.5" /> Adicionar
-              </Button>
             </div>
-
-            {/* Appointments */}
-            <div className="p-2">
-              {dayAppointments.length === 0 ? (
-                <div className="py-8 text-center text-sm text-muted-foreground">
-                  Nenhum compromisso para este dia
-                </div>
-              ) : (
-                <div className="space-y-1.5">
-                  {dayAppointments.map(apt => (
-                    <AppointmentCard key={apt.id} appointment={apt} tags={tags} onToggle={onToggle} onCancel={onCancel} onDelete={onDelete} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          </DroppableDay>
         );
       })}
     </div>
@@ -618,13 +659,15 @@ const DayListView = ({ dates, appointmentsByDate, tags, onToggle, onCancel, onDe
 
 // ── Appointment Card ────────────────────────────────────────────────────────────
 
-const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete }: {
+const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete, draggable = false }: {
   appointment: Appointment;
   tags: AppointmentTag[];
   onToggle: (id: string, completed: boolean) => void;
   onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
+  draggable?: boolean;
 }) => {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: apt.id, disabled: !draggable });
   const [detailOpen, setDetailOpen] = useState(false);
   const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
   const now = new Date();
@@ -652,9 +695,14 @@ const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete 
   return (
     <>
       <div
+        ref={draggable ? setNodeRef : undefined}
+        {...(draggable ? attributes : {})}
+        {...(draggable ? listeners : {})}
         onClick={() => setDetailOpen(true)}
         className={cn(
-          "group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-all cursor-pointer",
+          "group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-all",
+          draggable ? "cursor-grab active:cursor-grabbing" : "cursor-pointer",
+          isDragging && "opacity-50",
           rowBg
         )}
         style={tagStyle}
@@ -873,67 +921,105 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreate
           const completedCount = dayApts.filter(a => a.completed).length;
 
           return (
-            <div
+            <MonthDayCell
               key={i}
-              onClick={() => onDayClick(day)}
-              className={cn(
-                "min-h-[90px] border-b border-r p-1.5 cursor-pointer transition-colors hover:bg-muted/30",
-                !isCurrentMonth && "opacity-40"
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <span className={cn(
-                  "flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium",
-                  today ? "bg-accent text-accent-foreground font-bold" : "text-foreground"
-                )}>
-                  {format(day, "d")}
-                </span>
-                {dayApts.length > 0 && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onCreateClick(day); }}
-                    className="rounded-full p-0.5 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
-                  >
-                    <Plus className="h-3 w-3" />
-                  </button>
-                )}
-              </div>
-              {dayApts.length > 0 && (
-                <div className="mt-1 space-y-0.5">
-                  {dayApts.slice(0, 3).map(apt => {
-                    const isLastPost = apt.category.toLowerCase() === "último post";
-                    const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
-                    const useTagColor = !apt.completed && !apt.cancelled && !isLastPost && aptTag;
-                    return (
-                      <div
-                        key={apt.id}
-                        className={cn(
-                          "rounded px-1.5 py-0.5 text-[10px] font-medium truncate",
-                          apt.completed
-                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 line-through"
-                            : apt.cancelled
-                              ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 line-through"
-                              : isLastPost
-                                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                                : useTagColor
-                                  ? ""
-                                  : getCategoryStyle(apt.category)
-                        )}
-                        style={useTagColor ? { backgroundColor: aptTag!.color + "25", color: aptTag!.color } : undefined}
-                      >
-                        <span className="font-mono mr-1">{apt.appointmentTime}</span>
-                        {apt.title}
-                      </div>
-                    );
-                  })}
-                  {dayApts.length > 3 && (
-                    <div className="text-[10px] text-muted-foreground pl-1">+{dayApts.length - 3} mais</div>
-                  )}
-                </div>
-              )}
-            </div>
+              day={day}
+              dateStr={dateStr}
+              dayApts={dayApts}
+              tags={tags}
+              isCurrentMonth={isCurrentMonth}
+              today={today}
+              onDayClick={onDayClick}
+              onCreateClick={onCreateClick}
+            />
           );
         })}
       </div>
+    </div>
+  );
+};
+
+// ── Month Day Cell (droppable) ──────────────────────────────────────────────────
+
+const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDayClick, onCreateClick }: {
+  day: Date;
+  dateStr: string;
+  dayApts: Appointment[];
+  tags: AppointmentTag[];
+  isCurrentMonth: boolean;
+  today: boolean;
+  onDayClick: (date: Date) => void;
+  onCreateClick: (date: Date) => void;
+}) => {
+  const { setNodeRef, isOver } = useDroppable({ id: dateStr });
+  return (
+    <div
+      ref={setNodeRef}
+      onClick={() => onDayClick(day)}
+      className={cn(
+        "min-h-[90px] border-b border-r p-1.5 cursor-pointer transition-colors hover:bg-muted/30",
+        !isCurrentMonth && "opacity-40",
+        isOver && "ring-2 ring-inset ring-primary bg-primary/5"
+      )}
+    >
+      <div className="flex items-center justify-between">
+        <span className={cn(
+          "flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium",
+          today ? "bg-accent text-accent-foreground font-bold" : "text-foreground"
+        )}>
+          {format(day, "d")}
+        </span>
+        {dayApts.length > 0 && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onCreateClick(day); }}
+            className="rounded-full p-0.5 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
+          >
+            <Plus className="h-3 w-3" />
+          </button>
+        )}
+      </div>
+      {dayApts.length > 0 && (
+        <div className="mt-1 space-y-0.5">
+          {dayApts.slice(0, 3).map(apt => (
+            <MonthApt key={apt.id} apt={apt} tags={tags} />
+          ))}
+          {dayApts.length > 3 && (
+            <div className="text-[10px] text-muted-foreground pl-1">+{dayApts.length - 3} mais</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MonthApt = ({ apt, tags }: { apt: Appointment; tags: AppointmentTag[] }) => {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: apt.id });
+  const isLastPost = apt.category.toLowerCase() === "último post";
+  const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
+  const useTagColor = !apt.completed && !apt.cancelled && !isLastPost && aptTag;
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      onClick={(e) => e.stopPropagation()}
+      className={cn(
+        "rounded px-1.5 py-0.5 text-[10px] font-medium truncate cursor-grab active:cursor-grabbing",
+        isDragging && "opacity-50",
+        apt.completed
+          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 line-through"
+          : apt.cancelled
+            ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 line-through"
+            : isLastPost
+              ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+              : useTagColor
+                ? ""
+                : getCategoryStyle(apt.category)
+      )}
+      style={useTagColor ? { backgroundColor: aptTag!.color + "25", color: aptTag!.color } : undefined}
+    >
+      <span className="font-mono mr-1">{apt.appointmentTime}</span>
+      {apt.title}
     </div>
   );
 };
