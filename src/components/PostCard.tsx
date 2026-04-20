@@ -174,15 +174,6 @@ export const PostCard = memo(
                   <Download className="h-3.5 w-3.5" />
                 </button>
               )}
-              {onArchive && (
-                <button
-                  className="text-muted-foreground hover:text-amber-500 transition-colors"
-                  onClick={(e) => { e.stopPropagation(); onArchive(); }}
-                  title="Arquivar"
-                >
-                  <Archive className="h-3.5 w-3.5" />
-                </button>
-              )}
               {onDelete && (
                 <button
                   className="text-muted-foreground hover:text-destructive transition-colors"
