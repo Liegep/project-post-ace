@@ -659,13 +659,15 @@ const DayListView = ({ dates, appointmentsByDate, tags, onToggle, onCancel, onDe
 
 // ── Appointment Card ────────────────────────────────────────────────────────────
 
-const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete }: {
+const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete, draggable = false }: {
   appointment: Appointment;
   tags: AppointmentTag[];
   onToggle: (id: string, completed: boolean) => void;
   onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
+  draggable?: boolean;
 }) => {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: apt.id, disabled: !draggable });
   const [detailOpen, setDetailOpen] = useState(false);
   const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
   const now = new Date();
