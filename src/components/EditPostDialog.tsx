@@ -21,6 +21,7 @@ import { SortableMediaGrid, SortableMediaItem } from "@/components/SortableMedia
 import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
 import { InternalApprovalDialog } from "@/components/InternalApprovalDialog";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import { createPostDeadlineFromInput, formatPostDeadlineInput } from "@/lib/postDeadline";
 
 const STATUS_KEYS: Record<PostStatus, string> = {
