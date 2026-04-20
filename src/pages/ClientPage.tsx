@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import ClientBriefs from "@/components/ClientBriefs";
 import { ClientInvoicesPanel } from "@/components/billing/ClientInvoicesPanel";
 import ClientDesignBriefs from "@/components/briefs/ClientDesignBriefs";
+import ClientBriefAssignments from "@/components/briefs/ClientBriefAssignments";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
