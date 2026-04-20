@@ -128,7 +128,7 @@ export default function TemplateEditor({ open, onOpenChange, template, onSave }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto backdrop-blur-2xl border-border bg-[sidebar-primary-foreground] bg-primary-foreground">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto backdrop-blur-2xl border-border bg-[sidebar-accent-foreground] bg-zinc-700">
         <DialogHeader>
           <DialogTitle>{template ? "Editar template" : "Novo template"}</DialogTitle>
         </DialogHeader>
