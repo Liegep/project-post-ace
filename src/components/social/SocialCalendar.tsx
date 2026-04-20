@@ -200,7 +200,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                           className={`w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate flex items-center gap-1 transition-colors ${
                             isSelected
                               ? "bg-primary/15 ring-1 ring-primary text-primary"
-                              : "bg-accent/50 border border-accent hover:bg-accent/70"
+                              : "border border-accent bg-blue-500"
                           } cursor-pointer`}
                         >
                           <FileText className="h-2.5 w-2.5 text-primary shrink-0" />
