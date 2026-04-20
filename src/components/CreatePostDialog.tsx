@@ -134,12 +134,21 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
       setCaption("");
       setDeadline("");
       setStatus(["entrada"]);
-      setColumnId(null);
       setSelectedTags([]);
-      handleOpenChange(false);
+      if (createAnother) {
+        setColumnId(keepColumnId);
+      } else {
+        setColumnId(null);
+        handleOpenChange(false);
+      }
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    submitPost(false);
   };
 
   return (
