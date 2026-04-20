@@ -244,46 +244,59 @@ export default function DesignBriefsPage() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-foreground">Briefs de Design</h2>
-                <p className="text-sm text-muted-foreground">Selecione a categoria de briefing</p>
+                <p className="text-sm text-muted-foreground">Categorias fixas ou seus próprios templates</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {briefTemplates.map(t => {
-                const Icon = categoryIcons[t.id] || FileText;
-                const count = briefCounts[t.id] || 0;
-                return (
-                  <button
-                    key={t.id}
-                    onClick={() => openCategory(t.id)}
-                    className="group relative text-left rounded-2xl border border-white/20 bg-white/55 dark:bg-white/5 backdrop-blur-xl shadow-md hover:shadow-xl hover:border-[hsl(var(--gradient-mid))/0.4] transition-all duration-300 p-6 flex flex-col gap-3"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[hsl(var(--gradient-start))] to-[hsl(var(--gradient-end))] flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Icon className="h-5 w-5 text-white" />
-                      </div>
-                      {count > 0 && (
-                        <Badge variant="secondary" className="text-[10px]">
-                          {count} {count === 1 ? "brief" : "briefs"}
-                        </Badge>
-                      )}
-                      {t.isBase && count > 0 && (
-                        <Badge className="text-[10px] bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30">
-                          Preenchido
-                        </Badge>
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground mb-1">{t.name}</h3>
-                      <p className="text-xs text-muted-foreground line-clamp-2">{t.description}</p>
-                    </div>
-                    {t.isBase && (
-                      <span className="text-[10px] text-primary/70 font-medium">Base do cliente • Preencha uma vez</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            <Tabs defaultValue="categories" className="w-full">
+              <TabsList>
+                <TabsTrigger value="categories">Categorias</TabsTrigger>
+                <TabsTrigger value="templates">Meus Templates</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="categories" className="mt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {briefTemplates.map(t => {
+                    const Icon = categoryIcons[t.id] || FileText;
+                    const count = briefCounts[t.id] || 0;
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => openCategory(t.id)}
+                        className="group relative text-left rounded-2xl border border-white/20 bg-white/55 dark:bg-white/5 backdrop-blur-xl shadow-md hover:shadow-xl hover:border-[hsl(var(--gradient-mid))/0.4] transition-all duration-300 p-6 flex flex-col gap-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[hsl(var(--gradient-start))] to-[hsl(var(--gradient-end))] flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <Icon className="h-5 w-5 text-white" />
+                          </div>
+                          {count > 0 && (
+                            <Badge variant="secondary" className="text-[10px]">
+                              {count} {count === 1 ? "brief" : "briefs"}
+                            </Badge>
+                          )}
+                          {t.isBase && count > 0 && (
+                            <Badge className="text-[10px] bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30">
+                              Preenchido
+                            </Badge>
+                          )}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-foreground mb-1">{t.name}</h3>
+                          <p className="text-xs text-muted-foreground line-clamp-2">{t.description}</p>
+                        </div>
+                        {t.isBase && (
+                          <span className="text-[10px] text-primary/70 font-medium">Base do cliente • Preencha uma vez</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="templates" className="mt-4">
+                <TemplatesManager />
+              </TabsContent>
+            </Tabs>
           </div>
         )}
 
