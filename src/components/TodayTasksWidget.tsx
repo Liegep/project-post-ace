@@ -84,6 +84,9 @@ export const TodayTasksWidget = () => {
     (posts || []).forEach((p: any) => {
       const client = clientMap[p.client_id];
       if (!client) return;
+      const statusArr = Array.isArray(p.status) ? p.status : [p.status];
+      // Skip already published posts
+      if (statusArr.includes("publicado")) return;
       allTasks.push({
         id: p.id,
         title: p.title,
@@ -93,7 +96,7 @@ export const TodayTasksWidget = () => {
         type: "post",
         deadline: p.deadline,
         urgency: getDeadlineUrgency(p.deadline),
-        status: Array.isArray(p.status) ? p.status.join(", ") : p.status,
+        status: statusArr.join(", "),
       });
     });
 
