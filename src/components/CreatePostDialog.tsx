@@ -84,9 +84,9 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitPost = async (createAnother: boolean) => {
     if (!title) return;
+    const keepColumnId = columnId;
 
     setUploading(true);
     try {
