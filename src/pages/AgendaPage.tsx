@@ -40,7 +40,25 @@ const getCategoryStyle = (cat: string) => CATEGORY_COLORS[cat.toLowerCase()] || 
 const AgendaPage = () => {
   const navigate = useNavigate();
   const { t } = useI18n();
-  const { appointments, tags, loading, createAppointment, createBatch, toggleComplete, toggleCancelled, deleteAppointment, createTag, deleteTag } = useAppointments();
+  const { appointments, tags, loading, createAppointment, createBatch, toggleComplete, toggleCancelled, deleteAppointment, updateAppointment, createTag, deleteTag } = useAppointments();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+    const appointmentId = String(active.id);
+    const newDate = String(over.id);
+    const apt = appointments.find(a => a.id === appointmentId);
+    if (!apt || apt.appointmentDate === newDate) return;
+    const ok = await updateAppointment(appointmentId, { appointmentDate: newDate });
+    if (ok === false) {
+      toast({ title: "Erro ao reagendar", description: "Não foi possível atualizar a data.", variant: "destructive" });
+    }
+  };
 
   const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [currentDate, setCurrentDate] = useState(new Date());
