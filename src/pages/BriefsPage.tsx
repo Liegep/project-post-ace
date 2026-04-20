@@ -680,7 +680,7 @@ const BriefsPage = () => {
             </div>
 
             <div className="flex gap-2 justify-end pt-2">
-              <Button variant="outline" onClick={() => { setDialogOpen(false); resetForm(); }}>Cancelar</Button>
+              <Button variant="outline" onClick={() => { setDialogOpen(false); resetForm(); }} className="bg-zinc-50 hover:bg-zinc-50">Cancelar</Button>
               <Button onClick={handleSave}>{editingBrief ? "Salvar" : "Criar Pauta"}</Button>
             </div>
           </div>
