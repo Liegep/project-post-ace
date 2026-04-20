@@ -226,11 +226,11 @@ const IdeasPage = () => {
           </Button>
           <h1 className="text-base md:text-xl font-bold text-foreground truncate">💡 Ideias de Pauta</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-primary-foreground">
           {/* Add column button in header */}
           <Popover open={addingCol} onOpenChange={setAddingCol}>
             <PopoverTrigger asChild>
-              <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-yellow-950 h-8 text-xs gap-1">
+              <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-primary-foreground h-8 text-xs gap-1">
                 <Plus className="h-3.5 w-3.5" /> Nova coluna
               </Button>
             </PopoverTrigger>
