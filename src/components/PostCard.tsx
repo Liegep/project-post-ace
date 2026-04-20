@@ -100,7 +100,38 @@ export const PostCard = memo(
       .map((tagId) => tags.find((t) => t.id === tagId))
       .filter(Boolean);
 
-    return (
+    const ALL_STATUSES: PostStatus[] = ["entrada", "em_desenvolvimento", "escrevendo_legenda", "pronto", "finalizado", "alteracao_solicitada", "agendado"];
+
+    const handleToggleStatus = (s: PostStatus) => {
+      const next = post.status.includes(s)
+        ? post.status.filter((x) => x !== s)
+        : [...post.status, s];
+      updatePostStatus(post.id, next.length > 0 ? next : [s]);
+    };
+
+    const handleToggleTag = (tagId: string) => {
+      const next = post.tags.includes(tagId)
+        ? post.tags.filter((x) => x !== tagId)
+        : [...post.tags, tagId];
+      updatePost(post.id, { tags: next });
+    };
+
+    const handleDuplicate = async () => {
+      const ok = await addPost({
+        title: `${post.title} (cópia)`,
+        imageUrl: post.imageUrl,
+        mediaType: post.mediaType,
+        mediaUrls: post.mediaUrls,
+        caption: post.caption,
+        status: post.status,
+        tags: post.tags,
+        columnId: post.columnId,
+        deadline: post.deadline ?? undefined,
+      } as any);
+      toast[ok ? "success" : "error"](ok ? "Card duplicado" : "Erro ao duplicar");
+    };
+
+    const cardEl = (
       <Card
         className={`overflow-hidden transition-all duration-150 hover:shadow-md hover:translate-y-[-1px] cursor-pointer group ${
           selectionMode && isSelected ? "ring-2 ring-accent shadow-lg" : ""
