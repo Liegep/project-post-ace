@@ -328,6 +328,7 @@ const KanbanBoard = ({
                     {columnPosts.length === 0 && (
                       <p className="py-8 text-center text-sm text-muted-foreground">{t("noPosts")}</p>
                     )}
+                    <QuickAddCard columnId={col.id} />
                   </DroppableColumn>
                 </SortableContext>
               </SortableColumn>
