@@ -33,6 +33,7 @@ export const QuickAddCard = ({ columnId }: QuickAddCardProps) => {
         tags: [],
         columnId,
         clientCreated: false,
+        deadline: undefined,
       });
       if (ok) {
         setTitle("");
