@@ -921,64 +921,17 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreate
           const completedCount = dayApts.filter(a => a.completed).length;
 
           return (
-            <div
+            <MonthDayCell
               key={i}
-              onClick={() => onDayClick(day)}
-              className={cn(
-                "min-h-[90px] border-b border-r p-1.5 cursor-pointer transition-colors hover:bg-muted/30",
-                !isCurrentMonth && "opacity-40"
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <span className={cn(
-                  "flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium",
-                  today ? "bg-accent text-accent-foreground font-bold" : "text-foreground"
-                )}>
-                  {format(day, "d")}
-                </span>
-                {dayApts.length > 0 && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onCreateClick(day); }}
-                    className="rounded-full p-0.5 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100"
-                  >
-                    <Plus className="h-3 w-3" />
-                  </button>
-                )}
-              </div>
-              {dayApts.length > 0 && (
-                <div className="mt-1 space-y-0.5">
-                  {dayApts.slice(0, 3).map(apt => {
-                    const isLastPost = apt.category.toLowerCase() === "último post";
-                    const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
-                    const useTagColor = !apt.completed && !apt.cancelled && !isLastPost && aptTag;
-                    return (
-                      <div
-                        key={apt.id}
-                        className={cn(
-                          "rounded px-1.5 py-0.5 text-[10px] font-medium truncate",
-                          apt.completed
-                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 line-through"
-                            : apt.cancelled
-                              ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 line-through"
-                              : isLastPost
-                                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                                : useTagColor
-                                  ? ""
-                                  : getCategoryStyle(apt.category)
-                        )}
-                        style={useTagColor ? { backgroundColor: aptTag!.color + "25", color: aptTag!.color } : undefined}
-                      >
-                        <span className="font-mono mr-1">{apt.appointmentTime}</span>
-                        {apt.title}
-                      </div>
-                    );
-                  })}
-                  {dayApts.length > 3 && (
-                    <div className="text-[10px] text-muted-foreground pl-1">+{dayApts.length - 3} mais</div>
-                  )}
-                </div>
-              )}
-            </div>
+              day={day}
+              dateStr={dateStr}
+              dayApts={dayApts}
+              tags={tags}
+              isCurrentMonth={isCurrentMonth}
+              today={today}
+              onDayClick={onDayClick}
+              onCreateClick={onCreateClick}
+            />
           );
         })}
       </div>
