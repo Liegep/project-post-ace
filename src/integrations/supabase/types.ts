@@ -398,6 +398,57 @@ export type Database = {
           },
         ]
       }
+      brief_assignments: {
+        Row: {
+          assigned_by: string
+          client_id: string
+          created_at: string
+          due_date: string | null
+          id: string
+          status: string
+          template_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_by: string
+          client_id: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          status?: string
+          template_id: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_by?: string
+          client_id?: string
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          status?: string
+          template_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brief_assignments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brief_assignments_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "brief_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brief_attachments: {
         Row: {
           brief_id: string
@@ -470,6 +521,103 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      brief_responses: {
+        Row: {
+          answers: Json
+          assignment_id: string
+          client_id: string
+          created_at: string
+          id: string
+          submitted_at: string | null
+          submitted_by: string | null
+          template_id: string
+          updated_at: string
+        }
+        Insert: {
+          answers?: Json
+          assignment_id: string
+          client_id: string
+          created_at?: string
+          id?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
+          template_id: string
+          updated_at?: string
+        }
+        Update: {
+          answers?: Json
+          assignment_id?: string
+          client_id?: string
+          created_at?: string
+          id?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
+          template_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brief_responses_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: true
+            referencedRelation: "brief_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brief_responses_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brief_responses_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "brief_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brief_templates: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          description: string
+          id: string
+          locale: string
+          name: string
+          questions: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          locale?: string
+          name?: string
+          questions?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          locale?: string
+          name?: string
+          questions?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       calendar_posts: {
         Row: {
