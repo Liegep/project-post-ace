@@ -695,9 +695,14 @@ const AppointmentCard = ({ appointment: apt, tags, onToggle, onCancel, onDelete,
   return (
     <>
       <div
+        ref={draggable ? setNodeRef : undefined}
+        {...(draggable ? attributes : {})}
+        {...(draggable ? listeners : {})}
         onClick={() => setDetailOpen(true)}
         className={cn(
-          "group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-all cursor-pointer",
+          "group flex items-start gap-3 rounded-lg px-3 py-2.5 transition-all",
+          draggable ? "cursor-grab active:cursor-grabbing" : "cursor-pointer",
+          isDragging && "opacity-50",
           rowBg
         )}
         style={tagStyle}
