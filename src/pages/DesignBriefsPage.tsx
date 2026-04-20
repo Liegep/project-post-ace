@@ -20,6 +20,8 @@ import { briefTemplates, getTemplate } from "@/lib/briefTemplates";
 import BriefForm from "@/components/briefs/BriefForm";
 import BriefDetailDialog from "@/components/briefs/BriefDetailDialog";
 import { downloadBriefPdf } from "@/lib/briefPdf";
+import TemplatesManager from "@/components/briefs/TemplatesManager";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { LucideIcon } from "lucide-react";
 
 interface DesignBrief {
