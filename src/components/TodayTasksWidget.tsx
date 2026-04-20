@@ -232,13 +232,32 @@ export const TodayTasksWidget = () => {
   const handleMarkPublished = async (task: TaskItem, e: React.MouseEvent) => {
     e.stopPropagation();
     const now = new Date().toISOString();
-    if (task.type === "post") {
-      await supabase.from("posts").update({ published_at: now, status: ["publicado"] }).eq("id", task.id);
-    } else if (task.type === "calendar_post") {
-      await supabase.from("calendar_posts").update({ status: "published" as any }).eq("id", task.id);
+    try {
+      if (task.type === "post") {
+        const { error } = await supabase
+          .from("posts")
+          .update({ published_at: now, status: ["publicado"] })
+          .eq("id", task.id);
+        if (error) throw error;
+      } else if (task.type === "calendar_post") {
+        const { error } = await supabase
+          .from("calendar_posts")
+          .update({ status: "published" as any })
+          .eq("id", task.id);
+        if (error) throw error;
+      }
+      toast({ title: "Post marcado como publicado!" });
+      // Optimistically remove the task from the list
+      setTasks((prev) => prev.filter((t) => !(t.id === task.id && t.type === task.type)));
+      fetchTasks();
+    } catch (err: any) {
+      console.error("[TodayTasksWidget] mark published failed:", err);
+      toast({
+        title: "Erro ao marcar como publicado",
+        description: err?.message || "Verifique suas permissões.",
+        variant: "destructive",
+      });
     }
-    toast({ title: "Post marcado como publicado!" });
-    fetchTasks();
   };
 
   if (loading || tasks.length === 0) return null;
