@@ -204,8 +204,8 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                           } cursor-pointer`}
                         >
                           <FileText className="h-2.5 w-2.5 text-primary shrink-0" />
-                          <span className="truncate font-medium">{p.title}</span>
-                          <span className="text-muted-foreground shrink-0">· {p.client_name}</span>
+                          <span className="truncate text-primary-foreground font-bold">{p.title}</span>
+                          <span className="shrink-0 text-primary-foreground">· {p.client_name}</span>
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="right" align="start" className="w-56 p-2 space-y-2">
