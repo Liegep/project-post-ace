@@ -318,7 +318,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
           <Button size="sm" variant="outline" onClick={() => setEditingInvoice(!editingInvoice)} className="border-white/30 hover:bg-white/10 text-black">
             <Pencil className="h-3.5 w-3.5 mr-1" /> Editar
           </Button>
-          <Button size="sm" variant="outline" onClick={handleDownloadPDF} className="border-white/30 text-white hover:bg-white/10 hover:text-white">
+          <Button size="sm" variant="outline" onClick={handleDownloadPDF} className="border-white/30 hover:bg-white/10 text-black">
             <Download className="h-3.5 w-3.5 mr-1" /> Baixar PDF
           </Button>
           <Button size="sm" variant="destructive" onClick={handleDeleteInvoice}>
@@ -440,10 +440,10 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
                   </div>
                   <div className="flex gap-1 shrink-0 lg:justify-end">
                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => handleEditItem(item)}>
-                      <Pencil className="h-3.5 w-3.5" />
+                      <Pencil className="h-3.5 w-3.5 text-primary-foreground" />
                     </Button>
                     <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => handleDeleteItem(item.id)}>
-                      <Trash2 className="h-3.5 w-3.5" />
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
                     </Button>
                   </div>
                 </div>
