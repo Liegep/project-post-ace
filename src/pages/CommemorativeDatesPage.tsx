@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useCommemorativeDates, CATEGORY_LABELS, CommemorativeDate } from "@/hooks/useCommemorativeDates";
+import { useNagerHolidays, getCountryColor } from "@/hooks/useNagerHolidays";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,6 +55,32 @@ export default function CommemorativeDatesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filterMonth, setFilterMonth] = useState("all");
   const [briefDate, setBriefDate] = useState<CommemorativeDate | null>(null);
+
+  // Nager.Date public holidays integration
+  const currentYear = new Date().getFullYear();
+  const [nagerYear, setNagerYear] = useState<number>(currentYear);
+  const { countryCode, setCountryCode, holidays, countries: nagerCountries, loading: nagerLoading } =
+    useNagerHolidays(nagerYear);
+
+  // Convert Nager holidays into the same shape so the existing UI renders them
+  const nagerAsCommemorative: CommemorativeDate[] = useMemo(() => {
+    const countryName = nagerCountries.find((c) => c.countryCode === countryCode)?.name || countryCode;
+    const color = getCountryColor(countryCode);
+    return holidays.map((h) => {
+      const [, m, d] = h.date.split("-").map(Number);
+      return {
+        id: `nager-${h.countryCode}-${h.date}-${h.name}`,
+        country: countryName,
+        country_code: h.countryCode,
+        country_color: color,
+        name: h.localName || h.name,
+        date_month: m,
+        date_day: d,
+        category: "feriado",
+        description: h.localName !== h.name ? h.name : "",
+      };
+    });
+  }, [holidays, nagerCountries, countryCode]);
 
   // Form state
   const [formName, setFormName] = useState("");
