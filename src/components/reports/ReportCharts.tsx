@@ -6,10 +6,12 @@ import {
   PieChart, Pie, Cell, Legend, AreaChart, Area
 } from "recharts";
 import { BarChart3 } from "lucide-react";
+import { getReportT } from "@/i18n/reportTranslations";
 
 interface ReportChartsProps {
   metrics: SocialReportMetrics;
   prevMetrics: SocialReportMetrics;
+  locale?: string;
 }
 
 const CHART_COLORS = [
