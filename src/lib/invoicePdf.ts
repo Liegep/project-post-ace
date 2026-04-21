@@ -26,7 +26,7 @@ export function generateInvoicePDF(
 <html>
 <head>
 <meta charset="utf-8">
-<title>Fatura #${invoice.invoice_number}</title>
+<title>Fatura ${invoice.invoice_number} - www.liegestudio.com</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a1a; padding: 40px; max-width: 800px; margin: 0 auto; }
@@ -53,7 +53,10 @@ export function generateInvoicePDF(
   .notes p { font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
   .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e5e5e5; text-align: center; font-size: 12px; color: #666; }
   .footer a { color: #2563eb; text-decoration: none; }
-  @media print { body { padding: 20px; } }
+  @media print {
+    body { padding: 20px; }
+    @page { margin: 15mm; }
+  }
 </style>
 </head>
 <body>
