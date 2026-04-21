@@ -28,6 +28,7 @@ import { ReportCharts } from "@/components/reports/ReportCharts";
 import { CsvDataTable } from "@/components/reports/CsvDataTable";
 import { CsvDataCharts, MetricKey as CsvMetricKey } from "@/components/reports/CsvDataCharts";
 import { TopContentPanel, TopContentData, EMPTY_TOP_CONTENT } from "@/components/reports/TopContentPanel";
+import { InstagramScreenshotPanel } from "@/components/reports/InstagramScreenshotPanel";
 import { cn } from "@/lib/utils";
 
 interface Client { id: string; name: string; slug: string; logo_url: string; }
@@ -254,6 +255,16 @@ export default function CreateReportPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Instagram Screenshot OCR */}
+        {platform === "instagram" && (
+          <InstagramScreenshotPanel
+            onParsed={(m, p) => {
+              setMetrics((prev) => ({ ...prev, ...m }));
+              setPrevMetrics((prev) => ({ ...prev, ...p }));
+            }}
+          />
+        )}
 
         {/* CSV Upload */}
         <CsvUploadPanel onMetricsParsed={handleCsvParsed} />
