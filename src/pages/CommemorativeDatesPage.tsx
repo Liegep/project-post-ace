@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useCommemorativeDates, CATEGORY_LABELS, CommemorativeDate } from "@/hooks/useCommemorativeDates";
-import { useNagerHolidays, getCountryColor } from "@/hooks/useNagerHolidays";
+import { useNagerHolidaysMulti, getCountryColor } from "@/hooks/useNagerHolidays";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -56,23 +56,28 @@ export default function CommemorativeDatesPage() {
   const [filterMonth, setFilterMonth] = useState("all");
   const [briefDate, setBriefDate] = useState<CommemorativeDate | null>(null);
 
-  // Nager.Date public holidays integration
+  // Nager.Date public holidays integration (multi-country)
   const currentYear = new Date().getFullYear();
   const [nagerYear, setNagerYear] = useState<number>(currentYear);
-  const { countryCode, setCountryCode, holidays, countries: nagerCountries, loading: nagerLoading } =
-    useNagerHolidays(nagerYear);
+  const {
+    selectedCodes,
+    toggleCountry: toggleNagerCountry,
+    holidays,
+    countries: nagerCountries,
+    loading: nagerLoading,
+  } = useNagerHolidaysMulti(nagerYear);
 
   // Convert Nager holidays into the same shape so the existing UI renders them
   const nagerAsCommemorative: CommemorativeDate[] = useMemo(() => {
-    const countryName = nagerCountries.find((c) => c.countryCode === countryCode)?.name || countryCode;
-    const color = getCountryColor(countryCode);
     return holidays.map((h) => {
       const [, m, d] = h.date.split("-").map(Number);
+      const countryName =
+        nagerCountries.find((c) => c.countryCode === h.countryCode)?.name || h.countryCode;
       return {
         id: `nager-${h.countryCode}-${h.date}-${h.name}`,
         country: countryName,
         country_code: h.countryCode,
-        country_color: color,
+        country_color: getCountryColor(h.countryCode),
         name: h.localName || h.name,
         date_month: m,
         date_day: d,
@@ -80,7 +85,7 @@ export default function CommemorativeDatesPage() {
         description: h.localName !== h.name ? h.name : "",
       };
     });
-  }, [holidays, nagerCountries, countryCode]);
+  }, [holidays, nagerCountries]);
 
   // Form state
   const [formName, setFormName] = useState("");
