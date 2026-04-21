@@ -183,7 +183,7 @@ const ClientAccessPanel = ({ clientId, clientName }: ClientAccessPanelProps) => 
               <Input type="email" value={formEmail} onChange={e => setFormEmail(e.target.value)} placeholder="cliente@empresa.com" />
             </div>
             <div>
-              <Label>Senha</Label>
+              <Label>Password</Label>
               <Input type="password" value={formPassword} onChange={e => setFormPassword(e.target.value)} placeholder="Mínimo 6 caracteres" />
             </div>
             <Button onClick={handleCreate} disabled={saving || !formName || !formEmail || !formPassword} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
