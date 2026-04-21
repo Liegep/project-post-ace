@@ -420,11 +420,6 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         <div>
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-semibold">Itens da fatura</h3>
-            {!addingItem && (
-              <Button size="sm" variant="ghost" onClick={openAddItem} className="text-xs">
-                <Plus className="h-3.5 w-3.5 mr-1" /> Adicionar
-              </Button>
-            )}
           </div>
 
           {itemsLoading ? (
