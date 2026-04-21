@@ -67,17 +67,32 @@ export function CommemorativeDatesWidget() {
       });
   }, [holidays, nagerCountries]);
 
-  // Merge custom dates + nager (avoid duplicates)
+  // Merge custom dates + nager (avoid duplicates).
+  // Dedupe by country_code + month + day so naming differences between
+  // sources (custom DB vs Nager localName) don't produce duplicate rows.
   const mergedNextWeek = useMemo(() => {
-    const seen = new Set(
-      nextWeekDates.map((d) => `${d.country_code}-${d.date_month}-${d.date_day}-${d.name.toLowerCase()}`),
-    );
-    const merged = [...nextWeekDates];
-    for (const n of nagerNextWeek) {
-      const key = `${n.country_code}-${n.date_month}-${n.date_day}-${n.name.toLowerCase()}`;
-      if (!seen.has(key)) merged.push(n);
+    const normalize = (s: string) =>
+      s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+    const map = new Map<string, CommemorativeDate>();
+    const keyOf = (d: CommemorativeDate) =>
+      `${(d.country_code || "").toUpperCase()}-${d.date_month}-${d.date_day}`;
+
+    for (const d of nextWeekDates) {
+      const k = keyOf(d);
+      if (!map.has(k)) map.set(k, d);
     }
-    return merged.sort((a, b) => {
+    const nameSeen = new Set(
+      Array.from(map.values()).map((d) => `${keyOf(d)}-${normalize(d.name)}`),
+    );
+    for (const n of nagerNextWeek) {
+      const k = keyOf(n);
+      const nameKey = `${k}-${normalize(n.name)}`;
+      if (map.has(k)) continue;
+      if (nameSeen.has(nameKey)) continue;
+      map.set(k, n);
+      nameSeen.add(nameKey);
+    }
+    return Array.from(map.values()).sort((a, b) => {
       if (a.date_month !== b.date_month) return a.date_month - b.date_month;
       return a.date_day - b.date_day;
     });

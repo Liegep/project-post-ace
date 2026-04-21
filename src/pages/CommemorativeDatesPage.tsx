@@ -177,15 +177,37 @@ export default function CommemorativeDatesPage() {
     ? nagerAsCommemorative.filter((d) => d.date_month === parseInt(filterMonth))
     : nagerAsCommemorative;
 
-  // Merge: avoid duplicates (same country_code + month + day + name)
+  // Merge: avoid duplicates. Use country_code + month + day as the primary key
+  // (ignoring the name) so that Nager's localName variants don't slip past
+  // the dedupe vs. custom DB entries. Also dedupe Nager entries against
+  // themselves in case the API returns repeated rows.
   const displayDates = useMemo(() => {
-    const seen = new Set(baseDates.map((d) => `${d.country_code}-${d.date_month}-${d.date_day}-${d.name.toLowerCase()}`));
-    const merged = [...baseDates];
-    for (const n of nagerFiltered) {
-      const key = `${n.country_code}-${n.date_month}-${n.date_day}-${n.name.toLowerCase()}`;
-      if (!seen.has(key)) merged.push(n);
+    const normalize = (s: string) =>
+      s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+    const seen = new Map<string, CommemorativeDate>();
+    const keyOf = (d: CommemorativeDate) =>
+      `${(d.country_code || "").toUpperCase()}-${d.date_month}-${d.date_day}`;
+
+    // Custom DB entries take precedence
+    for (const d of baseDates) {
+      const k = keyOf(d);
+      if (!seen.has(k)) seen.set(k, d);
     }
-    return merged;
+    // Then add Nager entries, skipping anything already present at that
+    // country+date OR with a near-identical name (covers same holiday with
+    // slightly different naming across sources).
+    const nameSeen = new Set(
+      Array.from(seen.values()).map((d) => `${keyOf(d)}-${normalize(d.name)}`),
+    );
+    for (const n of nagerFiltered) {
+      const k = keyOf(n);
+      const nameKey = `${k}-${normalize(n.name)}`;
+      if (seen.has(k)) continue;
+      if (nameSeen.has(nameKey)) continue;
+      seen.set(k, n);
+      nameSeen.add(nameKey);
+    }
+    return Array.from(seen.values());
   }, [baseDates, nagerFiltered]);
 
   // Group by month
