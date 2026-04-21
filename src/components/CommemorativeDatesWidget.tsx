@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useCommemorativeDates, CATEGORY_LABELS } from "@/hooks/useCommemorativeDates";
+import { useNagerHolidaysMulti, getCountryColor } from "@/hooks/useNagerHolidays";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CalendarHeart, Star, FileText } from "lucide-react";
@@ -23,10 +24,66 @@ export function CommemorativeDatesWidget() {
     toggleFavorite,
   } = useCommemorativeDates();
 
+  const currentYear = new Date().getFullYear();
+  const {
+    selectedCodes,
+    countries: nagerCountries,
+    toggleCountry: toggleNagerCountry,
+    holidays,
+  } = useNagerHolidaysMulti(currentYear);
+
   const [showFavPicker, setShowFavPicker] = useState(false);
   const [briefDate, setBriefDate] = useState<CommemorativeDate | null>(null);
 
-  if (loading || nextWeekDates.length === 0) return null;
+  // Compute Nager holidays in the next 7 days for selected countries
+  const nagerNextWeek: CommemorativeDate[] = useMemo(() => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekEnd = new Date(today);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    return holidays
+      .map((h) => {
+        const [y, m, d] = h.date.split("-").map(Number);
+        const date = new Date(y, m - 1, d);
+        if (date < today || date > weekEnd) return null;
+        const countryName =
+          nagerCountries.find((c) => c.countryCode === h.countryCode)?.name || h.countryCode;
+        return {
+          id: `nager-${h.countryCode}-${h.date}-${h.name}`,
+          country: countryName,
+          country_code: h.countryCode,
+          country_color: getCountryColor(h.countryCode),
+          name: h.localName || h.name,
+          date_month: m,
+          date_day: d,
+          category: "feriado",
+          description: h.localName !== h.name ? h.name : "",
+        } as CommemorativeDate;
+      })
+      .filter((x): x is CommemorativeDate => x !== null)
+      .sort((a, b) => {
+        if (a.date_month !== b.date_month) return a.date_month - b.date_month;
+        return a.date_day - b.date_day;
+      });
+  }, [holidays, nagerCountries]);
+
+  // Merge custom dates + nager (avoid duplicates)
+  const mergedNextWeek = useMemo(() => {
+    const seen = new Set(
+      nextWeekDates.map((d) => `${d.country_code}-${d.date_month}-${d.date_day}-${d.name.toLowerCase()}`),
+    );
+    const merged = [...nextWeekDates];
+    for (const n of nagerNextWeek) {
+      const key = `${n.country_code}-${n.date_month}-${n.date_day}-${n.name.toLowerCase()}`;
+      if (!seen.has(key)) merged.push(n);
+    }
+    return merged.sort((a, b) => {
+      if (a.date_month !== b.date_month) return a.date_month - b.date_month;
+      return a.date_day - b.date_day;
+    });
+  }, [nextWeekDates, nagerNextWeek]);
+
+  if (loading || mergedNextWeek.length === 0) return null;
 
   return (
     <TooltipProvider>
