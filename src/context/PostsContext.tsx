@@ -574,8 +574,10 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
           ...(updates.mediaUrls ?? prevPost.mediaUrls ?? []),
           ...((updates.imageUrl ?? prevPost.imageUrl) ? [updates.imageUrl ?? prevPost.imageUrl] : []),
         ];
-        const { deleteRemovedMedia } = await import("@/lib/mediaCleanup");
-        deleteRemovedMedia(oldUrls, newUrls).catch((e) => console.error(e));
+        // Best-effort cleanup — never block the save if the dynamic chunk fails to load
+        import("@/lib/mediaCleanup")
+          .then(({ deleteRemovedMedia }) => deleteRemovedMedia(oldUrls, newUrls))
+          .catch((e) => console.warn("[mediaCleanup] skipped:", e));
       }
     }
 
