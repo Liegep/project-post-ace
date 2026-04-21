@@ -305,7 +305,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         </div>
 
         {/* Actions */}
-        <div className="flex flex-wrap gap-2 border-t border-white/15 pt-3">
+        <div className="flex flex-wrap gap-2 border-t border-white/15 pt-3 text-primary-foreground">
           {invStatus !== "paid" ? (
             <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleMarkPaid()}>
               <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Marcar como Paga
@@ -315,7 +315,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
               <Clock className="h-3.5 w-3.5 mr-1" /> Reverter para Aberta
             </Button>
           )}
-          <Button size="sm" variant="outline" onClick={() => setEditingInvoice(!editingInvoice)} className="border-white/30 text-white hover:bg-white/10 hover:text-white">
+          <Button size="sm" variant="outline" onClick={() => setEditingInvoice(!editingInvoice)} className="border-white/30 hover:bg-white/10 text-black">
             <Pencil className="h-3.5 w-3.5 mr-1" /> Editar
           </Button>
           <Button size="sm" variant="outline" onClick={handleDownloadPDF} className="border-white/30 text-white hover:bg-white/10 hover:text-white">
