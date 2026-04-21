@@ -25,8 +25,11 @@ interface CsvUploadPanelProps {
 const METRIC_ALIASES: Record<string, string> = {
   // Reach
   reach: "reach", alcance: "reach", resultados: "reach", results: "reach",
+  "alcance total": "reach", "pessoas alcancadas": "reach",
   // Impressions
   impressions: "impressions", impressoes: "impressions", "impressões": "impressions",
+  "impressoes do anuncio": "impressions", "impressões do anúncio": "impressions",
+  "impressoes totais": "impressions", "ad impressions": "impressions",
   // Engagement
   engagement: "engagement", engajamento: "engagement", "taxa de engajamento": "engagement", "engagement rate": "engagement",
   // Interactions
@@ -53,9 +56,15 @@ const METRIC_ALIASES: Record<string, string> = {
   "valor usado": "spend",
   investimento: "spend",
   "investimento (brl)": "spend",
+  gasto: "spend", "gasto (brl)": "spend", "valor gasto (brl)": "spend",
   // Special non-metric fields
   "campaign name": "__campaign_name__",
   "nome da campanha": "__campaign_name__",
+  "identificacao do post": "__post_id__",
+  "identificação do post": "__post_id__",
+  "post id": "__post_id__", "id do post": "__post_id__",
+  descricao: "__description__", "descrição": "__description__", description: "__description__",
+  data: "__date__", date: "__date__",
   "reporting starts": "__period_start__",
   "reporting start": "__period_start__",
   "início dos relatórios": "__period_start__",
@@ -240,6 +249,14 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
               if (d) endDates.push(d);
               return;
             }
+            if (key === "__date__") {
+              const d = normalizeDate(cell);
+              if (d) { startDates.push(d); endDates.push(d); }
+              return;
+            }
+            if (key === "__post_id__" || key === "__description__") {
+              return; // ignore – not a metric, not a period
+            }
             // Numeric metric — accumulate sum across rows
             const value = key === "spend" ? cleanMoney(cell) : cleanInt(cell);
             metrics[key] = (metrics[key] ?? 0) + value;
@@ -248,8 +265,11 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
         }
 
         // Period: take min(start) / max(end)
-        if (startDates.length) extra.periodStart = startDates.sort()[0];
-        if (endDates.length) extra.periodEnd = endDates.sort()[endDates.length - 1];
+        if (startDates.length) extra.periodStart = [...startDates].sort()[0];
+        if (endDates.length) {
+          const sorted = [...endDates].sort();
+          extra.periodEnd = sorted[sorted.length - 1];
+        }
         // Campaign title: first non-empty (or first if multiple campaigns in file)
         if (titles.length === 1) extra.campaignTitle = titles[0];
         else if (titles.length > 1) extra.campaignTitle = `${titles[0]} (+${titles.length - 1})`;
