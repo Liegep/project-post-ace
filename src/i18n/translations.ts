@@ -370,7 +370,7 @@ const pt: TranslationKeys = {
   selectLogo: "Selecionar logo",
   change: "Alterar",
   save: "Salvar",
-  password: "Senha",
+  password: "Password",
   changePassword: "Alterar Senha",
   newPassword: "Nova senha",
   confirmNewPassword: "Confirmar nova senha",
