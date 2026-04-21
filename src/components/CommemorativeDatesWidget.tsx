@@ -94,7 +94,7 @@ export function CommemorativeDatesWidget() {
             <CalendarHeart className="h-4 w-4 text-primary" />
             <h3 className="font-semibold text-sm text-foreground">Datas Comemorativas</h3>
             <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-              {nextWeekDates.length}
+              {mergedNextWeek.length}
             </Badge>
             <span className="text-[10px] text-muted-foreground">próximos 7 dias</span>
           </div>
@@ -105,12 +105,12 @@ export function CommemorativeDatesWidget() {
                 Favoritos
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-64 p-3" align="end">
+            <PopoverContent className="w-72 p-3" align="end">
               <p className="text-xs font-semibold text-foreground mb-2">Países favoritos</p>
               <p className="text-[10px] text-muted-foreground mb-3">
-                O widget prioriza datas dos seus favoritos
+                O widget exibe datas dos seus favoritos
               </p>
-              <div className="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto">
+              <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto mb-3">
                 {countries.map((c) => (
                   <button
                     key={c.name}
@@ -119,7 +119,7 @@ export function CommemorativeDatesWidget() {
                       "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-all border",
                       c.isFavorite
                         ? "border-transparent text-white shadow-sm"
-                        : "border-border bg-background text-muted-foreground hover:bg-muted"
+                        : "border-border bg-background text-muted-foreground hover:bg-muted",
                     )}
                     style={c.isFavorite ? { backgroundColor: c.color } : undefined}
                   >
@@ -128,25 +128,45 @@ export function CommemorativeDatesWidget() {
                   </button>
                 ))}
               </div>
-              {favoriteCountries.length > 0 && (
-                <p className="text-[10px] text-muted-foreground mt-2">
-                  {favoriteCountries.length} país(es) selecionado(s)
+
+              <div className="border-t pt-2">
+                <p className="text-xs font-semibold text-foreground mb-2">Feriados oficiais (por país)</p>
+                <p className="text-[10px] text-muted-foreground mb-2">
+                  Apenas feriados dos países selecionados aparecerão
                 </p>
-              )}
+                <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto">
+                  {nagerCountries.map((c) => {
+                    const active = selectedCodes.includes(c.countryCode);
+                    return (
+                      <button
+                        key={c.countryCode}
+                        onClick={() => toggleNagerCountry(c.countryCode)}
+                        className={cn(
+                          "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-all border",
+                          active
+                            ? "border-transparent text-white shadow-sm"
+                            : "border-border bg-background text-muted-foreground hover:bg-muted",
+                        )}
+                        style={active ? { backgroundColor: getCountryColor(c.countryCode) } : undefined}
+                      >
+                        {c.countryCode}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </PopoverContent>
           </Popover>
         </div>
 
         {/* List */}
         <div className="divide-y">
-          {nextWeekDates.length === 0 && (
+          {mergedNextWeek.length === 0 && (
             <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-              {favoriteCountries.length > 0
-                ? "Nenhuma data dos seus favoritos nos próximos 7 dias"
-                : "Nenhuma data comemorativa nos próximos 7 dias"}
+              Nenhuma data nos próximos 7 dias
             </div>
           )}
-          {nextWeekDates.map((d) => (
+          {mergedNextWeek.map((d) => (
             <div
               key={d.id}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/30 transition-colors group"
