@@ -598,12 +598,12 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
                   <div className="flex gap-1 shrink-0">
                     <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
                       <a href={att.file_url} target="_blank" rel="noopener noreferrer">
-                        <Eye className="h-3.5 w-3.5" />
+                        <Eye className="h-3.5 w-3.5 text-primary-foreground" />
                       </a>
                     </Button>
                     <Button size="icon" variant="ghost" className="h-7 w-7" asChild>
                       <a href={att.file_url} download={att.file_name}>
-                        <Download className="h-3.5 w-3.5" />
+                        <Download className="h-3.5 w-3.5 text-primary-foreground" />
                       </a>
                     </Button>
                     <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => handleDeleteAttachment(att.id)}>
