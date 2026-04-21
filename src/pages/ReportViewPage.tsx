@@ -2,28 +2,27 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  SocialReport, SocialReportMetrics, METRIC_LABELS, useUpdateReport
+  SocialReport, SocialReportMetrics, useUpdateReport
 } from "@/hooks/useSocialReports";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { MobileNav } from "@/components/MobileNav";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { ReportCharts } from "@/components/reports/ReportCharts";
 import {
-  ArrowLeft, TrendingUp, TrendingDown, Minus, Instagram, Facebook,
-  Calendar, Pencil, Star, AlertTriangle, Lightbulb, BarChart3,
+  ArrowLeft, TrendingUp, Minus, Instagram, Facebook,
+  Calendar, Star, AlertTriangle, Lightbulb, BarChart3,
   Eye, MessageSquareText, ArrowUpRight, ArrowDownRight, Send, Check
 } from "lucide-react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { getReportT, getReportDateLocale, getReportNumberLocale } from "@/i18n/reportTranslations";
 
 interface Client { id: string; name: string; logo_url: string; }
 
-function MetricCard({ label, current, previous }: { label: string; current?: number; previous?: number }) {
+function MetricCard({ label, current, previous, numberLocale, prevLabel }: { label: string; current?: number; previous?: number; numberLocale: string; prevLabel: string }) {
   const curr = current ?? 0;
   const prev = previous ?? 0;
   const diff = prev > 0 ? ((curr - prev) / prev) * 100 : curr > 0 ? 100 : 0;
@@ -35,7 +34,7 @@ function MetricCard({ label, current, previous }: { label: string; current?: num
       <CardContent className="p-4 space-y-1">
         <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
         <div className="flex items-end justify-between gap-2">
-          <p className="text-2xl font-bold tabular-nums">{curr.toLocaleString("pt-BR")}</p>
+          <p className="text-2xl font-bold tabular-nums">{curr.toLocaleString(numberLocale)}</p>
           {prev > 0 && (
             <span className={cn(
               "flex items-center gap-0.5 text-xs font-semibold rounded-full px-1.5 py-0.5",
@@ -49,7 +48,7 @@ function MetricCard({ label, current, previous }: { label: string; current?: num
           )}
         </div>
         {prev > 0 && (
-          <p className="text-[10px] text-muted-foreground">Anterior: {prev.toLocaleString("pt-BR")}</p>
+          <p className="text-[10px] text-muted-foreground">{prevLabel}: {prev.toLocaleString(numberLocale)}</p>
         )}
       </CardContent>
     </Card>
@@ -80,7 +79,12 @@ export default function ReportViewPage() {
   }, [id]);
 
   if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" /></div>;
-  if (!report) return <div className="flex items-center justify-center min-h-screen text-muted-foreground">Relatório não encontrado</div>;
+
+  const t = getReportT(report?.locale);
+  const dateLocale = getReportDateLocale(report?.locale);
+  const numberLocale = getReportNumberLocale(report?.locale);
+
+  if (!report) return <div className="flex items-center justify-center min-h-screen text-muted-foreground">{t.notFound}</div>;
 
   const metrics = (typeof report.metrics === "object" ? report.metrics : {}) as SocialReportMetrics;
   const prevMetrics = (typeof report.previous_metrics === "object" ? report.previous_metrics : {}) as SocialReportMetrics;
@@ -101,14 +105,14 @@ export default function ReportViewPage() {
       <header className="sticky top-0 z-30 glass-header">
         <div className="flex items-center justify-between px-4 py-3 md:px-6">
           <div className="flex items-center gap-3">
-            <MobileNav title="Relatório" />
+            <MobileNav title={t.report} />
             <Button variant="ghost" size="icon" onClick={() => navigate("/reports")}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-2 min-w-0">
               {client?.logo_url && <img src={client.logo_url} alt="" className="h-7 w-7 rounded-full object-cover" />}
               <div className="min-w-0">
-                <h1 className="text-sm font-semibold truncate">{report.title || "Relatório"}</h1>
+                <h1 className="text-sm font-semibold truncate">{report.title || t.report}</h1>
                 <p className="text-[11px] text-muted-foreground">{client?.name}</p>
               </div>
             </div>
@@ -116,12 +120,12 @@ export default function ReportViewPage() {
           <div className="flex items-center gap-2">
             {report.status === "draft" && (
               <Button size="sm" className="h-8 text-xs gap-1.5 bg-gradient-to-r from-primary to-accent hover:opacity-90" onClick={handlePublish}>
-                <Send className="h-3.5 w-3.5" /> Publicar e Enviar
+                <Send className="h-3.5 w-3.5" /> {t.publishAndSend}
               </Button>
             )}
             {report.status === "published" && (
               <Badge className="bg-emerald-500/15 text-emerald-600 gap-1">
-                <Check className="h-3 w-3" /> Enviado ao cliente
+                <Check className="h-3 w-3" /> {t.sentToClient}
               </Badge>
             )}
             <UserProfileMenu />
@@ -138,12 +142,12 @@ export default function ReportViewPage() {
           </Badge>
           <Badge variant="outline" className="gap-1.5">
             <Calendar className="h-3.5 w-3.5" />
-            {format(new Date(report.period_start), "dd MMM", { locale: ptBR })} – {format(new Date(report.period_end), "dd MMM yyyy", { locale: ptBR })}
+            {format(new Date(report.period_start), "dd MMM", { locale: dateLocale })} – {format(new Date(report.period_end), "dd MMM yyyy", { locale: dateLocale })}
           </Badge>
           <Badge variant="secondary" className={cn(
             report.status === "published" ? "bg-emerald-500/15 text-emerald-600" : "bg-muted text-muted-foreground"
           )}>
-            {report.status === "published" ? "Publicado" : "Rascunho"}
+            {report.status === "published" ? t.published : t.draft}
           </Badge>
         </div>
 
@@ -156,7 +160,7 @@ export default function ReportViewPage() {
                   <MessageSquareText className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold mb-2">Análise Estratégica</h3>
+                  <h3 className="text-sm font-semibold mb-2">{t.strategicAnalysis}</h3>
                   <p className="text-sm text-foreground/80 whitespace-pre-line leading-relaxed">{report.strategic_comment}</p>
                 </div>
               </div>
@@ -168,15 +172,17 @@ export default function ReportViewPage() {
         {metricKeys.length > 0 && (
           <div>
             <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              <BarChart3 className="h-4 w-4 text-primary" /> Métricas Principais
+              <BarChart3 className="h-4 w-4 text-primary" /> {t.mainMetrics}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {metricKeys.map(key => (
                 <MetricCard
                   key={key}
-                  label={METRIC_LABELS[key] || key}
+                  label={t.metricLabels[key] || key}
                   current={metrics[key]}
                   previous={prevMetrics[key]}
+                  numberLocale={numberLocale}
+                  prevLabel={t.previous}
                 />
               ))}
             </div>
@@ -194,7 +200,7 @@ export default function ReportViewPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Star className="h-4 w-4 text-amber-500" />
-                    <span className="text-xs font-semibold">Melhor Conteúdo</span>
+                    <span className="text-xs font-semibold">{t.bestContent}</span>
                   </div>
                   <p className="text-sm text-foreground/80">{report.best_content}</p>
                 </CardContent>
@@ -205,7 +211,7 @@ export default function ReportViewPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <AlertTriangle className="h-4 w-4 text-red-400" />
-                    <span className="text-xs font-semibold">Pior Conteúdo</span>
+                    <span className="text-xs font-semibold">{t.worstContent}</span>
                   </div>
                   <p className="text-sm text-foreground/80">{report.worst_content}</p>
                 </CardContent>
@@ -216,7 +222,7 @@ export default function ReportViewPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <TrendingUp className="h-4 w-4 text-emerald-500" />
-                    <span className="text-xs font-semibold">Melhor Formato</span>
+                    <span className="text-xs font-semibold">{t.bestFormat}</span>
                   </div>
                   <p className="text-sm text-foreground/80">{report.best_format}</p>
                 </CardContent>
@@ -243,9 +249,9 @@ export default function ReportViewPage() {
           }
 
           const sections: { key: "posts" | "reels" | "stories"; label: string }[] = [
-            { key: "posts", label: "Top 3 Posts" },
-            { key: "reels", label: "Top 3 Reels" },
-            { key: "stories", label: "Top 3 Stories" },
+            { key: "posts", label: t.topPosts },
+            { key: "reels", label: t.topReels },
+            { key: "stories", label: t.topStories },
           ];
 
           const hasTopContent =
@@ -260,7 +266,7 @@ export default function ReportViewPage() {
                 <Card>
                   <CardContent className="p-4">
                     <h3 className="text-xs font-semibold mb-2 flex items-center gap-2">
-                      <Eye className="h-3.5 w-3.5 text-muted-foreground" /> Observações
+                      <Eye className="h-3.5 w-3.5 text-muted-foreground" /> {t.observations}
                     </h3>
                     <p className="text-sm text-foreground/80 whitespace-pre-line">{parsedText}</p>
                   </CardContent>
@@ -271,7 +277,7 @@ export default function ReportViewPage() {
                 <Card className="glass-card">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <Star className="h-4 w-4 text-primary" /> Conteúdos com mais resultados
+                      <Star className="h-4 w-4 text-primary" /> {t.topResultsTitle}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -327,7 +333,7 @@ export default function ReportViewPage() {
                   <Lightbulb className="h-4 w-4 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold mb-2">Recomendações e Próximos Passos</h3>
+                  <h3 className="text-sm font-semibold mb-2">{t.recommendations}</h3>
                   <p className="text-sm text-foreground/80 whitespace-pre-line leading-relaxed">{report.recommendations}</p>
                 </div>
               </div>
