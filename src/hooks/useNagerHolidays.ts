@@ -85,7 +85,6 @@ function detectBrowserCountry(): string {
   const lang = navigator.language || "en-US";
   const parts = lang.split("-");
   if (parts.length > 1) return parts[1].toUpperCase();
-  // Fallback by language
   const map: Record<string, string> = {
     pt: "BR",
     en: "US",
@@ -98,26 +97,44 @@ function detectBrowserCountry(): string {
   return map[parts[0].toLowerCase()] || "BR";
 }
 
-const STORAGE_KEY = "nager_country_code";
+const STORAGE_KEY_SELECTED = "nager_selected_countries";
 
-export function useNagerHolidays(initialYear?: number) {
-  const [year, setYear] = useState<number>(initialYear ?? new Date().getFullYear());
-  const [countryCode, setCountryCodeState] = useState<string>(() => {
+/**
+ * Returns Nager.Date holidays for a list of selected country codes.
+ * Codes are persisted in localStorage. If none saved, defaults to detected browser country.
+ */
+export function useNagerHolidaysMulti(year?: number) {
+  const targetYear = year ?? new Date().getFullYear();
+  const [countries, setCountries] = useState<NagerCountry[]>([]);
+  const [selectedCodes, setSelectedCodesState] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) return saved;
+      const saved = localStorage.getItem(STORAGE_KEY_SELECTED);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch {
+          /* ignore */
+        }
+      }
     }
-    return detectBrowserCountry();
+    return [detectBrowserCountry()];
   });
   const [holidays, setHolidays] = useState<NagerHoliday[]>([]);
-  const [countries, setCountries] = useState<NagerCountry[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const setCountryCode = (code: string) => {
-    setCountryCodeState(code);
+  const setSelectedCodes = (codes: string[]) => {
+    setSelectedCodesState(codes);
     if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEY, code);
+      localStorage.setItem(STORAGE_KEY_SELECTED, JSON.stringify(codes));
     }
+  };
+
+  const toggleCountry = (code: string) => {
+    const next = selectedCodes.includes(code)
+      ? selectedCodes.filter((c) => c !== code)
+      : [...selectedCodes, code];
+    setSelectedCodes(next);
   };
 
   useEffect(() => {
@@ -126,25 +143,29 @@ export function useNagerHolidays(initialYear?: number) {
 
   useEffect(() => {
     let cancelled = false;
+    if (selectedCodes.length === 0) {
+      setHolidays([]);
+      return;
+    }
     setLoading(true);
-    fetchNagerHolidays(year, countryCode).then((data) => {
+    Promise.all(selectedCodes.map((code) => fetchNagerHolidays(targetYear, code))).then((results) => {
       if (!cancelled) {
-        setHolidays(data);
+        setHolidays(results.flat());
         setLoading(false);
       }
     });
     return () => {
       cancelled = true;
     };
-  }, [year, countryCode]);
+  }, [targetYear, selectedCodes.join(",")]);
 
   return {
-    year,
-    setYear,
-    countryCode,
-    setCountryCode,
-    holidays,
+    year: targetYear,
     countries,
+    selectedCodes,
+    setSelectedCodes,
+    toggleCountry,
+    holidays,
     loading,
   };
 }
