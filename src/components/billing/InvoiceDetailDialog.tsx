@@ -361,7 +361,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
 
         {/* Edit invoice section */}
         {editingInvoice && (
-          <div className="border border-white/20 rounded-lg p-3 space-y-3 bg-white/5">
+          <div ref={editInvoiceRef} className="border border-white/20 rounded-lg p-3 space-y-3 bg-white/5 scroll-mt-4">
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label className="text-xs">Status</Label>
