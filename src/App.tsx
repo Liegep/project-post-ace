@@ -66,6 +66,7 @@ const App = () => (
               {/* activity-log route removed */}
               <Route path="/reports" element={<AuthGuard allowedRoles={["super_admin"]}><ReportsPage /></AuthGuard>} />
               <Route path="/reports/new" element={<AuthGuard allowedRoles={["super_admin"]}><CreateReportPage /></AuthGuard>} />
+              <Route path="/reports/:id/edit" element={<AuthGuard allowedRoles={["super_admin"]}><CreateReportPage /></AuthGuard>} />
               <Route path="/reports/:id" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ReportViewPage /></AuthGuard>} />
               <Route path="/billing" element={<AuthGuard allowedRoles={["super_admin"]}><BillingPage /></AuthGuard>} />
               <Route path="/proposals" element={<AuthGuard allowedRoles={["super_admin"]}><ProposalsPage /></AuthGuard>} />

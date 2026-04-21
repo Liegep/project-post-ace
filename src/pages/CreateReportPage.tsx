@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  useCreateReport, useSocialReportTemplates, useSaveTemplate,
+  useCreateReport, useUpdateReport, useSocialReportTemplates, useSaveTemplate,
   METRIC_LABELS, DEFAULT_METRIC_FIELDS, INSTAGRAM_METRIC_FIELDS, FACEBOOK_METRIC_FIELDS,
   SocialReportMetrics,
 } from "@/hooks/useSocialReports";
@@ -34,7 +34,10 @@ interface Client { id: string; name: string; slug: string; logo_url: string; }
 
 export default function CreateReportPage() {
   const navigate = useNavigate();
+  const { id: editId } = useParams();
+  const isEditMode = !!editId;
   const createReport = useCreateReport();
+  const updateReport = useUpdateReport();
   const saveTemplate = useSaveTemplate();
   const { data: templates = [] } = useSocialReportTemplates();
   const { userId } = useUserRole();
@@ -65,10 +68,11 @@ export default function CreateReportPage() {
   const [csvDateColumn, setCsvDateColumn] = useState<string | null>(null);
   const [topContent, setTopContent] = useState<TopContentData>(EMPTY_TOP_CONTENT);
 
-  // When platform changes, swap default metric fields (Instagram vs Facebook)
+  // When platform changes, swap default metric fields (Instagram vs Facebook) — skip in edit mode
   useEffect(() => {
+    if (isEditMode) return;
     setActiveFields(platform === "facebook" ? FACEBOOK_METRIC_FIELDS : INSTAGRAM_METRIC_FIELDS);
-  }, [platform]);
+  }, [platform, isEditMode]);
 
   const handleCsvParsed = (
     csvMetrics: SocialReportMetrics,
@@ -102,6 +106,55 @@ export default function CreateReportPage() {
     };
     fetch();
   }, [userId]);
+
+  // Load report data when editing
+  useEffect(() => {
+    if (!editId) return;
+    const loadReport = async () => {
+      const { data, error } = await supabase
+        .from("social_reports")
+        .select("*")
+        .eq("id", editId)
+        .single();
+      if (error || !data) {
+        toast({ title: "Erro ao carregar relatório", variant: "destructive" });
+        return;
+      }
+      const r: any = data;
+      setClientId(r.client_id || "");
+      setTitle(r.title || "");
+      setPlatform(r.platform || "instagram");
+      setPeriodStart(r.period_start || "");
+      setPeriodEnd(r.period_end || "");
+      setStrategicComment(r.strategic_comment || "");
+      setRecommendations(r.recommendations || "");
+      setBestContent(r.best_content || "");
+      setWorstContent(r.worst_content || "");
+      setBestFormat(r.best_format || "");
+      setReportLocale((r.locale as Locale) || "pt");
+      setMetrics((r.metrics as SocialReportMetrics) || {});
+      setPrevMetrics((r.previous_metrics as SocialReportMetrics) || {});
+      // Decode observations + topContent
+      try {
+        const parsed = JSON.parse(r.observations || "");
+        if (parsed && typeof parsed === "object" && ("text" in parsed || "top_content" in parsed)) {
+          setObservations(parsed.text || "");
+          if (parsed.top_content) setTopContent({ ...EMPTY_TOP_CONTENT, ...parsed.top_content });
+        } else {
+          setObservations(r.observations || "");
+        }
+      } catch {
+        setObservations(r.observations || "");
+      }
+      // Active fields = keys with values
+      const keys = Object.keys((r.metrics as SocialReportMetrics) || {}).filter(
+        (k) => (r.metrics as any)[k] !== undefined && (r.metrics as any)[k] !== null,
+      );
+      if (keys.length > 0) setActiveFields(keys);
+      if (r.status === "published") setSendToClient(true);
+    };
+    loadReport();
+  }, [editId]);
 
   const toggleField = (field: string) => {
     setActiveFields(prev =>
@@ -142,9 +195,8 @@ export default function CreateReportPage() {
         text: observations,
         top_content: topContent,
       });
-      const report = await createReport.mutateAsync({
+      const payload = {
         client_id: clientId,
-        created_by: userId,
         title: title || `Relatório ${client?.name || ""} - ${platform}`,
         period_start: periodStart,
         period_end: periodEnd,
@@ -159,11 +211,21 @@ export default function CreateReportPage() {
         observations: observationsPayload,
         locale: reportLocale,
         status,
-      });
+      };
+      let reportId = editId;
+      if (isEditMode && editId) {
+        await updateReport.mutateAsync({ id: editId, ...payload });
+      } else {
+        const created = await createReport.mutateAsync({ ...payload, created_by: userId });
+        reportId = created.id;
+      }
+      // When (re)publishing, clear seen markers so clients see it as new again
+      if (status === "published" && reportId) {
+        await supabase.from("client_seen_items").delete().eq("item_id", reportId).eq("item_type", "report");
+      }
 
-
-      toast({ title: status === "published" ? "Relatório publicado!" : "Rascunho salvo!" });
-      navigate(`/reports/${report.id}`);
+      toast({ title: status === "published" ? (isEditMode ? "Relatório republicado!" : "Relatório publicado!") : "Rascunho salvo!" });
+      navigate(`/reports/${reportId}`);
     } catch {
       toast({ title: "Erro ao salvar", variant: "destructive" });
     } finally {
@@ -176,11 +238,11 @@ export default function CreateReportPage() {
       <header className="sticky top-0 z-30 glass-header">
         <div className="flex items-center justify-between px-4 py-3 md:px-6">
           <div className="flex items-center gap-3">
-            <MobileNav title="Novo Relatório" />
+            <MobileNav title={isEditMode ? "Editar Relatório" : "Novo Relatório"} />
             <Button variant="ghost" size="icon" onClick={() => navigate("/reports")}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <h1 className="text-lg font-semibold">Novo Relatório</h1>
+            <h1 className="text-lg font-semibold">{isEditMode ? "Editar Relatório" : "Novo Relatório"}</h1>
           </div>
           <div className="flex items-center gap-2">
             <UserProfileMenu />

@@ -11,7 +11,7 @@ import { MobileNav } from "@/components/MobileNav";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import {
-  Plus, FileBarChart, Trash2, Copy, Eye, Calendar,
+  Plus, FileBarChart, Trash2, Copy, Eye, Calendar, Pencil, Send,
   Instagram, Facebook, ArrowLeft
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -86,6 +86,21 @@ export default function ReportsPage() {
       toast({ title: "Relatório excluído" });
     } catch {
       toast({ title: "Erro ao excluir", variant: "destructive" });
+    }
+  };
+
+  const handleResend = async (report: SocialReport) => {
+    if (!confirm("Reenviar este relatório? Ele aparecerá novamente como novidade para o cliente.")) return;
+    try {
+      // Ensure it's published so the client area shows it
+      if (report.status !== "published") {
+        await supabase.from("social_reports").update({ status: "published" }).eq("id", report.id);
+      }
+      // Clear seen markers so the Novidades widget surfaces it again
+      await supabase.from("client_seen_items").delete().eq("item_id", report.id).eq("item_type", "report");
+      toast({ title: "Relatório reenviado ao cliente" });
+    } catch {
+      toast({ title: "Erro ao reenviar", variant: "destructive" });
     }
   };
 
@@ -196,13 +211,19 @@ export default function ReportsPage() {
                     </div>
 
                     <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); navigate(`/reports/${report.id}`); }}>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" title="Visualizar" onClick={(e) => { e.stopPropagation(); navigate(`/reports/${report.id}`); }}>
                         <Eye className="h-3.5 w-3.5" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); handleDuplicate(report); }}>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" title="Editar" onClick={(e) => { e.stopPropagation(); navigate(`/reports/${report.id}/edit`); }}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-primary" title="Reenviar ao cliente" onClick={(e) => { e.stopPropagation(); handleResend(report); }}>
+                        <Send className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" title="Duplicar" onClick={(e) => { e.stopPropagation(); handleDuplicate(report); }}>
                         <Copy className="h-3.5 w-3.5" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={(e) => { e.stopPropagation(); handleDelete(report.id); }}>
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" title="Excluir" onClick={(e) => { e.stopPropagation(); handleDelete(report.id); }}>
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
