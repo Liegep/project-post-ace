@@ -1,6 +1,7 @@
 import { Invoice, InvoiceItem } from "@/hooks/useInvoices";
 import { format } from "date-fns";
 import { formatCurrency } from "@/lib/currency";
+import { fetchIssuerDetails, IssuerDetails } from "@/hooks/useIssuerDetails";
 
 const STATUS_LABELS: Record<string, string> = {
   open: "Aberta",
@@ -9,80 +10,199 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: "Cancelada",
 };
 
-export function generateInvoicePDF(
+const escapeHtml = (s: string) =>
+  (s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/\n/g, "<br>");
+
+export async function generateInvoicePDF(
   invoice: Invoice,
   items: InvoiceItem[],
   total: number,
   subtotal: number,
-  currencyCode?: string
+  currencyCode?: string,
+  issuerOverride?: IssuerDetails
 ) {
+  const issuer = issuerOverride ?? (await fetchIssuerDetails());
+
   const clientName = invoice.clients?.name || "Cliente";
+  const clientAddress = invoice.clients?.address || "";
+  const clientCountry = invoice.clients?.country || "";
+  const clientTaxId = invoice.clients?.tax_id || "";
+  const clientLogo = invoice.clients?.logo_url || "";
+
   const discount = Number(invoice.discount || 0);
   const surcharge = Number(invoice.surcharge || 0);
   const fmt = (v: number) => formatCurrency(v, currencyCode);
+
+  const paymentMethod = invoice.payment_method || issuer.payment_method || "";
+  const paymentDetails = invoice.payment_details || issuer.payment_details || "";
 
   const html = `
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>Fatura ${invoice.invoice_number} - www.liegestudio.com</title>
+<title>Fatura ${invoice.invoice_number} - ${escapeHtml(issuer.business_name || "www.liegestudio.com")}</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1a1a1a; padding: 40px; max-width: 800px; margin: 0 auto; }
-  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; border-bottom: 2px solid #e5e5e5; padding-bottom: 24px; }
-  .header h1 { font-size: 28px; font-weight: 700; color: #111; }
-  .header .invoice-num { font-size: 14px; color: #666; font-family: monospace; }
-  .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
-  .meta-block h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 6px; }
-  .meta-block p { font-size: 14px; line-height: 1.5; }
-  .status { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
-  .status-open { background: #dbeafe; color: #2563eb; }
-  .status-paid { background: #d1fae5; color: #059669; }
-  .status-overdue { background: #fee2e2; color: #dc2626; }
-  .status-cancelled { background: #f3f4f6; color: #6b7280; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+    color: #1d1d1f;
+    padding: 48px;
+    max-width: 820px;
+    margin: 0 auto;
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e5e5e7;
+  }
+  .top .logo-wrap { max-width: 200px; }
+  .top .logo-wrap img { max-height: 64px; max-width: 200px; object-fit: contain; }
+  .top .title-wrap { text-align: right; }
+  .top h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: #1d1d1f; }
+  .top .invoice-num { font-size: 13px; color: #86868b; font-family: 'SF Mono', monospace; margin-top: 4px; }
+  .status { display: inline-block; padding: 4px 12px; border-radius: 980px; font-size: 11px; font-weight: 600; margin-top: 8px; letter-spacing: 0.02em; }
+  .status-open { background: #e3f2fd; color: #0066cc; }
+  .status-paid { background: #d1f4dd; color: #00875a; }
+  .status-overdue { background: #ffe5e5; color: #d70015; }
+  .status-cancelled { background: #f5f5f7; color: #86868b; }
+
+  .parties {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-bottom: 40px;
+  }
+  .party h3 {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #86868b;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .party .name { font-size: 15px; font-weight: 600; color: #1d1d1f; margin-bottom: 6px; }
+  .party p { font-size: 13px; line-height: 1.6; color: #424245; }
+  .party .meta-line { color: #86868b; font-size: 12px; margin-top: 4px; }
+
+  .dates {
+    display: flex;
+    gap: 40px;
+    padding: 16px 0;
+    margin-bottom: 32px;
+    border-top: 1px solid #f2f2f5;
+    border-bottom: 1px solid #f2f2f5;
+    font-size: 13px;
+  }
+  .dates .item span { color: #86868b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 2px; }
+  .dates .item strong { color: #1d1d1f; font-weight: 500; }
+
   table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-  thead th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #999; padding: 8px 12px; border-bottom: 1px solid #e5e5e5; }
-  tbody td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid #f3f4f6; }
+  thead th {
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #86868b;
+    padding: 10px 12px;
+    border-bottom: 1px solid #d2d2d7;
+    font-weight: 600;
+  }
+  tbody td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f2f2f5; color: #1d1d1f; }
+  tbody td .desc { color: #86868b; font-size: 11px; margin-top: 2px; }
   .text-right { text-align: right; }
-  .totals { margin-left: auto; width: 280px; }
-  .totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
-  .totals .row.total { font-size: 18px; font-weight: 700; border-top: 2px solid #111; padding-top: 10px; margin-top: 6px; }
-  .notes { margin-top: 32px; padding: 16px; background: #f9fafb; border-radius: 8px; }
-  .notes h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 8px; }
-  .notes p { font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
-  .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e5e5e5; text-align: center; font-size: 12px; color: #666; }
-  .footer a { color: #2563eb; text-decoration: none; }
+
+  .totals { margin-left: auto; width: 320px; padding-top: 8px; }
+  .totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: #424245; }
+  .totals .row.total {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d1d1f;
+    border-top: 1px solid #1d1d1f;
+    padding-top: 12px;
+    margin-top: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .payment-block, .notes-block {
+    margin-top: 32px;
+    padding: 18px 20px;
+    background: #f5f5f7;
+    border-radius: 12px;
+  }
+  .payment-block h3, .notes-block h3 {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #86868b;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .payment-block .pm { font-size: 14px; font-weight: 600; color: #1d1d1f; margin-bottom: 6px; }
+  .payment-block .pd, .notes-block p { font-size: 13px; line-height: 1.6; color: #424245; white-space: pre-wrap; }
+
+  .footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e5e7;
+    text-align: center;
+    font-size: 11px;
+    color: #86868b;
+  }
+  .footer a { color: #0066cc; text-decoration: none; }
+
   @media print {
-    body { padding: 20px; }
-    @page { margin: 15mm; }
+    body { padding: 24px; }
+    @page { margin: 14mm; }
   }
 </style>
 </head>
 <body>
-  <div class="header">
-    <div>
-      <h1>FATURA</h1>
-      <span class="invoice-num">#${invoice.invoice_number}</span>
+
+  <div class="top">
+    <div class="logo-wrap">
+      ${clientLogo ? `<img src="${escapeHtml(clientLogo)}" alt="${escapeHtml(clientName)}">` : `<div style="font-size:18px;font-weight:600;color:#1d1d1f">${escapeHtml(clientName)}</div>`}
     </div>
-    <div style="text-align:right">
-      <span class="status status-${invoice.status}">${STATUS_LABELS[invoice.status]}</span>
+    <div class="title-wrap">
+      <h1>FATURA</h1>
+      <div class="invoice-num">#${invoice.invoice_number}</div>
+      <span class="status status-${invoice.status}">${STATUS_LABELS[invoice.status] || invoice.status}</span>
     </div>
   </div>
 
-  <div class="meta">
-    <div class="meta-block">
-      <h3>Cliente</h3>
-      <p><strong>${clientName}</strong></p>
+  <div class="parties">
+    <div class="party">
+      <h3>De</h3>
+      <div class="name">${escapeHtml(issuer.business_name) || "—"}</div>
+      ${issuer.address ? `<p>${escapeHtml(issuer.address)}</p>` : ""}
+      ${issuer.country ? `<p class="meta-line">${escapeHtml(issuer.country)}</p>` : ""}
+      ${issuer.email ? `<p class="meta-line">${escapeHtml(issuer.email)}</p>` : ""}
+      ${issuer.tax_id ? `<p class="meta-line">Tax ID: ${escapeHtml(issuer.tax_id)}</p>` : ""}
     </div>
-    <div class="meta-block">
-      <h3>Detalhes</h3>
-      <p>
-        Emissão: ${format(new Date(invoice.issue_date), "dd/MM/yyyy")}<br>
-        Vencimento: ${format(new Date(invoice.due_date), "dd/MM/yyyy")}
-        ${invoice.period_start && invoice.period_end ? `<br>Período: ${format(new Date(invoice.period_start), "dd/MM/yyyy")} - ${format(new Date(invoice.period_end), "dd/MM/yyyy")}` : ""}
-      </p>
+    <div class="party">
+      <h3>Para</h3>
+      <div class="name">${escapeHtml(clientName)}</div>
+      ${clientAddress ? `<p>${escapeHtml(clientAddress)}</p>` : ""}
+      ${clientCountry ? `<p class="meta-line">${escapeHtml(clientCountry)}</p>` : ""}
+      ${clientTaxId ? `<p class="meta-line">Tax ID: ${escapeHtml(clientTaxId)}</p>` : ""}
     </div>
+  </div>
+
+  <div class="dates">
+    <div class="item"><span>Emissão</span><strong>${format(new Date(invoice.issue_date), "dd/MM/yyyy")}</strong></div>
+    <div class="item"><span>Vencimento</span><strong>${format(new Date(invoice.due_date), "dd/MM/yyyy")}</strong></div>
+    ${invoice.period_start && invoice.period_end ? `<div class="item"><span>Período</span><strong>${format(new Date(invoice.period_start), "dd/MM/yyyy")} – ${format(new Date(invoice.period_end), "dd/MM/yyyy")}</strong></div>` : ""}
   </div>
 
   <table>
@@ -99,8 +219,8 @@ export function generateInvoicePDF(
     <tbody>
       ${items.map(item => `
         <tr>
-          <td>${item.name}${item.description ? `<br><span style="color:#999;font-size:11px">${item.description}</span>` : ""}</td>
-          <td>${item.category}</td>
+          <td>${escapeHtml(item.name)}${item.description ? `<div class="desc">${escapeHtml(item.description)}</div>` : ""}</td>
+          <td>${escapeHtml(item.category)}</td>
           <td>${format(new Date(item.service_date), "dd/MM/yyyy")}</td>
           <td class="text-right">${item.quantity}</td>
           <td class="text-right">${fmt(Number(item.unit_price))}</td>
@@ -112,15 +232,23 @@ export function generateInvoicePDF(
 
   <div class="totals">
     <div class="row"><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
-    ${discount > 0 ? `<div class="row" style="color:#059669"><span>Desconto</span><span>- ${fmt(discount)}</span></div>` : ""}
-    ${surcharge > 0 ? `<div class="row" style="color:#d97706"><span>Acréscimo</span><span>+ ${fmt(surcharge)}</span></div>` : ""}
+    ${discount > 0 ? `<div class="row" style="color:#00875a"><span>Desconto</span><span>− ${fmt(discount)}</span></div>` : ""}
+    ${surcharge > 0 ? `<div class="row" style="color:#bf6900"><span>Acréscimo</span><span>+ ${fmt(surcharge)}</span></div>` : ""}
     <div class="row total"><span>Total</span><span>${fmt(total)}</span></div>
   </div>
 
+  ${paymentMethod || paymentDetails ? `
+  <div class="payment-block">
+    <h3>Pagamento</h3>
+    ${paymentMethod ? `<div class="pm">${escapeHtml(paymentMethod)}</div>` : ""}
+    ${paymentDetails ? `<div class="pd">${escapeHtml(paymentDetails)}</div>` : ""}
+  </div>
+  ` : ""}
+
   ${invoice.notes ? `
-  <div class="notes">
+  <div class="notes-block">
     <h3>Observações</h3>
-    <p>${invoice.notes}</p>
+    <p>${escapeHtml(invoice.notes)}</p>
   </div>
   ` : ""}
 
@@ -134,6 +262,6 @@ export function generateInvoicePDF(
   if (printWindow) {
     printWindow.document.write(html);
     printWindow.document.close();
-    setTimeout(() => printWindow.print(), 500);
+    setTimeout(() => printWindow.print(), 600);
   }
 }
