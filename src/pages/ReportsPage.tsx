@@ -211,13 +211,19 @@ export default function ReportsPage() {
                     </div>
 
                     <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); navigate(`/reports/${report.id}`); }}>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" title="Visualizar" onClick={(e) => { e.stopPropagation(); navigate(`/reports/${report.id}`); }}>
                         <Eye className="h-3.5 w-3.5" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); handleDuplicate(report); }}>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" title="Editar" onClick={(e) => { e.stopPropagation(); navigate(`/reports/${report.id}/edit`); }}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-primary" title="Reenviar ao cliente" onClick={(e) => { e.stopPropagation(); handleResend(report); }}>
+                        <Send className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" title="Duplicar" onClick={(e) => { e.stopPropagation(); handleDuplicate(report); }}>
                         <Copy className="h-3.5 w-3.5" />
                       </Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={(e) => { e.stopPropagation(); handleDelete(report.id); }}>
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" title="Excluir" onClick={(e) => { e.stopPropagation(); handleDelete(report.id); }}>
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
