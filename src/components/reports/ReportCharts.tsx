@@ -27,31 +27,31 @@ const CHART_COLORS = [
   "hsl(120, 50%, 50%)",
 ];
 
-export function ReportCharts({ metrics, prevMetrics }: ReportChartsProps) {
+export function ReportCharts({ metrics, prevMetrics, locale }: ReportChartsProps) {
+  const t = getReportT(locale);
+  const labelFor = (k: string) => t.metricLabels[k] || METRIC_LABELS[k] || k;
   const keys = Object.keys(metrics).filter(k => metrics[k] !== undefined && metrics[k] !== null);
   if (keys.length === 0) return null;
 
   const barData = keys.map(k => ({
-    name: METRIC_LABELS[k] || k,
+    name: labelFor(k),
     atual: metrics[k] ?? 0,
     anterior: prevMetrics[k] ?? 0,
   }));
 
   const hasPrev = barData.some(d => d.anterior > 0);
 
-  // Pie data for current metrics
   const pieData = keys.map((k, i) => ({
-    name: METRIC_LABELS[k] || k,
+    name: labelFor(k),
     value: metrics[k] ?? 0,
     color: CHART_COLORS[i % CHART_COLORS.length],
   })).filter(d => d.value > 0);
 
-  // Variation data for area chart
   const variationData = keys.map(k => {
     const curr = metrics[k] ?? 0;
     const prev = prevMetrics[k] ?? 0;
     const pct = prev > 0 ? ((curr - prev) / prev) * 100 : curr > 0 ? 100 : 0;
-    return { name: METRIC_LABELS[k] || k, variação: parseFloat(pct.toFixed(1)) };
+    return { name: labelFor(k), value: parseFloat(pct.toFixed(1)) };
   });
 
   const tooltipStyle = {
