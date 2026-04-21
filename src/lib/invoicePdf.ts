@@ -172,7 +172,7 @@ export async function generateInvoicePDF(
 
   <div class="top">
     <div class="logo-wrap">
-      ${clientLogo ? `<img src="${escapeHtml(clientLogo)}" alt="${escapeHtml(clientName)}">` : `<div style="font-size:18px;font-weight:600;color:#1d1d1f">${escapeHtml(clientName)}</div>`}
+      ${clientLogo ? `<img src="${escapeHtml(clientLogo)}" alt="${escapeHtml(clientName)}" crossorigin="anonymous">` : `<div style="font-size:18px;font-weight:600;color:#1d1d1f">${escapeHtml(clientName)}</div>`}
     </div>
     <div class="title-wrap">
       <h1>FATURA</h1>
