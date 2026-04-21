@@ -89,6 +89,21 @@ export default function ReportsPage() {
     }
   };
 
+  const handleResend = async (report: SocialReport) => {
+    if (!confirm("Reenviar este relatório? Ele aparecerá novamente como novidade para o cliente.")) return;
+    try {
+      // Ensure it's published so the client area shows it
+      if (report.status !== "published") {
+        await supabase.from("social_reports").update({ status: "published" }).eq("id", report.id);
+      }
+      // Clear seen markers so the Novidades widget surfaces it again
+      await supabase.from("client_seen_items").delete().eq("item_id", report.id).eq("item_type", "report");
+      toast({ title: "Relatório reenviado ao cliente" });
+    } catch {
+      toast({ title: "Erro ao reenviar", variant: "destructive" });
+    }
+  };
+
   const clientMap = Object.fromEntries(clients.map(c => [c.id, c]));
 
   return (
