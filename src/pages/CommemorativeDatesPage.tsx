@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useCommemorativeDates, CATEGORY_LABELS, CommemorativeDate } from "@/hooks/useCommemorativeDates";
+import { useNagerHolidays, getCountryColor } from "@/hooks/useNagerHolidays";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,6 +55,32 @@ export default function CommemorativeDatesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [filterMonth, setFilterMonth] = useState("all");
   const [briefDate, setBriefDate] = useState<CommemorativeDate | null>(null);
+
+  // Nager.Date public holidays integration
+  const currentYear = new Date().getFullYear();
+  const [nagerYear, setNagerYear] = useState<number>(currentYear);
+  const { countryCode, setCountryCode, holidays, countries: nagerCountries, loading: nagerLoading } =
+    useNagerHolidays(nagerYear);
+
+  // Convert Nager holidays into the same shape so the existing UI renders them
+  const nagerAsCommemorative: CommemorativeDate[] = useMemo(() => {
+    const countryName = nagerCountries.find((c) => c.countryCode === countryCode)?.name || countryCode;
+    const color = getCountryColor(countryCode);
+    return holidays.map((h) => {
+      const [, m, d] = h.date.split("-").map(Number);
+      return {
+        id: `nager-${h.countryCode}-${h.date}-${h.name}`,
+        country: countryName,
+        country_code: h.countryCode,
+        country_color: color,
+        name: h.localName || h.name,
+        date_month: m,
+        date_day: d,
+        category: "feriado",
+        description: h.localName !== h.name ? h.name : "",
+      };
+    });
+  }, [holidays, nagerCountries, countryCode]);
 
   // Form state
   const [formName, setFormName] = useState("");
@@ -136,9 +163,24 @@ export default function CommemorativeDatesPage() {
     refetch();
   };
 
-  const displayDates = filterMonth !== "all"
+  const baseDates = filterMonth !== "all"
     ? filteredDates.filter((d) => d.date_month === parseInt(filterMonth))
     : filteredDates;
+
+  const nagerFiltered = filterMonth !== "all"
+    ? nagerAsCommemorative.filter((d) => d.date_month === parseInt(filterMonth))
+    : nagerAsCommemorative;
+
+  // Merge: avoid duplicates (same country_code + month + day + name)
+  const displayDates = useMemo(() => {
+    const seen = new Set(baseDates.map((d) => `${d.country_code}-${d.date_month}-${d.date_day}-${d.name.toLowerCase()}`));
+    const merged = [...baseDates];
+    for (const n of nagerFiltered) {
+      const key = `${n.country_code}-${n.date_month}-${n.date_day}-${n.name.toLowerCase()}`;
+      if (!seen.has(key)) merged.push(n);
+    }
+    return merged;
+  }, [baseDates, nagerFiltered]);
 
   // Group by month
   const grouped = displayDates.reduce<Record<number, CommemorativeDate[]>>((acc, d) => {
@@ -258,6 +300,41 @@ export default function CommemorativeDatesPage() {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          {/* Public Holidays (Nager.Date) selector */}
+          <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center rounded-lg border bg-card p-2.5">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+              <CalendarHeart className="h-3.5 w-3.5 text-primary" />
+              <span className="font-medium">Feriados oficiais:</span>
+            </div>
+            <div className="flex gap-2 flex-1 w-full sm:w-auto">
+              <Select value={countryCode} onValueChange={setCountryCode}>
+                <SelectTrigger className="h-8 text-xs flex-1 sm:w-[220px] sm:flex-none">
+                  <SelectValue placeholder="País" />
+                </SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {nagerCountries.map((c) => (
+                    <SelectItem key={c.countryCode} value={c.countryCode} className="text-xs">
+                      {c.name} ({c.countryCode})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={String(nagerYear)} onValueChange={(v) => setNagerYear(parseInt(v))}>
+                <SelectTrigger className="h-8 text-xs w-[90px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 6 }, (_, i) => currentYear - 1 + i).map((y) => (
+                    <SelectItem key={y} value={String(y)} className="text-xs">{y}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {nagerLoading && (
+              <span className="text-[10px] text-muted-foreground">Carregando...</span>
+            )}
           </div>
 
           {/* Active country filters */}
