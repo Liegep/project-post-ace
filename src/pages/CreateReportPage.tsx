@@ -68,10 +68,11 @@ export default function CreateReportPage() {
   const [csvDateColumn, setCsvDateColumn] = useState<string | null>(null);
   const [topContent, setTopContent] = useState<TopContentData>(EMPTY_TOP_CONTENT);
 
-  // When platform changes, swap default metric fields (Instagram vs Facebook)
+  // When platform changes, swap default metric fields (Instagram vs Facebook) — skip in edit mode
   useEffect(() => {
+    if (isEditMode) return;
     setActiveFields(platform === "facebook" ? FACEBOOK_METRIC_FIELDS : INSTAGRAM_METRIC_FIELDS);
-  }, [platform]);
+  }, [platform, isEditMode]);
 
   const handleCsvParsed = (
     csvMetrics: SocialReportMetrics,
