@@ -4,9 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LogIn, ArrowLeft, Mail } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LogIn, ArrowLeft, Mail, Globe } from "lucide-react";
 import { useAppLogo } from "@/hooks/useAppLogo";
+import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
+import { loginTranslations } from "@/i18n/loginTranslations";
 
+const LOGIN_LOCALE_KEY = "login_locale";
 
 const LoginPage = () => {
   const appLogo = useAppLogo();
@@ -18,11 +22,23 @@ const LoginPage = () => {
   const [mode, setMode] = useState<"login" | "forgot">("login");
   const [successMessage, setSuccessMessage] = useState("");
   const [animDone, setAnimDone] = useState(false);
+  const [locale, setLocale] = useState<Locale>(() => {
+    const saved = localStorage.getItem(LOGIN_LOCALE_KEY);
+    if (saved && saved in loginTranslations) return saved as Locale;
+    return "pt";
+  });
+
+  const t = loginTranslations[locale];
 
   useEffect(() => {
     const timer = setTimeout(() => setAnimDone(true), 100);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleLocaleChange = (loc: Locale) => {
+    setLocale(loc);
+    localStorage.setItem(LOGIN_LOCALE_KEY, loc);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +52,7 @@ const LoginPage = () => {
       });
 
       if (signInError || !data.user) {
-        setError("E-mail ou senha inválidos");
+        setError(t.errorInvalidCredentials);
         return;
       }
 
@@ -86,15 +102,15 @@ const LoginPage = () => {
           }
         }
 
-        setError("Nenhum cliente vinculado à sua conta");
+        setError(t.errorNoClientLinked);
         await supabase.auth.signOut();
         return;
       }
 
-      setError("Seu usuário não tem acesso liberado");
+      setError(t.errorNoAccess);
       await supabase.auth.signOut();
     } catch {
-      setError("Erro ao fazer login");
+      setError(t.errorLogin);
     } finally {
       setLoading(false);
     }
@@ -112,13 +128,13 @@ const LoginPage = () => {
       });
 
       if (resetError) {
-        setError("Erro ao enviar e-mail de recuperação");
+        setError(t.errorReset);
         return;
       }
 
-      setSuccessMessage("E-mail de recuperação enviado! Verifique sua caixa de entrada.");
+      setSuccessMessage(t.successResetSent);
     } catch {
-      setError("Erro ao enviar e-mail de recuperação");
+      setError(t.errorReset);
     } finally {
       setLoading(false);
     }
@@ -126,6 +142,27 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Language selector — top right */}
+      <div
+        className={`absolute top-4 right-4 transition-opacity duration-500 ${
+          animDone ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <Select value={locale} onValueChange={(v) => handleLocaleChange(v as Locale)}>
+          <SelectTrigger className="h-9 w-[150px] text-xs bg-card">
+            <Globe className="mr-1 h-3.5 w-3.5 text-muted-foreground" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {(Object.keys(loginTranslations) as Locale[]).map((loc) => (
+              <SelectItem key={loc} value={loc}>
+                {LOCALE_FLAGS[loc]} {LOCALE_LABELS[loc]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Login content — fades in */}
       <div
         className={`w-full max-w-sm space-y-6 transition-all duration-700 ${
@@ -147,16 +184,14 @@ const LoginPage = () => {
               animDone ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            Design Hub
+            {t.appName}
           </h1>
           <p
             className={`text-sm text-muted-foreground mt-1 transition-all duration-500 delay-400 ${
               animDone ? "opacity-100" : "opacity-0"
             }`}
           >
-            {mode === "login"
-              ? "Faça login para acessar o painel"
-              : "Recupere sua senha"}
+            {mode === "login" ? t.loginSubtitle : t.forgotSubtitle}
           </p>
         </div>
 
@@ -168,24 +203,24 @@ const LoginPage = () => {
             }`}
           >
             <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="email">{t.email}</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
+                placeholder={t.emailPlaceholder}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t.password}</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t.passwordPlaceholder}
                 required
               />
             </div>
@@ -194,7 +229,7 @@ const LoginPage = () => {
 
             <Button type="submit" className="w-full" disabled={loading}>
               <LogIn className="mr-2 h-4 w-4" />
-              {loading ? "Entrando..." : "Entrar"}
+              {loading ? t.signingIn : t.signIn}
             </Button>
 
             <button
@@ -202,7 +237,7 @@ const LoginPage = () => {
               onClick={() => { setMode("forgot"); setError(""); setSuccessMessage(""); }}
               className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              Esqueci minha senha
+              {t.forgotPassword}
             </button>
           </form>
         ) : (
@@ -213,23 +248,23 @@ const LoginPage = () => {
             }`}
           >
             <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="email">{t.email}</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
+                placeholder={t.emailPlaceholder}
                 required
               />
             </div>
 
             {error && <p className="text-sm text-destructive">{error}</p>}
-            {successMessage && <p className="text-sm text-green-600">{successMessage}</p>}
+            {successMessage && <p className="text-sm text-primary">{successMessage}</p>}
 
             <Button type="submit" className="w-full" disabled={loading}>
               <Mail className="mr-2 h-4 w-4" />
-              {loading ? "Enviando..." : "Enviar link de recuperação"}
+              {loading ? t.sending : t.sendResetLink}
             </Button>
 
             <button
@@ -238,7 +273,7 @@ const LoginPage = () => {
               className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1"
             >
               <ArrowLeft className="h-3 w-3" />
-              Voltar para login
+              {t.backToLogin}
             </button>
           </form>
         )}
