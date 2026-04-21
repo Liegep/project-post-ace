@@ -106,7 +106,7 @@ export const PostCard = memo(
       const next = post.status.includes(s)
         ? post.status.filter((x) => x !== s)
         : [...post.status, s];
-      updatePostStatus(post.id, next.length > 0 ? next : [s]);
+      updatePostStatus(post.id, next);
     };
 
     const handleToggleTag = (tagId: string) => {
