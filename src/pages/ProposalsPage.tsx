@@ -530,7 +530,7 @@ export default function ProposalsPage() {
                   />
                 </div>
               ))}
-              <div className="flex justify-end text-sm font-semibold">
+              <div className="flex justify-end text-sm font-semibold text-primary-foreground">
                 Total: {formatCurrency(totalValue, currency)}
               </div>
             </div>
