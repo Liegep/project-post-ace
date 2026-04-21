@@ -23,9 +23,16 @@ const LoginPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [animDone, setAnimDone] = useState(false);
   const [locale, setLocale] = useState<Locale>(() => {
+    // 1) Respeita a escolha manual do usuário (salva em visitas anteriores)
     const saved = localStorage.getItem(LOGIN_LOCALE_KEY);
     if (saved && saved in loginTranslations) return saved as Locale;
-    return "pt";
+    // 2) Primeira visita: detecta o idioma do navegador
+    if (typeof navigator !== "undefined") {
+      const browserLang = (navigator.language || "").toLowerCase();
+      if (browserLang.startsWith("pt")) return "pt";
+    }
+    // 3) Fallback: Inglês
+    return "en";
   });
 
   const t = loginTranslations[locale];
