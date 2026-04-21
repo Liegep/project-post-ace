@@ -1,63 +1,63 @@
 
 
-## Expandir o editor de templates de Brief (estilo Google Forms)
+## Visualização rica do CSV em gráficos bonitos
 
-Vou turbinar o `TemplateEditor.tsx` que já existe para ficar parecido com Google Forms, com mais tipos de campo, configurações por pergunta, seções e pré-visualização.
+Vou transformar o painel de upload + dashboard de relatórios numa experiência visual completa: depois do upload, além dos cards de totais que já existem, o sistema vai exibir **todos os dados linha-a-linha do CSV** em vários gráficos elegantes (não só os 7 agregados), com um "pretty print" da tabela bruta para o usuário inspecionar.
 
-### Novos tipos de pergunta
+### O que será adicionado
 
-Hoje já temos: texto curto, texto longo, sim/não, escolha única, múltipla escolha, upload, link.
+**1. Tabela "pretty print" do CSV** (colapsável)
+- Mostra as primeiras 50 linhas do CSV como uma tabela glassmorphism rolável
+- Cabeçalhos sticky, números alinhados à direita com formatação pt-BR
+- Badge com total de linhas + colunas detectadas
+- Botão "Ver todas as linhas" para expandir
 
-Vou adicionar:
-- **Dropdown** (select) — lista suspensa com opções
-- **Escala linear** (1 a 5, 1 a 10) — com rótulos nas pontas (ex: "Ruim" → "Ótimo")
-- **Data** — date picker
-- **Hora** — time picker
-- **Número** — input numérico com min/max opcional
-- **Email** — com validação
-- **Grade de múltipla escolha** — linhas × colunas (ex: avaliar vários itens)
-- **Seção/Quebra** — divisor com título e descrição (organiza o formulário em blocos)
+**2. Novo componente `CsvDataCharts.tsx`** — gera múltiplos gráficos a partir das linhas brutas do CSV:
 
-### Configurações por pergunta (painel expandido)
+   - **Linha temporal** (Area chart): se houver coluna de Data, plota Alcance/Impressões/Investimento ao longo do tempo
+   - **Top 10 linhas por métrica** (Bar chart horizontal): ranking das linhas com maior Alcance, maior Investimento, maior Engajamento
+   - **Mix de Investimento × Resultado** (Scatter chart): correlação Spend × Reach — cada ponto é uma linha do CSV, ajuda a ver custo-benefício
+   - **Distribuição por categoria** (Donut): se houver coluna textual repetitiva (ex: "Tipo de post", "Campanha", "Descrição"), agrupa e soma a métrica principal
+   - **Comparativo de métricas** (Radar): visão consolidada normalizada das 7 métricas
 
-Cada pergunta vai ter um card expansível com:
-- Texto da pergunta
-- Texto de ajuda/descrição (subtítulo opcional)
-- Tipo de campo (dropdown com ícones)
-- Obrigatória (switch)
-- Opções dinâmicas (adicionar/remover/reordenar uma a uma, em vez de lista separada por vírgula)
-- "Outro" como opção (para escolha única / múltipla / dropdown)
-- Placeholder (para campos de texto)
-- Limites (min/max para número e escala)
+   Cada gráfico só aparece se houver dados suficientes — sem espaços vazios.
 
-### UX do editor
+**3. Cards de totais existentes** ganham:
+   - Mini-sparkline (mostra a evolução ao longo das linhas do CSV)
+   - Variação % vs período anterior, se houver
+   - Já permanecem com Alcance / Impressões / Investimento
 
-- **Drag & drop** real entre perguntas (substituir setas ↑↓ por @dnd-kit que já está no projeto)
-- **Duplicar pergunta** (botão de cópia ao lado de excluir)
-- **Aba "Pré-visualizar"** dentro do editor — mostra como o cliente verá o formulário, sem salvar nada
-- **Contador de perguntas obrigatórias** no rodapé
-- **Auto-save indicator** (apenas visual; salvamento continua manual via botão)
+**4. Fluxo atualizado em `CsvUploadPanel.tsx`**:
+   - Continua: Upload → Confirmar mapeamento → Aplicar
+   - Passa para o `CreateReportPage` não só os totais agregados, mas também as **linhas brutas + headers** via callback estendido
+   - Adiciona auto-detecção de coluna de Data (palavras-chave: "data", "date", "dia", "início", "fim")
 
-### Renderização no formulário do cliente
+**5. Em `CreateReportPage.tsx`**:
+   - Renderiza, abaixo dos cards: Tabela pretty print → Gráficos do CSV (`CsvDataCharts`) → Gráficos agregados existentes (`ReportCharts`)
+   - Tudo dentro do estilo glassmorphism dark já estabelecido no projeto
 
-Atualizar `FillBriefDialog.tsx` para suportar todos os novos tipos:
-- Dropdown → `<Select>`
-- Escala → botões 1..N com rótulos
-- Data/hora → componentes existentes (`Calendar`, input time)
-- Número/email → input com validação
-- Grade → tabela de radios
-- Seção → renderiza título grande + descrição, sem campo de resposta
+### Detalhes técnicos
 
-### Arquivos a alterar
+- **Sem nova dependência**: já existe `recharts` no projeto (visto em `ReportCharts.tsx`); usarei `LineChart`, `ScatterChart`, `BarChart` horizontal e `RadarChart` dele.
+- **Cores**: reutilizo a paleta `CHART_COLORS` definida em `ReportCharts.tsx` para manter consistência.
+- **Detecção de coluna de data**: regex em `stripDiacritics(header)` + tentativa de parsear cada célula como `Date`.
+- **Detecção de coluna de categoria**: heurística — coluna textual com 2 ≤ valores únicos ≤ 15 e que não seja a coluna de data.
+- **Performance**: limita gráficos a 50 pontos no scatter (sample) e top 10 no ranking. Tabela pretty print usa `useMemo` para slicing.
+- **Estado adicional em `CreateReportPage`**: `csvRawRows` e `csvHeaders` para alimentar `CsvDataCharts` e a tabela.
+- **Interface do callback** `onMetricsParsed` ganha campos opcionais `rawRows` e `rawHeaders` — retrocompatível.
 
-- `src/hooks/useBriefTemplates.ts` — expandir o tipo `FieldType` e `BriefQuestion` (adicionar `helpText`, `placeholder`, `min`, `max`, `scaleLabels`, `gridRows`, `gridCols`, `allowOther`)
-- `src/components/briefs/TemplateEditor.tsx` — reescrever painel de pergunta com card expansível, drag & drop, opções dinâmicas, aba de preview
-- `src/components/briefs/FillBriefDialog.tsx` — adicionar renderização para os novos tipos
-- (sem mudanças de schema — o campo `questions` já é JSONB e aceita qualquer estrutura)
+### Arquivos
 
-### Não vou mexer
+- **Editar** `src/components/reports/CsvUploadPanel.tsx` — passar linhas brutas + headers + coluna de data detectada via callback
+- **Criar** `src/components/reports/CsvDataCharts.tsx` — novo componente com 5 gráficos visuais
+- **Criar** `src/components/reports/CsvDataTable.tsx` — pretty print colapsável das primeiras 50 linhas
+- **Editar** `src/pages/CreateReportPage.tsx` — integrar tabela + novos gráficos abaixo dos cards de totais
+- **Editar** `src/components/reports/ReportCharts.tsx` — adicionar mini-sparklines opcionais aos cards (apenas pequena melhoria visual)
 
-- Visual geral / glassmorphism / cores
-- Tabelas do banco (a estrutura JSONB atual já comporta tudo)
-- Fluxo de envio/resposta/reabertura
+### O que NÃO muda
+
+- Lógica de mapeamento manual (dropdowns) e detecção das 7 métricas continua igual
+- Cards de total (Alcance / Impressões / Investimento) permanecem visíveis como antes
+- Estética glassmorphism dark já definida nas memórias do projeto
+- Salvamento no banco continua igual — os gráficos adicionais são apenas visualização local pré-publicação
 
