@@ -301,7 +301,7 @@ export default function CreateReportPage() {
 
         {/* Live Chart Preview (aggregated totals) */}
         {Object.keys(metrics).filter(k => metrics[k] !== undefined).length > 0 && (
-          <ReportCharts metrics={metrics} prevMetrics={prevMetrics} />
+          <ReportCharts metrics={metrics} prevMetrics={prevMetrics} locale={reportLocale} />
         )}
 
         {/* Strategic Comment */}
