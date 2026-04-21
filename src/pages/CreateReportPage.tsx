@@ -403,12 +403,13 @@ export default function CreateReportPage() {
           </CardContent>
         </Card>
 
-        {/* Recommendations */}
         {/* Top Content (Posts / Reels / Stories) */}
         <TopContentPanel value={topContent} onChange={setTopContent} />
 
         {/* Recommendations */}
         <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Recomendações e Próximos Passos</CardTitle>
           </CardHeader>
           <CardContent>
             <Textarea
