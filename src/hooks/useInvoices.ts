@@ -29,6 +29,7 @@ export interface Invoice {
     address?: string;
     country?: string;
     tax_id?: string;
+    locale?: string;
   };
 }
 
@@ -64,7 +65,7 @@ export function useInvoices(clientId?: string) {
     setLoading(true);
     let query = supabase
       .from("invoices")
-      .select("*, clients(name, logo_url, slug, billing_currency, address, country, tax_id)")
+      .select("*, clients(name, logo_url, slug, billing_currency, address, country, tax_id, locale)")
       .order("created_at", { ascending: false });
 
     if (clientId) {
