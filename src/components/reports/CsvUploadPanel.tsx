@@ -175,11 +175,27 @@ function splitCsvLine(line: string, sep: string): string[] {
 function parseCsvText(text: string): { headers: string[]; rows: string[][] } {
   const lines = text.split(/\r?\n/).filter(l => l.trim());
   if (lines.length === 0) return { headers: [], rows: [] };
-  // Detect separator from first line: prefer comma, but use ; if it appears more often
-  const first = lines[0];
-  const sep = (first.split(";").length - 1) > (first.split(",").length - 1) ? ";" : ",";
-  const headers = splitCsvLine(first, sep).map(h => h.replace(/^"|"$/g, ""));
-  const rows = lines.slice(1).map(l => splitCsvLine(l, sep).map(c => c.replace(/^"|"$/g, "")));
+
+  // Detect separator from a line that looks like data (most separators wins across first lines)
+  const sniff = lines.slice(0, 10).join("\n");
+  const sep = (sniff.split(";").length - 1) > (sniff.split(",").length - 1) ? ";" : ",";
+
+  // Skip metadata/preamble rows: Facebook exports often begin with title, date range,
+  // empty rows or single-cell lines before the real header. The real header is the
+  // first row with >=2 cells AND at least one recognized metric/field alias.
+  let headerIdx = 0;
+  for (let i = 0; i < Math.min(lines.length, 20); i++) {
+    const cells = splitCsvLine(lines[i], sep).map(c => c.replace(/^"|"$/g, ""));
+    if (cells.length < 2) continue;
+    const recognized = cells.filter(c => normalizeHeader(c) !== null).length;
+    if (recognized >= 1) { headerIdx = i; break; }
+  }
+
+  const headers = splitCsvLine(lines[headerIdx], sep).map(h => h.replace(/^"|"$/g, ""));
+  const rows = lines.slice(headerIdx + 1)
+    .map(l => splitCsvLine(l, sep).map(c => c.replace(/^"|"$/g, "")))
+    // Drop rows that are essentially empty (all blank cells)
+    .filter(r => r.some(c => c && c.trim() !== ""));
   return { headers, rows };
 }
 
