@@ -1,63 +1,115 @@
 
 
-## Visualização rica do CSV em gráficos bonitos
+# Plano: Faturas Profissionais com Emissor + Cliente + Logo
 
-Vou transformar o painel de upload + dashboard de relatórios numa experiência visual completa: depois do upload, além dos cards de totais que já existem, o sistema vai exibir **todos os dados linha-a-linha do CSV** em vários gráficos elegantes (não só os 7 agregados), com um "pretty print" da tabela bruta para o usuário inspecionar.
+## Objetivo
+Transformar o PDF da fatura em um documento profissional completo, com dados do emissor (você), dados expandidos do cliente, métodos de pagamento e logo do cliente — tudo no estilo Apple minimalista.
 
-### O que será adicionado
+## 1. Banco de Dados
 
-**1. Tabela "pretty print" do CSV** (colapsável)
-- Mostra as primeiras 50 linhas do CSV como uma tabela glassmorphism rolável
-- Cabeçalhos sticky, números alinhados à direita com formatação pt-BR
-- Badge com total de linhas + colunas detectadas
-- Botão "Ver todas as linhas" para expandir
+### Configurações globais do emissor (você)
+Reaproveitar a tabela existente `app_settings` (key/value) para salvar os dados do negócio como JSON sob a chave `issuer_details`:
+- `business_name`, `address`, `country`, `email`, `tax_id`, `payment_method`, `payment_details`
 
-**2. Novo componente `CsvDataCharts.tsx`** — gera múltiplos gráficos a partir das linhas brutas do CSV:
+Sem necessidade de nova tabela — `app_settings` já existe e é editável por admins.
 
-   - **Linha temporal** (Area chart): se houver coluna de Data, plota Alcance/Impressões/Investimento ao longo do tempo
-   - **Top 10 linhas por métrica** (Bar chart horizontal): ranking das linhas com maior Alcance, maior Investimento, maior Engajamento
-   - **Mix de Investimento × Resultado** (Scatter chart): correlação Spend × Reach — cada ponto é uma linha do CSV, ajuda a ver custo-benefício
-   - **Distribuição por categoria** (Donut): se houver coluna textual repetitiva (ex: "Tipo de post", "Campanha", "Descrição"), agrupa e soma a métrica principal
-   - **Comparativo de métricas** (Radar): visão consolidada normalizada das 7 métricas
+### Expandir tabela `clients` (migração)
+Adicionar colunas opcionais:
+- `address` (text, default '')
+- `country` (text, default '')
+- `tax_id` (text, default '')
 
-   Cada gráfico só aparece se houver dados suficientes — sem espaços vazios.
+Não quebra nada: todos com default vazio.
 
-**3. Cards de totais existentes** ganham:
-   - Mini-sparkline (mostra a evolução ao longo das linhas do CSV)
-   - Variação % vs período anterior, se houver
-   - Já permanecem com Alcance / Impressões / Investimento
+## 2. UI — Configurações do Emissor
 
-**4. Fluxo atualizado em `CsvUploadPanel.tsx`**:
-   - Continua: Upload → Confirmar mapeamento → Aplicar
-   - Passa para o `CreateReportPage` não só os totais agregados, mas também as **linhas brutas + headers** via callback estendido
-   - Adiciona auto-detecção de coluna de Data (palavras-chave: "data", "date", "dia", "início", "fim")
+Nova aba/seção **"Dados da Empresa"** dentro de `BillingPage.tsx` (ou no menu admin), com formulário:
+- Nome do negócio, endereço, país, e-mail, Tax ID/VAT
+- Forma de pagamento padrão (ex: "Transferência Bancária")
+- Detalhes de pagamento (IBAN, PayPal, PIX, etc.)
+- Botão "Salvar" → grava em `app_settings`
 
-**5. Em `CreateReportPage.tsx`**:
-   - Renderiza, abaixo dos cards: Tabela pretty print → Gráficos do CSV (`CsvDataCharts`) → Gráficos agregados existentes (`ReportCharts`)
-   - Tudo dentro do estilo glassmorphism dark já estabelecido no projeto
+Hook novo: `useIssuerDetails()` para ler/salvar.
 
-### Detalhes técnicos
+## 3. UI — Dados Expandidos do Cliente
 
-- **Sem nova dependência**: já existe `recharts` no projeto (visto em `ReportCharts.tsx`); usarei `LineChart`, `ScatterChart`, `BarChart` horizontal e `RadarChart` dele.
-- **Cores**: reutilizo a paleta `CHART_COLORS` definida em `ReportCharts.tsx` para manter consistência.
-- **Detecção de coluna de data**: regex em `stripDiacritics(header)` + tentativa de parsear cada célula como `Date`.
-- **Detecção de coluna de categoria**: heurística — coluna textual com 2 ≤ valores únicos ≤ 15 e que não seja a coluna de data.
-- **Performance**: limita gráficos a 50 pontos no scatter (sample) e top 10 no ranking. Tabela pretty print usa `useMemo` para slicing.
-- **Estado adicional em `CreateReportPage`**: `csvRawRows` e `csvHeaders` para alimentar `CsvDataCharts` e a tabela.
-- **Interface do callback** `onMetricsParsed` ganha campos opcionais `rawRows` e `rawHeaders` — retrocompatível.
+Em `ClientBillingConfig.tsx` (ou no editor do cliente), adicionar campos opcionais:
+- Endereço, País, Tax ID/VAT
 
-### Arquivos
+## 4. UI — Editor de Fatura (`InvoiceDetailDialog.tsx`)
 
-- **Editar** `src/components/reports/CsvUploadPanel.tsx` — passar linhas brutas + headers + coluna de data detectada via callback
-- **Criar** `src/components/reports/CsvDataCharts.tsx` — novo componente com 5 gráficos visuais
-- **Criar** `src/components/reports/CsvDataTable.tsx` — pretty print colapsável das primeiras 50 linhas
-- **Editar** `src/pages/CreateReportPage.tsx` — integrar tabela + novos gráficos abaixo dos cards de totais
-- **Editar** `src/components/reports/ReportCharts.tsx` — adicionar mini-sparklines opcionais aos cards (apenas pequena melhoria visual)
+Adicionar campos editáveis por fatura (sobrescrevem padrões se preenchidos):
+- Forma de pagamento (input)
+- Detalhes de pagamento (textarea)
+- Notas/observações já existem (`notes`)
 
-### O que NÃO muda
+Migração extra na tabela `invoices`:
+- `payment_method` (text, default '')
+- `payment_details` (text, default '')
 
-- Lógica de mapeamento manual (dropdowns) e detecção das 7 métricas continua igual
-- Cards de total (Alcance / Impressões / Investimento) permanecem visíveis como antes
-- Estética glassmorphism dark já definida nas memórias do projeto
-- Salvamento no banco continua igual — os gráficos adicionais são apenas visualização local pré-publicação
+## 5. PDF — Novo Layout (`src/lib/invoicePdf.ts`)
+
+```text
+┌─────────────────────────────────────────────┐
+│  [LOGO CLIENTE]              FATURA #001    │
+│                              Status: Paga   │
+├─────────────────────────────────────────────┤
+│  DE (Emissor)          PARA (Cliente)       │
+│  Liege Studio          Nome do Cliente      │
+│  Endereço              Endereço             │
+│  País                  País                  │
+│  email@...             Tax ID                │
+│  VAT: ...                                   │
+├─────────────────────────────────────────────┤
+│  Emissão: ...    Vencimento: ...            │
+├─────────────────────────────────────────────┤
+│  [TABELA DE ITENS — mantida igual]          │
+├─────────────────────────────────────────────┤
+│  Subtotal / Desconto / Total                │
+├─────────────────────────────────────────────┤
+│  PAGAMENTO                                  │
+│  Método: Transferência                      │
+│  IBAN: IT00...                              │
+├─────────────────────────────────────────────┤
+│  Observações: ...                           │
+├─────────────────────────────────────────────┤
+│  www.liegestudio.com                        │
+└─────────────────────────────────────────────┘
+```
+
+- Logo do cliente: usar `invoice.clients.logo_url` (já existe no schema), exibido no canto superior esquerdo (max 80px altura).
+- `generateInvoicePDF` recebe novos parâmetros: `issuer` (do `app_settings`) e usa dados expandidos do cliente.
+- Estilo Apple: tipografia limpa, espaçamento generoso, divisores sutis, sem cores chamativas.
+
+## 6. Fluxo Geral
+
+1. Admin abre **Faturamento → Dados da Empresa**, preenche uma vez.
+2. Admin edita cliente → preenche endereço/Tax ID (opcional).
+3. Ao gerar PDF, o sistema carrega:
+   - `app_settings` → emissor
+   - `invoice.clients` → cliente expandido + logo
+   - `invoice.payment_method/details` (sobrescreve padrão se houver)
+4. PDF renderiza tudo no novo layout.
+
+## Arquivos a alterar/criar
+
+**Migrações:**
+- Adicionar colunas em `clients` (address, country, tax_id)
+- Adicionar colunas em `invoices` (payment_method, payment_details)
+
+**Código novo:**
+- `src/hooks/useIssuerDetails.ts` — ler/salvar dados do emissor
+- `src/components/billing/IssuerSettingsPanel.tsx` — formulário de configuração
+
+**Código alterado:**
+- `src/lib/invoicePdf.ts` — novo layout completo com logo + emissor + cliente expandido + pagamento
+- `src/components/billing/InvoiceDetailDialog.tsx` — campos payment_method/details, passar issuer ao gerar PDF
+- `src/components/billing/ClientBillingConfig.tsx` — campos de endereço/Tax ID do cliente
+- `src/pages/BillingPage.tsx` — aba/botão para abrir configurações do emissor
+- `src/hooks/useInvoices.ts` — incluir novos campos no tipo `Invoice`
+
+## Garantias
+- Nenhum campo existente removido.
+- Todos os novos campos opcionais com default vazio → faturas antigas continuam funcionando.
+- Funcionalidade atual (criar/editar/baixar/enviar ao cliente) intacta.
 
