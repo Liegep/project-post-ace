@@ -106,6 +106,55 @@ export default function CreateReportPage() {
     fetch();
   }, [userId]);
 
+  // Load report data when editing
+  useEffect(() => {
+    if (!editId) return;
+    const loadReport = async () => {
+      const { data, error } = await supabase
+        .from("social_reports")
+        .select("*")
+        .eq("id", editId)
+        .single();
+      if (error || !data) {
+        toast({ title: "Erro ao carregar relatório", variant: "destructive" });
+        return;
+      }
+      const r: any = data;
+      setClientId(r.client_id || "");
+      setTitle(r.title || "");
+      setPlatform(r.platform || "instagram");
+      setPeriodStart(r.period_start || "");
+      setPeriodEnd(r.period_end || "");
+      setStrategicComment(r.strategic_comment || "");
+      setRecommendations(r.recommendations || "");
+      setBestContent(r.best_content || "");
+      setWorstContent(r.worst_content || "");
+      setBestFormat(r.best_format || "");
+      setReportLocale((r.locale as Locale) || "pt");
+      setMetrics((r.metrics as SocialReportMetrics) || {});
+      setPrevMetrics((r.previous_metrics as SocialReportMetrics) || {});
+      // Decode observations + topContent
+      try {
+        const parsed = JSON.parse(r.observations || "");
+        if (parsed && typeof parsed === "object" && ("text" in parsed || "top_content" in parsed)) {
+          setObservations(parsed.text || "");
+          if (parsed.top_content) setTopContent({ ...EMPTY_TOP_CONTENT, ...parsed.top_content });
+        } else {
+          setObservations(r.observations || "");
+        }
+      } catch {
+        setObservations(r.observations || "");
+      }
+      // Active fields = keys with values
+      const keys = Object.keys((r.metrics as SocialReportMetrics) || {}).filter(
+        (k) => (r.metrics as any)[k] !== undefined && (r.metrics as any)[k] !== null,
+      );
+      if (keys.length > 0) setActiveFields(keys);
+      if (r.status === "published") setSendToClient(true);
+    };
+    loadReport();
+  }, [editId]);
+
   const toggleField = (field: string) => {
     setActiveFields(prev =>
       prev.includes(field) ? prev.filter(f => f !== field) : [...prev, field]
