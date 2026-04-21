@@ -1,0 +1,1 @@
+CREATE POLICY "Admins can delete client_seen_items" ON public.client_seen_items FOR DELETE TO authenticated USING (has_role(auth.uid(), 'admin'::app_role));
