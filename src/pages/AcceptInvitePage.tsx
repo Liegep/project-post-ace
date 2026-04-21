@@ -106,7 +106,7 @@ const AcceptInvitePage = () => {
 
         <form onSubmit={handleAccept} className="space-y-4 rounded-xl border bg-card p-6">
           <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password">Password</Label>
             <Input
               id="password"
               type="password"
