@@ -302,6 +302,41 @@ export default function CommemorativeDatesPage() {
             </div>
           </div>
 
+          {/* Public Holidays (Nager.Date) selector */}
+          <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center rounded-lg border bg-card p-2.5">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+              <CalendarHeart className="h-3.5 w-3.5 text-primary" />
+              <span className="font-medium">Feriados oficiais:</span>
+            </div>
+            <div className="flex gap-2 flex-1 w-full sm:w-auto">
+              <Select value={countryCode} onValueChange={setCountryCode}>
+                <SelectTrigger className="h-8 text-xs flex-1 sm:w-[220px] sm:flex-none">
+                  <SelectValue placeholder="País" />
+                </SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {nagerCountries.map((c) => (
+                    <SelectItem key={c.countryCode} value={c.countryCode} className="text-xs">
+                      {c.name} ({c.countryCode})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={String(nagerYear)} onValueChange={(v) => setNagerYear(parseInt(v))}>
+                <SelectTrigger className="h-8 text-xs w-[90px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 6 }, (_, i) => currentYear - 1 + i).map((y) => (
+                    <SelectItem key={y} value={String(y)} className="text-xs">{y}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {nagerLoading && (
+              <span className="text-[10px] text-muted-foreground">Carregando...</span>
+            )}
+          </div>
+
           {/* Active country filters */}
           {selectedCountries.length > 0 && (
             <div className="flex flex-wrap gap-1.5 items-center">
