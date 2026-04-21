@@ -123,9 +123,10 @@ export async function generateInvoicePDF(
 <title>${t.invoice} ${invoice.invoice_number} - ${escapeHtml(issuer.business_name || "www.liegestudio.com")}</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: #1c1c1e; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-    color: #1d1d1f;
+    color: #e8e6e1;
     padding: 48px;
     max-width: 820px;
     margin: 0 auto;
@@ -135,22 +136,23 @@ export async function generateInvoicePDF(
   }
   .top {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 40px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid #e5e5e7;
+    padding-bottom: 28px;
+    border-bottom: 1px solid #3a3a3c;
+    text-align: center;
   }
-  .top .logo-wrap { max-width: 200px; }
-  .top .logo-wrap img { max-height: 64px; max-width: 200px; object-fit: contain; }
-  .top .title-wrap { text-align: right; }
-  .top h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: #1d1d1f; }
-  .top .invoice-num { font-size: 13px; color: #86868b; font-family: 'SF Mono', monospace; margin-top: 4px; }
+  .top .logo-wrap { max-width: 320px; margin-bottom: 20px; }
+  .top .logo-wrap img { max-height: 160px; max-width: 320px; object-fit: contain; display: block; }
+  .top .title-wrap { text-align: center; }
+  .top h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: #f5f3ee; }
+  .top .invoice-num { font-size: 13px; color: #a1a1a6; font-family: 'SF Mono', monospace; margin-top: 4px; }
   .status { display: inline-block; padding: 4px 12px; border-radius: 980px; font-size: 11px; font-weight: 600; margin-top: 8px; letter-spacing: 0.02em; }
-  .status-open { background: #e3f2fd; color: #0066cc; }
-  .status-paid { background: #d1f4dd; color: #00875a; }
-  .status-overdue { background: #ffe5e5; color: #d70015; }
-  .status-cancelled { background: #f5f5f7; color: #86868b; }
+  .status-open { background: #1d3a5f; color: #6cb2ff; }
+  .status-paid { background: #1a3d2c; color: #6dd49a; }
+  .status-overdue { background: #4a1f1f; color: #ff6b6b; }
+  .status-cancelled { background: #2c2c2e; color: #a1a1a6; }
 
   .parties {
     display: grid;
@@ -162,25 +164,25 @@ export async function generateInvoicePDF(
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #86868b;
+    color: #a1a1a6;
     margin-bottom: 10px;
     font-weight: 600;
   }
-  .party .name { font-size: 15px; font-weight: 600; color: #1d1d1f; margin-bottom: 6px; }
-  .party p { font-size: 13px; line-height: 1.6; color: #424245; }
-  .party .meta-line { color: #86868b; font-size: 12px; margin-top: 4px; }
+  .party .name { font-size: 15px; font-weight: 600; color: #f5f3ee; margin-bottom: 6px; }
+  .party p { font-size: 13px; line-height: 1.6; color: #d1cfca; }
+  .party .meta-line { color: #a1a1a6; font-size: 12px; margin-top: 4px; }
 
   .dates {
     display: flex;
     gap: 40px;
     padding: 16px 0;
     margin-bottom: 32px;
-    border-top: 1px solid #f2f2f5;
-    border-bottom: 1px solid #f2f2f5;
+    border-top: 1px solid #3a3a3c;
+    border-bottom: 1px solid #3a3a3c;
     font-size: 13px;
   }
-  .dates .item span { color: #86868b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 2px; }
-  .dates .item strong { color: #1d1d1f; font-weight: 500; }
+  .dates .item span { color: #a1a1a6; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 2px; }
+  .dates .item strong { color: #f5f3ee; font-weight: 500; }
 
   table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
   thead th {
@@ -188,22 +190,22 @@ export async function generateInvoicePDF(
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #86868b;
+    color: #a1a1a6;
     padding: 10px 12px;
-    border-bottom: 1px solid #d2d2d7;
+    border-bottom: 1px solid #48484a;
     font-weight: 600;
   }
-  tbody td { padding: 12px; font-size: 13px; border-bottom: 1px solid #f2f2f5; color: #1d1d1f; }
-  tbody td .desc { color: #86868b; font-size: 11px; margin-top: 2px; }
+  tbody td { padding: 12px; font-size: 13px; border-bottom: 1px solid #2c2c2e; color: #e8e6e1; }
+  tbody td .desc { color: #a1a1a6; font-size: 11px; margin-top: 2px; }
   .text-right { text-align: right; }
 
   .totals { margin-left: auto; width: 320px; padding-top: 8px; }
-  .totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: #424245; }
+  .totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: #d1cfca; }
   .totals .row.total {
     font-size: 18px;
     font-weight: 600;
-    color: #1d1d1f;
-    border-top: 1px solid #1d1d1f;
+    color: #f5f3ee;
+    border-top: 1px solid #f5f3ee;
     padding-top: 12px;
     margin-top: 8px;
     letter-spacing: -0.01em;
@@ -212,33 +214,34 @@ export async function generateInvoicePDF(
   .payment-block, .notes-block {
     margin-top: 32px;
     padding: 18px 20px;
-    background: #f5f5f7;
+    background: #2c2c2e;
     border-radius: 12px;
   }
   .payment-block h3, .notes-block h3 {
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #86868b;
+    color: #a1a1a6;
     margin-bottom: 10px;
     font-weight: 600;
   }
-  .payment-block .pm { font-size: 14px; font-weight: 600; color: #1d1d1f; margin-bottom: 6px; }
-  .payment-block .pd, .notes-block p { font-size: 13px; line-height: 1.6; color: #424245; white-space: pre-wrap; }
+  .payment-block .pm { font-size: 14px; font-weight: 600; color: #f5f3ee; margin-bottom: 6px; }
+  .payment-block .pd, .notes-block p { font-size: 13px; line-height: 1.6; color: #d1cfca; white-space: pre-wrap; }
 
   .footer {
     margin-top: 56px;
     padding-top: 20px;
-    border-top: 1px solid #e5e5e7;
+    border-top: 1px solid #3a3a3c;
     text-align: center;
     font-size: 11px;
-    color: #86868b;
+    color: #a1a1a6;
   }
-  .footer a { color: #0066cc; text-decoration: none; }
+  .footer a { color: #7ab8ff; text-decoration: none; }
 
   @media print {
     body { padding: 24px; }
-    @page { margin: 14mm; }
+    @page { margin: 14mm; background: #1c1c1e; }
+    html, body { background: #1c1c1e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
