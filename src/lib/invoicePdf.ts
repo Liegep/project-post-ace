@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { pt, enUS, it, es, sv } from "date-fns/locale";
 import { formatCurrency } from "@/lib/currency";
 import { fetchIssuerDetails, IssuerDetails } from "@/hooks/useIssuerDetails";
+import issuerLogo from "@/assets/issuer-logo.png";
 
 type Locale = "pt" | "en" | "it" | "es" | "sv";
 
@@ -105,8 +106,7 @@ export async function generateInvoicePDF(
   const clientAddress = invoice.clients?.address || "";
   const clientCountry = invoice.clients?.country || "";
   const clientTaxId = invoice.clients?.tax_id || "";
-  const rawLogo = invoice.clients?.logo_url || "";
-  const clientLogo = rawLogo ? await imageUrlToDataUrl(rawLogo) : "";
+  const issuerLogoData = await imageUrlToDataUrl(issuerLogo);
 
   const discount = Number(invoice.discount || 0);
   const surcharge = Number(invoice.surcharge || 0);
@@ -246,7 +246,7 @@ export async function generateInvoicePDF(
 
   <div class="top">
     <div class="logo-wrap">
-      ${clientLogo ? `<img src="${clientLogo}" alt="${escapeHtml(clientName)}">` : `<div style="font-size:18px;font-weight:600;color:#1d1d1f">${escapeHtml(clientName)}</div>`}
+      <img src="${issuerLogoData}" alt="${escapeHtml(issuer.business_name || "Liege Paschoalini Studio")}">
     </div>
     <div class="title-wrap">
       <h1>${t.invoice}</h1>
