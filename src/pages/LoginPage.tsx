@@ -260,7 +260,7 @@ const LoginPage = () => {
             </div>
 
             {error && <p className="text-sm text-destructive">{error}</p>}
-            {successMessage && <p className="text-sm text-green-600">{successMessage}</p>}
+            {successMessage && <p className="text-sm text-primary">{successMessage}</p>}
 
             <Button type="submit" className="w-full" disabled={loading}>
               <Mail className="mr-2 h-4 w-4" />
