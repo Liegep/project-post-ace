@@ -220,13 +220,38 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                 </div>
                 <div className="mt-2 border-primary-foreground text-black bg-transparent">
                   <Label htmlFor="edit-external-link" className="font-medium peer-disabled:cursor-not-allowed text-xs text-primary-foreground opacity-100">Ou usar link externo</Label>
-                  <Input
-                    id="edit-external-link"
-                    value={externalLink}
-                    onChange={(e) => setExternalLink(e.target.value)}
-                    placeholder="https://drive.google.com/..."
-                    disabled={mediaItems.length > 0}
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      id="edit-external-link"
+                      value={externalLink}
+                      onChange={(e) => setExternalLink(e.target.value)}
+                      placeholder="https://drive.google.com/..."
+                      disabled={mediaItems.length > 0}
+                      className="flex-1"
+                    />
+                    {externalLink.trim() && /^https?:\/\//i.test(externalLink.trim()) && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(externalLink.trim(), "_blank", "noopener,noreferrer")}
+                        title="Abrir link em nova aba"
+                      >
+                        Abrir
+                      </Button>
+                    )}
+                  </div>
+                  {externalLink.trim() && /^https?:\/\//i.test(externalLink.trim()) && (
+                    <a
+                      href={externalLink.trim()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-block text-xs text-primary hover:underline truncate max-w-full"
+                      title={externalLink.trim()}
+                    >
+                      🔗 {externalLink.trim()}
+                    </a>
+                  )}
                   {mediaItems.length > 0 && externalLink && (
                     <p className="text-xs text-muted-foreground mt-1">Arquivos enviados têm prioridade sobre o link.</p>
                   )}
