@@ -25,6 +25,9 @@ interface BillingConfig {
   billing_due_day: number;
   billing_start_date: string | null;
   billing_currency: string;
+  address: string;
+  country: string;
+  tax_id: string;
 }
 
 export function ClientBillingConfig({ clientId }: { clientId: string }) {
@@ -36,6 +39,9 @@ export function ClientBillingConfig({ clientId }: { clientId: string }) {
     billing_due_day: 10,
     billing_start_date: null,
     billing_currency: "BRL",
+    address: "",
+    country: "",
+    tax_id: "",
   });
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +49,7 @@ export function ClientBillingConfig({ clientId }: { clientId: string }) {
     const load = async () => {
       const { data } = await supabase
         .from("clients")
-        .select("billing_type, billing_recurrence_active, billing_monthly_amount, billing_description, billing_due_day, billing_start_date, billing_currency")
+        .select("billing_type, billing_recurrence_active, billing_monthly_amount, billing_description, billing_due_day, billing_start_date, billing_currency, address, country, tax_id")
         .eq("id", clientId)
         .single();
       if (data) setConfig(data as any);
@@ -217,6 +223,43 @@ export function ClientBillingConfig({ clientId }: { clientId: string }) {
           </div>
         </>
       )}
+
+      <Separator />
+
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Dados para Faturação</p>
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs">Endereço</Label>
+          <Textarea
+            className="text-sm min-h-[60px] resize-none"
+            value={config.address}
+            onChange={(e) => save({ address: e.target.value })}
+            placeholder="Rua, número, bairro, cidade, CEP"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs">País</Label>
+            <Input
+              className="h-9 text-sm"
+              value={config.country}
+              onChange={(e) => save({ country: e.target.value })}
+              placeholder="Brasil"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Tax ID / VAT / CNPJ</Label>
+            <Input
+              className="h-9 text-sm"
+              value={config.tax_id}
+              onChange={(e) => save({ tax_id: e.target.value })}
+              placeholder="00.000.000/0001-00"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

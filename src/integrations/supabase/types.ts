@@ -827,6 +827,7 @@ export type Database = {
       }
       clients: {
         Row: {
+          address: string
           allow_client_create_post: boolean
           allow_client_create_tags: boolean
           allow_client_download: boolean
@@ -841,6 +842,7 @@ export type Database = {
           billing_type: string
           client_portal_title: string
           client_type: string
+          country: string
           created_at: string
           facebook_url: string
           id: string
@@ -858,6 +860,7 @@ export type Database = {
           show_invoices_to_client: boolean
           show_upcoming_posts: boolean
           slug: string
+          tax_id: string
           tiktok_url: string
           tracking_enabled: boolean
           tracking_visible_to_client: boolean
@@ -868,6 +871,7 @@ export type Database = {
           youtube_url: string
         }
         Insert: {
+          address?: string
           allow_client_create_post?: boolean
           allow_client_create_tags?: boolean
           allow_client_download?: boolean
@@ -882,6 +886,7 @@ export type Database = {
           billing_type?: string
           client_portal_title?: string
           client_type?: string
+          country?: string
           created_at?: string
           facebook_url?: string
           id?: string
@@ -899,6 +904,7 @@ export type Database = {
           show_invoices_to_client?: boolean
           show_upcoming_posts?: boolean
           slug: string
+          tax_id?: string
           tiktok_url?: string
           tracking_enabled?: boolean
           tracking_visible_to_client?: boolean
@@ -909,6 +915,7 @@ export type Database = {
           youtube_url?: string
         }
         Update: {
+          address?: string
           allow_client_create_post?: boolean
           allow_client_create_tags?: boolean
           allow_client_download?: boolean
@@ -923,6 +930,7 @@ export type Database = {
           billing_type?: string
           client_portal_title?: string
           client_type?: string
+          country?: string
           created_at?: string
           facebook_url?: string
           id?: string
@@ -940,6 +948,7 @@ export type Database = {
           show_invoices_to_client?: boolean
           show_upcoming_posts?: boolean
           slug?: string
+          tax_id?: string
           tiktok_url?: string
           tracking_enabled?: boolean
           tracking_visible_to_client?: boolean
@@ -1572,6 +1581,7 @@ export type Database = {
           issue_date: string
           notes: string
           paid_at: string | null
+          payment_details: string
           payment_method: string
           period_end: string | null
           period_start: string | null
@@ -1592,6 +1602,7 @@ export type Database = {
           issue_date?: string
           notes?: string
           paid_at?: string | null
+          payment_details?: string
           payment_method?: string
           period_end?: string | null
           period_start?: string | null
@@ -1612,6 +1623,7 @@ export type Database = {
           issue_date?: string
           notes?: string
           paid_at?: string | null
+          payment_details?: string
           payment_method?: string
           period_end?: string | null
           period_start?: string | null

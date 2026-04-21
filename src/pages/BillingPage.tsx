@@ -14,10 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Search, ArrowLeft, FileText, DollarSign, AlertCircle, CheckCircle2, XCircle, Clock, TrendingUp, Eye, EyeOff } from "lucide-react";
+import { Plus, Search, ArrowLeft, FileText, DollarSign, AlertCircle, CheckCircle2, XCircle, Clock, TrendingUp, Eye, EyeOff, Building2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import InvoiceDetailDialog from "@/components/billing/InvoiceDetailDialog";
+import IssuerSettingsPanel from "@/components/billing/IssuerSettingsPanel";
 import { formatCurrency } from "@/lib/currency";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
@@ -40,6 +41,7 @@ const BillingPage = () => {
   const { invoices, loading, refetch } = useInvoices();
   const [clients, setClients] = useState<Client[]>([]);
   const [createOpen, setCreateOpen] = useState(false);
+  const [issuerOpen, setIssuerOpen] = useState(false);
   const [detailInvoice, setDetailInvoice] = useState<Invoice | null>(null);
   
   // Filters
@@ -218,6 +220,9 @@ const BillingPage = () => {
             <DollarSign className="h-5 w-5 text-primary" />
             <h1 className="text-lg font-bold">Faturamento</h1>
           </div>
+          <Button variant="outline" size="sm" onClick={() => setIssuerOpen(true)} className="gap-1.5">
+            <Building2 className="h-4 w-4" /> Dados da Empresa
+          </Button>
           <Button onClick={() => setCreateOpen(true)} size="sm" className="gap-1.5">
             <Plus className="h-4 w-4" /> Nova Fatura
           </Button>
@@ -486,6 +491,8 @@ const BillingPage = () => {
           onUpdate={() => { refetch(); }}
         />
       )}
+
+      <IssuerSettingsPanel open={issuerOpen} onOpenChange={setIssuerOpen} />
     </div>
   );
 };

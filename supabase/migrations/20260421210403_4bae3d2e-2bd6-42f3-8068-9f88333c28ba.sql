@@ -1,0 +1,8 @@
+ALTER TABLE public.clients
+  ADD COLUMN IF NOT EXISTS address text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS country text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS tax_id text NOT NULL DEFAULT '';
+
+ALTER TABLE public.invoices
+  ADD COLUMN IF NOT EXISTS payment_method text NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS payment_details text NOT NULL DEFAULT '';
