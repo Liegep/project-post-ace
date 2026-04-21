@@ -294,16 +294,6 @@ export default function ReportViewPage() {
 
           return (
             <>
-              {parsedText && (
-                <Card>
-                  <CardContent className="p-4">
-                    <h3 className="text-xs font-semibold mb-2 flex items-center gap-2">
-                      <Eye className="h-3.5 w-3.5 text-muted-foreground" /> {t.observations}
-                    </h3>
-                    <p className="text-sm text-foreground/80 whitespace-pre-line">{parsedText}</p>
-                  </CardContent>
-                </Card>
-              )}
 
               {hasTopContent && (
                 <Card className="glass-card">
