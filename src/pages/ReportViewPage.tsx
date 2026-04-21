@@ -151,6 +151,38 @@ export default function ReportViewPage() {
           </Badge>
         </div>
 
+        {/* Parse observations + top content once */}
+        {(() => null)()}
+        {(() => {
+          // no-op; actual parsing happens inline below
+          return null;
+        })()}
+
+        {/* Observations (moved to top) */}
+        {(() => {
+          if (!report.observations) return null;
+          let parsedText = "";
+          try {
+            const parsed = JSON.parse(report.observations);
+            parsedText = (parsed && typeof parsed === "object" && "text" in parsed)
+              ? (parsed.text || "")
+              : report.observations;
+          } catch {
+            parsedText = report.observations;
+          }
+          if (!parsedText) return null;
+          return (
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="text-xs font-semibold mb-2 flex items-center gap-2">
+                  <Eye className="h-3.5 w-3.5 text-muted-foreground" /> {t.observations}
+                </h3>
+                <p className="text-sm text-foreground/80 whitespace-pre-line">{parsedText}</p>
+              </CardContent>
+            </Card>
+          );
+        })()}
+
         {/* Strategic Comment */}
         {report.strategic_comment && (
           <Card className="border-primary/20 bg-primary/[0.02]">
