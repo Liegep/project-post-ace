@@ -24,6 +24,8 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { CsvUploadPanel, CsvParsedExtra } from "@/components/reports/CsvUploadPanel";
 import { ReportCharts } from "@/components/reports/ReportCharts";
+import { CsvDataTable } from "@/components/reports/CsvDataTable";
+import { CsvDataCharts, MetricKey as CsvMetricKey } from "@/components/reports/CsvDataCharts";
 import { cn } from "@/lib/utils";
 
 interface Client { id: string; name: string; slug: string; logo_url: string; }
@@ -55,6 +57,10 @@ export default function CreateReportPage() {
   const [showTemplateSave, setShowTemplateSave] = useState(false);
   const [sendToClient, setSendToClient] = useState(false);
   const [reportLocale, setReportLocale] = useState<Locale>("pt");
+  const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
+  const [csvRows, setCsvRows] = useState<Record<string, unknown>[]>([]);
+  const [csvMapping, setCsvMapping] = useState<Partial<Record<CsvMetricKey, string>>>({});
+  const [csvDateColumn, setCsvDateColumn] = useState<string | null>(null);
 
   const handleCsvParsed = (
     csvMetrics: SocialReportMetrics,
@@ -68,6 +74,10 @@ export default function CreateReportPage() {
     if (extra?.periodStart) setPeriodStart(extra.periodStart);
     if (extra?.periodEnd) setPeriodEnd(extra.periodEnd);
     if (extra?.campaignTitle && !title) setTitle(extra.campaignTitle);
+    if (extra?.rawHeaders) setCsvHeaders(extra.rawHeaders);
+    if (extra?.rawRows) setCsvRows(extra.rawRows);
+    if (extra?.mapping) setCsvMapping(extra.mapping as Partial<Record<CsvMetricKey, string>>);
+    setCsvDateColumn(extra?.dateColumn ?? null);
   };
 
   useEffect(() => {
