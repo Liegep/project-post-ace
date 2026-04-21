@@ -271,7 +271,22 @@ export default function CreateReportPage() {
           </div>
         )}
 
-        {/* Live Chart Preview */}
+        {/* Pretty-print CSV table */}
+        {csvRows.length > 0 && csvHeaders.length > 0 && (
+          <CsvDataTable headers={csvHeaders} rows={csvRows} />
+        )}
+
+        {/* Rich CSV Charts (per-row analysis) */}
+        {csvRows.length > 0 && Object.keys(csvMapping).length > 0 && (
+          <CsvDataCharts
+            headers={csvHeaders}
+            rows={csvRows}
+            mapping={csvMapping}
+            dateColumn={csvDateColumn}
+          />
+        )}
+
+        {/* Live Chart Preview (aggregated totals) */}
         {Object.keys(metrics).filter(k => metrics[k] !== undefined).length > 0 && (
           <ReportCharts metrics={metrics} prevMetrics={prevMetrics} />
         )}
