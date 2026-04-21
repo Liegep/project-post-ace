@@ -190,7 +190,7 @@ export default function ReportViewPage() {
         )}
 
         {/* Charts */}
-        <ReportCharts metrics={metrics} prevMetrics={prevMetrics} />
+        <ReportCharts metrics={metrics} prevMetrics={prevMetrics} locale={report?.locale} />
 
         {/* Content Analysis */}
         {(report.best_content || report.worst_content || report.best_format) && (
