@@ -479,7 +479,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
 
           {/* Add/Edit item form */}
           {addingItem && (
-            <div className="border rounded-lg p-3 mt-3 space-y-2 bg-muted/30">
+            <div ref={itemFormRef} className="border rounded-lg p-3 mt-3 space-y-2 bg-muted/30 scroll-mt-4">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-medium">{editingItem ? "Editar item" : "Novo item"}</h4>
                 <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => { setAddingItem(false); resetItemForm(); }}>
