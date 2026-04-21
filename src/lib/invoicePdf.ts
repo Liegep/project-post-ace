@@ -123,9 +123,10 @@ export async function generateInvoicePDF(
 <title>${t.invoice} ${invoice.invoice_number} - ${escapeHtml(issuer.business_name || "www.liegestudio.com")}</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: #1c1c1e; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-    color: #1d1d1f;
+    color: #e8e6e1;
     padding: 48px;
     max-width: 820px;
     margin: 0 auto;
@@ -135,17 +136,18 @@ export async function generateInvoicePDF(
   }
   .top {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 40px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid #e5e5e7;
+    padding-bottom: 28px;
+    border-bottom: 1px solid #3a3a3c;
+    text-align: center;
   }
-  .top .logo-wrap { max-width: 200px; }
-  .top .logo-wrap img { max-height: 64px; max-width: 200px; object-fit: contain; }
-  .top .title-wrap { text-align: right; }
-  .top h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; color: #1d1d1f; }
-  .top .invoice-num { font-size: 13px; color: #86868b; font-family: 'SF Mono', monospace; margin-top: 4px; }
+  .top .logo-wrap { max-width: 320px; margin-bottom: 20px; }
+  .top .logo-wrap img { max-height: 160px; max-width: 320px; object-fit: contain; display: block; }
+  .top .title-wrap { text-align: center; }
+  .top h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: #f5f3ee; }
+  .top .invoice-num { font-size: 13px; color: #a1a1a6; font-family: 'SF Mono', monospace; margin-top: 4px; }
   .status { display: inline-block; padding: 4px 12px; border-radius: 980px; font-size: 11px; font-weight: 600; margin-top: 8px; letter-spacing: 0.02em; }
   .status-open { background: #e3f2fd; color: #0066cc; }
   .status-paid { background: #d1f4dd; color: #00875a; }
