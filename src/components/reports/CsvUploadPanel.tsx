@@ -156,13 +156,52 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
     }
     setFileName(file.name);
 
-    Papa.parse<Record<string, unknown>>(file, {
-      header: true,
+    // First pass: parse without headers to find the real header row.
+    // Facebook/Meta exports often include metadata rows (e.g. "Relatório", date ranges) before the actual header.
+    Papa.parse<string[]>(file, {
+      header: false,
       skipEmptyLines: "greedy",
-      transformHeader: (h) => h.trim(),
-      complete: (results) => {
-        const fields = (results.meta.fields || []).filter(Boolean);
-        const data = (results.data || []).filter(r => Object.values(r).some(v => v !== null && String(v).trim() !== ""));
+      complete: (raw) => {
+        const allRows = (raw.data || []).filter(r => Array.isArray(r) && r.some(c => String(c ?? "").trim() !== ""));
+        if (allRows.length === 0) {
+          toast({ title: "CSV vazio ou ilegível", variant: "destructive" });
+          return;
+        }
+
+        // Find the header row: the row with the most non-empty string cells that look like labels
+        // (contain letters, not just numbers). Scan first 10 rows.
+        let headerRowIdx = 0;
+        let bestScore = -1;
+        const scanLimit = Math.min(10, allRows.length);
+        for (let i = 0; i < scanLimit; i++) {
+          const row = allRows[i];
+          let score = 0;
+          for (const cell of row) {
+            const s = String(cell ?? "").trim();
+            if (!s) continue;
+            // Reward cells that contain letters (likely a label) and aren't pure numbers
+            if (/[a-zA-ZÀ-ÿ]/.test(s) && !/^[\d.,\s$R€£%-]+$/.test(s)) score += 1;
+          }
+          if (score > bestScore) { bestScore = score; headerRowIdx = i; }
+        }
+
+        const rawHeaders = (allRows[headerRowIdx] || []).map(h => String(h ?? "").replace(/^\uFEFF/, "").trim());
+        // Preserve ALL headers verbatim, even duplicates — disambiguate empty/dup names so dropdown shows them all
+        const seen = new Map<string, number>();
+        const fields = rawHeaders.map((h, i) => {
+          const base = h || `Coluna ${i + 1}`;
+          const count = seen.get(base) || 0;
+          seen.set(base, count + 1);
+          return count === 0 ? base : `${base} (${count + 1})`;
+        });
+
+        // Build row objects from rows AFTER the header row
+        const dataRows = allRows.slice(headerRowIdx + 1);
+        const data: Record<string, unknown>[] = dataRows.map(row => {
+          const obj: Record<string, unknown> = {};
+          fields.forEach((f, i) => { obj[f] = row[i] ?? ""; });
+          return obj;
+        }).filter(r => Object.values(r).some(v => v !== null && String(v).trim() !== ""));
 
         if (fields.length === 0 || data.length === 0) {
           toast({ title: "CSV vazio ou ilegível", variant: "destructive" });
@@ -180,7 +219,7 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
 
         const detected = METRIC_KEYS.filter(k => auto[k]).length;
         toast({
-          title: `${data.length} linhas lidas`,
+          title: `${data.length} linhas lidas · ${fields.length} colunas`,
           description: `${detected}/${METRIC_KEYS.length} colunas detectadas — confirme o mapeamento abaixo`,
         });
       },
