@@ -235,35 +235,29 @@ export default function CreateReportPage() {
         {/* CSV Upload */}
         <CsvUploadPanel onMetricsParsed={handleCsvParsed} />
 
-        {/* Summary Cards (Reach + Spend) */}
-        {(metrics.reach !== undefined || metrics.spend !== undefined || metrics.impressions !== undefined) && (
+        {/* Summary Cards (always visible once any metric is set) */}
+        {Object.keys(metrics).length > 0 && (
           <div className="grid gap-3 sm:grid-cols-3">
-            {metrics.reach !== undefined && (
-              <Card className="glass-card border-primary/20">
-                <CardContent className="p-4">
-                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Alcance total</p>
-                  <p className="text-2xl font-semibold mt-1">{Number(metrics.reach).toLocaleString("pt-BR")}</p>
-                </CardContent>
-              </Card>
-            )}
-            {metrics.impressions !== undefined && (
-              <Card className="glass-card border-primary/20">
-                <CardContent className="p-4">
-                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Impressões totais</p>
-                  <p className="text-2xl font-semibold mt-1">{Number(metrics.impressions).toLocaleString("pt-BR")}</p>
-                </CardContent>
-              </Card>
-            )}
-            {metrics.spend !== undefined && (
-              <Card className="glass-card border-primary/20">
-                <CardContent className="p-4">
-                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Investimento total</p>
-                  <p className="text-2xl font-semibold mt-1">
-                    {Number(metrics.spend).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 })}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+            <Card className="glass-card border-primary/20">
+              <CardContent className="p-4">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Alcance total</p>
+                <p className="text-2xl font-semibold mt-1">{Number(metrics.reach ?? 0).toLocaleString("pt-BR")}</p>
+              </CardContent>
+            </Card>
+            <Card className="glass-card border-primary/20">
+              <CardContent className="p-4">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Impressões totais</p>
+                <p className="text-2xl font-semibold mt-1">{Number(metrics.impressions ?? 0).toLocaleString("pt-BR")}</p>
+              </CardContent>
+            </Card>
+            <Card className="glass-card border-primary/20">
+              <CardContent className="p-4">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Investimento total</p>
+                <p className="text-2xl font-semibold mt-1">
+                  {Number(metrics.spend ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 })}
+                </p>
+              </CardContent>
+            </Card>
           </div>
         )}
 
