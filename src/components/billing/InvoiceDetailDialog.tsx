@@ -92,6 +92,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
   const [invNotes, setInvNotes] = useState(invoice.notes || "");
   const [invDueDate, setInvDueDate] = useState(invoice.due_date);
   const [invPaymentMethod, setInvPaymentMethod] = useState(invoice.payment_method || "none");
+  const [invPaymentDetails, setInvPaymentDetails] = useState(invoice.payment_details || "");
   const [invClientVisible, setInvClientVisible] = useState(invoice.client_visible !== false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -124,6 +125,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     setInvNotes(invoice.notes || "");
     setInvDueDate(invoice.due_date);
     setInvPaymentMethod(invoice.payment_method || "none");
+    setInvPaymentDetails(invoice.payment_details || "");
     setInvClientVisible(invoice.client_visible !== false);
   }, [invoice]);
 
@@ -216,6 +218,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         notes: invNotes,
         due_date: invDueDate,
         payment_method: invPaymentMethod === "none" ? "" : invPaymentMethod,
+        payment_details: invPaymentDetails,
         client_visible: invClientVisible,
       } as any);
       toast({ title: "Fatura atualizada" });
@@ -286,8 +289,8 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     refetchAttachments();
   };
 
-  const handleDownloadPDF = () => {
-    generateInvoicePDF(invoice, items, total, subtotal, cur);
+  const handleDownloadPDF = async () => {
+    await generateInvoicePDF(invoice, items, total, subtotal, cur);
   };
 
   const cfg = STATUS_CONFIG[invStatus] || STATUS_CONFIG[invoice.status];
@@ -402,6 +405,15 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
                   {PAYMENT_METHODS.map(m => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Detalhes de pagamento (IBAN, Pix, PayPal...)</Label>
+              <Textarea
+                value={invPaymentDetails}
+                onChange={e => setInvPaymentDetails(e.target.value)}
+                rows={2}
+                placeholder="Deixe em branco para usar o padrão da empresa"
+              />
             </div>
             <div className="flex items-center justify-between py-1">
               <div>
