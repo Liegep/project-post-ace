@@ -56,10 +56,18 @@ export default function CreateReportPage() {
   const [sendToClient, setSendToClient] = useState(false);
   const [reportLocale, setReportLocale] = useState<Locale>("pt");
 
-  const handleCsvParsed = (csvMetrics: SocialReportMetrics, csvPrevMetrics: SocialReportMetrics, fields: string[]) => {
+  const handleCsvParsed = (
+    csvMetrics: SocialReportMetrics,
+    csvPrevMetrics: SocialReportMetrics,
+    fields: string[],
+    extra?: CsvParsedExtra,
+  ) => {
     setMetrics(csvMetrics);
     setPrevMetrics(csvPrevMetrics);
     setActiveFields(fields);
+    if (extra?.periodStart) setPeriodStart(extra.periodStart);
+    if (extra?.periodEnd) setPeriodEnd(extra.periodEnd);
+    if (extra?.campaignTitle && !title) setTitle(extra.campaignTitle);
   };
 
   useEffect(() => {
