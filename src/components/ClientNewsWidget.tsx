@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, FileBarChart, Eye, Check, Bell } from "lucide-react";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { ptBR, enUS, it as itLocale, es as esLocale, sv as svLocale } from "date-fns/locale";
+import type { Locale as DateLocale } from "date-fns";
 
 interface NewsItem {
   id: string;
@@ -16,16 +17,89 @@ interface NewsItem {
   date: string;
 }
 
+type LocaleKey = "pt" | "en" | "it" | "es" | "sv";
+
+const TRANSLATIONS: Record<LocaleKey, {
+  news: string;
+  newInvoice: string;
+  newReport: string;
+  invoiceFallback: (n: string | number) => string;
+  reportFallback: string;
+  issuedOn: string;
+  view: string;
+  ok: string;
+}> = {
+  pt: {
+    news: "Novidades",
+    newInvoice: "Nova fatura disponível",
+    newReport: "Novo relatório disponível",
+    invoiceFallback: (n) => `Fatura #${n}`,
+    reportFallback: "Relatório de Mídias",
+    issuedOn: "Emitida em",
+    view: "Visualizar",
+    ok: "OK",
+  },
+  en: {
+    news: "What's new",
+    newInvoice: "New invoice available",
+    newReport: "New report available",
+    invoiceFallback: (n) => `Invoice #${n}`,
+    reportFallback: "Social Report",
+    issuedOn: "Issued on",
+    view: "View",
+    ok: "OK",
+  },
+  it: {
+    news: "Novità",
+    newInvoice: "Nuova fattura disponibile",
+    newReport: "Nuovo report disponibile",
+    invoiceFallback: (n) => `Fattura #${n}`,
+    reportFallback: "Report Social",
+    issuedOn: "Emessa il",
+    view: "Visualizza",
+    ok: "OK",
+  },
+  es: {
+    news: "Novedades",
+    newInvoice: "Nueva factura disponible",
+    newReport: "Nuevo informe disponible",
+    invoiceFallback: (n) => `Factura #${n}`,
+    reportFallback: "Informe de Medios",
+    issuedOn: "Emitida el",
+    view: "Ver",
+    ok: "OK",
+  },
+  sv: {
+    news: "Nyheter",
+    newInvoice: "Ny faktura tillgänglig",
+    newReport: "Ny rapport tillgänglig",
+    invoiceFallback: (n) => `Faktura #${n}`,
+    reportFallback: "Sociala medierapport",
+    issuedOn: "Utfärdad den",
+    view: "Visa",
+    ok: "OK",
+  },
+};
+
+const DATE_LOCALES: Record<LocaleKey, DateLocale> = {
+  pt: ptBR, en: enUS, it: itLocale, es: esLocale, sv: svLocale,
+};
+
 interface ClientNewsWidgetProps {
   clientId: string;
   showInvoices: boolean;
+  locale?: string;
 }
 
-export const ClientNewsWidget = ({ clientId, showInvoices }: ClientNewsWidgetProps) => {
+export const ClientNewsWidget = ({ clientId, showInvoices, locale }: ClientNewsWidgetProps) => {
   const navigate = useNavigate();
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+
+  const localeKey = ((locale as LocaleKey) in TRANSLATIONS ? (locale as LocaleKey) : "pt");
+  const t = TRANSLATIONS[localeKey];
+  const dateLocale = DATE_LOCALES[localeKey];
 
   useEffect(() => {
     const init = async () => {
@@ -33,7 +107,6 @@ export const ClientNewsWidget = ({ clientId, showInvoices }: ClientNewsWidgetPro
       if (!session?.user) { setLoading(false); return; }
       setUserId(session.user.id);
 
-      // Fetch seen items for this user
       const { data: seenData } = await supabase
         .from("client_seen_items")
         .select("item_type, item_id")
@@ -45,7 +118,6 @@ export const ClientNewsWidget = ({ clientId, showInvoices }: ClientNewsWidgetPro
 
       const items: NewsItem[] = [];
 
-      // Fetch invoices
       if (showInvoices) {
         const { data: invoices } = await supabase
           .from("invoices")
@@ -59,15 +131,14 @@ export const ClientNewsWidget = ({ clientId, showInvoices }: ClientNewsWidgetPro
             items.push({
               id: inv.id,
               type: "invoice",
-              title: inv.title || `Fatura #${inv.invoice_number}`,
-              subtitle: `Emitida em ${format(new Date(inv.issue_date), "dd/MM/yyyy", { locale: ptBR })}`,
+              title: inv.title || t.invoiceFallback(inv.invoice_number),
+              subtitle: `${t.issuedOn} ${format(new Date(inv.issue_date), "dd/MM/yyyy", { locale: dateLocale })}`,
               date: inv.issue_date,
             });
           }
         });
       }
 
-      // Fetch reports
       const { data: reports } = await supabase
         .from("social_reports")
         .select("id, title, period_start, period_end, created_at")
@@ -79,8 +150,8 @@ export const ClientNewsWidget = ({ clientId, showInvoices }: ClientNewsWidgetPro
           items.push({
             id: rep.id,
             type: "report",
-            title: rep.title || "Relatório de Mídias",
-            subtitle: `${format(new Date(rep.period_start), "dd/MM", { locale: ptBR })} — ${format(new Date(rep.period_end), "dd/MM/yyyy", { locale: ptBR })}`,
+            title: rep.title || t.reportFallback,
+            subtitle: `${format(new Date(rep.period_start), "dd/MM", { locale: dateLocale })} — ${format(new Date(rep.period_end), "dd/MM/yyyy", { locale: dateLocale })}`,
             date: rep.created_at,
           });
         }
@@ -90,7 +161,8 @@ export const ClientNewsWidget = ({ clientId, showInvoices }: ClientNewsWidgetPro
       setLoading(false);
     };
     init();
-  }, [clientId, showInvoices]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clientId, showInvoices, localeKey]);
 
   const markAsSeen = async (item: NewsItem) => {
     if (!userId) return;
@@ -107,7 +179,6 @@ export const ClientNewsWidget = ({ clientId, showInvoices }: ClientNewsWidgetPro
     if (item.type === "report") {
       navigate(`/reports/${item.id}`);
     }
-    // For invoices, just mark as seen (they're on the invoices panel below)
   };
 
   const handleDismiss = (item: NewsItem) => {
@@ -122,7 +193,7 @@ export const ClientNewsWidget = ({ clientId, showInvoices }: ClientNewsWidgetPro
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15">
           <Bell className="h-4 w-4 text-primary" />
         </div>
-        <h2 className="font-semibold text-foreground">Novidades</h2>
+        <h2 className="font-semibold text-foreground">{t.news}</h2>
         <Badge variant="secondary" className="text-xs">
           {newsItems.length}
         </Badge>
@@ -144,7 +215,7 @@ export const ClientNewsWidget = ({ clientId, showInvoices }: ClientNewsWidgetPro
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">
-                  {item.type === "invoice" ? "Nova fatura disponível" : "Novo relatório disponível"}
+                  {item.type === "invoice" ? t.newInvoice : t.newReport}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
                   {item.title} · {item.subtitle}
@@ -160,7 +231,7 @@ export const ClientNewsWidget = ({ clientId, showInvoices }: ClientNewsWidgetPro
                   onClick={() => handleView(item)}
                 >
                   <Eye className="h-3.5 w-3.5" />
-                  Visualizar
+                  {t.view}
                 </Button>
               )}
               <Button
@@ -170,7 +241,7 @@ export const ClientNewsWidget = ({ clientId, showInvoices }: ClientNewsWidgetPro
                 onClick={() => handleDismiss(item)}
               >
                 <Check className="h-3.5 w-3.5" />
-                OK
+                {t.ok}
               </Button>
             </div>
           </div>
