@@ -25,8 +25,11 @@ interface CsvUploadPanelProps {
 const METRIC_ALIASES: Record<string, string> = {
   // Reach
   reach: "reach", alcance: "reach", resultados: "reach", results: "reach",
+  "alcance total": "reach", "pessoas alcancadas": "reach",
   // Impressions
   impressions: "impressions", impressoes: "impressions", "impressões": "impressions",
+  "impressoes do anuncio": "impressions", "impressões do anúncio": "impressions",
+  "impressoes totais": "impressions", "ad impressions": "impressions",
   // Engagement
   engagement: "engagement", engajamento: "engagement", "taxa de engajamento": "engagement", "engagement rate": "engagement",
   // Interactions
