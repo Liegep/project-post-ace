@@ -390,31 +390,6 @@ export default function CreateReportPage() {
           </CardContent>
         </Card>
 
-        {/* Content Analysis */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Análise de Conteúdo</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs">Melhor conteúdo</Label>
-              <Input value={bestContent} onChange={e => setBestContent(e.target.value)} placeholder="Qual post teve melhor performance?" />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Pior conteúdo</Label>
-              <Input value={worstContent} onChange={e => setWorstContent(e.target.value)} placeholder="Qual post teve pior performance?" />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Formato com melhor performance</Label>
-              <Input value={bestFormat} onChange={e => setBestFormat(e.target.value)} placeholder="Ex: Reels, Carrossel, Imagem estática..." />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Observações adicionais</Label>
-              <Textarea value={observations} onChange={e => setObservations(e.target.value)} placeholder="Notas, insights extras..." className="min-h-[80px]" />
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Recommendations */}
         <Card>
           <CardHeader className="pb-3">
