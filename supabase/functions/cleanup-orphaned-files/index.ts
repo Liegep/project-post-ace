@@ -70,16 +70,28 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { data: deleted, error: delErr } = await supabase.rpc(
-      "delete_orphaned_media_files",
-      { older_than_hours: olderThanHours }
-    );
-    if (delErr) throw delErr;
+    // Delete via Storage API (raw SQL DELETE on storage.objects is blocked)
+    const paths: string[] = (orphans || []).map((o: any) => o.name).filter(Boolean);
+    let deleted = 0;
+    const errors: string[] = [];
+    const BATCH = 100;
+    for (let i = 0; i < paths.length; i += BATCH) {
+      const chunk = paths.slice(i, i + BATCH);
+      const { data: removed, error: rmErr } = await supabase.storage
+        .from("media")
+        .remove(chunk);
+      if (rmErr) {
+        errors.push(rmErr.message);
+        continue;
+      }
+      deleted += removed?.length ?? 0;
+    }
 
     return new Response(
       JSON.stringify({
         deleted,
         freedBytes: totalSize,
+        errors: errors.length ? errors : undefined,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
