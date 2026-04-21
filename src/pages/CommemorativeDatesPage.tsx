@@ -2,12 +2,13 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useCommemorativeDates, CATEGORY_LABELS, CommemorativeDate } from "@/hooks/useCommemorativeDates";
-import { useNagerHolidays, getCountryColor } from "@/hooks/useNagerHolidays";
+import { useNagerHolidaysMulti, getCountryColor } from "@/hooks/useNagerHolidays";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Plus, Pencil, Trash2, Search, CalendarHeart, X, Star, FileText } from "lucide-react";
@@ -56,23 +57,28 @@ export default function CommemorativeDatesPage() {
   const [filterMonth, setFilterMonth] = useState("all");
   const [briefDate, setBriefDate] = useState<CommemorativeDate | null>(null);
 
-  // Nager.Date public holidays integration
+  // Nager.Date public holidays integration (multi-country)
   const currentYear = new Date().getFullYear();
   const [nagerYear, setNagerYear] = useState<number>(currentYear);
-  const { countryCode, setCountryCode, holidays, countries: nagerCountries, loading: nagerLoading } =
-    useNagerHolidays(nagerYear);
+  const {
+    selectedCodes,
+    toggleCountry: toggleNagerCountry,
+    holidays,
+    countries: nagerCountries,
+    loading: nagerLoading,
+  } = useNagerHolidaysMulti(nagerYear);
 
   // Convert Nager holidays into the same shape so the existing UI renders them
   const nagerAsCommemorative: CommemorativeDate[] = useMemo(() => {
-    const countryName = nagerCountries.find((c) => c.countryCode === countryCode)?.name || countryCode;
-    const color = getCountryColor(countryCode);
     return holidays.map((h) => {
       const [, m, d] = h.date.split("-").map(Number);
+      const countryName =
+        nagerCountries.find((c) => c.countryCode === h.countryCode)?.name || h.countryCode;
       return {
         id: `nager-${h.countryCode}-${h.date}-${h.name}`,
         country: countryName,
         country_code: h.countryCode,
-        country_color: color,
+        country_color: getCountryColor(h.countryCode),
         name: h.localName || h.name,
         date_month: m,
         date_day: d,
@@ -80,7 +86,7 @@ export default function CommemorativeDatesPage() {
         description: h.localName !== h.name ? h.name : "",
       };
     });
-  }, [holidays, nagerCountries, countryCode]);
+  }, [holidays, nagerCountries]);
 
   // Form state
   const [formName, setFormName] = useState("");
@@ -302,27 +308,65 @@ export default function CommemorativeDatesPage() {
             </div>
           </div>
 
-          {/* Public Holidays (Nager.Date) selector */}
+          {/* Public Holidays (Nager.Date) multi-country selector */}
           <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center rounded-lg border bg-card p-2.5">
             <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
               <CalendarHeart className="h-3.5 w-3.5 text-primary" />
               <span className="font-medium">Feriados oficiais:</span>
             </div>
-            <div className="flex gap-2 flex-1 w-full sm:w-auto">
-              <Select value={countryCode} onValueChange={setCountryCode}>
-                <SelectTrigger className="h-8 text-xs flex-1 sm:w-[220px] sm:flex-none">
-                  <SelectValue placeholder="País" />
-                </SelectTrigger>
-                <SelectContent className="max-h-72">
-                  {nagerCountries.map((c) => (
-                    <SelectItem key={c.countryCode} value={c.countryCode} className="text-xs">
-                      {c.name} ({c.countryCode})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex gap-2 flex-1 w-full sm:w-auto items-center flex-wrap">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 text-xs">
+                    {selectedCodes.length === 0
+                      ? "Selecionar países"
+                      : `${selectedCodes.length} país(es) selecionado(s)`}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-72 p-3" align="start">
+                  <p className="text-xs font-semibold text-foreground mb-2">Países</p>
+                  <p className="text-[10px] text-muted-foreground mb-2">
+                    Apenas os feriados dos países selecionados serão exibidos
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 max-h-64 overflow-y-auto">
+                    {nagerCountries.map((c) => {
+                      const active = selectedCodes.includes(c.countryCode);
+                      return (
+                        <button
+                          key={c.countryCode}
+                          onClick={() => toggleNagerCountry(c.countryCode)}
+                          className={cn(
+                            "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-all border",
+                            active
+                              ? "border-transparent text-white shadow-sm"
+                              : "border-border bg-background text-muted-foreground hover:bg-muted",
+                          )}
+                          style={active ? { backgroundColor: getCountryColor(c.countryCode) } : undefined}
+                        >
+                          {c.name} ({c.countryCode})
+                        </button>
+                      );
+                    })}
+                  </div>
+                </PopoverContent>
+              </Popover>
+              {selectedCodes.map((code) => {
+                const c = nagerCountries.find((x) => x.countryCode === code);
+                return (
+                  <button
+                    key={code}
+                    onClick={() => toggleNagerCountry(code)}
+                    className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-white"
+                    style={{ backgroundColor: getCountryColor(code) }}
+                    title="Remover"
+                  >
+                    {c?.name || code}
+                    <X className="h-3 w-3" />
+                  </button>
+                );
+              })}
               <Select value={String(nagerYear)} onValueChange={(v) => setNagerYear(parseInt(v))}>
-                <SelectTrigger className="h-8 text-xs w-[90px]">
+                <SelectTrigger className="h-8 text-xs w-[90px] ml-auto">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
