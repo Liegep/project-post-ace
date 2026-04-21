@@ -262,6 +262,18 @@ export async function generateInvoicePDF(
   if (printWindow) {
     printWindow.document.write(html);
     printWindow.document.close();
-    setTimeout(() => printWindow.print(), 600);
+    const triggerPrint = () => {
+      try { printWindow.focus(); } catch {}
+      printWindow.print();
+    };
+    const img = printWindow.document.querySelector("img");
+    if (img && !(img as HTMLImageElement).complete) {
+      (img as HTMLImageElement).addEventListener("load", () => setTimeout(triggerPrint, 200));
+      (img as HTMLImageElement).addEventListener("error", () => setTimeout(triggerPrint, 200));
+      // Fallback timeout in case load never fires
+      setTimeout(triggerPrint, 2500);
+    } else {
+      setTimeout(triggerPrint, 400);
+    }
   }
 }
