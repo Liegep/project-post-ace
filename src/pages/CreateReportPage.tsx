@@ -256,6 +256,16 @@ export default function CreateReportPage() {
           </CardContent>
         </Card>
 
+        {/* Instagram Screenshot OCR */}
+        {platform === "instagram" && (
+          <InstagramScreenshotPanel
+            onParsed={(m, p) => {
+              setMetrics((prev) => ({ ...prev, ...m }));
+              setPrevMetrics((prev) => ({ ...prev, ...p }));
+            }}
+          />
+        )}
+
         {/* CSV Upload */}
         <CsvUploadPanel onMetricsParsed={handleCsvParsed} />
 
