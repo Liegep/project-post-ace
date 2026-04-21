@@ -22,6 +22,13 @@ export interface ReportTranslations {
   topReels: string;
   topStories: string;
   recommendations: string;
+  dataVisualization: string;
+  metricsChart: string;
+  vsPrevious: string;
+  distribution: string;
+  percentVariation: string;
+  current: string;
+  variation: string;
   metricLabels: Record<string, string>;
 }
 
@@ -44,6 +51,13 @@ const PT: ReportTranslations = {
   topReels: "Top 3 Reels",
   topStories: "Top 3 Stories",
   recommendations: "Recomendações e Próximos Passos",
+  dataVisualization: "Visualização de Dados",
+  metricsChart: "Métricas",
+  vsPrevious: "vs Anterior",
+  distribution: "Distribuição",
+  percentVariation: "Variação Percentual (%)",
+  current: "Atual",
+  variation: "Variação",
   metricLabels: {
     views: "Visualizações",
     reach: "Alcance",
@@ -82,6 +96,13 @@ const EN: ReportTranslations = {
   topReels: "Top 3 Reels",
   topStories: "Top 3 Stories",
   recommendations: "Recommendations & Next Steps",
+  dataVisualization: "Data Visualization",
+  metricsChart: "Metrics",
+  vsPrevious: "vs Previous",
+  distribution: "Distribution",
+  percentVariation: "Percent Variation (%)",
+  current: "Current",
+  variation: "Variation",
   metricLabels: {
     views: "Views",
     reach: "Reach",
@@ -120,6 +141,13 @@ const IT: ReportTranslations = {
   topReels: "Top 3 Reel",
   topStories: "Top 3 Storie",
   recommendations: "Raccomandazioni e prossimi passi",
+  dataVisualization: "Visualizzazione dati",
+  metricsChart: "Metriche",
+  vsPrevious: "vs Precedente",
+  distribution: "Distribuzione",
+  percentVariation: "Variazione percentuale (%)",
+  current: "Attuale",
+  variation: "Variazione",
   metricLabels: {
     views: "Visualizzazioni",
     reach: "Copertura",
@@ -158,6 +186,13 @@ const ES: ReportTranslations = {
   topReels: "Top 3 Reels",
   topStories: "Top 3 Stories",
   recommendations: "Recomendaciones y próximos pasos",
+  dataVisualization: "Visualización de datos",
+  metricsChart: "Métricas",
+  vsPrevious: "vs Anterior",
+  distribution: "Distribución",
+  percentVariation: "Variación porcentual (%)",
+  current: "Actual",
+  variation: "Variación",
   metricLabels: {
     views: "Visualizaciones",
     reach: "Alcance",
@@ -196,6 +231,13 @@ const SV: ReportTranslations = {
   topReels: "Topp 3 Reels",
   topStories: "Topp 3 Stories",
   recommendations: "Rekommendationer och nästa steg",
+  dataVisualization: "Datavisualisering",
+  metricsChart: "Mått",
+  vsPrevious: "vs Föregående",
+  distribution: "Fördelning",
+  percentVariation: "Procentuell variation (%)",
+  current: "Aktuell",
+  variation: "Variation",
   metricLabels: {
     views: "Visningar",
     reach: "Räckvidd",

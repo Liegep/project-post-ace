@@ -6,10 +6,12 @@ import {
   PieChart, Pie, Cell, Legend, AreaChart, Area
 } from "recharts";
 import { BarChart3 } from "lucide-react";
+import { getReportT } from "@/i18n/reportTranslations";
 
 interface ReportChartsProps {
   metrics: SocialReportMetrics;
   prevMetrics: SocialReportMetrics;
+  locale?: string;
 }
 
 const CHART_COLORS = [
@@ -25,31 +27,31 @@ const CHART_COLORS = [
   "hsl(120, 50%, 50%)",
 ];
 
-export function ReportCharts({ metrics, prevMetrics }: ReportChartsProps) {
+export function ReportCharts({ metrics, prevMetrics, locale }: ReportChartsProps) {
+  const t = getReportT(locale);
+  const labelFor = (k: string) => t.metricLabels[k] || METRIC_LABELS[k] || k;
   const keys = Object.keys(metrics).filter(k => metrics[k] !== undefined && metrics[k] !== null);
   if (keys.length === 0) return null;
 
   const barData = keys.map(k => ({
-    name: METRIC_LABELS[k] || k,
+    name: labelFor(k),
     atual: metrics[k] ?? 0,
     anterior: prevMetrics[k] ?? 0,
   }));
 
   const hasPrev = barData.some(d => d.anterior > 0);
 
-  // Pie data for current metrics
   const pieData = keys.map((k, i) => ({
-    name: METRIC_LABELS[k] || k,
+    name: labelFor(k),
     value: metrics[k] ?? 0,
     color: CHART_COLORS[i % CHART_COLORS.length],
   })).filter(d => d.value > 0);
 
-  // Variation data for area chart
   const variationData = keys.map(k => {
     const curr = metrics[k] ?? 0;
     const prev = prevMetrics[k] ?? 0;
     const pct = prev > 0 ? ((curr - prev) / prev) * 100 : curr > 0 ? 100 : 0;
-    return { name: METRIC_LABELS[k] || k, variação: parseFloat(pct.toFixed(1)) };
+    return { name: labelFor(k), value: parseFloat(pct.toFixed(1)) };
   });
 
   const tooltipStyle = {
@@ -63,14 +65,14 @@ export function ReportCharts({ metrics, prevMetrics }: ReportChartsProps) {
   return (
     <div className="space-y-4">
       <h3 className="text-sm font-semibold flex items-center gap-2">
-        <BarChart3 className="h-4 w-4 text-primary" /> Visualização de Dados
+        <BarChart3 className="h-4 w-4 text-primary" /> {t.dataVisualization}
       </h3>
 
       <div className="grid gap-4 md:grid-cols-2">
         {/* Bar Chart */}
         <Card className="glass-card border-white/10">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium text-muted-foreground">Métricas {hasPrev ? "vs Anterior" : ""}</CardTitle>
+            <CardTitle className="text-xs font-medium text-muted-foreground">{t.metricsChart} {hasPrev ? t.vsPrevious : ""}</CardTitle>
           </CardHeader>
           <CardContent className="pb-4">
             <div className="h-[260px]">
@@ -86,8 +88,8 @@ export function ReportCharts({ metrics, prevMetrics }: ReportChartsProps) {
                   <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-40} textAnchor="end" />
                   <YAxis tick={{ fontSize: 9 }} />
                   <Tooltip contentStyle={tooltipStyle} />
-                  {hasPrev && <Bar dataKey="anterior" name="Anterior" fill="hsl(var(--muted-foreground))" opacity={0.3} radius={[4, 4, 0, 0]} />}
-                  <Bar dataKey="atual" name="Atual" fill="url(#barGrad)" radius={[6, 6, 0, 0]} />
+                  {hasPrev && <Bar dataKey="anterior" name={t.previous} fill="hsl(var(--muted-foreground))" opacity={0.3} radius={[4, 4, 0, 0]} />}
+                  <Bar dataKey="atual" name={t.current} fill="url(#barGrad)" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -98,7 +100,7 @@ export function ReportCharts({ metrics, prevMetrics }: ReportChartsProps) {
         {pieData.length > 1 && (
           <Card className="glass-card border-white/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-muted-foreground">Distribuição</CardTitle>
+              <CardTitle className="text-xs font-medium text-muted-foreground">{t.distribution}</CardTitle>
             </CardHeader>
             <CardContent className="pb-4">
               <div className="h-[260px]">
@@ -121,7 +123,7 @@ export function ReportCharts({ metrics, prevMetrics }: ReportChartsProps) {
       {hasPrev && (
         <Card className="glass-card border-white/10">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium text-muted-foreground">Variação Percentual (%)</CardTitle>
+            <CardTitle className="text-xs font-medium text-muted-foreground">{t.percentVariation}</CardTitle>
           </CardHeader>
           <CardContent className="pb-4">
             <div className="h-[220px]">
@@ -136,8 +138,8 @@ export function ReportCharts({ metrics, prevMetrics }: ReportChartsProps) {
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                   <XAxis dataKey="name" tick={{ fontSize: 9 }} angle={-40} textAnchor="end" />
                   <YAxis tick={{ fontSize: 9 }} unit="%" />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v}%`, "Variação"]} />
-                  <Area type="monotone" dataKey="variação" stroke="hsl(var(--primary))" fill="url(#areaGrad)" strokeWidth={2} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v}%`, t.variation]} />
+                  <Area type="monotone" dataKey="value" name={t.variation} stroke="hsl(var(--primary))" fill="url(#areaGrad)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
