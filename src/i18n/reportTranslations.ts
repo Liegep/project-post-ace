@@ -51,6 +51,13 @@ const PT: ReportTranslations = {
   topReels: "Top 3 Reels",
   topStories: "Top 3 Stories",
   recommendations: "Recomendações e Próximos Passos",
+  dataVisualization: "Visualização de Dados",
+  metricsChart: "Métricas",
+  vsPrevious: "vs Anterior",
+  distribution: "Distribuição",
+  percentVariation: "Variação Percentual (%)",
+  current: "Atual",
+  variation: "Variação",
   metricLabels: {
     views: "Visualizações",
     reach: "Alcance",
