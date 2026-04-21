@@ -491,6 +491,8 @@ const BillingPage = () => {
           onUpdate={() => { refetch(); }}
         />
       )}
+
+      <IssuerSettingsPanel open={issuerOpen} onOpenChange={setIssuerOpen} />
     </div>
   );
 };

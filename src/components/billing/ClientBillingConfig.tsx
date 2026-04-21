@@ -25,6 +25,9 @@ interface BillingConfig {
   billing_due_day: number;
   billing_start_date: string | null;
   billing_currency: string;
+  address: string;
+  country: string;
+  tax_id: string;
 }
 
 export function ClientBillingConfig({ clientId }: { clientId: string }) {
@@ -36,6 +39,9 @@ export function ClientBillingConfig({ clientId }: { clientId: string }) {
     billing_due_day: 10,
     billing_start_date: null,
     billing_currency: "BRL",
+    address: "",
+    country: "",
+    tax_id: "",
   });
   const [loading, setLoading] = useState(true);
 
@@ -43,7 +49,7 @@ export function ClientBillingConfig({ clientId }: { clientId: string }) {
     const load = async () => {
       const { data } = await supabase
         .from("clients")
-        .select("billing_type, billing_recurrence_active, billing_monthly_amount, billing_description, billing_due_day, billing_start_date, billing_currency")
+        .select("billing_type, billing_recurrence_active, billing_monthly_amount, billing_description, billing_due_day, billing_start_date, billing_currency, address, country, tax_id")
         .eq("id", clientId)
         .single();
       if (data) setConfig(data as any);
