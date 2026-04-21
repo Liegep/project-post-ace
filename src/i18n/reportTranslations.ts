@@ -22,6 +22,13 @@ export interface ReportTranslations {
   topReels: string;
   topStories: string;
   recommendations: string;
+  dataVisualization: string;
+  metricsChart: string;
+  vsPrevious: string;
+  distribution: string;
+  percentVariation: string;
+  current: string;
+  variation: string;
   metricLabels: Record<string, string>;
 }
 
