@@ -97,6 +97,26 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
+  const editInvoiceRef = useRef<HTMLDivElement>(null);
+  const itemFormRef = useRef<HTMLDivElement>(null);
+
+  const scrollIntoView = (ref: React.RefObject<HTMLDivElement>) => {
+    setTimeout(() => {
+      ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  };
+
+  const openEditInvoice = () => {
+    setEditingInvoice(true);
+    scrollIntoView(editInvoiceRef);
+  };
+
+  const openAddItem = () => {
+    resetItemForm();
+    setAddingItem(true);
+    scrollIntoView(itemFormRef);
+  };
+
   useEffect(() => {
     setInvStatus(invoice.status);
     setInvDiscount(String(invoice.discount || 0));
@@ -184,6 +204,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     setItemUnitPrice(String(item.unit_price));
     setItemNotes(item.notes);
     setAddingItem(true);
+    scrollIntoView(itemFormRef);
   };
 
   const handleSaveInvoice = async () => {
@@ -315,8 +336,11 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
               <Clock className="h-3.5 w-3.5 mr-1" /> Reverter para Aberta
             </Button>
           )}
-          <Button size="sm" variant="outline" onClick={() => setEditingInvoice(!editingInvoice)} className="border-white/30 hover:bg-white/10 text-black">
+          <Button size="sm" variant="outline" onClick={openEditInvoice} className="border-white/30 hover:bg-white/10 text-black">
             <Pencil className="h-3.5 w-3.5 mr-1" /> Editar
+          </Button>
+          <Button size="sm" variant="outline" onClick={openAddItem} className="border-white/30 hover:bg-white/10 text-black">
+            <Plus className="h-3.5 w-3.5 mr-1" /> Adicionar item
           </Button>
           <Button size="sm" variant="outline" onClick={handleDownloadPDF} className="border-white/30 hover:bg-white/10 text-black">
             <Download className="h-3.5 w-3.5 mr-1" /> Baixar PDF
@@ -337,7 +361,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
 
         {/* Edit invoice section */}
         {editingInvoice && (
-          <div className="border border-white/20 rounded-lg p-3 space-y-3 bg-white/5">
+          <div ref={editInvoiceRef} className="border border-white/20 rounded-lg p-3 space-y-3 bg-white/5 scroll-mt-4">
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label className="text-xs">Status</Label>
@@ -396,9 +420,11 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         <div>
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-semibold">Itens da fatura</h3>
-            <Button size="sm" variant="outline" onClick={() => { resetItemForm(); setAddingItem(true); }}>
-              <Plus className="h-3.5 w-3.5 mr-1" /> Adicionar item
-            </Button>
+            {!addingItem && (
+              <Button size="sm" variant="ghost" onClick={openAddItem} className="text-xs">
+                <Plus className="h-3.5 w-3.5 mr-1" /> Adicionar
+              </Button>
+            )}
           </div>
 
           {itemsLoading ? (
@@ -453,7 +479,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
 
           {/* Add/Edit item form */}
           {addingItem && (
-            <div className="border rounded-lg p-3 mt-3 space-y-2 bg-muted/30">
+            <div ref={itemFormRef} className="border rounded-lg p-3 mt-3 space-y-2 bg-muted/30 scroll-mt-4">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-medium">{editingItem ? "Editar item" : "Novo item"}</h4>
                 <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => { setAddingItem(false); resetItemForm(); }}>
