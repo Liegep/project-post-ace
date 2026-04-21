@@ -22,7 +22,7 @@ import {
   TrendingUp, TrendingDown, Minus, MessageSquareText, Send
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { CsvUploadPanel } from "@/components/reports/CsvUploadPanel";
+import { CsvUploadPanel, CsvParsedExtra } from "@/components/reports/CsvUploadPanel";
 import { ReportCharts } from "@/components/reports/ReportCharts";
 import { cn } from "@/lib/utils";
 
