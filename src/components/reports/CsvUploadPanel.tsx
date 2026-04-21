@@ -6,59 +6,188 @@ import { Upload, FileSpreadsheet, Check, X, ArrowRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { METRIC_LABELS, SocialReportMetrics } from "@/hooks/useSocialReports";
 
-interface CsvUploadPanelProps {
-  onMetricsParsed: (metrics: SocialReportMetrics, prevMetrics: SocialReportMetrics, detectedFields: string[]) => void;
+export interface CsvParsedExtra {
+  periodStart?: string; // YYYY-MM-DD
+  periodEnd?: string;   // YYYY-MM-DD
+  campaignTitle?: string;
 }
 
+interface CsvUploadPanelProps {
+  onMetricsParsed: (
+    metrics: SocialReportMetrics,
+    prevMetrics: SocialReportMetrics,
+    detectedFields: string[],
+    extra?: CsvParsedExtra,
+  ) => void;
+}
+
+// Maps normalized header text -> internal metric key (or special key)
 const METRIC_ALIASES: Record<string, string> = {
+  // Reach
   reach: "reach", alcance: "reach", resultados: "reach", results: "reach",
+  // Impressions
   impressions: "impressions", impressoes: "impressions", "impressões": "impressions",
+  // Engagement
   engagement: "engagement", engajamento: "engagement", "taxa de engajamento": "engagement", "engagement rate": "engagement",
+  // Interactions
   interactions: "interactions", "interações": "interactions", interacoes: "interactions",
+  // Clicks
   clicks: "clicks", cliques: "clicks", "cliques no link": "clicks", "link clicks": "clicks", "cliques em links": "clicks", "link click": "clicks",
+  // Profile visits
   profile_visits: "profile_visits", "visitas ao perfil": "profile_visits", "visitas_perfil": "profile_visits", "profile visits": "profile_visits",
+  // Followers gained
   followers_gained: "followers_gained", "seguidores ganhos": "followers_gained", "seguidores_ganhos": "followers_gained", "followers gained": "followers_gained", "novos seguidores": "followers_gained", "new followers": "followers_gained",
+  // Followers lost
   followers_lost: "followers_lost", "seguidores perdidos": "followers_lost", "seguidores_perdidos": "followers_lost", "followers lost": "followers_lost",
+  // Posts / Reels published
   posts_published: "posts_published", "posts publicados": "posts_published", "posts_publicados": "posts_published", "posts published": "posts_published",
   reels_published: "reels_published", "reels publicados": "reels_published", "reels_publicados": "reels_published", "reels published": "reels_published",
+  // Spend (Facebook Ads)
+  spend: "spend",
+  "amount spent": "spend",
+  "amount spent brl": "spend",
+  "amount spent (brl)": "spend",
+  "amount spent usd": "spend",
+  "amount spent (usd)": "spend",
+  "valor gasto": "spend",
+  "valor usado": "spend",
+  investimento: "spend",
+  "investimento (brl)": "spend",
+  // Special non-metric fields
+  "campaign name": "__campaign_name__",
+  "nome da campanha": "__campaign_name__",
+  "reporting starts": "__period_start__",
+  "reporting start": "__period_start__",
+  "início dos relatórios": "__period_start__",
+  "inicio dos relatorios": "__period_start__",
+  "reporting ends": "__period_end__",
+  "reporting end": "__period_end__",
+  "término dos relatórios": "__period_end__",
+  "termino dos relatorios": "__period_end__",
 };
 
-function cleanNumber(raw: string): number {
-  if (!raw || !raw.trim()) return 0;
-  let s = raw.trim().replace(/[%$€R\s]/g, "");
-  // Detect pt-BR format: 1.234,56 → 1234.56
-  if (/^\d{1,3}(\.\d{3})*(,\d+)?$/.test(s)) {
-    s = s.replace(/\./g, "").replace(",", ".");
-  } else {
-    // EN format or plain: remove commas as thousand sep
-    s = s.replace(/,/g, "");
+function stripDiacritics(s: string): string {
+  return s
+    .replace(/[áàãâä]/g, "a").replace(/[éèêë]/g, "e").replace(/[íìîï]/g, "i")
+    .replace(/[óòõôö]/g, "o").replace(/[úùûü]/g, "u").replace(/[ç]/g, "c");
+}
+
+function normalizeHeaderRaw(h: string): string {
+  return stripDiacritics(h.trim().toLowerCase()).replace(/[_\s]+/g, " ").trim();
+}
+
+function normalizeHeader(h: string): string | null {
+  const clean = normalizeHeaderRaw(h);
+  if (METRIC_ALIASES[clean]) return METRIC_ALIASES[clean];
+  // Strip parenthesised currency suffix like "(brl)" then retry
+  const noParen = clean.replace(/\s*\([^)]*\)\s*/g, "").trim();
+  if (METRIC_ALIASES[noParen]) return METRIC_ALIASES[noParen];
+  // Fuzzy contains as last resort
+  for (const [alias, key] of Object.entries(METRIC_ALIASES)) {
+    const a = stripDiacritics(alias);
+    if (clean === a || clean.includes(a)) return key;
   }
+  return null;
+}
+
+/** Clean an integer-like CSV cell: strips R$, currency, spaces, dots and commas (thousands). */
+function cleanInt(raw: string): number {
+  if (!raw) return 0;
+  const s = raw.replace(/[R$€$£\s.,]/g, "");
+  const n = parseInt(s, 10);
+  return isNaN(n) ? 0 : n;
+}
+
+/** Clean a money/decimal cell using pt-BR rules: removes 'R$' and spaces, then '1.250,50' → 1250.50. */
+function cleanMoney(raw: string): number {
+  if (!raw) return 0;
+  let s = raw.replace(/[R$€$£\s]/gi, "").trim();
+  if (!s) return 0;
+  const hasComma = s.includes(",");
+  const hasDot = s.includes(".");
+  if (hasComma && hasDot) {
+    // pt-BR: dot = thousands, comma = decimal
+    s = s.replace(/\./g, "").replace(",", ".");
+  } else if (hasComma) {
+    // Only comma → decimal separator pt-BR
+    s = s.replace(",", ".");
+  }
+  // Else only dots or plain digits → leave as-is (en-US)
   const n = parseFloat(s);
   return isNaN(n) ? 0 : n;
 }
 
-function normalizeHeader(h: string): string | null {
-  const clean = h.trim().toLowerCase().replace(/[_\s]+/g, " ").replace(/[áàã]/g, "a").replace(/[éê]/g, "e").replace(/[íì]/g, "i").replace(/[óòõ]/g, "o").replace(/[úù]/g, "u").replace(/[ç]/g, "c");
-  for (const [alias, key] of Object.entries(METRIC_ALIASES)) {
-    const normalizedAlias = alias.replace(/[áàã]/g, "a").replace(/[éê]/g, "e").replace(/[íì]/g, "i").replace(/[óòõ]/g, "o").replace(/[úù]/g, "u").replace(/[ç]/g, "c");
-    if (clean === normalizedAlias || clean.includes(normalizedAlias)) return key;
+/** Normalize a date cell to YYYY-MM-DD if possible. Accepts YYYY-MM-DD, DD/MM/YYYY, MM/DD/YYYY. */
+function normalizeDate(raw: string): string | undefined {
+  if (!raw) return undefined;
+  const s = raw.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // DD/MM/YYYY (default Brazilian) or MM/DD/YYYY (Facebook English exports)
+  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (m) {
+    const a = parseInt(m[1], 10);
+    const b = parseInt(m[2], 10);
+    const y = m[3];
+    // If first part > 12, must be DD/MM; else assume MM/DD (Facebook default in English exports)
+    let day: number, month: number;
+    if (a > 12) { day = a; month = b; }
+    else { month = a; day = b; }
+    return `${y}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
   }
-  return null;
+  // Fallback: try Date parse
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+  return undefined;
+}
+
+/** Robust CSV line splitter that respects quoted commas. */
+function splitCsvLine(line: string, sep: string): string[] {
+  const out: string[] = [];
+  let cur = "";
+  let inQuote = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuote && line[i + 1] === '"') { cur += '"'; i++; }
+      else inQuote = !inQuote;
+    } else if (ch === sep && !inQuote) {
+      out.push(cur);
+      cur = "";
+    } else {
+      cur += ch;
+    }
+  }
+  out.push(cur);
+  return out.map(c => c.trim());
 }
 
 function parseCsvText(text: string): { headers: string[]; rows: string[][] } {
   const lines = text.split(/\r?\n/).filter(l => l.trim());
   if (lines.length === 0) return { headers: [], rows: [] };
-  const separator = lines[0].includes(";") ? ";" : ",";
-  const headers = lines[0].split(separator).map(h => h.trim().replace(/^"|"$/g, ""));
-  const rows = lines.slice(1).map(l => l.split(separator).map(c => c.trim().replace(/^"|"$/g, "")));
+  // Detect separator from first line: prefer comma, but use ; if it appears more often
+  const first = lines[0];
+  const sep = (first.split(";").length - 1) > (first.split(",").length - 1) ? ";" : ",";
+  const headers = splitCsvLine(first, sep).map(h => h.replace(/^"|"$/g, ""));
+  const rows = lines.slice(1).map(l => splitCsvLine(l, sep).map(c => c.replace(/^"|"$/g, "")));
   return { headers, rows };
 }
+
+const INTEGER_KEYS = new Set([
+  "reach", "impressions", "interactions", "clicks", "profile_visits",
+  "followers_gained", "followers_lost", "posts_published", "reels_published",
+]);
 
 export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
-  const [parsed, setParsed] = useState<{ metrics: SocialReportMetrics; prevMetrics: SocialReportMetrics; fields: string[] } | null>(null);
+  const [parsed, setParsed] = useState<{
+    metrics: SocialReportMetrics;
+    prevMetrics: SocialReportMetrics;
+    fields: string[];
+    extra: CsvParsedExtra;
+  } | null>(null);
   const [fileName, setFileName] = useState("");
 
   const processFile = (file: File) => {
@@ -81,40 +210,86 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
       const metrics: SocialReportMetrics = {};
       const prevMetrics: SocialReportMetrics = {};
       const detectedFields: string[] = [];
+      const extra: CsvParsedExtra = {};
 
-      // Try two formats:
-      // 1) Row-based: first column = metric name, second = current, third = previous
-      // 2) Column-based: headers are metric names, row 0 = current, row 1 = previous
-      const isColumnBased = mappedHeaders.filter(h => h !== null).length >= 2;
+      // Determine layout: column-based (typical Facebook export = headers row + many data rows
+      // we aggregate by SUM across rows) vs row-based (metric name | current | previous).
+      const recognizedColumns = mappedHeaders.filter(h => h !== null).length;
+      const isColumnBased = recognizedColumns >= 2;
 
       if (isColumnBased) {
-        mappedHeaders.forEach((key, idx) => {
-          if (!key) return;
-          detectedFields.push(key);
-          metrics[key] = cleanNumber(rows[0]?.[idx] || "");
-          if (rows.length > 1) {
-            prevMetrics[key] = cleanNumber(rows[1]?.[idx] || "");
+        const titles: string[] = [];
+        const startDates: string[] = [];
+        const endDates: string[] = [];
+
+        for (const row of rows) {
+          mappedHeaders.forEach((key, idx) => {
+            if (!key) return;
+            const cell = row[idx] ?? "";
+            if (key === "__campaign_name__") {
+              if (cell.trim()) titles.push(cell.trim());
+              return;
+            }
+            if (key === "__period_start__") {
+              const d = normalizeDate(cell);
+              if (d) startDates.push(d);
+              return;
+            }
+            if (key === "__period_end__") {
+              const d = normalizeDate(cell);
+              if (d) endDates.push(d);
+              return;
+            }
+            // Numeric metric — accumulate sum across rows
+            const value = key === "spend" ? cleanMoney(cell) : cleanInt(cell);
+            metrics[key] = (metrics[key] ?? 0) + value;
+            if (!detectedFields.includes(key)) detectedFields.push(key);
+          });
+        }
+
+        // Period: take min(start) / max(end)
+        if (startDates.length) extra.periodStart = startDates.sort()[0];
+        if (endDates.length) extra.periodEnd = endDates.sort()[endDates.length - 1];
+        // Campaign title: first non-empty (or first if multiple campaigns in file)
+        if (titles.length === 1) extra.campaignTitle = titles[0];
+        else if (titles.length > 1) extra.campaignTitle = `${titles[0]} (+${titles.length - 1})`;
+
+        // Round integer metrics to whole numbers
+        for (const k of detectedFields) {
+          if (INTEGER_KEYS.has(k) && metrics[k] !== undefined) {
+            metrics[k] = Math.round(metrics[k] as number);
           }
-        });
+        }
       } else {
+        // Row-based: metric | current | previous
         rows.forEach(row => {
           const key = normalizeHeader(row[0] || "");
-          if (!key) return;
-          detectedFields.push(key);
-          metrics[key] = cleanNumber(row[1] || "");
+          if (!key || key.startsWith("__")) return;
+          if (!detectedFields.includes(key)) detectedFields.push(key);
+          metrics[key] = key === "spend" ? cleanMoney(row[1] || "") : cleanInt(row[1] || "");
           if (row[2]) {
-            prevMetrics[key] = cleanNumber(row[2]);
+            prevMetrics[key] = key === "spend" ? cleanMoney(row[2]) : cleanInt(row[2]);
           }
         });
       }
 
       if (detectedFields.length === 0) {
-        toast({ title: "Nenhuma métrica reconhecida no CSV", description: "Verifique se os cabeçalhos correspondem às métricas disponíveis", variant: "destructive" });
+        toast({
+          title: "Nenhuma métrica reconhecida no CSV",
+          description: "Verifique se os cabeçalhos correspondem às métricas disponíveis (Reach, Impressions, Amount Spent…)",
+          variant: "destructive",
+        });
         return;
       }
 
-      setParsed({ metrics, prevMetrics, fields: detectedFields });
-      toast({ title: `${detectedFields.length} métricas detectadas!` });
+      setParsed({ metrics, prevMetrics, fields: detectedFields, extra });
+      const extraBits: string[] = [];
+      if (extra.periodStart && extra.periodEnd) extraBits.push("período detectado");
+      if (extra.campaignTitle) extraBits.push("campanha detectada");
+      toast({
+        title: `${detectedFields.length} métricas detectadas!`,
+        description: extraBits.length ? extraBits.join(" • ") : undefined,
+      });
     };
     reader.readAsText(file);
   };
@@ -128,8 +303,16 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
 
   const applyMetrics = () => {
     if (!parsed) return;
-    onMetricsParsed(parsed.metrics, parsed.prevMetrics, parsed.fields);
+    onMetricsParsed(parsed.metrics, parsed.prevMetrics, parsed.fields, parsed.extra);
     toast({ title: "Métricas aplicadas ao relatório!" });
+  };
+
+  const formatValue = (key: string, value?: number) => {
+    if (value === undefined) return "";
+    if (key === "spend") {
+      return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 });
+    }
+    return value.toLocaleString("pt-BR");
   };
 
   return (
@@ -141,7 +324,9 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
           </div>
           <div>
             <h3 className="text-sm font-semibold">Importar CSV</h3>
-            <p className="text-[11px] text-muted-foreground">Faça upload de um arquivo CSV com métricas</p>
+            <p className="text-[11px] text-muted-foreground">
+              Suporta exports do Facebook Ads (Reach, Impressions, Amount Spent…) e relatórios manuais
+            </p>
           </div>
         </div>
 
@@ -169,7 +354,7 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
             Arraste um arquivo CSV ou <span className="text-primary font-medium underline">clique para selecionar</span>
           </p>
           <p className="text-[10px] text-muted-foreground/60 mt-1">
-            Formatos aceitos: colunas com nomes das métricas ou linhas com métrica, valor atual, valor anterior
+            Várias linhas (ex.: campanhas) são somadas automaticamente. Datas e moeda BRL são reconhecidas.
           </p>
         </div>
 
@@ -178,7 +363,10 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Check className="h-3.5 w-3.5 text-emerald-500" />
               <span className="font-medium">{fileName}</span>
-              <span>— {parsed.fields.length} métricas detectadas</span>
+              <span>— {parsed.fields.length} métricas</span>
+              {parsed.extra.periodStart && parsed.extra.periodEnd && (
+                <span className="hidden sm:inline">• {parsed.extra.periodStart} → {parsed.extra.periodEnd}</span>
+              )}
               <Button size="icon" variant="ghost" className="h-5 w-5 ml-auto" onClick={() => { setParsed(null); setFileName(""); }}>
                 <X className="h-3 w-3" />
               </Button>
@@ -189,7 +377,7 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
                 <Badge key={f} variant="secondary" className="text-[10px] bg-primary/10 text-primary border-primary/20">
                   {METRIC_LABELS[f] || f}
                   {parsed.metrics[f] !== undefined && (
-                    <span className="ml-1 opacity-70">{parsed.metrics[f]?.toLocaleString("pt-BR")}</span>
+                    <span className="ml-1 opacity-70">{formatValue(f, parsed.metrics[f])}</span>
                   )}
                 </Badge>
               ))}

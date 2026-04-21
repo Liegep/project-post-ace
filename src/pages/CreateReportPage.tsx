@@ -22,7 +22,7 @@ import {
   TrendingUp, TrendingDown, Minus, MessageSquareText, Send
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { CsvUploadPanel } from "@/components/reports/CsvUploadPanel";
+import { CsvUploadPanel, CsvParsedExtra } from "@/components/reports/CsvUploadPanel";
 import { ReportCharts } from "@/components/reports/ReportCharts";
 import { cn } from "@/lib/utils";
 
@@ -56,10 +56,18 @@ export default function CreateReportPage() {
   const [sendToClient, setSendToClient] = useState(false);
   const [reportLocale, setReportLocale] = useState<Locale>("pt");
 
-  const handleCsvParsed = (csvMetrics: SocialReportMetrics, csvPrevMetrics: SocialReportMetrics, fields: string[]) => {
+  const handleCsvParsed = (
+    csvMetrics: SocialReportMetrics,
+    csvPrevMetrics: SocialReportMetrics,
+    fields: string[],
+    extra?: CsvParsedExtra,
+  ) => {
     setMetrics(csvMetrics);
     setPrevMetrics(csvPrevMetrics);
     setActiveFields(fields);
+    if (extra?.periodStart) setPeriodStart(extra.periodStart);
+    if (extra?.periodEnd) setPeriodEnd(extra.periodEnd);
+    if (extra?.campaignTitle && !title) setTitle(extra.campaignTitle);
   };
 
   useEffect(() => {
@@ -226,6 +234,38 @@ export default function CreateReportPage() {
 
         {/* CSV Upload */}
         <CsvUploadPanel onMetricsParsed={handleCsvParsed} />
+
+        {/* Summary Cards (Reach + Spend) */}
+        {(metrics.reach !== undefined || metrics.spend !== undefined || metrics.impressions !== undefined) && (
+          <div className="grid gap-3 sm:grid-cols-3">
+            {metrics.reach !== undefined && (
+              <Card className="glass-card border-primary/20">
+                <CardContent className="p-4">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Alcance total</p>
+                  <p className="text-2xl font-semibold mt-1">{Number(metrics.reach).toLocaleString("pt-BR")}</p>
+                </CardContent>
+              </Card>
+            )}
+            {metrics.impressions !== undefined && (
+              <Card className="glass-card border-primary/20">
+                <CardContent className="p-4">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Impressões totais</p>
+                  <p className="text-2xl font-semibold mt-1">{Number(metrics.impressions).toLocaleString("pt-BR")}</p>
+                </CardContent>
+              </Card>
+            )}
+            {metrics.spend !== undefined && (
+              <Card className="glass-card border-primary/20">
+                <CardContent className="p-4">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Investimento total</p>
+                  <p className="text-2xl font-semibold mt-1">
+                    {Number(metrics.spend).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 })}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
 
         {/* Live Chart Preview */}
         {Object.keys(metrics).filter(k => metrics[k] !== undefined).length > 0 && (
