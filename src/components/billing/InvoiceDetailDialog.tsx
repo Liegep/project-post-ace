@@ -97,6 +97,26 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
+  const editInvoiceRef = useRef<HTMLDivElement>(null);
+  const itemFormRef = useRef<HTMLDivElement>(null);
+
+  const scrollIntoView = (ref: React.RefObject<HTMLDivElement>) => {
+    setTimeout(() => {
+      ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  };
+
+  const openEditInvoice = () => {
+    setEditingInvoice(true);
+    scrollIntoView(editInvoiceRef);
+  };
+
+  const openAddItem = () => {
+    resetItemForm();
+    setAddingItem(true);
+    scrollIntoView(itemFormRef);
+  };
+
   useEffect(() => {
     setInvStatus(invoice.status);
     setInvDiscount(String(invoice.discount || 0));
