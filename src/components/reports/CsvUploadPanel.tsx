@@ -249,6 +249,14 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
               if (d) endDates.push(d);
               return;
             }
+            if (key === "__date__") {
+              const d = normalizeDate(cell);
+              if (d) { startDates.push(d); endDates.push(d); }
+              return;
+            }
+            if (key === "__post_id__" || key === "__description__") {
+              return; // ignore – not a metric, not a period
+            }
             // Numeric metric — accumulate sum across rows
             const value = key === "spend" ? cleanMoney(cell) : cleanInt(cell);
             metrics[key] = (metrics[key] ?? 0) + value;
@@ -257,8 +265,11 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
         }
 
         // Period: take min(start) / max(end)
-        if (startDates.length) extra.periodStart = startDates.sort()[0];
-        if (endDates.length) extra.periodEnd = endDates.sort()[endDates.length - 1];
+        if (startDates.length) extra.periodStart = [...startDates].sort()[0];
+        if (endDates.length) {
+          const sorted = [...endDates].sort();
+          extra.periodEnd = sorted[sorted.length - 1];
+        }
         // Campaign title: first non-empty (or first if multiple campaigns in file)
         if (titles.length === 1) extra.campaignTitle = titles[0];
         else if (titles.length > 1) extra.campaignTitle = `${titles[0]} (+${titles.length - 1})`;
