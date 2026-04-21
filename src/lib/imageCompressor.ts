@@ -1,9 +1,10 @@
 const MAX_WIDTH = 1600;
 const MAX_HEIGHT = 1600;
-const WEBP_QUALITY = 0.82;
-const JPEG_QUALITY = 0.82;
+const WEBP_QUALITY = 0.8; // 80% — bom equilíbrio entre peso e fidelidade
+const JPEG_QUALITY = 0.8;
 
 function isImageFile(file: File): boolean {
+  // GIFs (animados) e SVGs ficam de fora — perderiam animação/escalabilidade
   return file.type.startsWith("image/") && !file.type.includes("svg") && !file.type.includes("gif");
 }
 
@@ -26,6 +27,10 @@ function replaceExt(name: string, newExt: string): string {
   return `${base}.${newExt}`;
 }
 
+function isPng(file: File): boolean {
+  return file.type === "image/png";
+}
+
 export async function compressImage(file: File): Promise<File> {
   if (!isImageFile(file)) return file;
 
@@ -38,7 +43,7 @@ export async function compressImage(file: File): Promise<File> {
 
       let { width, height } = img;
 
-      // Resize if too big (preserve aspect ratio)
+      // Resize se for maior que o limite (mantém proporção)
       if (width > MAX_WIDTH || height > MAX_HEIGHT) {
         if (width > height) {
           height = Math.round((height * MAX_WIDTH) / width);
@@ -59,12 +64,19 @@ export async function compressImage(file: File): Promise<File> {
         return;
       }
 
+      // Preserva transparência (PNG -> WebP com alpha)
+      const pngWithAlpha = isPng(file);
+      if (pngWithAlpha) {
+        ctx.clearRect(0, 0, width, height);
+      }
+
       ctx.drawImage(img, 0, 0, width, height);
 
+      // Sempre tenta WebP quando o navegador suporta. WebP preserva alpha.
       const useWebP = WEBP_OK;
-      const mime = useWebP ? "image/webp" : "image/jpeg";
+      const mime = useWebP ? "image/webp" : pngWithAlpha ? "image/png" : "image/jpeg";
       const quality = useWebP ? WEBP_QUALITY : JPEG_QUALITY;
-      const newExt = useWebP ? "webp" : "jpg";
+      const newExt = useWebP ? "webp" : pngWithAlpha ? "png" : "jpg";
 
       canvas.toBlob(
         (blob) => {
@@ -72,8 +84,10 @@ export async function compressImage(file: File): Promise<File> {
             resolve(file);
             return;
           }
-          // Keep the smaller one — never grow the file
-          if (blob.size >= file.size && file.type !== "image/png") {
+          // Para PNGs com transparência, sempre preferimos a versão WebP
+          // (mesmo se ficar um pouco maior, ainda é geralmente menor que PNG).
+          // Para JPEG/outros, só mantemos o original se a versão nova for maior.
+          if (!pngWithAlpha && blob.size >= file.size) {
             resolve(file);
             return;
           }
