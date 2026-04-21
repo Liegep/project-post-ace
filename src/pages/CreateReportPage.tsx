@@ -34,7 +34,10 @@ interface Client { id: string; name: string; slug: string; logo_url: string; }
 
 export default function CreateReportPage() {
   const navigate = useNavigate();
+  const { id: editId } = useParams();
+  const isEditMode = !!editId;
   const createReport = useCreateReport();
+  const updateReport = useUpdateReport();
   const saveTemplate = useSaveTemplate();
   const { data: templates = [] } = useSocialReportTemplates();
   const { userId } = useUserRole();
