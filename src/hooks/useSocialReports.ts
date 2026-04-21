@@ -138,12 +138,17 @@ export function useSaveTemplate() {
 }
 
 export const METRIC_LABELS: Record<string, string> = {
+  views: "Visualizações",
   reach: "Alcance",
+  content_interactions: "Interações com o conteúdo",
+  profile_visits: "Visitas ao Perfil",
+  link_clicks: "Cliques no link",
+  followers: "Seguidores",
+  // Legacy / Facebook
   impressions: "Impressões",
   engagement: "Engajamento",
   interactions: "Interações",
   clicks: "Cliques",
-  profile_visits: "Visitas ao Perfil",
   followers_gained: "Seguidores Ganhos",
   followers_lost: "Seguidores Perdidos",
   posts_published: "Posts Publicados",
@@ -151,8 +156,14 @@ export const METRIC_LABELS: Record<string, string> = {
   spend: "Investimento (R$)",
 };
 
-export const DEFAULT_METRIC_FIELDS = [
+export const INSTAGRAM_METRIC_FIELDS = [
+  "views", "reach", "content_interactions", "profile_visits", "link_clicks", "followers",
+];
+
+export const FACEBOOK_METRIC_FIELDS = [
   "reach", "impressions", "engagement", "interactions", "clicks",
   "profile_visits", "followers_gained", "followers_lost",
-  "posts_published", "reels_published", "spend",
+  "posts_published", "spend",
 ];
+
+export const DEFAULT_METRIC_FIELDS = INSTAGRAM_METRIC_FIELDS;
