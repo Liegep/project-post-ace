@@ -11,7 +11,7 @@ import { MobileNav } from "@/components/MobileNav";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import {
-  Plus, FileBarChart, Trash2, Copy, Eye, Calendar,
+  Plus, FileBarChart, Trash2, Copy, Eye, Calendar, Pencil, Send,
   Instagram, Facebook, ArrowLeft
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
