@@ -4,7 +4,8 @@ import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { supabase } from "@/integrations/supabase/client";
 import {
   useCreateReport, useSocialReportTemplates, useSaveTemplate,
-  METRIC_LABELS, DEFAULT_METRIC_FIELDS, SocialReportMetrics
+  METRIC_LABELS, DEFAULT_METRIC_FIELDS, INSTAGRAM_METRIC_FIELDS, FACEBOOK_METRIC_FIELDS,
+  SocialReportMetrics,
 } from "@/hooks/useSocialReports";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ import { CsvUploadPanel, CsvParsedExtra } from "@/components/reports/CsvUploadPa
 import { ReportCharts } from "@/components/reports/ReportCharts";
 import { CsvDataTable } from "@/components/reports/CsvDataTable";
 import { CsvDataCharts, MetricKey as CsvMetricKey } from "@/components/reports/CsvDataCharts";
+import { TopContentPanel, TopContentData, EMPTY_TOP_CONTENT } from "@/components/reports/TopContentPanel";
 import { cn } from "@/lib/utils";
 
 interface Client { id: string; name: string; slug: string; logo_url: string; }
@@ -61,6 +63,12 @@ export default function CreateReportPage() {
   const [csvRows, setCsvRows] = useState<Record<string, unknown>[]>([]);
   const [csvMapping, setCsvMapping] = useState<Partial<Record<CsvMetricKey, string>>>({});
   const [csvDateColumn, setCsvDateColumn] = useState<string | null>(null);
+  const [topContent, setTopContent] = useState<TopContentData>(EMPTY_TOP_CONTENT);
+
+  // When platform changes, swap default metric fields (Instagram vs Facebook)
+  useEffect(() => {
+    setActiveFields(platform === "facebook" ? FACEBOOK_METRIC_FIELDS : INSTAGRAM_METRIC_FIELDS);
+  }, [platform]);
 
   const handleCsvParsed = (
     csvMetrics: SocialReportMetrics,
@@ -129,6 +137,11 @@ export default function CreateReportPage() {
     setSaving(true);
     try {
       const client = clients.find(c => c.id === clientId);
+      // Encode top content into observations as JSON (preserving any free text the user typed)
+      const observationsPayload = JSON.stringify({
+        text: observations,
+        top_content: topContent,
+      });
       const report = await createReport.mutateAsync({
         client_id: clientId,
         created_by: userId,
@@ -143,7 +156,7 @@ export default function CreateReportPage() {
         best_content: bestContent,
         worst_content: worstContent,
         best_format: bestFormat,
-        observations,
+        observations: observationsPayload,
         locale: reportLocale,
         status,
       });
@@ -389,6 +402,9 @@ export default function CreateReportPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Top Content (Posts / Reels / Stories) */}
+        <TopContentPanel value={topContent} onChange={setTopContent} />
 
         {/* Recommendations */}
         <Card>
