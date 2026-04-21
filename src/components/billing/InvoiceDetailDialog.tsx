@@ -335,8 +335,11 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
               <Clock className="h-3.5 w-3.5 mr-1" /> Reverter para Aberta
             </Button>
           )}
-          <Button size="sm" variant="outline" onClick={() => setEditingInvoice(!editingInvoice)} className="border-white/30 hover:bg-white/10 text-black">
+          <Button size="sm" variant="outline" onClick={openEditInvoice} className="border-white/30 hover:bg-white/10 text-black">
             <Pencil className="h-3.5 w-3.5 mr-1" /> Editar
+          </Button>
+          <Button size="sm" variant="outline" onClick={openAddItem} className="border-white/30 hover:bg-white/10 text-black">
+            <Plus className="h-3.5 w-3.5 mr-1" /> Adicionar item
           </Button>
           <Button size="sm" variant="outline" onClick={handleDownloadPDF} className="border-white/30 hover:bg-white/10 text-black">
             <Download className="h-3.5 w-3.5 mr-1" /> Baixar PDF
