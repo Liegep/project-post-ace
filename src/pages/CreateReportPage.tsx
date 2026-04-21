@@ -4,7 +4,8 @@ import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { supabase } from "@/integrations/supabase/client";
 import {
   useCreateReport, useSocialReportTemplates, useSaveTemplate,
-  METRIC_LABELS, DEFAULT_METRIC_FIELDS, SocialReportMetrics
+  METRIC_LABELS, DEFAULT_METRIC_FIELDS, INSTAGRAM_METRIC_FIELDS, FACEBOOK_METRIC_FIELDS,
+  SocialReportMetrics,
 } from "@/hooks/useSocialReports";
 import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
