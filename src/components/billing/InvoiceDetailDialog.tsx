@@ -204,6 +204,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     setItemUnitPrice(String(item.unit_price));
     setItemNotes(item.notes);
     setAddingItem(true);
+    scrollIntoView(itemFormRef);
   };
 
   const handleSaveInvoice = async () => {
