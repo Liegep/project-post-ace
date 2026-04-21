@@ -1,13 +1,59 @@
 import { Invoice, InvoiceItem } from "@/hooks/useInvoices";
 import { format } from "date-fns";
+import { pt, enUS, it, es, sv } from "date-fns/locale";
 import { formatCurrency } from "@/lib/currency";
 import { fetchIssuerDetails, IssuerDetails } from "@/hooks/useIssuerDetails";
 
-const STATUS_LABELS: Record<string, string> = {
-  open: "Aberta",
-  paid: "Paga",
-  overdue: "Atrasada",
-  cancelled: "Cancelada",
+type Locale = "pt" | "en" | "it" | "es" | "sv";
+
+const DATE_FN_LOCALES: Record<Locale, any> = { pt, en: enUS, it, es, sv };
+
+const T: Record<Locale, Record<string, string>> = {
+  pt: {
+    invoice: "FATURA",
+    statusOpen: "Aberta", statusPaid: "Paga", statusOverdue: "Atrasada", statusCancelled: "Cancelada",
+    from: "De", to: "Para", taxId: "NIF",
+    issueDate: "Emissão", dueDate: "Vencimento", period: "Período",
+    item: "Item", category: "Categoria", date: "Data", qty: "Qtd", unitPrice: "Unitário", total: "Total",
+    subtotal: "Subtotal", discount: "Desconto", surcharge: "Acréscimo",
+    payment: "Pagamento", notes: "Observações",
+  },
+  en: {
+    invoice: "INVOICE",
+    statusOpen: "Open", statusPaid: "Paid", statusOverdue: "Overdue", statusCancelled: "Cancelled",
+    from: "From", to: "Bill To", taxId: "Tax ID",
+    issueDate: "Issue Date", dueDate: "Due Date", period: "Period",
+    item: "Item", category: "Category", date: "Date", qty: "Qty", unitPrice: "Unit Price", total: "Total",
+    subtotal: "Subtotal", discount: "Discount", surcharge: "Surcharge",
+    payment: "Payment", notes: "Notes",
+  },
+  it: {
+    invoice: "FATTURA",
+    statusOpen: "Aperta", statusPaid: "Pagata", statusOverdue: "Scaduta", statusCancelled: "Annullata",
+    from: "Da", to: "A", taxId: "P. IVA",
+    issueDate: "Data Emissione", dueDate: "Scadenza", period: "Periodo",
+    item: "Voce", category: "Categoria", date: "Data", qty: "Qtà", unitPrice: "Prezzo Unit.", total: "Totale",
+    subtotal: "Subtotale", discount: "Sconto", surcharge: "Maggiorazione",
+    payment: "Pagamento", notes: "Note",
+  },
+  es: {
+    invoice: "FACTURA",
+    statusOpen: "Abierta", statusPaid: "Pagada", statusOverdue: "Vencida", statusCancelled: "Cancelada",
+    from: "De", to: "Para", taxId: "NIF",
+    issueDate: "Emisión", dueDate: "Vencimiento", period: "Período",
+    item: "Ítem", category: "Categoría", date: "Fecha", qty: "Cant.", unitPrice: "Unitario", total: "Total",
+    subtotal: "Subtotal", discount: "Descuento", surcharge: "Recargo",
+    payment: "Pago", notes: "Observaciones",
+  },
+  sv: {
+    invoice: "FAKTURA",
+    statusOpen: "Öppen", statusPaid: "Betald", statusOverdue: "Försenad", statusCancelled: "Avbruten",
+    from: "Från", to: "Till", taxId: "Org.nr",
+    issueDate: "Utfärdad", dueDate: "Förfallodatum", period: "Period",
+    item: "Artikel", category: "Kategori", date: "Datum", qty: "Antal", unitPrice: "Pris/st", total: "Totalt",
+    subtotal: "Delsumma", discount: "Rabatt", surcharge: "Tillägg",
+    payment: "Betalning", notes: "Anteckningar",
+  },
 };
 
 const escapeHtml = (s: string) =>
@@ -44,6 +90,17 @@ export async function generateInvoicePDF(
 ) {
   const issuer = issuerOverride ?? (await fetchIssuerDetails());
 
+  const rawLocale = (invoice.clients?.locale || "pt") as Locale;
+  const locale: Locale = (["pt", "en", "it", "es", "sv"] as Locale[]).includes(rawLocale) ? rawLocale : "pt";
+  const t = T[locale];
+  const dfLocale = DATE_FN_LOCALES[locale];
+  const dateFmt = locale === "en" ? "MM/dd/yyyy" : "dd/MM/yyyy";
+  const fd = (d: string | Date) => format(new Date(d), dateFmt, { locale: dfLocale });
+
+  const STATUS_LABELS: Record<string, string> = {
+    open: t.statusOpen, paid: t.statusPaid, overdue: t.statusOverdue, cancelled: t.statusCancelled,
+  };
+
   const clientName = invoice.clients?.name || "Cliente";
   const clientAddress = invoice.clients?.address || "";
   const clientCountry = invoice.clients?.country || "";
@@ -60,10 +117,10 @@ export async function generateInvoicePDF(
 
   const html = `
 <!DOCTYPE html>
-<html>
+<html lang="${locale}">
 <head>
 <meta charset="utf-8">
-<title>Fatura ${invoice.invoice_number} - ${escapeHtml(issuer.business_name || "www.liegestudio.com")}</title>
+<title>${t.invoice} ${invoice.invoice_number} - ${escapeHtml(issuer.business_name || "www.liegestudio.com")}</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -192,7 +249,7 @@ export async function generateInvoicePDF(
       ${clientLogo ? `<img src="${clientLogo}" alt="${escapeHtml(clientName)}">` : `<div style="font-size:18px;font-weight:600;color:#1d1d1f">${escapeHtml(clientName)}</div>`}
     </div>
     <div class="title-wrap">
-      <h1>FATURA</h1>
+      <h1>${t.invoice}</h1>
       <div class="invoice-num">#${invoice.invoice_number}</div>
       <span class="status status-${invoice.status}">${STATUS_LABELS[invoice.status] || invoice.status}</span>
     </div>
@@ -200,37 +257,37 @@ export async function generateInvoicePDF(
 
   <div class="parties">
     <div class="party">
-      <h3>De</h3>
+      <h3>${t.from}</h3>
       <div class="name">${escapeHtml(issuer.business_name) || "—"}</div>
       ${issuer.address ? `<p>${escapeHtml(issuer.address)}</p>` : ""}
       ${issuer.country ? `<p class="meta-line">${escapeHtml(issuer.country)}</p>` : ""}
       ${issuer.email ? `<p class="meta-line">${escapeHtml(issuer.email)}</p>` : ""}
-      ${issuer.tax_id ? `<p class="meta-line">Tax ID: ${escapeHtml(issuer.tax_id)}</p>` : ""}
+      ${issuer.tax_id ? `<p class="meta-line">${t.taxId}: ${escapeHtml(issuer.tax_id)}</p>` : ""}
     </div>
     <div class="party">
-      <h3>Para</h3>
+      <h3>${t.to}</h3>
       <div class="name">${escapeHtml(clientName)}</div>
       ${clientAddress ? `<p>${escapeHtml(clientAddress)}</p>` : ""}
       ${clientCountry ? `<p class="meta-line">${escapeHtml(clientCountry)}</p>` : ""}
-      ${clientTaxId ? `<p class="meta-line">Tax ID: ${escapeHtml(clientTaxId)}</p>` : ""}
+      ${clientTaxId ? `<p class="meta-line">${t.taxId}: ${escapeHtml(clientTaxId)}</p>` : ""}
     </div>
   </div>
 
   <div class="dates">
-    <div class="item"><span>Emissão</span><strong>${format(new Date(invoice.issue_date), "dd/MM/yyyy")}</strong></div>
-    <div class="item"><span>Vencimento</span><strong>${format(new Date(invoice.due_date), "dd/MM/yyyy")}</strong></div>
-    ${invoice.period_start && invoice.period_end ? `<div class="item"><span>Período</span><strong>${format(new Date(invoice.period_start), "dd/MM/yyyy")} – ${format(new Date(invoice.period_end), "dd/MM/yyyy")}</strong></div>` : ""}
+    <div class="item"><span>${t.issueDate}</span><strong>${fd(invoice.issue_date)}</strong></div>
+    <div class="item"><span>${t.dueDate}</span><strong>${fd(invoice.due_date)}</strong></div>
+    ${invoice.period_start && invoice.period_end ? `<div class="item"><span>${t.period}</span><strong>${fd(invoice.period_start)} – ${fd(invoice.period_end)}</strong></div>` : ""}
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>Item</th>
-        <th>Categoria</th>
-        <th>Data</th>
-        <th class="text-right">Qtd</th>
-        <th class="text-right">Unitário</th>
-        <th class="text-right">Total</th>
+        <th>${t.item}</th>
+        <th>${t.category}</th>
+        <th>${t.date}</th>
+        <th class="text-right">${t.qty}</th>
+        <th class="text-right">${t.unitPrice}</th>
+        <th class="text-right">${t.total}</th>
       </tr>
     </thead>
     <tbody>
@@ -238,7 +295,7 @@ export async function generateInvoicePDF(
         <tr>
           <td>${escapeHtml(item.name)}${item.description ? `<div class="desc">${escapeHtml(item.description)}</div>` : ""}</td>
           <td>${escapeHtml(item.category)}</td>
-          <td>${format(new Date(item.service_date), "dd/MM/yyyy")}</td>
+          <td>${fd(item.service_date)}</td>
           <td class="text-right">${item.quantity}</td>
           <td class="text-right">${fmt(Number(item.unit_price))}</td>
           <td class="text-right">${fmt(Number(item.total_price))}</td>
@@ -248,15 +305,15 @@ export async function generateInvoicePDF(
   </table>
 
   <div class="totals">
-    <div class="row"><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
-    ${discount > 0 ? `<div class="row" style="color:#00875a"><span>Desconto</span><span>− ${fmt(discount)}</span></div>` : ""}
-    ${surcharge > 0 ? `<div class="row" style="color:#bf6900"><span>Acréscimo</span><span>+ ${fmt(surcharge)}</span></div>` : ""}
-    <div class="row total"><span>Total</span><span>${fmt(total)}</span></div>
+    <div class="row"><span>${t.subtotal}</span><span>${fmt(subtotal)}</span></div>
+    ${discount > 0 ? `<div class="row" style="color:#00875a"><span>${t.discount}</span><span>− ${fmt(discount)}</span></div>` : ""}
+    ${surcharge > 0 ? `<div class="row" style="color:#bf6900"><span>${t.surcharge}</span><span>+ ${fmt(surcharge)}</span></div>` : ""}
+    <div class="row total"><span>${t.total}</span><span>${fmt(total)}</span></div>
   </div>
 
   ${paymentMethod || paymentDetails ? `
   <div class="payment-block">
-    <h3>Pagamento</h3>
+    <h3>${t.payment}</h3>
     ${paymentMethod ? `<div class="pm">${escapeHtml(paymentMethod)}</div>` : ""}
     ${paymentDetails ? `<div class="pd">${escapeHtml(paymentDetails)}</div>` : ""}
   </div>
@@ -264,7 +321,7 @@ export async function generateInvoicePDF(
 
   ${invoice.notes ? `
   <div class="notes-block">
-    <h3>Observações</h3>
+    <h3>${t.notes}</h3>
     <p>${escapeHtml(invoice.notes)}</p>
   </div>
   ` : ""}
@@ -287,7 +344,6 @@ export async function generateInvoicePDF(
     if (img && !(img as HTMLImageElement).complete) {
       (img as HTMLImageElement).addEventListener("load", () => setTimeout(triggerPrint, 200));
       (img as HTMLImageElement).addEventListener("error", () => setTimeout(triggerPrint, 200));
-      // Fallback timeout in case load never fires
       setTimeout(triggerPrint, 2500);
     } else {
       setTimeout(triggerPrint, 400);
