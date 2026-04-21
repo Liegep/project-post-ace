@@ -1,14 +1,17 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
+import Papa from "papaparse";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, FileSpreadsheet, Check, X, ArrowRight } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { METRIC_LABELS, SocialReportMetrics } from "@/hooks/useSocialReports";
+import { SocialReportMetrics } from "@/hooks/useSocialReports";
 
 export interface CsvParsedExtra {
-  periodStart?: string; // YYYY-MM-DD
-  periodEnd?: string;   // YYYY-MM-DD
+  periodStart?: string;
+  periodEnd?: string;
   campaignTitle?: string;
 }
 
@@ -21,334 +24,178 @@ interface CsvUploadPanelProps {
   ) => void;
 }
 
-// Maps normalized header text -> internal metric key (or special key)
-const METRIC_ALIASES: Record<string, string> = {
-  // Reach
-  reach: "reach", alcance: "reach", resultados: "reach", results: "reach",
-  "alcance total": "reach", "pessoas alcancadas": "reach",
-  // Impressions
-  impressions: "impressions", impressoes: "impressions", "impressões": "impressions",
-  "impressoes do anuncio": "impressions", "impressões do anúncio": "impressions",
-  "impressoes totais": "impressions", "ad impressions": "impressions",
-  // Engagement
-  engagement: "engagement", engajamento: "engagement", "taxa de engajamento": "engagement", "engagement rate": "engagement",
-  // Interactions
-  interactions: "interactions", "interações": "interactions", interacoes: "interactions",
-  // Clicks
-  clicks: "clicks", cliques: "clicks", "cliques no link": "clicks", "link clicks": "clicks", "cliques em links": "clicks", "link click": "clicks",
-  // Profile visits
-  profile_visits: "profile_visits", "visitas ao perfil": "profile_visits", "visitas_perfil": "profile_visits", "profile visits": "profile_visits",
-  // Followers gained
-  followers_gained: "followers_gained", "seguidores ganhos": "followers_gained", "seguidores_ganhos": "followers_gained", "followers gained": "followers_gained", "novos seguidores": "followers_gained", "new followers": "followers_gained",
-  // Followers lost
-  followers_lost: "followers_lost", "seguidores perdidos": "followers_lost", "seguidores_perdidos": "followers_lost", "followers lost": "followers_lost",
-  // Posts / Reels published
-  posts_published: "posts_published", "posts publicados": "posts_published", "posts_publicados": "posts_published", "posts published": "posts_published",
-  reels_published: "reels_published", "reels publicados": "reels_published", "reels_publicados": "reels_published", "reels published": "reels_published",
-  // Spend (Facebook Ads)
-  spend: "spend",
-  "amount spent": "spend",
-  "amount spent brl": "spend",
-  "amount spent (brl)": "spend",
-  "amount spent usd": "spend",
-  "amount spent (usd)": "spend",
-  "valor gasto": "spend",
-  "valor usado": "spend",
-  investimento: "spend",
-  "investimento (brl)": "spend",
-  gasto: "spend", "gasto (brl)": "spend", "valor gasto (brl)": "spend",
-  // Special non-metric fields
-  "campaign name": "__campaign_name__",
-  "nome da campanha": "__campaign_name__",
-  "identificacao do post": "__post_id__",
-  "identificação do post": "__post_id__",
-  "post id": "__post_id__", "id do post": "__post_id__",
-  descricao: "__description__", "descrição": "__description__", description: "__description__",
-  data: "__date__", date: "__date__",
-  "reporting starts": "__period_start__",
-  "reporting start": "__period_start__",
-  "início dos relatórios": "__period_start__",
-  "inicio dos relatorios": "__period_start__",
-  "reporting ends": "__period_end__",
-  "reporting end": "__period_end__",
-  "término dos relatórios": "__period_end__",
-  "termino dos relatorios": "__period_end__",
+type MetricKey = "reach" | "impressions" | "spend";
+
+const KEYWORDS: Record<MetricKey, string[]> = {
+  reach: ["alcance", "reach", "pessoas alcancadas"],
+  impressions: ["impressoes", "impressions", "impressao"],
+  spend: ["valor", "gasto", "spend", "amount spent", "investimento", "custo"],
+};
+
+const LABELS: Record<MetricKey, string> = {
+  reach: "Alcance",
+  impressions: "Impressões",
+  spend: "Investimento",
 };
 
 function stripDiacritics(s: string): string {
-  return s
-    .replace(/[áàãâä]/g, "a").replace(/[éèêë]/g, "e").replace(/[íìîï]/g, "i")
-    .replace(/[óòõôö]/g, "o").replace(/[úùûü]/g, "u").replace(/[ç]/g, "c");
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 }
 
-function normalizeHeaderRaw(h: string): string {
-  return stripDiacritics(h.trim().toLowerCase()).replace(/[_\s]+/g, " ").trim();
+/** Convert a CSV cell to a number, handling pt-BR (1.250,50) and en-US (1,250.50) and currency symbols. */
+function toNumber(raw: unknown): number | null {
+  if (raw === null || raw === undefined) return null;
+  let s = String(raw).replace(/[R$€$£\s]/gi, "").trim();
+  if (!s) return null;
+  const hasComma = s.includes(",");
+  const hasDot = s.includes(".");
+  if (hasComma && hasDot) {
+    // The rightmost separator is the decimal one
+    if (s.lastIndexOf(",") > s.lastIndexOf(".")) {
+      s = s.replace(/\./g, "").replace(",", ".");
+    } else {
+      s = s.replace(/,/g, "");
+    }
+  } else if (hasComma) {
+    // pt-BR decimal
+    s = s.replace(/\./g, "").replace(",", ".");
+  }
+  const n = parseFloat(s);
+  return isNaN(n) ? null : n;
 }
 
-function normalizeHeader(h: string): string | null {
-  const clean = normalizeHeaderRaw(h);
-  if (METRIC_ALIASES[clean]) return METRIC_ALIASES[clean];
-  // Strip parenthesised currency suffix like "(brl)" then retry
-  const noParen = clean.replace(/\s*\([^)]*\)\s*/g, "").trim();
-  if (METRIC_ALIASES[noParen]) return METRIC_ALIASES[noParen];
-  // Fuzzy contains as last resort
-  for (const [alias, key] of Object.entries(METRIC_ALIASES)) {
-    const a = stripDiacritics(alias);
-    if (clean === a || clean.includes(a)) return key;
+/** Try to detect which CSV column matches a given metric, scanning ALL rows for keyword matches. */
+function detectColumn(headers: string[], rows: Record<string, unknown>[], metric: MetricKey): string | null {
+  const keywords = KEYWORDS[metric];
+
+  // 1) Match by header name
+  for (const h of headers) {
+    const norm = stripDiacritics(h);
+    if (keywords.some(k => norm.includes(k))) return h;
+  }
+
+  // 2) Scan rows for any cell that contains the keyword (some Facebook exports place metric names in cells)
+  for (const row of rows) {
+    for (const h of headers) {
+      const cell = stripDiacritics(String(row[h] ?? ""));
+      if (cell && keywords.some(k => cell === k || cell.startsWith(k + " "))) {
+        // Found the metric label in a cell — its NUMERIC neighbour column is likely the value.
+        const idx = headers.indexOf(h);
+        for (let j = idx + 1; j < headers.length; j++) {
+          const v = toNumber(row[headers[j]]);
+          if (v !== null) return headers[j];
+        }
+      }
+    }
   }
   return null;
 }
 
-/** Clean an integer-like CSV cell: strips R$, currency, spaces, dots and commas (thousands). */
-function cleanInt(raw: string): number {
-  if (!raw) return 0;
-  const s = raw.replace(/[R$€$£\s.,]/g, "");
-  const n = parseInt(s, 10);
-  return isNaN(n) ? 0 : n;
-}
-
-/** Clean a money/decimal cell using pt-BR rules: removes 'R$' and spaces, then '1.250,50' → 1250.50. */
-function cleanMoney(raw: string): number {
-  if (!raw) return 0;
-  let s = raw.replace(/[R$€$£\s]/gi, "").trim();
-  if (!s) return 0;
-  const hasComma = s.includes(",");
-  const hasDot = s.includes(".");
-  if (hasComma && hasDot) {
-    // pt-BR: dot = thousands, comma = decimal
-    s = s.replace(/\./g, "").replace(",", ".");
-  } else if (hasComma) {
-    // Only comma → decimal separator pt-BR
-    s = s.replace(",", ".");
+/** Sum every numeric value in a column, ignoring rows where the cell isn't a number. */
+function sumColumn(rows: Record<string, unknown>[], column: string): number {
+  let sum = 0;
+  for (const row of rows) {
+    const n = toNumber(row[column]);
+    if (n !== null) sum += n;
   }
-  // Else only dots or plain digits → leave as-is (en-US)
-  const n = parseFloat(s);
-  return isNaN(n) ? 0 : n;
+  return Math.round(sum * 100) / 100; // 2 decimal max
 }
-
-/** Normalize a date cell to YYYY-MM-DD if possible. Accepts YYYY-MM-DD, DD/MM/YYYY, MM/DD/YYYY. */
-function normalizeDate(raw: string): string | undefined {
-  if (!raw) return undefined;
-  const s = raw.trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-  // DD/MM/YYYY (default Brazilian) or MM/DD/YYYY (Facebook English exports)
-  const m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-  if (m) {
-    const a = parseInt(m[1], 10);
-    const b = parseInt(m[2], 10);
-    const y = m[3];
-    // If first part > 12, must be DD/MM; else assume MM/DD (Facebook default in English exports)
-    let day: number, month: number;
-    if (a > 12) { day = a; month = b; }
-    else { month = a; day = b; }
-    return `${y}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-  }
-  // Fallback: try Date parse
-  const d = new Date(s);
-  if (!isNaN(d.getTime())) {
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  }
-  return undefined;
-}
-
-/** Robust CSV line splitter that respects quoted commas. */
-function splitCsvLine(line: string, sep: string): string[] {
-  const out: string[] = [];
-  let cur = "";
-  let inQuote = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      if (inQuote && line[i + 1] === '"') { cur += '"'; i++; }
-      else inQuote = !inQuote;
-    } else if (ch === sep && !inQuote) {
-      out.push(cur);
-      cur = "";
-    } else {
-      cur += ch;
-    }
-  }
-  out.push(cur);
-  return out.map(c => c.trim());
-}
-
-function parseCsvText(text: string): { headers: string[]; rows: string[][] } {
-  const lines = text.split(/\r?\n/).filter(l => l.trim());
-  if (lines.length === 0) return { headers: [], rows: [] };
-
-  // Detect separator from a line that looks like data (most separators wins across first lines)
-  const sniff = lines.slice(0, 10).join("\n");
-  const sep = (sniff.split(";").length - 1) > (sniff.split(",").length - 1) ? ";" : ",";
-
-  // Skip metadata/preamble rows: Facebook exports often begin with title, date range,
-  // empty rows or single-cell lines before the real header. The real header is the
-  // first row with >=2 cells AND at least one recognized metric/field alias.
-  let headerIdx = 0;
-  for (let i = 0; i < Math.min(lines.length, 20); i++) {
-    const cells = splitCsvLine(lines[i], sep).map(c => c.replace(/^"|"$/g, ""));
-    if (cells.length < 2) continue;
-    const recognized = cells.filter(c => normalizeHeader(c) !== null).length;
-    if (recognized >= 1) { headerIdx = i; break; }
-  }
-
-  const headers = splitCsvLine(lines[headerIdx], sep).map(h => h.replace(/^"|"$/g, ""));
-  const rows = lines.slice(headerIdx + 1)
-    .map(l => splitCsvLine(l, sep).map(c => c.replace(/^"|"$/g, "")))
-    // Drop rows that are essentially empty (all blank cells)
-    .filter(r => r.some(c => c && c.trim() !== ""));
-  return { headers, rows };
-}
-
-const INTEGER_KEYS = new Set([
-  "reach", "impressions", "interactions", "clicks", "profile_visits",
-  "followers_gained", "followers_lost", "posts_published", "reels_published",
-]);
 
 export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
-  const [parsed, setParsed] = useState<{
-    metrics: SocialReportMetrics;
-    prevMetrics: SocialReportMetrics;
-    fields: string[];
-    extra: CsvParsedExtra;
-  } | null>(null);
   const [fileName, setFileName] = useState("");
+  const [headers, setHeaders] = useState<string[]>([]);
+  const [rows, setRows] = useState<Record<string, unknown>[]>([]);
+  const [mapping, setMapping] = useState<Record<MetricKey, string>>({ reach: "", impressions: "", spend: "" });
+
+  const totals = useMemo(() => {
+    const out: Record<MetricKey, number> = { reach: 0, impressions: 0, spend: 0 };
+    (Object.keys(mapping) as MetricKey[]).forEach(k => {
+      if (mapping[k]) out[k] = sumColumn(rows, mapping[k]);
+    });
+    return out;
+  }, [rows, mapping]);
+
+  const reset = () => {
+    setFileName("");
+    setHeaders([]);
+    setRows([]);
+    setMapping({ reach: "", impressions: "", spend: "" });
+    if (fileRef.current) fileRef.current.value = "";
+  };
 
   const processFile = (file: File) => {
-    if (!file.name.endsWith(".csv")) {
+    if (!file.name.toLowerCase().endsWith(".csv")) {
       toast({ title: "Apenas arquivos .csv são aceitos", variant: "destructive" });
       return;
     }
     setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target?.result as string;
-      const { headers, rows } = parseCsvText(text);
 
-      if (rows.length === 0) {
-        toast({ title: "CSV vazio ou formato inválido", variant: "destructive" });
-        return;
-      }
+    Papa.parse<Record<string, unknown>>(file, {
+      header: true,
+      skipEmptyLines: "greedy",
+      transformHeader: (h) => h.trim(),
+      complete: (results) => {
+        const fields = (results.meta.fields || []).filter(Boolean);
+        const data = (results.data || []).filter(r => Object.values(r).some(v => v !== null && String(v).trim() !== ""));
 
-      const mappedHeaders = headers.map(h => normalizeHeader(h));
-      const metrics: SocialReportMetrics = {};
-      const prevMetrics: SocialReportMetrics = {};
-      const detectedFields: string[] = [];
-      const extra: CsvParsedExtra = {};
-
-      // Determine layout: column-based (typical Facebook export = headers row + many data rows
-      // we aggregate by SUM across rows) vs row-based (metric name | current | previous).
-      const recognizedColumns = mappedHeaders.filter(h => h !== null).length;
-      const isColumnBased = recognizedColumns >= 2;
-
-      if (isColumnBased) {
-        const titles: string[] = [];
-        const startDates: string[] = [];
-        const endDates: string[] = [];
-
-        for (const row of rows) {
-          mappedHeaders.forEach((key, idx) => {
-            if (!key) return;
-            const cell = row[idx] ?? "";
-            if (key === "__campaign_name__") {
-              if (cell.trim()) titles.push(cell.trim());
-              return;
-            }
-            if (key === "__period_start__") {
-              const d = normalizeDate(cell);
-              if (d) startDates.push(d);
-              return;
-            }
-            if (key === "__period_end__") {
-              const d = normalizeDate(cell);
-              if (d) endDates.push(d);
-              return;
-            }
-            if (key === "__date__") {
-              const d = normalizeDate(cell);
-              if (d) { startDates.push(d); endDates.push(d); }
-              return;
-            }
-            if (key === "__post_id__" || key === "__description__") {
-              return; // ignore – not a metric, not a period
-            }
-            // Numeric metric — accumulate sum across rows
-            const value = key === "spend" ? cleanMoney(cell) : cleanInt(cell);
-            metrics[key] = (metrics[key] ?? 0) + value;
-            if (!detectedFields.includes(key)) detectedFields.push(key);
-          });
+        if (fields.length === 0 || data.length === 0) {
+          toast({ title: "CSV vazio ou ilegível", variant: "destructive" });
+          return;
         }
 
-        // Period: take min(start) / max(end)
-        if (startDates.length) extra.periodStart = [...startDates].sort()[0];
-        if (endDates.length) {
-          const sorted = [...endDates].sort();
-          extra.periodEnd = sorted[sorted.length - 1];
-        }
-        // Campaign title: first non-empty (or first if multiple campaigns in file)
-        if (titles.length === 1) extra.campaignTitle = titles[0];
-        else if (titles.length > 1) extra.campaignTitle = `${titles[0]} (+${titles.length - 1})`;
+        setHeaders(fields);
+        setRows(data);
 
-        // Round integer metrics to whole numbers
-        for (const k of detectedFields) {
-          if (INTEGER_KEYS.has(k) && metrics[k] !== undefined) {
-            metrics[k] = Math.round(metrics[k] as number);
-          }
-        }
-      } else {
-        // Row-based: metric | current | previous
-        rows.forEach(row => {
-          const key = normalizeHeader(row[0] || "");
-          if (!key || key.startsWith("__")) return;
-          if (!detectedFields.includes(key)) detectedFields.push(key);
-          metrics[key] = key === "spend" ? cleanMoney(row[1] || "") : cleanInt(row[1] || "");
-          if (row[2]) {
-            prevMetrics[key] = key === "spend" ? cleanMoney(row[2]) : cleanInt(row[2]);
-          }
-        });
-      }
+        // Auto-detect the 3 metric columns
+        const auto: Record<MetricKey, string> = {
+          reach: detectColumn(fields, data, "reach") || "",
+          impressions: detectColumn(fields, data, "impressions") || "",
+          spend: detectColumn(fields, data, "spend") || "",
+        };
+        setMapping(auto);
 
-      if (detectedFields.length === 0) {
+        const detected = (Object.keys(auto) as MetricKey[]).filter(k => auto[k]).length;
         toast({
-          title: "Nenhuma métrica reconhecida no CSV",
-          description: "Verifique se os cabeçalhos correspondem às métricas disponíveis (Reach, Impressions, Amount Spent…)",
-          variant: "destructive",
+          title: `${data.length} linhas lidas`,
+          description: detected === 3
+            ? "Todas as colunas foram detectadas automaticamente"
+            : `${detected}/3 colunas detectadas — confirme o mapeamento abaixo`,
         });
-        return;
-      }
-
-      setParsed({ metrics, prevMetrics, fields: detectedFields, extra });
-      const extraBits: string[] = [];
-      if (extra.periodStart && extra.periodEnd) extraBits.push("período detectado");
-      if (extra.campaignTitle) extraBits.push("campanha detectada");
-      toast({
-        title: `${detectedFields.length} métricas detectadas!`,
-        description: extraBits.length ? extraBits.join(" • ") : undefined,
-      });
-    };
-    reader.readAsText(file);
+      },
+      error: () => toast({ title: "Erro ao ler o CSV", variant: "destructive" }),
+    });
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file) processFile(file);
+    const f = e.dataTransfer.files[0];
+    if (f) processFile(f);
   };
 
-  const applyMetrics = () => {
-    if (!parsed) return;
-    onMetricsParsed(parsed.metrics, parsed.prevMetrics, parsed.fields, parsed.extra);
+  const apply = () => {
+    const fields: string[] = [];
+    const metrics: SocialReportMetrics = {};
+    (Object.keys(mapping) as MetricKey[]).forEach(k => {
+      if (mapping[k]) {
+        metrics[k] = totals[k];
+        fields.push(k);
+      }
+    });
+    if (fields.length === 0) {
+      toast({ title: "Selecione ao menos uma coluna", variant: "destructive" });
+      return;
+    }
+    onMetricsParsed(metrics, {}, fields, {});
     toast({ title: "Métricas aplicadas ao relatório!" });
   };
 
-  const formatValue = (key: string, value?: number) => {
-    if (value === undefined) return "";
-    if (key === "spend") {
-      return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 });
-    }
-    return value.toLocaleString("pt-BR");
+  const formatTotal = (k: MetricKey): string => {
+    const v = totals[k];
+    if (k === "spend") return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 });
+    return v.toLocaleString("pt-BR");
   };
 
   return (
@@ -361,7 +208,7 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
           <div>
             <h3 className="text-sm font-semibold">Importar CSV</h3>
             <p className="text-[11px] text-muted-foreground">
-              Suporta exports do Facebook Ads (Reach, Impressions, Amount Spent…) e relatórios manuais
+              Upload → confirmar colunas → exibir. Detecta Alcance, Impressões e Valor automaticamente.
             </p>
           </div>
         </div>
@@ -374,54 +221,64 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
           onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f); }}
         />
 
-        <div
-          className={`relative rounded-xl border-2 border-dashed transition-all cursor-pointer p-6 text-center ${
-            dragOver
-              ? "border-primary bg-primary/10 scale-[1.01]"
-              : "border-border/50 hover:border-primary/40 hover:bg-primary/[0.02]"
-          }`}
-          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={handleDrop}
-          onClick={() => fileRef.current?.click()}
-        >
-          <Upload className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
-          <p className="text-xs text-muted-foreground">
-            Arraste um arquivo CSV ou <span className="text-primary font-medium underline">clique para selecionar</span>
-          </p>
-          <p className="text-[10px] text-muted-foreground/60 mt-1">
-            Várias linhas (ex.: campanhas) são somadas automaticamente. Datas e moeda BRL são reconhecidas.
-          </p>
-        </div>
+        {!fileName && (
+          <div
+            className={`relative rounded-xl border-2 border-dashed transition-all cursor-pointer p-6 text-center ${
+              dragOver
+                ? "border-primary bg-primary/10 scale-[1.01]"
+                : "border-border/50 hover:border-primary/40 hover:bg-primary/[0.02]"
+            }`}
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleDrop}
+            onClick={() => fileRef.current?.click()}
+          >
+            <Upload className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
+            <p className="text-xs text-muted-foreground">
+              Arraste um arquivo CSV ou <span className="text-primary font-medium underline">clique para selecionar</span>
+            </p>
+          </div>
+        )}
 
-        {parsed && (
-          <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2">
+        {fileName && headers.length > 0 && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Check className="h-3.5 w-3.5 text-emerald-500" />
               <span className="font-medium">{fileName}</span>
-              <span>— {parsed.fields.length} métricas</span>
-              {parsed.extra.periodStart && parsed.extra.periodEnd && (
-                <span className="hidden sm:inline">• {parsed.extra.periodStart} → {parsed.extra.periodEnd}</span>
-              )}
-              <Button size="icon" variant="ghost" className="h-5 w-5 ml-auto" onClick={() => { setParsed(null); setFileName(""); }}>
+              <span>— {rows.length} linhas</span>
+              <Button size="icon" variant="ghost" className="h-5 w-5 ml-auto" onClick={reset}>
                 <X className="h-3 w-3" />
               </Button>
             </div>
 
-            <div className="flex flex-wrap gap-1.5">
-              {parsed.fields.map(f => (
-                <Badge key={f} variant="secondary" className="text-[10px] bg-primary/10 text-primary border-primary/20">
-                  {METRIC_LABELS[f] || f}
-                  {parsed.metrics[f] !== undefined && (
-                    <span className="ml-1 opacity-70">{formatValue(f, parsed.metrics[f])}</span>
-                  )}
-                </Badge>
+            <div className="space-y-3 rounded-lg border border-border/50 bg-background/40 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                Confirme o mapeamento de colunas
+              </p>
+              {(Object.keys(mapping) as MetricKey[]).map(k => (
+                <div key={k} className="grid grid-cols-[100px_1fr_auto] items-center gap-3">
+                  <Label className="text-xs">{LABELS[k]}</Label>
+                  <Select value={mapping[k] || "__none__"} onValueChange={v => setMapping(m => ({ ...m, [k]: v === "__none__" ? "" : v }))}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder="— selecionar coluna —" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">— ignorar —</SelectItem>
+                      {headers.map(h => (
+                        <SelectItem key={h} value={h}>{h}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Badge variant="secondary" className="text-[10px] tabular-nums bg-primary/10 text-primary border-primary/20 min-w-[80px] justify-end">
+                    {mapping[k] ? formatTotal(k) : "—"}
+                  </Badge>
+                </div>
               ))}
             </div>
 
-            <Button onClick={applyMetrics} className="w-full gap-2 bg-gradient-to-r from-primary to-accent hover:opacity-90">
+            <Button onClick={apply} className="w-full gap-2 bg-gradient-to-r from-primary to-accent hover:opacity-90">
               <ArrowRight className="h-4 w-4" />
-              Aplicar métricas ao relatório
+              Aplicar ao relatório
             </Button>
           </div>
         )}
