@@ -195,9 +195,8 @@ export default function CreateReportPage() {
         text: observations,
         top_content: topContent,
       });
-      const report = await createReport.mutateAsync({
+      const payload = {
         client_id: clientId,
-        created_by: userId,
         title: title || `Relatório ${client?.name || ""} - ${platform}`,
         period_start: periodStart,
         period_end: periodEnd,
@@ -212,11 +211,21 @@ export default function CreateReportPage() {
         observations: observationsPayload,
         locale: reportLocale,
         status,
-      });
+      };
+      let reportId = editId;
+      if (isEditMode && editId) {
+        await updateReport.mutateAsync({ id: editId, ...payload });
+      } else {
+        const created = await createReport.mutateAsync({ ...payload, created_by: userId });
+        reportId = created.id;
+      }
+      // When (re)publishing, clear seen markers so clients see it as new again
+      if (status === "published" && reportId) {
+        await supabase.from("client_seen_items").delete().eq("item_id", reportId).eq("item_type", "report");
+      }
 
-
-      toast({ title: status === "published" ? "Relatório publicado!" : "Rascunho salvo!" });
-      navigate(`/reports/${report.id}`);
+      toast({ title: status === "published" ? (isEditMode ? "Relatório republicado!" : "Relatório publicado!") : "Rascunho salvo!" });
+      navigate(`/reports/${reportId}`);
     } catch {
       toast({ title: "Erro ao salvar", variant: "destructive" });
     } finally {
