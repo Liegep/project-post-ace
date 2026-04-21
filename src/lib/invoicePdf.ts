@@ -51,6 +51,8 @@ export function generateInvoicePDF(
   .notes { margin-top: 32px; padding: 16px; background: #f9fafb; border-radius: 8px; }
   .notes h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin-bottom: 8px; }
   .notes p { font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+  .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #e5e5e5; text-align: center; font-size: 12px; color: #666; }
+  .footer a { color: #2563eb; text-decoration: none; }
   @media print { body { padding: 20px; } }
 </style>
 </head>
@@ -118,6 +120,10 @@ export function generateInvoicePDF(
     <p>${invoice.notes}</p>
   </div>
   ` : ""}
+
+  <div class="footer">
+    <a href="https://www.liegestudio.com" target="_blank">www.liegestudio.com</a>
+  </div>
 </body>
 </html>`;
 
