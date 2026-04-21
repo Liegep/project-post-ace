@@ -225,17 +225,98 @@ export default function ReportViewPage() {
           </div>
         )}
 
-        {/* Observations */}
-        {report.observations && (
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="text-xs font-semibold mb-2 flex items-center gap-2">
-                <Eye className="h-3.5 w-3.5 text-muted-foreground" /> Observações
-              </h3>
-              <p className="text-sm text-foreground/80 whitespace-pre-line">{report.observations}</p>
-            </CardContent>
-          </Card>
-        )}
+        {/* Observations + Top Content (Posts / Reels / Stories) */}
+        {(() => {
+          if (!report.observations) return null;
+          let parsedText = "";
+          let topContent: { posts?: any[]; reels?: any[]; stories?: any[] } | null = null;
+          try {
+            const parsed = JSON.parse(report.observations);
+            if (parsed && typeof parsed === "object" && ("text" in parsed || "top_content" in parsed)) {
+              parsedText = parsed.text || "";
+              topContent = parsed.top_content || null;
+            } else {
+              parsedText = report.observations;
+            }
+          } catch {
+            parsedText = report.observations;
+          }
+
+          const sections: { key: "posts" | "reels" | "stories"; label: string }[] = [
+            { key: "posts", label: "Top 3 Posts" },
+            { key: "reels", label: "Top 3 Reels" },
+            { key: "stories", label: "Top 3 Stories" },
+          ];
+
+          const hasTopContent =
+            topContent &&
+            sections.some((s) =>
+              (topContent![s.key] || []).some((it: any) => it?.image_url || it?.title),
+            );
+
+          return (
+            <>
+              {parsedText && (
+                <Card>
+                  <CardContent className="p-4">
+                    <h3 className="text-xs font-semibold mb-2 flex items-center gap-2">
+                      <Eye className="h-3.5 w-3.5 text-muted-foreground" /> Observações
+                    </h3>
+                    <p className="text-sm text-foreground/80 whitespace-pre-line">{parsedText}</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {hasTopContent && (
+                <Card className="glass-card">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                      <Star className="h-4 w-4 text-primary" /> Conteúdos com mais resultados
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {sections.map((section) => {
+                      const items = (topContent![section.key] || []).filter(
+                        (it: any) => it?.image_url || it?.title,
+                      );
+                      if (items.length === 0) return null;
+                      return (
+                        <div key={section.key} className="space-y-3">
+                          <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            {section.label}
+                          </h4>
+                          <div className="grid gap-3 sm:grid-cols-3">
+                            {items.map((item: any, idx: number) => (
+                              <div
+                                key={idx}
+                                className="rounded-lg border border-border/50 bg-background/40 overflow-hidden"
+                              >
+                                {item.image_url && (
+                                  <div className="aspect-[4/5] w-full overflow-hidden bg-muted/40">
+                                    <img
+                                      src={item.image_url}
+                                      alt={item.title || `${section.key} ${idx + 1}`}
+                                      className="h-full w-full object-cover"
+                                    />
+                                  </div>
+                                )}
+                                {item.title && (
+                                  <p className="px-3 py-2 text-xs font-medium text-foreground/80">
+                                    {item.title}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          );
+        })()}
 
         {/* Recommendations */}
         {report.recommendations && (
