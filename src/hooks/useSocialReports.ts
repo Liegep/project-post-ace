@@ -148,10 +148,11 @@ export const METRIC_LABELS: Record<string, string> = {
   followers_lost: "Seguidores Perdidos",
   posts_published: "Posts Publicados",
   reels_published: "Reels Publicados",
+  spend: "Investimento (R$)",
 };
 
 export const DEFAULT_METRIC_FIELDS = [
   "reach", "impressions", "engagement", "interactions", "clicks",
   "profile_visits", "followers_gained", "followers_lost",
-  "posts_published", "reels_published",
+  "posts_published", "reels_published", "spend",
 ];
