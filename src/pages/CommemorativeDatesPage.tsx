@@ -163,9 +163,24 @@ export default function CommemorativeDatesPage() {
     refetch();
   };
 
-  const displayDates = filterMonth !== "all"
+  const baseDates = filterMonth !== "all"
     ? filteredDates.filter((d) => d.date_month === parseInt(filterMonth))
     : filteredDates;
+
+  const nagerFiltered = filterMonth !== "all"
+    ? nagerAsCommemorative.filter((d) => d.date_month === parseInt(filterMonth))
+    : nagerAsCommemorative;
+
+  // Merge: avoid duplicates (same country_code + month + day + name)
+  const displayDates = useMemo(() => {
+    const seen = new Set(baseDates.map((d) => `${d.country_code}-${d.date_month}-${d.date_day}-${d.name.toLowerCase()}`));
+    const merged = [...baseDates];
+    for (const n of nagerFiltered) {
+      const key = `${n.country_code}-${n.date_month}-${n.date_day}-${n.name.toLowerCase()}`;
+      if (!seen.has(key)) merged.push(n);
+    }
+    return merged;
+  }, [baseDates, nagerFiltered]);
 
   // Group by month
   const grouped = displayDates.reduce<Record<number, CommemorativeDate[]>>((acc, d) => {
