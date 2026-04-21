@@ -13,6 +13,10 @@ export interface CsvParsedExtra {
   periodStart?: string;
   periodEnd?: string;
   campaignTitle?: string;
+  rawHeaders?: string[];
+  rawRows?: Record<string, unknown>[];
+  mapping?: Record<string, string>;
+  dateColumn?: string | null;
 }
 
 interface CsvUploadPanelProps {
@@ -234,6 +238,35 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
     if (f) processFile(f);
   };
 
+  /** Detect a date column by header keywords + cell parsing. */
+  const detectedDateColumn = useMemo<string | null>(() => {
+    if (headers.length === 0 || rows.length === 0) return null;
+    const dateKeywords = ["data", "date", "dia", "inicio", "fim", "start", "end", "day"];
+    const candidates = headers.filter(h => {
+      const norm = stripDiacritics(h);
+      return dateKeywords.some(k => norm.includes(k));
+    });
+    const tryParseDate = (v: unknown): boolean => {
+      if (!v) return false;
+      const s = String(v).trim();
+      if (!s) return false;
+      if (!isNaN(new Date(s).getTime())) return true;
+      return /^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/.test(s);
+    };
+    for (const c of candidates) {
+      const sample = rows.slice(0, 10);
+      const hits = sample.filter(r => tryParseDate(r[c])).length;
+      if (hits >= sample.length / 2) return c;
+    }
+    // Fallback: any column whose values mostly parse as dates
+    for (const h of headers) {
+      const sample = rows.slice(0, 10);
+      const hits = sample.filter(r => tryParseDate(r[h])).length;
+      if (hits >= Math.max(3, sample.length * 0.6)) return h;
+    }
+    return null;
+  }, [headers, rows]);
+
   const apply = () => {
     const fields: string[] = [];
     const metrics: SocialReportMetrics = {};
@@ -246,7 +279,14 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
       toast({ title: "Selecione ao menos uma coluna", variant: "destructive" });
       return;
     }
-    onMetricsParsed(metrics, {}, fields, {});
+    const cleanMapping: Record<string, string> = {};
+    METRIC_KEYS.forEach(k => { if (mapping[k]) cleanMapping[k] = mapping[k]; });
+    onMetricsParsed(metrics, {}, fields, {
+      rawHeaders: headers,
+      rawRows: rows,
+      mapping: cleanMapping,
+      dateColumn: detectedDateColumn,
+    });
     toast({ title: "Métricas aplicadas ao relatório!" });
   };
 
