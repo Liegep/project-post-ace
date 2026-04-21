@@ -12,6 +12,7 @@ export interface SocialReportMetrics {
   followers_lost?: number;
   posts_published?: number;
   reels_published?: number;
+  spend?: number;
   [key: string]: number | undefined;
 }
 
