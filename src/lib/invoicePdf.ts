@@ -18,6 +18,22 @@ const escapeHtml = (s: string) =>
     .replace(/"/g, "&quot;")
     .replace(/\n/g, "<br>");
 
+async function imageUrlToDataUrl(url: string): Promise<string> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return url;
+    const blob = await res.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return url;
+  }
+}
+
 export async function generateInvoicePDF(
   invoice: Invoice,
   items: InvoiceItem[],
@@ -32,7 +48,8 @@ export async function generateInvoicePDF(
   const clientAddress = invoice.clients?.address || "";
   const clientCountry = invoice.clients?.country || "";
   const clientTaxId = invoice.clients?.tax_id || "";
-  const clientLogo = invoice.clients?.logo_url || "";
+  const rawLogo = invoice.clients?.logo_url || "";
+  const clientLogo = rawLogo ? await imageUrlToDataUrl(rawLogo) : "";
 
   const discount = Number(invoice.discount || 0);
   const surcharge = Number(invoice.surcharge || 0);
@@ -172,7 +189,7 @@ export async function generateInvoicePDF(
 
   <div class="top">
     <div class="logo-wrap">
-      ${clientLogo ? `<img src="${escapeHtml(clientLogo)}" alt="${escapeHtml(clientName)}" crossorigin="anonymous">` : `<div style="font-size:18px;font-weight:600;color:#1d1d1f">${escapeHtml(clientName)}</div>`}
+      ${clientLogo ? `<img src="${clientLogo}" alt="${escapeHtml(clientName)}">` : `<div style="font-size:18px;font-weight:600;color:#1d1d1f">${escapeHtml(clientName)}</div>`}
     </div>
     <div class="title-wrap">
       <h1>FATURA</h1>
