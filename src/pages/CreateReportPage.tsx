@@ -137,6 +137,11 @@ export default function CreateReportPage() {
     setSaving(true);
     try {
       const client = clients.find(c => c.id === clientId);
+      // Encode top content into observations as JSON (preserving any free text the user typed)
+      const observationsPayload = JSON.stringify({
+        text: observations,
+        top_content: topContent,
+      });
       const report = await createReport.mutateAsync({
         client_id: clientId,
         created_by: userId,
@@ -151,7 +156,7 @@ export default function CreateReportPage() {
         best_content: bestContent,
         worst_content: worstContent,
         best_format: bestFormat,
-        observations,
+        observations: observationsPayload,
         locale: reportLocale,
         status,
       });
