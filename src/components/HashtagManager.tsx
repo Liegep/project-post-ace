@@ -133,7 +133,7 @@ export const HashtagManager = ({ clientId, onInsert }: HashtagManagerProps) => {
             </p>
           )}
 
-          <div className="max-h-60 space-y-2 overflow-y-auto">
+          <div className="flex-1 min-h-0 space-y-2 overflow-y-auto pr-1">
             {groups.map((group) => (
               <div key={group.id} className="rounded-lg border p-2 space-y-1.5">
                 <div className="flex items-center justify-between">
