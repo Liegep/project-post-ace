@@ -45,7 +45,7 @@ export function RecentReportsWidget() {
           </span>
         </div>
         <Button variant="ghost" size="sm" className="text-xs" onClick={() => navigate("/reports")}>
-          Ver todos <ArrowRight className="ml-1 h-3 w-3" />
+          Ver todos <ArrowRight className="ml-1 h-3 w-3 text-primary-foreground" />
         </Button>
       </div>
 

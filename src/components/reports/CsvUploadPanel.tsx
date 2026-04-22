@@ -375,7 +375,7 @@ export function CsvUploadPanel({ onMetricsParsed }: CsvUploadPanelProps) {
             </div>
 
             <Button onClick={apply} className="w-full gap-2 bg-gradient-to-r from-primary to-accent hover:opacity-90">
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4 text-primary-foreground" />
               Aplicar ao relatório
             </Button>
           </div>

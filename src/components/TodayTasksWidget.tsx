@@ -386,7 +386,7 @@ export const TodayTasksWidget = () => {
               onClick={() => navigate("/agenda")}
               className="w-full flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
             >
-              <ChevronDown className="h-3.5 w-3.5" />
+              <ChevronDown className="h-3.5 w-3.5 text-primary-foreground" />
               Ver mais {filteredTasks.length - 5} tarefas
             </button>
           )}

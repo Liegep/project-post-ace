@@ -397,7 +397,7 @@ const BriefsPage = () => {
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 md:gap-3 px-3 md:px-4">
           <MobileNav title="Pautas" />
           <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/admin")}>
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 text-primary-foreground" />
           </Button>
           <div className="flex items-center gap-2 min-w-0">
             <FileText className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
@@ -463,7 +463,7 @@ const BriefsPage = () => {
         {/* Month/Year Navigator */}
         <div className="flex items-center justify-between rounded-lg border bg-card px-3 py-2">
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prevMonth}>
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 text-primary-foreground" />
           </Button>
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold capitalize">
@@ -474,7 +474,7 @@ const BriefsPage = () => {
             </Button>
           </div>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={nextMonth}>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-primary-foreground" />
           </Button>
         </div>
 

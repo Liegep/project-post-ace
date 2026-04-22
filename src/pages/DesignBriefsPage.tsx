@@ -227,7 +227,7 @@ export default function DesignBriefsPage() {
         <div className="flex items-center gap-2 md:gap-3">
           <MobileNav title="Briefs de Design" />
           <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => view === "categories" ? navigate("/") : goBack()}>
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-primary-foreground" />
           </Button>
           <h1 className="text-lg font-bold text-foreground">{viewTitle}</h1>
         </div>
@@ -257,7 +257,7 @@ export default function DesignBriefsPage() {
           <div className="max-w-4xl mx-auto space-y-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <button onClick={goBack} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                <ArrowLeft className="h-4 w-4" /> Voltar
+                <ArrowLeft className="h-4 w-4 text-primary-foreground" /> Voltar
               </button>
               <Button
                 onClick={() => { setEditingBrief(null); setView("form"); }}
@@ -364,7 +364,7 @@ export default function DesignBriefsPage() {
         {view === "form" && currentTemplate && (
           <div className="max-w-2xl mx-auto">
             <button onClick={goBack} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-              <ArrowLeft className="h-4 w-4" /> Voltar
+              <ArrowLeft className="h-4 w-4 text-primary-foreground" /> Voltar
             </button>
 
             <div className="rounded-2xl border border-white/20 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-xl p-6 md:p-8">

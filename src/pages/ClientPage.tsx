@@ -301,7 +301,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             className="h-8 w-8"
             onClick={() => setSelectedMonth(prev => subMonths(prev, 1))}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 text-primary-foreground" />
           </Button>
           <button
             onClick={() => setSelectedMonth(new Date())}

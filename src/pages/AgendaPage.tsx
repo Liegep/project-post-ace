@@ -202,7 +202,7 @@ const AgendaPage = () => {
           <div className="flex items-center gap-3">
             <MobileNav title="Agenda" />
             <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-5 w-5 text-primary-foreground" />
             </Button>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-foreground">Agenda</h1>
@@ -225,13 +225,13 @@ const AgendaPage = () => {
             </Button>
             <div className="flex items-center rounded-lg border bg-card">
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigateDate(-1)}>
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-4 w-4 text-primary-foreground" />
               </Button>
               <span className="px-2 text-sm font-medium text-foreground capitalize min-w-0 truncate max-w-[260px]">
                 {headerTitle()}
               </span>
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigateDate(1)}>
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4 text-primary-foreground" />
               </Button>
             </div>
           </div>

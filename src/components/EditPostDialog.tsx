@@ -433,7 +433,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                   <PopoverTrigger asChild>
                     <Button variant="outline" size="sm" className="w-full justify-between mt-1 text-xs h-9">
                       <span>{status.map((s) => t(STATUS_KEYS[s] as any)).join(", ") || "Selecionar"}</span>
-                      <ChevronDown className="h-3.5 w-3.5 ml-1 opacity-50" />
+                      <ChevronDown className="h-3.5 w-3.5 ml-1 opacity-50 text-primary-foreground" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-52 p-2" align="start">

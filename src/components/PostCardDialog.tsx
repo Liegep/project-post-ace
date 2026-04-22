@@ -360,7 +360,7 @@ export function PostCardDialog({
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs h-8 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white">
-                            <ChevronDown className="h-3.5 w-3.5" />
+                            <ChevronDown className="h-3.5 w-3.5 text-primary-foreground" />
                             Alterar Status
                           </Button>
                         </PopoverTrigger>

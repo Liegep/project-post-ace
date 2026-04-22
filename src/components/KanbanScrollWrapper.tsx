@@ -88,7 +88,7 @@ export function KanbanScrollWrapper({ children, className, fillHeight }: KanbanS
           className={cn(arrowBase, "left-2 opacity-0 group-hover/kanban:opacity-100")}
           aria-label="Scroll left"
         >
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="h-5 w-5 text-primary-foreground" />
         </button>
       )}
 
@@ -99,7 +99,7 @@ export function KanbanScrollWrapper({ children, className, fillHeight }: KanbanS
           className={cn(arrowBase, "right-2 opacity-0 group-hover/kanban:opacity-100")}
           aria-label="Scroll right"
         >
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className="h-5 w-5 text-primary-foreground" />
         </button>
       )}
 

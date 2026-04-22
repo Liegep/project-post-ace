@@ -142,13 +142,13 @@ export function InternalApprovalReviewDialog({ open, onOpenChange, postId }: Int
                       onClick={() => setMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length)}
                       className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-2 hover:bg-background shadow-md"
                     >
-                      <ChevronLeft className="h-5 w-5" />
+                      <ChevronLeft className="h-5 w-5 text-primary-foreground" />
                     </button>
                     <button
                       onClick={() => setMediaIndex((prev) => (prev + 1) % allMedia.length)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-2 hover:bg-background shadow-md"
                     >
-                      <ChevronRight className="h-5 w-5" />
+                      <ChevronRight className="h-5 w-5 text-primary-foreground" />
                     </button>
                     <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
                       {allMedia.map((_, i) => (

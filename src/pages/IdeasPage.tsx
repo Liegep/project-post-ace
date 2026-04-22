@@ -222,7 +222,7 @@ const IdeasPage = () => {
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
           <MobileNav title="Ideias" />
           <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-primary-foreground" />
           </Button>
           <h1 className="text-base md:text-xl font-bold text-foreground truncate">💡 Ideias de Pauta</h1>
         </div>
