@@ -91,8 +91,8 @@ export const HashtagManager = ({ clientId, onInsert }: HashtagManagerProps) => {
           <ChevronDown className="h-3 w-3" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-3" align="start">
-        <div className="space-y-3">
+      <PopoverContent className="w-80 p-3 max-h-[80vh] overflow-hidden flex flex-col" align="start">
+        <div className="space-y-3 flex flex-col min-h-0 flex-1">
           <div className="flex items-center justify-between">
             <Label className="text-sm font-semibold">Grupos de Hashtags</Label>
             {!creating && (
@@ -133,7 +133,7 @@ export const HashtagManager = ({ clientId, onInsert }: HashtagManagerProps) => {
             </p>
           )}
 
-          <div className="max-h-60 space-y-2 overflow-y-auto">
+          <div className="flex-1 min-h-0 space-y-2 overflow-y-auto pr-1">
             {groups.map((group) => (
               <div key={group.id} className="rounded-lg border p-2 space-y-1.5">
                 <div className="flex items-center justify-between">
