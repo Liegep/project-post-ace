@@ -72,8 +72,19 @@ const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, onArchive, 
     transition,
     opacity: isDragging ? 0.4 : 1,
   };
+  // Wrap pointer-down listener so right-click (button !== 0) does not start a drag
+  // and Radix ContextMenu can open + receive clicks normally.
+  const dragListeners = selectionMode
+    ? {}
+    : {
+        ...listeners,
+        onPointerDown: (e: React.PointerEvent) => {
+          if (e.button !== 0) return;
+          listeners?.onPointerDown?.(e);
+        },
+      };
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...(selectionMode ? {} : listeners)}>
+    <div ref={setNodeRef} style={style} {...attributes} {...dragListeners}>
       <PostCard
         post={post}
         isAdmin
