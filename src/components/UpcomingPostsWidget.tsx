@@ -44,7 +44,7 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
 
   const scheduledPosts = useMemo(() => {
     return posts
-      .filter((p) => p.deadline)
+      .filter((p) => p.deadline && Array.isArray(p.status) && p.status.some((s) => s.toLowerCase().includes("agendado")))
       .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime());
   }, [posts]);
 
