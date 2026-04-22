@@ -183,13 +183,13 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate((prev) => subMonths(prev, 1))}>
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4 text-primary-foreground" />
             </Button>
             <h3 className="text-lg font-semibold capitalize text-zinc-950">
               {format(currentDate, "MMMM yyyy", { locale: ptBR })}
             </h3>
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setCurrentDate((prev) => addMonths(prev, 1))}>
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4 text-primary-foreground" />
             </Button>
           </div>
           <Button size="sm" onClick={() => openCreate()}>
