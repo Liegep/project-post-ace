@@ -91,7 +91,13 @@ export const HashtagManager = ({ clientId, onInsert }: HashtagManagerProps) => {
           <ChevronDown className="h-3 w-3" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-3 max-h-[80vh] overflow-hidden flex flex-col" align="start">
+      <PopoverContent
+        className="w-80 p-3 flex flex-col"
+        align="start"
+        style={{ height: "min(80vh, 520px)" }}
+        onWheel={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+      >
         <div className="space-y-3 flex flex-col min-h-0 flex-1">
           <div className="flex items-center justify-between">
             <Label className="text-sm font-semibold">Grupos de Hashtags</Label>
