@@ -199,7 +199,7 @@ export default function ProposalsPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-5 w-5 text-primary-foreground" />
             </Button>
             <div>
               <h1 className="text-lg font-bold text-foreground">Propostas Comerciais</h1>

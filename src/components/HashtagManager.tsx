@@ -88,7 +88,7 @@ export const HashtagManager = ({ clientId, onInsert }: HashtagManagerProps) => {
         <Button type="button" variant="outline" size="sm" className="gap-1.5">
           <Hash className="h-3.5 w-3.5" />
           Hashtags
-          <ChevronDown className="h-3 w-3" />
+          <ChevronDown className="h-3 w-3 text-primary-foreground" />
         </Button>
       </PopoverTrigger>
       <PopoverContent

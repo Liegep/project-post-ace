@@ -786,7 +786,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               onClick={() => navigate("/admin")}
               className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-5 w-5 text-primary-foreground" />
             </button>
             <button
               onClick={() => logoInputRef.current?.click()}

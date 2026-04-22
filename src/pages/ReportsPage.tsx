@@ -114,7 +114,7 @@ export default function ReportsPage() {
           <div className="flex items-center gap-3">
             <MobileNav title="Relatórios" />
             <Button variant="ghost" size="icon" className="hidden md:flex" onClick={() => navigate("/admin")}>
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4 text-primary-foreground" />
             </Button>
             <div>
               <h1 className="text-lg font-semibold tracking-tight">Relatórios</h1>

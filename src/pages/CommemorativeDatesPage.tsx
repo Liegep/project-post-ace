@@ -226,7 +226,7 @@ export default function CommemorativeDatesPage() {
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
           <MobileNav title="Datas Comemorativas" />
           <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5 text-primary-foreground" />
           </Button>
           <CalendarHeart className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
           <h1 className="text-base md:text-xl font-bold text-foreground truncate">Datas Comemorativas</h1>

@@ -279,7 +279,7 @@ const LoginPage = () => {
               onClick={() => { setMode("login"); setError(""); setSuccessMessage(""); }}
               className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-1"
             >
-              <ArrowLeft className="h-3 w-3" />
+              <ArrowLeft className="h-3 w-3 text-primary-foreground" />
               {t.backToLogin}
             </button>
           </form>

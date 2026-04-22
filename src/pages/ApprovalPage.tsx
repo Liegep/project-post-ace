@@ -286,7 +286,7 @@ const ApprovalPage = () => {
                             disabled={idx === 0}
                             onClick={() => setMediaIndex(post.id, idx - 1)}
                           >
-                            <ChevronLeft className="h-4 w-4" />
+                            <ChevronLeft className="h-4 w-4 text-primary-foreground" />
                           </Button>
                           <span className="bg-background/90 backdrop-blur rounded-full px-2 py-0.5 text-xs font-medium text-foreground shadow-md border border-border">
                             {idx + 1}/{urls.length}
@@ -298,7 +298,7 @@ const ApprovalPage = () => {
                             disabled={idx === urls.length - 1}
                             onClick={() => setMediaIndex(post.id, idx + 1)}
                           >
-                            <ChevronRight className="h-4 w-4" />
+                            <ChevronRight className="h-4 w-4 text-primary-foreground" />
                           </Button>
                         </div>
                       )}

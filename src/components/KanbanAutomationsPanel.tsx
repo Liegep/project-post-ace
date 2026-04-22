@@ -204,7 +204,7 @@ export function KanbanAutomationsPanel({ clientId, columns }: KanbanAutomationsP
                     <p className="text-sm font-medium truncate">{a.name}</p>
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap">
                       <span>{getTriggerLabel(a)}</span>
-                      <ArrowRight className="h-3 w-3" />
+                      <ArrowRight className="h-3 w-3 text-primary-foreground" />
                       <span className="font-medium text-foreground">{getActionLabel(a.action_type, a.action_value)}</span>
                     </div>
                   </div>

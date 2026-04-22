@@ -400,7 +400,7 @@ export default function CalendarPage() {
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="font-semibold">Detalhes do Post</h3>
           <Button variant="ghost" size="icon" onClick={() => setDetailPost(null)}>
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-primary-foreground" />
           </Button>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -477,7 +477,7 @@ export default function CalendarPage() {
           <div className="flex items-center gap-2 md:gap-3">
             <MobileNav title="Calendário" />
             <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4 text-primary-foreground" />
             </Button>
             <CalendarDays className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
             <h1 className="text-sm md:text-lg font-bold text-foreground truncate">Calendário</h1>
@@ -485,8 +485,8 @@ export default function CalendarPage() {
 
           <div className="flex items-center gap-1 md:gap-2 flex-wrap">
             <Button variant="outline" size="sm" className="text-xs h-7 md:h-8" onClick={goToToday}>Hoje</Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 md:h-8 md:w-8" onClick={() => navigate_date("prev")}><ChevronLeft className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 md:h-8 md:w-8" onClick={() => navigate_date("next")}><ChevronRight className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7 md:h-8 md:w-8" onClick={() => navigate_date("prev")}><ChevronLeft className="h-4 w-4 text-primary-foreground" /></Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7 md:h-8 md:w-8" onClick={() => navigate_date("next")}><ChevronRight className="h-4 w-4 text-primary-foreground" /></Button>
             <span className="text-xs md:text-sm font-semibold capitalize text-center">{headerLabel}</span>
           </div>
 

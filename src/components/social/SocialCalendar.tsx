@@ -143,13 +143,13 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
 
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4 text-primary-foreground" />
         </Button>
         <h3 className="font-semibold text-lg capitalize">
           {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
         </h3>
         <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4 text-primary-foreground" />
         </Button>
       </div>
 
