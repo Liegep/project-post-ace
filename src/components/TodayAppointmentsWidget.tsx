@@ -396,7 +396,21 @@ export const TodayAppointmentsWidget = () => {
               Escolha a nova data e horário para "{selectedAppt?.title}".
             </p>
             <div className="flex justify-center">
-              <Calendar mode="single" selected={rescheduleDate} onSelect={setRescheduleDate} className="rounded-md border" />
+              <Calendar
+                mode="single"
+                selected={rescheduleDate}
+                onSelect={setRescheduleDate}
+                className="rounded-md border"
+                classNames={{
+                  caption_label: "text-sm font-medium text-foreground",
+                  head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+                  day: "h-9 w-9 p-0 font-normal text-foreground hover:bg-accent hover:text-accent-foreground rounded-md aria-selected:opacity-100",
+                  day_today: "bg-accent text-accent-foreground font-semibold",
+                  day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                  day_outside: "day-outside text-muted-foreground/50 opacity-60",
+                  day_disabled: "text-muted-foreground opacity-40",
+                }}
+              />
             </div>
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium text-foreground">Horário:</label>
