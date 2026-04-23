@@ -470,6 +470,7 @@ export const PostCard = memo(
                 <ContextMenuCheckboxItem
                   key={s}
                   checked={post.status.includes(s)}
+                  onClick={(e) => e.stopPropagation()}
                   onSelect={(e) => {
                     e.preventDefault();
                     handleToggleStatus(s);
@@ -494,6 +495,7 @@ export const PostCard = memo(
                   <ContextMenuCheckboxItem
                     key={tag.id}
                     checked={post.tags.includes(tag.id)}
+                    onClick={(e) => e.stopPropagation()}
                     onSelect={(e) => {
                       e.preventDefault();
                       handleToggleTag(tag.id);
