@@ -425,10 +425,12 @@ const AdminDashboard = () => {
     if (allowedIds.length === 0) { setFeedbacks([]); return; }
 
     // Fetch posts where client gave feedback (label != pendente)
+    // Exclude archived posts and posts whose deadline has already passed
     const { data: posts } = await supabase
       .from("posts")
-      .select("id, title, client_label, client_id, updated_at, deadline, image_url, media_urls, caption")
+      .select("id, title, client_label, client_id, updated_at, deadline, image_url, media_urls, caption, archived, status")
       .neq("client_label", "pendente")
+      .eq("archived", false)
       .in("client_id", allowedIds)
       .order("updated_at", { ascending: false });
 
@@ -437,7 +439,25 @@ const AdminDashboard = () => {
       return;
     }
 
-    const clientIds = [...new Set(posts.map((p: any) => p.client_id).filter(Boolean))];
+    // Filter out posts whose deadline has already passed or that are already published
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const activePosts = posts.filter((p: any) => {
+      const statusList: string[] = Array.isArray(p.status) ? p.status : [];
+      if (statusList.includes("publicado")) return false;
+      if (p.deadline) {
+        const d = new Date(p.deadline);
+        if (!Number.isNaN(d.getTime()) && d < todayStart) return false;
+      }
+      return true;
+    });
+
+    if (activePosts.length === 0) {
+      setFeedbacks([]);
+      return;
+    }
+
+    const clientIds = [...new Set(activePosts.map((p: any) => p.client_id).filter(Boolean))];
     const { data: clientsData } = await supabase
       .from("clients")
       .select("id, name, slug, logo_url")
@@ -447,7 +467,7 @@ const AdminDashboard = () => {
     (clientsData || []).forEach((c: any) => { clientMap[c.id] = { name: c.name, slug: c.slug, logo_url: c.logo_url }; });
 
     setFeedbacks(
-      posts.map((p: any) => ({
+      activePosts.map((p: any) => ({
         postId: p.id,
         postTitle: p.title,
         clientId: p.client_id,
