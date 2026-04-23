@@ -246,7 +246,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                       href={externalLink.trim()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-1 inline-block text-xs text-primary hover:underline truncate max-w-full"
+                      className="mt-1 inline-block text-xs hover:underline truncate max-w-full bg-transparent text-primary-foreground"
                       title={externalLink.trim()}
                     >
                       🔗 {externalLink.trim()}
