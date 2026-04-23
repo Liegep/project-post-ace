@@ -279,7 +279,7 @@ const KanbanBoard = ({
   const columnSortIds = columns.map((c) => `col-${c.id}`);
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <KanbanScrollWrapper fillHeight>
         <SortableContext items={columnSortIds} strategy={horizontalListSortingStrategy}>
           {columns.map((col) => {
