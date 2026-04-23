@@ -24,6 +24,19 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error("[ErrorBoundary]", error, errorInfo);
+
+    // Auto-recover from stale chunk references after a new deploy.
+    // When a lazy() import fails because the asset hash changed,
+    // reload once so the browser fetches the new manifest.
+    const msg = error?.message ?? "";
+    const isStaleChunk = /Failed to fetch dynamically imported module|Importing a module script failed|ChunkLoadError|error loading dynamically imported module/i.test(msg);
+    if (isStaleChunk) {
+      const FLAG = "lovable:reloaded-for-stale-chunk";
+      if (!sessionStorage.getItem(FLAG)) {
+        sessionStorage.setItem(FLAG, "1");
+        window.location.reload();
+      }
+    }
   }
 
   handleReset = () => {
