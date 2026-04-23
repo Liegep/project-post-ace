@@ -457,7 +457,7 @@ const AdminDashboard = () => {
       return;
     }
 
-    const clientIds = [...new Set(posts.map((p: any) => p.client_id).filter(Boolean))];
+    const clientIds = [...new Set(activePosts.map((p: any) => p.client_id).filter(Boolean))];
     const { data: clientsData } = await supabase
       .from("clients")
       .select("id, name, slug, logo_url")
@@ -467,7 +467,7 @@ const AdminDashboard = () => {
     (clientsData || []).forEach((c: any) => { clientMap[c.id] = { name: c.name, slug: c.slug, logo_url: c.logo_url }; });
 
     setFeedbacks(
-      posts.map((p: any) => ({
+      activePosts.map((p: any) => ({
         postId: p.id,
         postTitle: p.title,
         clientId: p.client_id,
