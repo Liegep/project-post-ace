@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { ClientBillingConfig } from "@/components/billing/ClientBillingConfig";
@@ -37,7 +37,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
-import { DndContext, DragOverlay, closestCenter, PointerSensor, useSensor, useSensors, DragStartEvent, DragEndEvent, DragOverEvent, useDroppable } from "@dnd-kit/core";
+import { DndContext, DragOverlay, closestCorners, pointerWithin, rectIntersection, getFirstCollision, PointerSensor, TouchSensor, useSensor, useSensors, DragStartEvent, DragEndEvent, DragOverEvent, useDroppable, CollisionDetection } from "@dnd-kit/core";
 import { useSortable, SortableContext, verticalListSortingStrategy, horizontalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -188,8 +188,20 @@ const KanbanBoard = ({
   const [activePost, setActivePost] = useState<Post | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } })
   );
+
+  // Custom collision detection: prefer pointer-within (great for sparse columns),
+  // fall back to rectangle intersection, then closest-corners. Makes dropping into
+  // empty space inside a column and swapping with adjacent cards much easier.
+  const collisionDetection: CollisionDetection = useCallback((args) => {
+    const pointerCollisions = pointerWithin(args);
+    if (pointerCollisions.length > 0) return pointerCollisions;
+    const rectCollisions = rectIntersection(args);
+    if (rectCollisions.length > 0) return rectCollisions;
+    return closestCorners(args);
+  }, []);
 
   const handleDragStart = (event: DragStartEvent) => {
     const data = event.active.data.current;
@@ -267,7 +279,7 @@ const KanbanBoard = ({
   const columnSortIds = columns.map((c) => `col-${c.id}`);
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <KanbanScrollWrapper fillHeight>
         <SortableContext items={columnSortIds} strategy={horizontalListSortingStrategy}>
           {columns.map((col) => {
