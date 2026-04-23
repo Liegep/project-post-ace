@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
-import { Post, PostStatus, ClientLabel, Comment, Tag, MediaType, Column } from "@/types/post";
+import { Post, PostStatus, ClientLabel, Comment, Tag, MediaType, Column, DEFAULT_TAGS } from "@/types/post";
 import { supabase } from "@/integrations/supabase/client";
 import { pushToTrello } from "@/lib/trelloPush";
 import { logActivity } from "@/lib/activityLogger";
@@ -458,7 +458,13 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       previousColumnId?: string | null;
     }): Promise<AutomationResult | null> => {
       if (!clientId) return null;
-      const tagIdToName = new Map(tags.map((t) => [t.id, t.name]));
+      // Build tag-id → name map. Include DEFAULT_TAGS legacy slugs (e.g.
+      // "alteracao_solicitada" → "Alteração Solicitada") so automations whose
+      // trigger_value uses the human-readable name still match posts that
+      // store the legacy slug in their tags array.
+      const tagIdToName = new Map<string, string>();
+      for (const t of DEFAULT_TAGS) tagIdToName.set(t.id, t.name);
+      for (const t of tags) tagIdToName.set(t.id, t.name);
       const result = await runAutomationsForPost({
         ctx: { clientId, tagIdToName },
         postId: params.postId,
