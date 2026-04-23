@@ -458,21 +458,31 @@ export const PostCard = memo(
 
     return (
       <ContextMenu>
-        <ContextMenuTrigger asChild>{cardEl}</ContextMenuTrigger>
-        <ContextMenuContent className="w-56">
+        <ContextMenuTrigger asChild>
+          <div className="block">
+            {cardEl}
+          </div>
+        </ContextMenuTrigger>
+        <ContextMenuContent
+          className="w-56"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
           <ContextMenuSub>
             <ContextMenuSubTrigger>
               <ListChecks className="h-4 w-4 mr-2" />
               Status
             </ContextMenuSubTrigger>
-            <ContextMenuSubContent className="w-56">
+            <ContextMenuSubContent className="w-56" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
               {ALL_STATUSES.map((s) => (
                 <ContextMenuCheckboxItem
                   key={s}
                   checked={post.status.includes(s)}
+                  onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => e.stopPropagation()}
                   onSelect={(e) => {
                     e.preventDefault();
+                    e.stopPropagation();
                     handleToggleStatus(s);
                   }}
                 >
@@ -487,7 +497,7 @@ export const PostCard = memo(
               <TagIcon className="h-4 w-4 mr-2" />
               Etiquetas
             </ContextMenuSubTrigger>
-            <ContextMenuSubContent className="w-56 max-h-72 overflow-y-auto">
+            <ContextMenuSubContent className="w-56 max-h-72 overflow-y-auto" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
               {tags.length === 0 ? (
                 <ContextMenuItem disabled>Nenhuma etiqueta</ContextMenuItem>
               ) : (
@@ -495,9 +505,11 @@ export const PostCard = memo(
                   <ContextMenuCheckboxItem
                     key={tag.id}
                     checked={post.tags.includes(tag.id)}
+                    onPointerDown={(e) => e.stopPropagation()}
                     onClick={(e) => e.stopPropagation()}
                     onSelect={(e) => {
                       e.preventDefault();
+                      e.stopPropagation();
                       handleToggleTag(tag.id);
                     }}
                   >
