@@ -224,14 +224,14 @@ const AgendaPage = () => {
               Hoje
             </Button>
             <div className="flex items-center rounded-lg border bg-card">
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigateDate(-1)}>
-                <ChevronLeft className="h-4 w-4 text-primary-foreground" />
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-black hover:text-black" onClick={() => navigateDate(-1)}>
+                <ChevronLeft className="h-4 w-4" />
               </Button>
               <span className="px-2 text-sm font-medium text-foreground capitalize min-w-0 truncate max-w-[260px]">
                 {headerTitle()}
               </span>
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigateDate(1)}>
-                <ChevronRight className="h-4 w-4 text-primary-foreground" />
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-black hover:text-black" onClick={() => navigateDate(1)}>
+                <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
