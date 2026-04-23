@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { ClientBillingConfig } from "@/components/billing/ClientBillingConfig";
