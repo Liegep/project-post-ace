@@ -188,8 +188,20 @@ const KanbanBoard = ({
   const [activePost, setActivePost] = useState<Post | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } })
   );
+
+  // Custom collision detection: prefer pointer-within (great for sparse columns),
+  // fall back to rectangle intersection, then closest-corners. Makes dropping into
+  // empty space inside a column and swapping with adjacent cards much easier.
+  const collisionDetection: CollisionDetection = useCallback((args) => {
+    const pointerCollisions = pointerWithin(args);
+    if (pointerCollisions.length > 0) return pointerCollisions;
+    const rectCollisions = rectIntersection(args);
+    if (rectCollisions.length > 0) return rectCollisions;
+    return closestCorners(args);
+  }, []);
 
   const handleDragStart = (event: DragStartEvent) => {
     const data = event.active.data.current;
