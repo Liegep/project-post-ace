@@ -302,7 +302,7 @@ export function ClientLinksPanel({ clientId, onCountChange }: Props) {
         </Button>
       </div>
 
-      {links.length === 0 ? (
+      {links.length === 0 && !editMode ? (
         <p className="text-sm text-muted-foreground text-center py-4">Nenhum link adicionado ainda.</p>
       ) : editMode ? (
         <>
