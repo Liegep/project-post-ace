@@ -442,9 +442,10 @@ const KanbanBoard = ({
   );
 };
 
-const ArchivedView = ({ archivedPosts, unarchivePost, deletePost, selectionMode, selectedPostIds, onToggleSelect, t }: {
+const ArchivedView = ({ archivedPosts, columns, unarchivePost, deletePost, selectionMode, selectedPostIds, onToggleSelect, t }: {
   archivedPosts: Post[];
-  unarchivePost: (id: string) => void;
+  columns: { id: string; name: string }[];
+  unarchivePost: (id: string, columnId?: string | null) => void;
   deletePost: (id: string) => void;
   selectionMode?: boolean;
   selectedPostIds?: Set<string>;
