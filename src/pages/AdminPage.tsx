@@ -1314,6 +1314,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
         ) : activeTab === "archived" ? (
           <ArchivedView
             archivedPosts={archivedPosts}
+            columns={columns}
             unarchivePost={unarchivePost}
             deletePost={deletePost}
             selectionMode={selectionMode}
