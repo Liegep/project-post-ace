@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/i18n/I18nContext";
 import { useAppointments, Appointment, AppointmentTag } from "@/hooks/useAppointments";
