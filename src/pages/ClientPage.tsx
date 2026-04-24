@@ -535,7 +535,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                     <div className="space-y-3">
                       {groupedArchived[month].map((post) => (
                         <div key={post.id} className="relative">
-                          <PostCard post={post} isAdmin={false} hideFeedback />
+                          <PostCard post={post} isAdmin={false} onEdit={() => setDetailPost(post)} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
                           {columns.length > 0 && (
                             <div className="mt-1.5">
                               <Popover>
