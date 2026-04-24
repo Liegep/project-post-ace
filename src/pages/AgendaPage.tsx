@@ -295,6 +295,9 @@ const AgendaPage = () => {
               tags={tags}
               onDayClick={(d) => openCreateForDate(d)}
               onCreateClick={(d) => openCreateForDate(d)}
+              onToggle={toggleComplete}
+              onCancel={toggleCancelled}
+              onDelete={deleteAppointment}
             />
           </DndContext>
         ) : viewMode === "week" ? (
