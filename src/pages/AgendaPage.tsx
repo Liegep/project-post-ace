@@ -295,6 +295,9 @@ const AgendaPage = () => {
               tags={tags}
               onDayClick={(d) => openCreateForDate(d)}
               onCreateClick={(d) => openCreateForDate(d)}
+              onToggle={toggleComplete}
+              onCancel={toggleCancelled}
+              onDelete={deleteAppointment}
             />
           </DndContext>
         ) : viewMode === "week" ? (
@@ -890,9 +893,12 @@ interface MonthViewProps {
   tags: AppointmentTag[];
   onDayClick: (date: Date) => void;
   onCreateClick: (date: Date) => void;
+  onToggle: (id: string, completed: boolean) => void;
+  onCancel: (id: string, cancelled: boolean) => void;
+  onDelete: (id: string) => void;
 }
 
-const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreateClick }: MonthViewProps) => {
+const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreateClick, onToggle, onCancel, onDelete }: MonthViewProps) => {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
@@ -917,8 +923,6 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreate
           const dayApts = appointmentsByDate[dateStr] || [];
           const isCurrentMonth = day.getMonth() === currentDate.getMonth();
           const today = isToday(day);
-          const pendingCount = dayApts.filter(a => !a.completed).length;
-          const completedCount = dayApts.filter(a => a.completed).length;
 
           return (
             <MonthDayCell
@@ -931,6 +935,9 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreate
               today={today}
               onDayClick={onDayClick}
               onCreateClick={onCreateClick}
+              onToggle={onToggle}
+              onCancel={onCancel}
+              onDelete={onDelete}
             />
           );
         })}
@@ -941,7 +948,7 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreate
 
 // ── Month Day Cell (droppable) ──────────────────────────────────────────────────
 
-const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDayClick, onCreateClick }: {
+const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDayClick, onCreateClick, onToggle, onCancel, onDelete }: {
   day: Date;
   dateStr: string;
   dayApts: Appointment[];
@@ -950,6 +957,9 @@ const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDa
   today: boolean;
   onDayClick: (date: Date) => void;
   onCreateClick: (date: Date) => void;
+  onToggle: (id: string, completed: boolean) => void;
+  onCancel: (id: string, cancelled: boolean) => void;
+  onDelete: (id: string) => void;
 }) => {
   const { setNodeRef, isOver } = useDroppable({ id: dateStr });
   return (
@@ -981,7 +991,7 @@ const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDa
       {dayApts.length > 0 && (
         <div className="mt-1 space-y-0.5">
           {dayApts.slice(0, 3).map(apt => (
-            <MonthApt key={apt.id} apt={apt} tags={tags} />
+            <MonthApt key={apt.id} apt={apt} tags={tags} onToggle={onToggle} onCancel={onCancel} onDelete={onDelete} />
           ))}
           {dayApts.length > 3 && (
             <div className="text-[10px] text-muted-foreground pl-1">+{dayApts.length - 3} mais</div>
@@ -992,35 +1002,138 @@ const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDa
   );
 };
 
-const MonthApt = ({ apt, tags }: { apt: Appointment; tags: AppointmentTag[] }) => {
+const MonthApt = ({ apt, tags, onToggle, onCancel, onDelete }: {
+  apt: Appointment;
+  tags: AppointmentTag[];
+  onToggle: (id: string, completed: boolean) => void;
+  onCancel: (id: string, cancelled: boolean) => void;
+  onDelete: (id: string) => void;
+}) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: apt.id });
+  const [detailOpen, setDetailOpen] = useState(false);
   const isLastPost = apt.category.toLowerCase() === "último post";
   const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
   const useTagColor = !apt.completed && !apt.cancelled && !isLastPost && aptTag;
+  const now = new Date();
+  const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
+  const isOverdue = !apt.completed && !apt.cancelled && isBefore(aptDateTime, now);
   return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      onClick={(e) => e.stopPropagation()}
-      className={cn(
-        "rounded px-1.5 py-0.5 text-[10px] font-medium truncate cursor-grab active:cursor-grabbing",
-        isDragging && "opacity-50",
-        apt.completed
-          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 line-through"
-          : apt.cancelled
-            ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 line-through"
-            : isLastPost
-              ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-              : useTagColor
-                ? ""
-                : getCategoryStyle(apt.category)
-      )}
-      style={useTagColor ? { backgroundColor: aptTag!.color + "25", color: aptTag!.color } : undefined}
-    >
-      <span className="font-mono mr-1">{apt.appointmentTime}</span>
-      {apt.title}
-    </div>
+    <>
+      <div
+        ref={setNodeRef}
+        {...attributes}
+        {...listeners}
+        onClick={(e) => { e.stopPropagation(); setDetailOpen(true); }}
+        className={cn(
+          "rounded px-1.5 py-0.5 text-[10px] font-medium truncate cursor-pointer hover:ring-1 hover:ring-primary/40",
+          isDragging && "opacity-50 cursor-grabbing",
+          apt.completed
+            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 line-through"
+            : apt.cancelled
+              ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 line-through"
+              : isLastPost
+                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                : useTagColor
+                  ? ""
+                  : getCategoryStyle(apt.category)
+        )}
+        style={useTagColor ? { backgroundColor: aptTag!.color + "25", color: aptTag!.color } : undefined}
+      >
+        <span className="font-mono mr-1">{apt.appointmentTime}</span>
+        {apt.title}
+      </div>
+
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarDays className="h-5 w-5 text-primary" />
+              {apt.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 pt-1">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <CalendarIcon className="h-4 w-4" />
+                <span>{format(new Date(apt.appointmentDate + "T12:00:00"), "dd/MM/yyyy")}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="h-4 w-4" />
+                <span>{apt.appointmentTime}</span>
+              </div>
+              {apt.category && (
+                <Badge variant="outline" className={cn("text-xs", getCategoryStyle(apt.category))}>
+                  {apt.category}
+                </Badge>
+              )}
+              {aptTag && (
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                  style={{ backgroundColor: aptTag.color + "20", color: aptTag.color, borderColor: aptTag.color + "50" }}
+                >
+                  {aptTag.name}
+                </Badge>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              {apt.completed && (
+                <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-400">
+                  Concluído
+                </Badge>
+              )}
+              {apt.cancelled && (
+                <Badge className="bg-red-100 text-red-600 border-red-300 dark:bg-red-900/30 dark:text-red-400">
+                  Cancelado
+                </Badge>
+              )}
+              {isOverdue && !apt.completed && !apt.cancelled && (
+                <Badge className="bg-destructive/10 text-destructive border-destructive/30">
+                  Atrasado
+                </Badge>
+              )}
+            </div>
+
+            <div className="rounded-lg bg-muted/50 p-3">
+              <p className="text-sm font-medium text-muted-foreground mb-1">Descrição</p>
+              <p className="text-sm text-foreground whitespace-pre-wrap">
+                {apt.description || "Sem descrição adicional."}
+              </p>
+            </div>
+
+            <div className="flex gap-2 pt-1">
+              <Button
+                size="sm"
+                variant={apt.completed ? "outline" : "default"}
+                className={cn("flex-1 gap-1.5", !apt.completed && "bg-emerald-600 hover:bg-emerald-700 text-white")}
+                onClick={() => { onToggle(apt.id, !apt.completed); setDetailOpen(false); }}
+              >
+                <Check className="h-4 w-4" />
+                {apt.completed ? "Desmarcar" : "Concluir"}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1 gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={() => { onCancel(apt.id, !apt.cancelled); setDetailOpen(false); }}
+              >
+                <Ban className="h-4 w-4" />
+                {apt.cancelled ? "Reativar" : "Cancelar"}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1.5"
+                onClick={() => { onDelete(apt.id); setDetailOpen(false); }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
