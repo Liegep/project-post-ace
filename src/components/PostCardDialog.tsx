@@ -224,14 +224,20 @@ export function PostCardDialog({
                     </PopoverContent>
                   </Popover>
                 ) : null}
-                {post.status.map((s) => (
-                  <span key={s} className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold ${STATUS_CONFIG[s].color}`}>
-                    {t(STATUS_KEYS[s] as any)}
+                {post.status.map((s) => {
+                  const cfg = STATUS_CONFIG[s];
+                  if (!cfg) return null;
+                  return (
+                    <span key={s} className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold ${cfg.color}`}>
+                      {t(STATUS_KEYS[s] as any)}
+                    </span>
+                  );
+                })}
+                {labelConfig && (
+                  <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold ${labelConfig.color}`}>
+                    {t(LABEL_KEYS[post.clientLabel] as any)}
                   </span>
-                ))}
-                <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold ${labelConfig.color}`}>
-                  {t(LABEL_KEYS[post.clientLabel] as any)}
-                </span>
+                )}
               </div>
 
               {/* Tags (client-only inline display) */}
