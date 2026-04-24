@@ -502,14 +502,38 @@ const ArchivedView = ({ archivedPosts, columns, unarchivePost, deletePost, selec
                   />
                   {!selectionMode && (
                     <div className="mt-1.5 flex gap-1.5">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 text-xs"
-                        onClick={() => unarchivePost(post.id)}
-                      >
-                        <RotateCcw className="mr-1 h-3 w-3" /> {t("restore")}
-                      </Button>
+                      {columns.length > 0 ? (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className="flex-1 text-xs">
+                              <RotateCcw className="mr-1 h-3 w-3" /> {t("restore")}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-48 p-2" align="start">
+                            <p className="text-xs font-medium text-muted-foreground mb-2">Mover para coluna:</p>
+                            <div className="space-y-1">
+                              {columns.map((col) => (
+                                <button
+                                  key={col.id}
+                                  onClick={() => unarchivePost(post.id, col.id)}
+                                  className="w-full rounded-md px-3 py-1.5 text-left text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                                >
+                                  {col.name}
+                                </button>
+                              ))}
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 text-xs"
+                          onClick={() => unarchivePost(post.id)}
+                        >
+                          <RotateCcw className="mr-1 h-3 w-3" /> {t("restore")}
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="sm"
