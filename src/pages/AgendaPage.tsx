@@ -893,9 +893,12 @@ interface MonthViewProps {
   tags: AppointmentTag[];
   onDayClick: (date: Date) => void;
   onCreateClick: (date: Date) => void;
+  onToggle: (id: string, completed: boolean) => void;
+  onCancel: (id: string, cancelled: boolean) => void;
+  onDelete: (id: string) => void;
 }
 
-const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreateClick }: MonthViewProps) => {
+const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreateClick, onToggle, onCancel, onDelete }: MonthViewProps) => {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
@@ -920,8 +923,6 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreate
           const dayApts = appointmentsByDate[dateStr] || [];
           const isCurrentMonth = day.getMonth() === currentDate.getMonth();
           const today = isToday(day);
-          const pendingCount = dayApts.filter(a => !a.completed).length;
-          const completedCount = dayApts.filter(a => a.completed).length;
 
           return (
             <MonthDayCell
@@ -934,6 +935,9 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreate
               today={today}
               onDayClick={onDayClick}
               onCreateClick={onCreateClick}
+              onToggle={onToggle}
+              onCancel={onCancel}
+              onDelete={onDelete}
             />
           );
         })}
