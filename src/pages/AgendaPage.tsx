@@ -1011,7 +1011,7 @@ const MonthApt = ({ apt, tags, onToggle, onCancel, onDelete }: {
 }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: apt.id });
   const [detailOpen, setDetailOpen] = useState(false);
-  const pointerStart = React.useRef<{ x: number; y: number } | null>(null);
+  const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const isLastPost = apt.category.toLowerCase() === "último post";
   const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
   const useTagColor = !apt.completed && !apt.cancelled && !isLastPost && aptTag;
