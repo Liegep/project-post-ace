@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "@/i18n/I18nContext";
 import { useAppointments, Appointment, AppointmentTag } from "@/hooks/useAppointments";
@@ -1011,19 +1011,38 @@ const MonthApt = ({ apt, tags, onToggle, onCancel, onDelete }: {
 }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: apt.id });
   const [detailOpen, setDetailOpen] = useState(false);
+  const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const isLastPost = apt.category.toLowerCase() === "último post";
   const aptTag = apt.tagId ? tags.find(t => t.id === apt.tagId) : null;
   const useTagColor = !apt.completed && !apt.cancelled && !isLastPost && aptTag;
   const now = new Date();
   const aptDateTime = new Date(`${apt.appointmentDate}T${apt.appointmentTime}`);
   const isOverdue = !apt.completed && !apt.cancelled && isBefore(aptDateTime, now);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    pointerStart.current = { x: e.clientX, y: e.clientY };
+    listeners?.onPointerDown?.(e);
+  };
+  const handlePointerUp = (e: React.PointerEvent) => {
+    e.stopPropagation();
+    const start = pointerStart.current;
+    pointerStart.current = null;
+    if (!start) return;
+    const dx = Math.abs(e.clientX - start.x);
+    const dy = Math.abs(e.clientY - start.y);
+    if (dx < 5 && dy < 5 && !isDragging) {
+      setDetailOpen(true);
+    }
+  };
+
   return (
     <>
       <div
         ref={setNodeRef}
         {...attributes}
-        {...listeners}
-        onClick={(e) => { e.stopPropagation(); setDetailOpen(true); }}
+        {...(listeners ? { ...listeners, onPointerDown: handlePointerDown } : {})}
+        onPointerUp={handlePointerUp}
+        onClick={(e) => e.stopPropagation()}
         className={cn(
           "rounded px-1.5 py-0.5 text-[10px] font-medium truncate cursor-pointer hover:ring-1 hover:ring-primary/40",
           isDragging && "opacity-50 cursor-grabbing",
