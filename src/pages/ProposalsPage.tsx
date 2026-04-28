@@ -198,8 +198,8 @@ export default function ProposalsPage() {
       <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="bg-white hover:bg-white/90" onClick={() => navigate("/")}>
-              <ArrowLeft className="h-5 w-5 text-black" />
+            <Button variant="ghost" size="icon" className="bg-white hover:bg-white shadow-md border border-border/40" onClick={() => navigate("/")}>
+              <ArrowLeft className="h-5 w-5 text-black" strokeWidth={2.5} />
             </Button>
             <div>
               <h1 className="text-lg font-bold text-foreground">Propostas Comerciais</h1>
