@@ -213,8 +213,8 @@ const BillingPage = () => {
       <header className="sticky top-0 z-30 glass-header">
         <div className="mx-auto max-w-5xl flex items-center gap-3 px-4 py-3">
           <MobileNav title="Faturamento" />
-          <Button variant="ghost" size="icon" onClick={() => navigate("/admin")}>
-            <ArrowLeft className="h-5 w-5 text-primary-foreground" />
+          <Button variant="ghost" size="icon" className="bg-white hover:bg-white/90" onClick={() => navigate("/admin")}>
+            <ArrowLeft className="h-5 w-5 text-black" />
           </Button>
           <div className="flex items-center gap-2 flex-1">
             <DollarSign className="h-5 w-5 text-primary" />

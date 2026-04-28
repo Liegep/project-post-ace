@@ -261,8 +261,8 @@ const TeamManagementPage = () => {
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-2">
           <div className="flex items-center gap-2 md:gap-3 min-w-0">
             <MobileNav title="Equipe" />
-            <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
-              <ArrowLeft className="h-4 w-4 text-primary-foreground" />
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex bg-white hover:bg-white/90" onClick={() => navigate("/")}>
+              <ArrowLeft className="h-4 w-4 text-black" />
             </Button>
             <div className="min-w-0">
               <h1 className="text-lg md:text-2xl font-bold text-foreground flex items-center gap-2 truncate">

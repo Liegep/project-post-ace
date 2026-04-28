@@ -221,8 +221,8 @@ const IdeasPage = () => {
       <header className="sticky top-0 z-30 glass-header px-4 py-3 md:px-6 md:py-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 md:gap-3 min-w-0">
           <MobileNav title="Ideias" />
-          <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => navigate("/")}>
-            <ArrowLeft className="h-5 w-5 text-primary-foreground" />
+          <Button variant="ghost" size="icon" className="hidden md:inline-flex bg-white hover:bg-white/90" onClick={() => navigate("/")}>
+            <ArrowLeft className="h-5 w-5 text-black" />
           </Button>
           <h1 className="text-base md:text-xl font-bold text-foreground truncate">💡 Ideias de Pauta</h1>
         </div>

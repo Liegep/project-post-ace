@@ -113,8 +113,8 @@ export default function ReportsPage() {
         <div className="flex items-center justify-between px-4 py-3 md:px-6">
           <div className="flex items-center gap-3">
             <MobileNav title="Relatórios" />
-            <Button variant="ghost" size="icon" className="hidden md:flex" onClick={() => navigate("/admin")}>
-              <ArrowLeft className="h-4 w-4 text-primary-foreground" />
+            <Button variant="ghost" size="icon" className="hidden md:flex bg-white hover:bg-white/90" onClick={() => navigate("/admin")}>
+              <ArrowLeft className="h-4 w-4 text-black" />
             </Button>
             <div>
               <h1 className="text-lg font-semibold tracking-tight">Relatórios</h1>

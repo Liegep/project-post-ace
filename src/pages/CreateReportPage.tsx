@@ -239,8 +239,8 @@ export default function CreateReportPage() {
         <div className="flex items-center justify-between px-4 py-3 md:px-6">
           <div className="flex items-center gap-3">
             <MobileNav title={isEditMode ? "Editar Relatório" : "Novo Relatório"} />
-            <Button variant="ghost" size="icon" onClick={() => navigate("/reports")}>
-              <ArrowLeft className="h-4 w-4 text-primary-foreground" />
+            <Button variant="ghost" size="icon" className="bg-white hover:bg-white/90" onClick={() => navigate("/reports")}>
+              <ArrowLeft className="h-4 w-4 text-black" />
             </Button>
             <h1 className="text-lg font-semibold">{isEditMode ? "Editar Relatório" : "Novo Relatório"}</h1>
           </div>
