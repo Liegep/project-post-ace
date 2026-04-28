@@ -396,8 +396,8 @@ const BriefsPage = () => {
       <header className="sticky top-0 z-30 glass-header">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 md:gap-3 px-3 md:px-4">
           <MobileNav title="Pautas" />
-          <Button variant="ghost" size="icon" className="hidden md:inline-flex bg-white hover:bg-white/90" onClick={() => navigate("/admin")}>
-            <ArrowLeft className="h-4 w-4 text-black" />
+          <Button variant="ghost" size="icon" className="hidden md:inline-flex bg-white hover:bg-white shadow-md border border-border/40" onClick={() => navigate("/admin")}>
+            <ArrowLeft className="h-5 w-5 text-black" strokeWidth={2.5} strokeWidth={2.5} />
           </Button>
           <div className="flex items-center gap-2 min-w-0">
             <FileText className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
