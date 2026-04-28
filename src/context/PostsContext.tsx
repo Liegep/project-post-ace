@@ -223,6 +223,17 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       }
     }
 
+    // Calculate next position to keep cards in ascending order (new cards at end)
+    const { data: maxPosRow } = await supabase
+      .from("posts")
+      .select("position")
+      .eq("client_id", clientId)
+      .eq("column_id", resolvedColumnId as any)
+      .order("position", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const nextPosition = ((maxPosRow as any)?.position ?? -1) + 1;
+
     const insertData: Record<string, any> = {
       title: post.title,
       image_url: post.imageUrl || '',
@@ -233,6 +244,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       tags: post.tags || [],
       client_id: clientId,
       column_id: resolvedColumnId,
+      position: nextPosition,
     };
     if (post.deadline) {
       insertData.deadline = serializePostDeadline(post.deadline);
