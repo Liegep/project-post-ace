@@ -47,7 +47,7 @@ const ActivityLogPage = () => {
         <div className="mx-auto flex max-w-4xl items-center justify-between">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" className="bg-white hover:bg-white shadow-md border border-border/40" onClick={() => navigate("/admin")}>
-              <ArrowLeft className="h-5 w-5 text-black" strokeWidth={2.5} strokeWidth={2.5} />
+              <ArrowLeft className="h-5 w-5 text-black" strokeWidth={2.5} />
             </Button>
             <div className="flex items-center gap-2">
               <History className="h-5 w-5 text-primary" />
