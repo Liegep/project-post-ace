@@ -476,8 +476,8 @@ export default function CalendarPage() {
         <div className="mx-auto max-w-7xl flex items-center justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-2 md:gap-3">
             <MobileNav title="Calendário" />
-            <Button variant="ghost" size="icon" className="hidden md:inline-flex bg-white hover:bg-white shadow-md border border-border/40" onClick={() => navigate("/")}>
-              <ArrowLeft className="h-5 w-5 text-black" strokeWidth={2.5} />
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex group bg-white hover:bg-foreground shadow-md border border-border/40 transition-colors" onClick={() => navigate("/")}>
+              <ArrowLeft className="h-5 w-5 text-black group-hover:text-white transition-colors" strokeWidth={2.5} />
             </Button>
             <CalendarDays className="h-4 w-4 md:h-5 md:w-5 text-primary shrink-0" />
             <h1 className="text-sm md:text-lg font-bold text-foreground truncate">Calendário</h1>

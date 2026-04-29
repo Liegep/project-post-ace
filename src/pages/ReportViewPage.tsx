@@ -106,8 +106,8 @@ export default function ReportViewPage() {
         <div className="flex items-center justify-between px-4 py-3 md:px-6">
           <div className="flex items-center gap-3">
             <MobileNav title={t.report} />
-            <Button variant="ghost" size="icon" className="bg-white hover:bg-white shadow-md border border-border/40" onClick={() => navigate("/reports")}>
-              <ArrowLeft className="h-5 w-5 text-black" strokeWidth={2.5} />
+            <Button variant="ghost" size="icon" className="group bg-white hover:bg-foreground shadow-md border border-border/40 transition-colors" onClick={() => navigate("/reports")}>
+              <ArrowLeft className="h-5 w-5 text-black group-hover:text-white transition-colors" strokeWidth={2.5} />
             </Button>
             <div className="flex items-center gap-2 min-w-0">
               {client?.logo_url && <img src={client.logo_url} alt="" className="h-7 w-7 rounded-full object-cover" />}

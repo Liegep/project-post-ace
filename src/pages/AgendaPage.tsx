@@ -201,8 +201,8 @@ const AgendaPage = () => {
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div className="flex items-center gap-3">
             <MobileNav title="Agenda" />
-            <Button variant="ghost" size="icon" className="bg-white hover:bg-white shadow-md border border-border/40" onClick={() => navigate(-1)}>
-              <ArrowLeft className="h-5 w-5 text-black" strokeWidth={2.5} />
+            <Button variant="ghost" size="icon" className="group bg-white hover:bg-foreground shadow-md border border-border/40 transition-colors" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-5 w-5 text-black group-hover:text-white transition-colors" strokeWidth={2.5} />
             </Button>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-foreground">Agenda</h1>
