@@ -293,6 +293,72 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     await generateInvoicePDF(invoice, items, total, subtotal, cur);
   };
 
+  const [sendingToClient, setSendingToClient] = useState(false);
+  const handleSendToClient = async () => {
+    if (!invClientVisible) {
+      toast({
+        title: "Fatura interna",
+        description: "Ative a visibilidade para o cliente antes de enviar.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setSendingToClient(true);
+    try {
+      // Find all client users assigned to this client
+      const { data: assignments, error: assignErr } = await supabase
+        .from("user_client_assignments")
+        .select("user_id")
+        .eq("client_id", invoice.client_id);
+      if (assignErr) throw assignErr;
+
+      const userIds = (assignments || []).map((a: any) => a.user_id);
+      if (userIds.length === 0) {
+        toast({
+          title: "Nenhum usuário do cliente",
+          description: "Este cliente ainda não tem acesso configurado.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Filter to only client-role users
+      const { data: clientRoles } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .in("user_id", userIds)
+        .eq("role", "client" as any);
+      const clientUserIds = (clientRoles || []).map((r: any) => r.user_id);
+      const targetIds = clientUserIds.length > 0 ? clientUserIds : userIds;
+
+      const clientName = invoice.clients?.name || "";
+      const totalFormatted = formatCurrency(total, cur);
+      const dueFormatted = format(new Date(invoice.due_date), "dd/MM/yyyy");
+
+      const rows = targetIds.map((uid) => ({
+        type: "invoice_sent",
+        title: `Nova fatura: ${invoice.title || `#${invoice.invoice_number}`}`,
+        message: `Valor ${totalFormatted} • Vencimento ${dueFormatted}`,
+        user_id: uid,
+        client_id: invoice.client_id,
+        post_id: null,
+        read: false,
+      }));
+
+      const { error: insErr } = await supabase.from("admin_notifications").insert(rows as any);
+      if (insErr) throw insErr;
+
+      toast({
+        title: "Fatura enviada ao cliente",
+        description: `${targetIds.length} usuário(s) notificado(s) no portal.`,
+      });
+    } catch (err: any) {
+      toast({ title: "Erro ao enviar", description: err.message, variant: "destructive" });
+    } finally {
+      setSendingToClient(false);
+    }
+  };
+
   const cfg = STATUS_CONFIG[invStatus] || STATUS_CONFIG[invoice.status];
   const Icon = cfg.icon;
 
