@@ -414,6 +414,15 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
           <Button size="sm" variant="outline" onClick={handleDownloadPDF} className="border-white/30 hover:bg-white/10 text-black">
             <Download className="h-3.5 w-3.5 mr-1" /> Baixar PDF
           </Button>
+          <Button
+            size="sm"
+            onClick={handleSendToClient}
+            disabled={sendingToClient}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Send className="h-3.5 w-3.5 mr-1" />
+            {sendingToClient ? "Enviando..." : "Enviar ao cliente"}
+          </Button>
           <Button size="sm" variant="destructive" onClick={handleDeleteInvoice}>
             <Trash2 className="h-3.5 w-3.5 mr-1" /> Excluir
           </Button>
