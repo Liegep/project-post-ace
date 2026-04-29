@@ -26,7 +26,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import {
   Plus, Trash2, Pencil, Download, Upload, FileText, Eye, EyeOff,
-  CheckCircle2, AlertCircle, XCircle, Clock, Paperclip, X, Link2
+  CheckCircle2, AlertCircle, XCircle, Clock, Paperclip, X, Link2, Send
 } from "lucide-react";
 import { format } from "date-fns";
 import { generateInvoicePDF } from "@/lib/invoicePdf";
