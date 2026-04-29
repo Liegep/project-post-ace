@@ -193,8 +193,8 @@ export default function SocialDashboard() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2">
           <div className="flex items-center gap-2 md:gap-3 min-w-0">
             <MobileNav title="Social" />
-            <Button variant="ghost" size="icon" className="hidden md:inline-flex bg-white hover:bg-white shadow-md border border-border/40" onClick={() => navigate("/")}>
-              <ArrowLeft className="h-5 w-5 text-black" strokeWidth={2.5} />
+            <Button variant="ghost" size="icon" className="hidden md:inline-flex group bg-white hover:bg-foreground shadow-md border border-border/40 transition-colors" onClick={() => navigate("/")}>
+              <ArrowLeft className="h-5 w-5 text-black group-hover:text-white transition-colors" strokeWidth={2.5} />
             </Button>
             <div className="min-w-0">
               <h1 className="text-base md:text-xl font-bold text-foreground flex items-center gap-2 truncate">

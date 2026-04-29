@@ -821,9 +821,9 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <button
               onClick={() => navigate("/admin")}
-              className="rounded-lg p-2 transition-colors shrink-0 bg-white hover:bg-white shadow-md border border-border/40"
+              className="rounded-lg p-2 transition-colors shrink-0 group bg-white hover:bg-foreground shadow-md border border-border/40 transition-colors"
             >
-              <ArrowLeft className="h-5 w-5 text-black" strokeWidth={2.5} />
+              <ArrowLeft className="h-5 w-5 text-black group-hover:text-white transition-colors" strokeWidth={2.5} />
             </button>
             <button
               onClick={() => logoInputRef.current?.click()}
