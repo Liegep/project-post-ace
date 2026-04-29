@@ -62,7 +62,7 @@ export const NotificationBell = () => {
     let query = supabase
       .from("admin_notifications")
       .select("*")
-      .in("type", ["deadline_warning", "deadline_today", "deadline_overdue", "internal_approval"])
+      .in("type", ["deadline_warning", "deadline_today", "deadline_overdue", "internal_approval", "invoice_sent"])
       .eq("read", false)
       .order("created_at", { ascending: false })
       .limit(30);
