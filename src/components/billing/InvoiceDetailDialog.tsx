@@ -329,7 +329,30 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         .in("user_id", userIds)
         .eq("role", "client" as any);
       const clientUserIds = (clientRoles || []).map((r: any) => r.user_id);
-      const targetIds = clientUserIds.length > 0 ? clientUserIds : userIds;
+      const candidateIds = clientUserIds.length > 0 ? clientUserIds : userIds;
+
+      // Only notify users with active permission to view invoices for this client
+      const { data: perms, error: permErr } = await supabase
+        .from("client_billing_permissions")
+        .select("user_id, can_view_invoices, expires_at")
+        .eq("client_id", invoice.client_id)
+        .in("user_id", candidateIds)
+        .eq("can_view_invoices", true);
+      if (permErr) throw permErr;
+
+      const nowMs = Date.now();
+      const targetIds = (perms || [])
+        .filter((p: any) => !p.expires_at || new Date(p.expires_at).getTime() > nowMs)
+        .map((p: any) => p.user_id);
+
+      if (targetIds.length === 0) {
+        toast({
+          title: "Sem destinatários",
+          description: "Nenhum usuário deste cliente tem permissão ativa para ver faturas. Ajuste em Permissões de Faturas.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       const clientName = invoice.clients?.name || "";
       const totalFormatted = formatCurrency(total, cur);
