@@ -424,7 +424,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
               <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Marcar como Paga
             </Button>
           ) : (
-            <Button size="sm" variant="outline" onClick={handleRevertOpen}>
+            <Button size="sm" variant="outline" onClick={handleRevertOpen} className="border-white/30 bg-white text-black hover:bg-white/90 hover:text-black">
               <Clock className="h-3.5 w-3.5 mr-1" /> Reverter para Aberta
             </Button>
           )}
