@@ -399,9 +399,11 @@ export function ClientInvoicesPanel({
           </div>
         </CardHeader>
         <CardContent className="space-y-2">
-          {recentInvoices.map((inv) => (
-            <InvoiceRow key={inv.id} invoice={inv} onSelect={setSelectedInvoice} isNew={unseenIds ? !unseenIds.has(`invoice:${inv.id}`) : false} />
-          ))}
+          {recentInvoices.map((inv) => {
+            const unseen = unseenIds ? !unseenIds.has(`invoice:${inv.id}`) : false;
+            const showNew = unseen || isRecentlyCreated(inv);
+            return <InvoiceRow key={inv.id} invoice={inv} onSelect={setSelectedInvoice} isNew={showNew} />;
+          })}
 
           {hasOlder && (
             <button
