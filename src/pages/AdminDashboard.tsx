@@ -929,9 +929,7 @@ const AdminDashboard = () => {
               </Button>
             )}
             
-            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)} title="Menu">
-              <Menu className="h-5 w-5" />
-            </Button>
+            <MobileNav title="Design Hub" />
             {isAdmin && (
               <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> Clientes
