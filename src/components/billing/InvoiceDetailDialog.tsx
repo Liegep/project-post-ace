@@ -424,27 +424,27 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
               <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Marcar como Paga
             </Button>
           ) : (
-            <Button size="sm" variant="outline" onClick={handleRevertOpen} className="border-white/30 bg-white text-black hover:bg-white/90 hover:text-black">
-              <Clock className="h-3.5 w-3.5 mr-1" /> Reverter para Aberta
+            <Button size="sm" variant="outline" onClick={handleRevertOpen} className="invoice-action-light">
+              <Clock className="h-3.5 w-3.5 mr-1" /> <span>Reverter para Aberta</span>
             </Button>
           )}
-          <Button size="sm" variant="outline" onClick={openEditInvoice} className="border-white/30 hover:bg-white/10 text-black">
-            <Pencil className="h-3.5 w-3.5 mr-1" /> Editar
+          <Button size="sm" variant="outline" onClick={openEditInvoice} className="invoice-action-light">
+            <Pencil className="h-3.5 w-3.5 mr-1" /> <span>Editar</span>
           </Button>
-          <Button size="sm" variant="outline" onClick={openAddItem} className="border-white/30 hover:bg-white/10 text-black">
-            <Plus className="h-3.5 w-3.5 mr-1" /> Adicionar item
+          <Button size="sm" variant="outline" onClick={openAddItem} className="invoice-action-light">
+            <Plus className="h-3.5 w-3.5 mr-1" /> <span>Adicionar item</span>
           </Button>
-          <Button size="sm" variant="outline" onClick={handleDownloadPDF} className="border-white/30 hover:bg-white/10 text-black">
-            <Download className="h-3.5 w-3.5 mr-1" /> Baixar PDF
+          <Button size="sm" variant="outline" onClick={handleDownloadPDF} className="invoice-action-light">
+            <Download className="h-3.5 w-3.5 mr-1" /> <span>Baixar PDF</span>
           </Button>
           <Button
             size="sm"
             onClick={handleSendToClient}
             disabled={sendingToClient}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="invoice-action-send"
           >
             <Send className="h-3.5 w-3.5 mr-1" />
-            {sendingToClient ? "Enviando..." : "Enviar ao cliente"}
+            <span>{sendingToClient ? "Enviando..." : "Enviar ao cliente"}</span>
           </Button>
           <Button size="sm" variant="destructive" onClick={handleDeleteInvoice}>
             <Trash2 className="h-3.5 w-3.5 mr-1" /> Excluir
