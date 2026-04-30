@@ -334,9 +334,25 @@ export function ClientInvoicesPanel({
     return list;
   }, [invoices, filterMonth]);
 
-  // Split into recent (first 3) and older
-  const recentInvoices = visibleInvoices.slice(0, MAX_RECENT);
-  const olderInvoices = visibleInvoices.slice(MAX_RECENT);
+  // Helper: was this invoice created in the last 7 days?
+  const isRecentlyCreated = (inv: Invoice) => {
+    const created = new Date((inv as any).created_at || inv.issue_date);
+    const diffMs = Date.now() - created.getTime();
+    return diffMs <= 7 * 24 * 60 * 60 * 1000;
+  };
+
+  // Show in main card: all unpaid (open/overdue) + the single most recent paid one.
+  // Everything else (older paid/cancelled) goes to history.
+  const { recentInvoices, olderInvoices } = useMemo(() => {
+    const unpaid = visibleInvoices.filter((i) => i.status === "open" || i.status === "overdue");
+    const paid = visibleInvoices.filter((i) => i.status === "paid");
+    const others = visibleInvoices.filter((i) => i.status !== "open" && i.status !== "overdue" && i.status !== "paid");
+    const mostRecentPaid = paid[0];
+    const recent = [...unpaid, ...(mostRecentPaid ? [mostRecentPaid] : [])].slice(0, MAX_RECENT);
+    const recentIds = new Set(recent.map((i) => i.id));
+    const older = visibleInvoices.filter((i) => !recentIds.has(i.id));
+    return { recentInvoices: recent, olderInvoices: older };
+  }, [visibleInvoices]);
   const hasOlder = olderInvoices.length > 0;
 
   if (loading) {
@@ -383,9 +399,11 @@ export function ClientInvoicesPanel({
           </div>
         </CardHeader>
         <CardContent className="space-y-2">
-          {recentInvoices.map((inv) => (
-            <InvoiceRow key={inv.id} invoice={inv} onSelect={setSelectedInvoice} isNew={unseenIds ? !unseenIds.has(`invoice:${inv.id}`) : false} />
-          ))}
+          {recentInvoices.map((inv) => {
+            const unseen = unseenIds ? !unseenIds.has(`invoice:${inv.id}`) : false;
+            const showNew = unseen || isRecentlyCreated(inv);
+            return <InvoiceRow key={inv.id} invoice={inv} onSelect={setSelectedInvoice} isNew={showNew} />;
+          })}
 
           {hasOlder && (
             <button
@@ -413,17 +431,21 @@ export function ClientInvoicesPanel({
           </SheetHeader>
           <ScrollArea className="h-[calc(100vh-120px)]">
             <div className="space-y-2 p-4">
-              {visibleInvoices.map((inv) => (
-                <InvoiceRow
-                  key={inv.id}
-                  invoice={inv}
-                  isNew={unseenIds ? !unseenIds.has(`invoice:${inv.id}`) : false}
-                  onSelect={(inv) => {
-                    setSelectedInvoice(inv);
-                    setHistoryOpen(false);
-                  }}
-                />
-              ))}
+              {visibleInvoices.map((inv) => {
+                const unseen = unseenIds ? !unseenIds.has(`invoice:${inv.id}`) : false;
+                const showNew = unseen || isRecentlyCreated(inv);
+                return (
+                  <InvoiceRow
+                    key={inv.id}
+                    invoice={inv}
+                    isNew={showNew}
+                    onSelect={(inv) => {
+                      setSelectedInvoice(inv);
+                      setHistoryOpen(false);
+                    }}
+                  />
+                );
+              })}
             </div>
           </ScrollArea>
         </SheetContent>
