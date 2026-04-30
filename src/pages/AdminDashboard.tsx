@@ -124,16 +124,6 @@ const AdminDashboard = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const { role, userId: currentUserId, isSuperAdmin, isAdmin, loading: roleLoading } = useUserRole();
-  const navItemClass = (path: string) => cn(
-    "flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors",
-    currentPath === path
-      ? "bg-primary/10 text-primary border-l-2 border-primary"
-      : "text-foreground hover:bg-muted"
-  );
-  const navIconClass = (path: string) => cn(
-    "h-4 w-4",
-    currentPath === path ? "text-primary" : "text-muted-foreground"
-  );
   const [clients, setClients] = useState<Client[]>([]);
   const [feedbacks, setFeedbacks] = useState<FeedbackNotification[]>([]);
   const [unarchiveNotifs, setUnarchiveNotifs] = useState<UnarchiveNotification[]>([]);
