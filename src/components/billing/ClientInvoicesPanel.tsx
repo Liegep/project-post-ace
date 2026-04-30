@@ -431,17 +431,21 @@ export function ClientInvoicesPanel({
           </SheetHeader>
           <ScrollArea className="h-[calc(100vh-120px)]">
             <div className="space-y-2 p-4">
-              {visibleInvoices.map((inv) => (
-                <InvoiceRow
-                  key={inv.id}
-                  invoice={inv}
-                  isNew={unseenIds ? !unseenIds.has(`invoice:${inv.id}`) : false}
-                  onSelect={(inv) => {
-                    setSelectedInvoice(inv);
-                    setHistoryOpen(false);
-                  }}
-                />
-              ))}
+              {visibleInvoices.map((inv) => {
+                const unseen = unseenIds ? !unseenIds.has(`invoice:${inv.id}`) : false;
+                const showNew = unseen || isRecentlyCreated(inv);
+                return (
+                  <InvoiceRow
+                    key={inv.id}
+                    invoice={inv}
+                    isNew={showNew}
+                    onSelect={(inv) => {
+                      setSelectedInvoice(inv);
+                      setHistoryOpen(false);
+                    }}
+                  />
+                );
+              })}
             </div>
           </ScrollArea>
         </SheetContent>
