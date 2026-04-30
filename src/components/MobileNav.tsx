@@ -4,21 +4,32 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button";
 import {
   Menu, LayoutDashboard, Users, CalendarClock, Lightbulb,
-  Calendar, FileText, CalendarHeart, X, History, FileBarChart, Palette
+  Calendar, FileText, CalendarHeart, FileBarChart, Palette,
+  DollarSign, FileSignature
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUserRole } from "@/hooks/useUserRole";
 
-const NAV_ITEMS = [
-  { path: "/admin", label: "Dashboard", icon: LayoutDashboard, superAdminOnly: false },
-  { path: "/team-management", label: "Equipe", icon: Users, superAdminOnly: false },
-  { path: "/social", label: "Social", icon: CalendarClock, superAdminOnly: false },
-  { path: "/ideas", label: "Ideias", icon: Lightbulb, superAdminOnly: false },
-  { path: "/calendar", label: "Calendário", icon: Calendar, superAdminOnly: false },
-  { path: "/briefs", label: "Pautas", icon: FileText, superAdminOnly: false },
-  { path: "/commemorative-dates", label: "Datas Comemorativas", icon: CalendarHeart, superAdminOnly: false },
-  { path: "/reports", label: "Relatórios", icon: FileBarChart, superAdminOnly: true },
-  { path: "/design-briefs", label: "Briefs de Design", icon: Palette, superAdminOnly: false },
+type NavItem = {
+  path: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  requires?: "any" | "admin" | "superAdmin";
+};
+
+const NAV_ITEMS: NavItem[] = [
+  { path: "/admin", label: "Dashboard", icon: LayoutDashboard, requires: "any" },
+  { path: "/team-management", label: "Equipe", icon: Users, requires: "admin" },
+  { path: "/social", label: "Social", icon: CalendarClock, requires: "admin" },
+  { path: "/ideas", label: "Ideias de Pauta", icon: Lightbulb, requires: "any" },
+  { path: "/calendar", label: "Calendário", icon: Calendar, requires: "any" },
+  { path: "/briefs", label: "Pautas", icon: FileText, requires: "any" },
+  { path: "/reports", label: "Relatórios", icon: FileBarChart, requires: "superAdmin" },
+  { path: "/billing", label: "Faturamento", icon: DollarSign, requires: "superAdmin" },
+  { path: "/proposals", label: "Propostas", icon: FileSignature, requires: "superAdmin" },
+  { path: "/contracts", label: "Contratos", icon: FileText, requires: "superAdmin" },
+  { path: "/commemorative-dates", label: "Datas Comemorativas", icon: CalendarHeart, requires: "any" },
+  { path: "/design-briefs", label: "Briefs de Design", icon: Palette, requires: "any" },
 ];
 
 interface MobileNavProps {
@@ -30,7 +41,13 @@ export function MobileNav({ title, children }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { isSuperAdmin } = useUserRole();
+  const { isSuperAdmin, isAdmin } = useUserRole();
+
+  const visibleItems = NAV_ITEMS.filter((item) => {
+    if (item.requires === "superAdmin") return isSuperAdmin;
+    if (item.requires === "admin") return isAdmin;
+    return true;
+  });
 
   return (
     <>
@@ -45,9 +62,7 @@ export function MobileNav({ title, children }: MobileNavProps) {
           </SheetHeader>
           {children && <div className="border-b px-5 py-3">{children}</div>}
           <nav className="flex flex-col py-2">
-            {NAV_ITEMS
-              .filter((item) => !item.superAdminOnly || isSuperAdmin)
-              .map((item) => {
+            {visibleItems.map((item) => {
               const isActive = location.pathname === item.path;
               return (
                 <button
