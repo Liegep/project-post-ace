@@ -223,6 +223,32 @@
     background: hsl(0 0% 100% / 0.18);
   }
 
+  .glass-modal .invoice-action-light,
+  .glass-modal .invoice-action-light:hover,
+  .glass-modal .invoice-action-light:focus-visible {
+    background: hsl(0 0% 100%) !important;
+    border-color: hsl(0 0% 100%) !important;
+    color: hsl(0 0% 0%) !important;
+  }
+
+  .glass-modal .invoice-action-light svg,
+  .glass-modal .invoice-action-light span {
+    color: hsl(0 0% 0%) !important;
+  }
+
+  .glass-modal .invoice-action-send,
+  .glass-modal .invoice-action-send:hover,
+  .glass-modal .invoice-action-send:focus-visible {
+    background: hsl(var(--primary)) !important;
+    border-color: hsl(var(--primary)) !important;
+    color: hsl(var(--primary-foreground)) !important;
+  }
+
+  .glass-modal .invoice-action-send svg,
+  .glass-modal .invoice-action-send span {
+    color: hsl(var(--primary-foreground)) !important;
+  }
+
   .btn-gradient {
     background: linear-gradient(135deg, hsl(var(--gradient-start)) 0%, hsl(var(--gradient-mid)) 50%, hsl(var(--gradient-end)) 100%);
     color: hsl(0 0% 100%);
