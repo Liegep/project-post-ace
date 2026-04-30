@@ -16,6 +16,7 @@ import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign, Eye, FileSignature, Link2, Palette } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { StorageCleanupButton } from "@/components/StorageCleanupButton";
+import { MobileNav } from "@/components/MobileNav";
 import { toast } from "@/hooks/use-toast";
 
 import { cn } from "@/lib/utils";
@@ -123,16 +124,6 @@ const AdminDashboard = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const { role, userId: currentUserId, isSuperAdmin, isAdmin, loading: roleLoading } = useUserRole();
-  const navItemClass = (path: string) => cn(
-    "flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors",
-    currentPath === path
-      ? "bg-primary/10 text-primary border-l-2 border-primary"
-      : "text-foreground hover:bg-muted"
-  );
-  const navIconClass = (path: string) => cn(
-    "h-4 w-4",
-    currentPath === path ? "text-primary" : "text-muted-foreground"
-  );
   const [clients, setClients] = useState<Client[]>([]);
   const [feedbacks, setFeedbacks] = useState<FeedbackNotification[]>([]);
   const [unarchiveNotifs, setUnarchiveNotifs] = useState<UnarchiveNotification[]>([]);
@@ -175,7 +166,7 @@ const AdminDashboard = () => {
   const [shareSelectedUsers, setShareSelectedUsers] = useState<Set<string>>(new Set());
   const [clientAssignments, setClientAssignments] = useState<{ user_id: string; client_id: string }[]>([]);
   const [clientUsersMap, setClientUsersMap] = useState<ClientUserMap>({});
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   const [navDrawerOpen, setNavDrawerOpen] = useState(false);
   const [quickLinksOpen, setQuickLinksOpen] = useState(false);
   const [appLogo, setAppLogo] = useState<string | null>(null);
@@ -928,9 +919,7 @@ const AdminDashboard = () => {
               </Button>
             )}
             
-            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)} title="Menu">
-              <Menu className="h-5 w-5" />
-            </Button>
+            <MobileNav title="Design Hub" />
             {isAdmin && (
               <Button onClick={openCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> Clientes
@@ -944,9 +933,7 @@ const AdminDashboard = () => {
           </div>
           {/* Mobile: only essential actions */}
           <div className="flex md:hidden items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(true)}>
-              <Menu className="h-5 w-5" />
-            </Button>
+            <MobileNav title="Design Hub" />
             <Button size="icon" variant="ghost" onClick={() => setQuickLinksOpen(true)}>
               <Link2 className="h-5 w-5" />
             </Button>
@@ -961,91 +948,7 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      {/* Mobile drawer menu */}
-      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-72 p-0">
-          <SheetHeader className="border-b px-5 py-4">
-            <SheetTitle className="text-left text-lg font-bold flex items-center gap-2">
-              {appLogo && <img src={appLogo} alt="Logo" className="h-7 w-7 rounded-md object-contain" />}
-              Design Hub
-            </SheetTitle>
-          </SheetHeader>
-          <div className="flex flex-col py-2">
-            {role && (
-              <div className="px-5 py-2">
-                <span className={cn(
-                  "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
-                  isSuperAdmin ? "bg-amber-500/15 text-amber-600" : "bg-blue-500/15 text-blue-600"
-                )}>
-                  <Shield className="h-3 w-3" />
-                  {isSuperAdmin ? "Super Admin" : role === "admin" ? "Admin" : "Colaborador"}
-                </span>
-              </div>
-            )}
-            <nav className="flex flex-col">
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/admin"); }} className={navItemClass("/admin")}>
-                <LayoutDashboard className={navIconClass("/admin")} /> Dashboard
-              </button>
-              {isAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); openCreate(); }} className="flex items-center gap-3 px-5 py-3 text-sm font-medium text-foreground hover:bg-muted transition-colors">
-                  <Plus className="h-4 w-4 text-muted-foreground" /> Novo Cliente
-                </button>
-              )}
-              {isAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); navigate("/team-management"); }} className={navItemClass("/team-management")}>
-                  <Users className={navIconClass("/team-management")} /> {t("team")}
-                </button>
-              )}
-              {isAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); navigate("/social"); }} className={navItemClass("/social")}>
-                  <CalendarClock className={navIconClass("/social")} /> {t("social")}
-                </button>
-              )}
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/ideas"); }} className={navItemClass("/ideas")}>
-                <Lightbulb className={navIconClass("/ideas")} /> Ideias de Pauta
-              </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/calendar"); }} className={navItemClass("/calendar")}>
-                <Calendar className={navIconClass("/calendar")} /> Calendário
-              </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/briefs"); }} className={navItemClass("/briefs")}>
-                <FileText className={navIconClass("/briefs")} /> Pautas
-              </button>
-              {isSuperAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); navigate("/reports"); }} className={navItemClass("/reports")}>
-                  <FileBarChart className={navIconClass("/reports")} /> Relatórios
-                </button>
-              )}
-              {isSuperAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); navigate("/billing"); }} className={navItemClass("/billing")}>
-                  <DollarSign className={navIconClass("/billing")} /> Faturamento
-                </button>
-              )}
-              {isSuperAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); navigate("/proposals"); }} className={navItemClass("/proposals")}>
-                  <FileSignature className={navIconClass("/proposals")} /> Propostas
-                </button>
-              )}
-              {isSuperAdmin && (
-                <button onClick={() => { setMobileMenuOpen(false); navigate("/contracts"); }} className={navItemClass("/contracts")}>
-                  <FileText className={navIconClass("/contracts")} /> Contratos
-                </button>
-              )}
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/commemorative-dates"); }} className={navItemClass("/commemorative-dates")}>
-                <CalendarHeart className={navIconClass("/commemorative-dates")} /> Datas Comemorativas
-              </button>
-              <button onClick={() => { setMobileMenuOpen(false); navigate("/design-briefs"); }} className={navItemClass("/design-briefs")}>
-                <Palette className={navIconClass("/design-briefs")} /> Briefs de Design
-              </button>
-              {/* Activity log link removed */}
-              {isAdmin && (
-                <div className="border-t mt-2 pt-2 px-5">
-                  <StorageCleanupButton />
-                </div>
-              )}
-            </nav>
-          </div>
-        </SheetContent>
-      </Sheet>
+
 
       {/* Quick Links drawer */}
       <Sheet open={quickLinksOpen} onOpenChange={setQuickLinksOpen}>
