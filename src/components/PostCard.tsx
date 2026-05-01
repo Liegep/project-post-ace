@@ -555,14 +555,12 @@ export const PostCard = memo(
             </>
           )}
         </ContextMenuContent>
-        {post.columnId !== undefined && (
-          <SendPostToClientDialog
-            open={sendDialogOpen}
-            onOpenChange={setSendDialogOpen}
-            post={post}
-            currentClientId={(post as any).clientId ?? ""}
-          />
-        )}
+        <SendPostToClientDialog
+          open={sendDialogOpen}
+          onOpenChange={setSendDialogOpen}
+          post={post}
+          currentClientId={clientId}
+        />
       </ContextMenu>
     );
   },
