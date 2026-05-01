@@ -75,7 +75,7 @@ export const PostCard = memo(
     showInlineDetails,
     allowEditCaption,
   }: PostCardProps) => {
-    const { tags, updateClientLabel, addComment, updatePost, addPost, updatePostStatus } = usePosts();
+    const { tags, updateClientLabel, addComment, updatePost, addPost, updatePostStatus, clientId } = usePosts();
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
