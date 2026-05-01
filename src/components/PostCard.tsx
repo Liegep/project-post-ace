@@ -533,6 +533,11 @@ export const PostCard = memo(
             Copiar card
           </ContextMenuItem>
 
+          <ContextMenuItem onSelect={() => setSendDialogOpen(true)}>
+            <SendHorizontal className="h-4 w-4 mr-2" />
+            Enviar para outro cliente
+          </ContextMenuItem>
+
           {onArchive && (
             <ContextMenuItem onSelect={() => onArchive()}>
               <Archive className="h-4 w-4 mr-2" />
