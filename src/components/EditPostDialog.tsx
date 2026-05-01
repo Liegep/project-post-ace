@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/RichTextEditor";
+import { CommentContent } from "@/components/CommentContent";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Smile, Send as SendIcon, Pencil, Trash2 as CommentTrash, Check, X } from "lucide-react";
 import { Label } from "@/components/ui/label";
