@@ -404,12 +404,13 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                           disabled={!commentHtml || commentHtml === "<p></p>"}
                           onClick={async () => {
                             if (!commentHtml || commentHtml === "<p></p>") return;
-                            // Strip HTML tags for storage (comments table stores plain text)
+                            // Ensure there is actual textual content (not just empty tags)
                             const div = document.createElement("div");
                             div.innerHTML = commentHtml;
-                            const plainText = div.textContent || div.innerText || "";
-                            if (!plainText.trim()) return;
-                            await addComment(post.id, "Admin", plainText.trim());
+                            const plainText = (div.textContent || div.innerText || "").trim();
+                            if (!plainText) return;
+                            // Store the HTML so rich-text formatting (lists, headings, bold, etc.) is preserved
+                            await addComment(post.id, "Admin", commentHtml);
                             setCommentHtml("");
                           }}
                         >
