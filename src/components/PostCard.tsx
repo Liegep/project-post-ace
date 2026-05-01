@@ -83,6 +83,7 @@ export const PostCard = memo(
     const [editingCaption, setEditingCaption] = useState(false);
     const [draftCaption, setDraftCaption] = useState(post.caption);
     const [savingCaption, setSavingCaption] = useState(false);
+    const [sendDialogOpen, setSendDialogOpen] = useState(false);
 
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
