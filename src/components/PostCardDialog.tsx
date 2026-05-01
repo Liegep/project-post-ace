@@ -20,6 +20,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { isPostInvoiced, invoicePostAuto, getPostInvoiceItem, deleteInvoiceItem } from "@/hooks/useInvoices";
+import { CommentContent } from "@/components/CommentContent";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { getContrastColor } from "@/lib/utils";
