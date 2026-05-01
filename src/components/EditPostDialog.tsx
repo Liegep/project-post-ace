@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/RichTextEditor";
+import { CommentContent } from "@/components/CommentContent";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Smile, Send as SendIcon, Pencil, Trash2 as CommentTrash, Check, X } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -323,38 +324,36 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                               </div>
                             </div>
                             {editingCommentId === c.id ? (
-                              <div className="flex items-center gap-1 mt-1">
-                                <Input
-                                  value={editingCommentText}
-                                  onChange={(e) => setEditingCommentText(e.target.value)}
-                                  className="h-7 text-xs"
-                                  autoFocus
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                      updateComment(post.id, c.id, editingCommentText.trim());
-                                      setEditingCommentId(null);
-                                    } else if (e.key === "Escape") {
-                                      setEditingCommentId(null);
-                                    }
-                                  }}
-                                />
-                                <button
-                                  type="button"
-                                  className="h-5 w-5 flex items-center justify-center rounded hover:bg-muted text-green-600"
-                                  onClick={() => { updateComment(post.id, c.id, editingCommentText.trim()); setEditingCommentId(null); }}
-                                >
-                                  <Check className="h-3.5 w-3.5" />
-                                </button>
-                                <button
-                                  type="button"
-                                  className="h-5 w-5 flex items-center justify-center rounded hover:bg-muted text-muted-foreground"
-                                  onClick={() => setEditingCommentId(null)}
-                                >
-                                  <X className="h-3.5 w-3.5" />
-                                </button>
+                              <div className="mt-1 space-y-1">
+                                <div className="rounded bg-white">
+                                  <RichTextEditor
+                                    content={editingCommentText}
+                                    onChange={setEditingCommentText}
+                                    placeholder="Editar comentário"
+                                    className="[&_.ProseMirror]:text-black [&_.ProseMirror]:min-h-[60px]"
+                                  />
+                                </div>
+                                <div className="flex items-center justify-end gap-1">
+                                  <button
+                                    type="button"
+                                    className="h-6 w-6 flex items-center justify-center rounded hover:bg-muted text-green-600"
+                                    onClick={() => { updateComment(post.id, c.id, editingCommentText); setEditingCommentId(null); }}
+                                    title="Salvar"
+                                  >
+                                    <Check className="h-3.5 w-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="h-6 w-6 flex items-center justify-center rounded hover:bg-muted text-muted-foreground"
+                                    onClick={() => setEditingCommentId(null)}
+                                    title="Cancelar"
+                                  >
+                                    <X className="h-3.5 w-3.5" />
+                                  </button>
+                                </div>
                               </div>
                             ) : (
-                              <div className="text-xs whitespace-pre-wrap text-neutral-950">{c.text}</div>
+                              <CommentContent text={c.text} className="text-xs text-neutral-950" />
                             )}
                           </div>
                           );
@@ -405,12 +404,13 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                           disabled={!commentHtml || commentHtml === "<p></p>"}
                           onClick={async () => {
                             if (!commentHtml || commentHtml === "<p></p>") return;
-                            // Strip HTML tags for storage (comments table stores plain text)
+                            // Ensure there is actual textual content (not just empty tags)
                             const div = document.createElement("div");
                             div.innerHTML = commentHtml;
-                            const plainText = div.textContent || div.innerText || "";
-                            if (!plainText.trim()) return;
-                            await addComment(post.id, "Admin", plainText.trim());
+                            const plainText = (div.textContent || div.innerText || "").trim();
+                            if (!plainText) return;
+                            // Store the HTML so rich-text formatting (lists, headings, bold, etc.) is preserved
+                            await addComment(post.id, "Admin", commentHtml);
                             setCommentHtml("");
                           }}
                         >

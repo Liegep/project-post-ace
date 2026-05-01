@@ -20,6 +20,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { isPostInvoiced, invoicePostAuto, getPostInvoiceItem, deleteInvoiceItem } from "@/hooks/useInvoices";
+import { CommentContent } from "@/components/CommentContent";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { getContrastColor } from "@/lib/utils";
@@ -508,7 +509,7 @@ export function PostCardDialog({
                           </div>
                           <span className="opacity-50 font-normal flex-shrink-0">{format(c.createdAt, "dd/MM")}</span>
                         </div>
-                        <p className="text-zinc-700 leading-relaxed">{c.text}</p>
+                        <CommentContent text={c.text} className="text-zinc-700 text-[11px] leading-relaxed" />
                       </div>
                       );
                     })}
