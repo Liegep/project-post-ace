@@ -21,7 +21,8 @@ import {
 } from "@/components/ui/context-menu";
 import { LinkedText } from "@/components/LinkedText";
 import { MediaLightbox } from "@/components/MediaLightbox";
-import { Archive, Calendar, Copy, Download, Pencil, Play, Send, Tag as TagIcon, Trash2, X, Check, ListChecks } from "lucide-react";
+import { Archive, Calendar, Copy, Download, Pencil, Play, Send, SendHorizontal, Tag as TagIcon, Trash2, X, Check, ListChecks } from "lucide-react";
+import { SendPostToClientDialog } from "@/components/SendPostToClientDialog";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
 import { getContrastColor } from "@/lib/utils";
@@ -74,7 +75,7 @@ export const PostCard = memo(
     showInlineDetails,
     allowEditCaption,
   }: PostCardProps) => {
-    const { tags, updateClientLabel, addComment, updatePost, addPost, updatePostStatus } = usePosts();
+    const { tags, updateClientLabel, addComment, updatePost, addPost, updatePostStatus, clientId } = usePosts();
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -82,6 +83,7 @@ export const PostCard = memo(
     const [editingCaption, setEditingCaption] = useState(false);
     const [draftCaption, setDraftCaption] = useState(post.caption);
     const [savingCaption, setSavingCaption] = useState(false);
+    const [sendDialogOpen, setSendDialogOpen] = useState(false);
 
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
@@ -531,6 +533,11 @@ export const PostCard = memo(
             Copiar card
           </ContextMenuItem>
 
+          <ContextMenuItem onSelect={() => setSendDialogOpen(true)}>
+            <SendHorizontal className="h-4 w-4 mr-2" />
+            Enviar para outro cliente
+          </ContextMenuItem>
+
           {onArchive && (
             <ContextMenuItem onSelect={() => onArchive()}>
               <Archive className="h-4 w-4 mr-2" />
@@ -548,6 +555,12 @@ export const PostCard = memo(
             </>
           )}
         </ContextMenuContent>
+        <SendPostToClientDialog
+          open={sendDialogOpen}
+          onOpenChange={setSendDialogOpen}
+          post={post}
+          currentClientId={clientId}
+        />
       </ContextMenu>
     );
   },
