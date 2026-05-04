@@ -35,6 +35,7 @@ interface PostsContextType {
   deletePost: (id: string) => void;
   updatePost: (id: string, updates: Partial<Post>) => void;
   addTag: (name: string, color: string) => Promise<Tag>;
+  updateTag: (id: string, updates: { name?: string; color?: string }) => Promise<void>;
   deleteTag: (id: string) => void;
   uploadMedia: (file: File) => Promise<string>;
   addColumn: (name: string) => Promise<Column>;
@@ -675,6 +676,16 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     return tag;
   }, [clientId]);
 
+  const updateTag = useCallback(async (id: string, updates: { name?: string; color?: string }) => {
+    setTags((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
+    const payload: Record<string, unknown> = {};
+    if (updates.name !== undefined) payload.name = updates.name;
+    if (updates.color !== undefined) payload.color = updates.color;
+    if (Object.keys(payload).length === 0) return;
+    const { error } = await supabase.from("tags").update(payload as any).eq("id", id);
+    if (error) throw error;
+  }, []);
+
   const deleteTag = useCallback((id: string) => {
     setTags((prev) => prev.filter((t) => t.id !== id));
     setPosts((prev) => prev.map((p) => ({ ...p, tags: p.tags.filter((t) => t !== id) })));
@@ -836,7 +847,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     <PostsContext.Provider value={{
       clientId, posts: activePosts, archivedPosts, tags, columns, postingPeriod, companyLogo, commentAuthors, setPostingPeriod, setCompanyLogo,
       addPost, updatePostStatus, updateClientLabel, addComment, deleteComment, updateComment, deletePost, updatePost,
-      addTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns, toggleColumnVisibility,
+      addTag, updateTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns, toggleColumnVisibility,
       movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, loading,
     }}>
       {children}
