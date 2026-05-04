@@ -163,29 +163,139 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
             {filteredTags.map((tag) => {
               const isSelected = selectedTagIds.includes(tag.id);
               const origin = getTagOrigin(tag.id);
+              const isLocked = TAG_TRANSLATION_KEYS[tag.id] !== undefined;
+              const isEditing = editingId === tag.id;
+
+              if (isEditing) {
+                return (
+                  <div key={tag.id} className="flex items-center gap-1 rounded-md px-2 py-1.5">
+                    <input
+                      type="color"
+                      value={editColor}
+                      onChange={(e) => setEditColor(e.target.value)}
+                      className="h-5 w-5 cursor-pointer rounded border-0 bg-transparent p-0 shrink-0"
+                    />
+                    <Input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          (async () => {
+                            const trimmed = editName.trim();
+                            if (!trimmed) return;
+                            setSavingEdit(true);
+                            try {
+                              await updateTag(tag.id, { name: trimmed, color: editColor });
+                              setEditingId(null);
+                            } catch (err) {
+                              console.error("[TagSelector] Failed to update tag", err);
+                              toast({ title: "Erro ao renomear", variant: "destructive" });
+                            } finally {
+                              setSavingEdit(false);
+                            }
+                          })();
+                        } else if (e.key === "Escape") {
+                          setEditingId(null);
+                        }
+                      }}
+                      className="h-7 text-xs flex-1"
+                      autoFocus
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      disabled={savingEdit}
+                      className="h-6 w-6 p-0"
+                      onClick={async () => {
+                        const trimmed = editName.trim();
+                        if (!trimmed) return;
+                        setSavingEdit(true);
+                        try {
+                          await updateTag(tag.id, { name: trimmed, color: editColor });
+                          setEditingId(null);
+                        } catch (err) {
+                          console.error("[TagSelector] Failed to update tag", err);
+                          toast({ title: "Erro ao renomear", variant: "destructive" });
+                        } finally {
+                          setSavingEdit(false);
+                        }
+                      }}
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="h-6 w-6 p-0"
+                      onClick={() => setEditingId(null)}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                );
+              }
+
               return (
-                <button
+                <div
                   key={tag.id}
-                  onClick={() => toggleTag(tag.id)}
-                  className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted cursor-pointer transition-colors"
+                  className="group/row w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted transition-colors"
                 >
-                  <Checkbox checked={isSelected} className="h-3.5 w-3.5 pointer-events-none" />
-                  <span
-                    className="h-3 w-3 rounded-full shrink-0"
-                    style={{ backgroundColor: tag.color }}
-                  />
-                  <span className="truncate text-foreground flex-1 text-left">{getTagDisplayName(tag, t)}</span>
+                  <button
+                    type="button"
+                    onClick={() => toggleTag(tag.id)}
+                    className="flex items-center gap-2 flex-1 min-w-0 text-left"
+                  >
+                    <Checkbox checked={isSelected} className="h-3.5 w-3.5 pointer-events-none" />
+                    <span
+                      className="h-3 w-3 rounded-full shrink-0"
+                      style={{ backgroundColor: tag.color }}
+                    />
+                    <span className="truncate text-foreground flex-1">{getTagDisplayName(tag, t)}</span>
+                  </button>
                   {origin === "trello" && (
                     <span className="rounded px-1 py-0.5 text-[9px] font-semibold bg-blue-500/15 text-blue-600 dark:text-blue-400 shrink-0">
                       Trello
                     </span>
                   )}
                   {origin === "legacy" && (
-                    <span className="rounded px-1 py-0.5 text-[9px] font-semibold bg-muted text-muted-foreground shrink-0">
+                    <span className="rounded px-1 py-0.5 text-[9px] font-semibold bg-muted-foreground/20 text-muted-foreground shrink-0">
                       Sistema
                     </span>
                   )}
-                </button>
+                  {!isLocked && (
+                    <div className="flex items-center gap-0.5 opacity-0 group-hover/row:opacity-100 transition-opacity">
+                      <button
+                        type="button"
+                        title="Renomear"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingId(tag.id);
+                          setEditName(tag.name);
+                          setEditColor(tag.color);
+                        }}
+                        className="p-1 rounded hover:bg-background"
+                      >
+                        <Pencil className="h-3 w-3 text-muted-foreground" />
+                      </button>
+                      <button
+                        type="button"
+                        title="Excluir"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm(`Excluir a etiqueta "${tag.name}"? Ela será removida de todos os cards.`)) {
+                            deleteTag(tag.id);
+                          }
+                        }}
+                        className="p-1 rounded hover:bg-background"
+                      >
+                        <Trash2 className="h-3 w-3 text-destructive" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
