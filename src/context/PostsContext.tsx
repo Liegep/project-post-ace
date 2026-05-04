@@ -676,6 +676,16 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     return tag;
   }, [clientId]);
 
+  const updateTag = useCallback(async (id: string, updates: { name?: string; color?: string }) => {
+    setTags((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
+    const payload: Record<string, unknown> = {};
+    if (updates.name !== undefined) payload.name = updates.name;
+    if (updates.color !== undefined) payload.color = updates.color;
+    if (Object.keys(payload).length === 0) return;
+    const { error } = await supabase.from("tags").update(payload as any).eq("id", id);
+    if (error) throw error;
+  }, []);
+
   const deleteTag = useCallback((id: string) => {
     setTags((prev) => prev.filter((t) => t.id !== id));
     setPosts((prev) => prev.map((p) => ({ ...p, tags: p.tags.filter((t) => t !== id) })));
