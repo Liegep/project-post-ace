@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/hooks/use-toast";
-import { Tags, Plus, Search, X } from "lucide-react";
+import { Tags, Plus, Search, X, Pencil, Trash2, Check } from "lucide-react";
 import { getContrastColor, getTagOrigin, type TagOrigin } from "@/lib/utils";
 
 const getTagDisplayName = (tag: Tag, t: ReturnType<typeof useI18n>["t"]) => {
