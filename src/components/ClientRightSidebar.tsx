@@ -1,25 +1,18 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink } from "lucide-react";
 import { GradientHeartIcon } from "@/components/GradientHeartIcon";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-
-const ClientNotes = lazy(() => import("@/components/ClientNotes").then(m => ({ default: m.ClientNotes })));
-const ClientLinksPanel = lazy(() => import("@/components/ClientLinksPanel").then(m => ({ default: m.ClientLinksPanel })));
-const QuickLinksPanel = lazy(() => import("@/components/QuickLinksPanel").then(m => ({ default: m.QuickLinksPanel })));
+import { ClientNotes } from "@/components/ClientNotes";
+import { ClientLinksPanel } from "@/components/ClientLinksPanel";
+import { QuickLinksPanel } from "@/components/QuickLinksPanel";
 
 type Tab = "notes" | "links" | "quick" | null;
 
 interface Props {
   clientId: string;
 }
-
-const Spinner = () => (
-  <div className="flex justify-center py-8">
-    <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-  </div>
-);
 
 export function ClientRightSidebar({ clientId }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(null);
@@ -168,15 +161,13 @@ export function ClientRightSidebar({ clientId }: Props) {
 
               {/* Content */}
               <div className="flex-1 overflow-y-auto p-4">
-                <Suspense fallback={<Spinner />}>
-                  {activeTab === "notes" && (
-                    <ClientNotes clientId={clientId} onCountChange={setNotesCount} />
-                  )}
-                  {activeTab === "links" && (
-                    <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
-                  )}
-                  {activeTab === "quick" && <QuickLinksPanel />}
-                </Suspense>
+                {activeTab === "notes" && (
+                  <ClientNotes clientId={clientId} onCountChange={setNotesCount} />
+                )}
+                {activeTab === "links" && (
+                  <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
+                )}
+                {activeTab === "quick" && <QuickLinksPanel />}
               </div>
             </div>
           </SheetContent>
@@ -276,15 +267,13 @@ export function ClientRightSidebar({ clientId }: Props) {
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-4">
-            <Suspense fallback={<Spinner />}>
-              {activeTab === "notes" && (
-                <ClientNotes clientId={clientId} onCountChange={setNotesCount} />
-              )}
-              {activeTab === "links" && (
-                <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
-              )}
-              {activeTab === "quick" && <QuickLinksPanel />}
-            </Suspense>
+            {activeTab === "notes" && (
+              <ClientNotes clientId={clientId} onCountChange={setNotesCount} />
+            )}
+            {activeTab === "links" && (
+              <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
+            )}
+            {activeTab === "quick" && <QuickLinksPanel />}
           </div>
         </div>
       </div>
