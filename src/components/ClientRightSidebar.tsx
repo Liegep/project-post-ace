@@ -161,15 +161,13 @@ export function ClientRightSidebar({ clientId }: Props) {
 
               {/* Content */}
               <div className="flex-1 overflow-y-auto p-4">
-                <Suspense fallback={<Spinner />}>
-                  {activeTab === "notes" && (
-                    <ClientNotes clientId={clientId} onCountChange={setNotesCount} />
-                  )}
-                  {activeTab === "links" && (
-                    <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
-                  )}
-                  {activeTab === "quick" && <QuickLinksPanel />}
-                </Suspense>
+                {activeTab === "notes" && (
+                  <ClientNotes clientId={clientId} onCountChange={setNotesCount} />
+                )}
+                {activeTab === "links" && (
+                  <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
+                )}
+                {activeTab === "quick" && <QuickLinksPanel />}
               </div>
             </div>
           </SheetContent>
