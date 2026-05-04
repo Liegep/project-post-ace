@@ -122,7 +122,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
             Tags
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-56 p-0" align="start" onClick={(e) => e.stopPropagation()}>
+        <PopoverContent className="w-80 p-0" align="start" onClick={(e) => e.stopPropagation()}>
           {/* Search */}
           <div className="p-2 border-b space-y-2">
             <div className="relative">
@@ -253,7 +253,7 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
                       className="h-3 w-3 rounded-full shrink-0"
                       style={{ backgroundColor: tag.color }}
                     />
-                    <span className="truncate text-foreground flex-1">{getTagDisplayName(tag, t)}</span>
+                    <span className="text-foreground flex-1 break-words whitespace-normal leading-tight">{getTagDisplayName(tag, t)}</span>
                   </button>
                   {origin === "trello" && (
                     <span className="rounded px-1 py-0.5 text-[9px] font-semibold bg-blue-500/15 text-blue-600 dark:text-blue-400 shrink-0">
