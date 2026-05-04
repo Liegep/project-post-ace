@@ -21,7 +21,7 @@ interface TagSelectorProps {
 }
 
 export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
-  const { tags, addTag } = usePosts();
+  const { tags, addTag, updateTag, deleteTag } = usePosts();
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -30,6 +30,10 @@ export const TagSelector = ({ selectedTagIds, onChange }: TagSelectorProps) => {
   const [savingTag, setSavingTag] = useState(false);
   const [newName, setNewName] = useState("");
   const [newColor, setNewColor] = useState("#6366f1");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editColor, setEditColor] = useState("#6366f1");
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const filteredTags = useMemo(() => {
     let list = tags;
