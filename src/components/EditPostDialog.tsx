@@ -430,6 +430,40 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
             {/* RIGHT COLUMN — Settings */}
             <div className="md:w-[35%] p-6 space-y-4">
+              {/* Art type dropdown */}
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tipo de arte</Label>
+                <Select value={artType} onValueChange={setArtType}>
+                  <SelectTrigger className="mt-1 h-9 text-xs">
+                    <SelectValue>
+                      {(() => {
+                        const cfg = getArtTypeConfig(artType);
+                        const Icon = cfg.icon;
+                        return (
+                          <span className="inline-flex items-center gap-2">
+                            <Icon className={`h-3.5 w-3.5 ${cfg.color}`} />
+                            {cfg.fallbackLabel}
+                          </span>
+                        );
+                      })()}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ART_TYPES.map((a) => {
+                      const Icon = a.icon;
+                      return (
+                        <SelectItem key={a.value} value={a.value}>
+                          <span className="inline-flex items-center gap-2">
+                            <Icon className={`h-4 w-4 ${a.color}`} />
+                            {a.fallbackLabel}
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Status dropdown */}
               <div>
                 <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</Label>
