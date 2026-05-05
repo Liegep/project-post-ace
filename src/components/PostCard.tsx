@@ -27,6 +27,7 @@ import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
 import { getContrastColor } from "@/lib/utils";
 import { toast } from "sonner";
+import { getArtTypeConfig } from "@/lib/artTypes";
 
 const STATUS_KEYS: Record<PostStatus, string> = {
   entrada: "statusEntry",
@@ -149,9 +150,21 @@ export const PostCard = memo(
               <Checkbox checked={isSelected} onCheckedChange={() => onToggleSelect?.(post.id)} />
             </div>
           )}
-          <h3 className="text-sm font-bold leading-snug text-foreground break-words flex-1">
-            {post.title}
-          </h3>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-bold leading-snug text-foreground break-words">
+              {post.title}
+            </h3>
+            {(() => {
+              const cfg = getArtTypeConfig(post.artType);
+              const Icon = cfg.icon;
+              return (
+                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-background border border-border px-1.5 py-0.5 text-[9px] font-semibold text-foreground/80">
+                  <Icon className={`h-2.5 w-2.5 ${cfg.color}`} />
+                  {cfg.fallbackLabel}
+                </span>
+              );
+            })()}
+          </div>
           {isAdmin && (
             <div className="flex items-center gap-0.5 pt-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
               {hasMedia && (
