@@ -24,6 +24,7 @@ import { InternalApprovalDialog } from "@/components/InternalApprovalDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { createPostDeadlineFromInput, formatPostDeadlineInput } from "@/lib/postDeadline";
+import { ART_TYPES, getArtTypeConfig } from "@/lib/artTypes";
 
 const STATUS_KEYS: Record<PostStatus, string> = {
   entrada: "statusEntry",
@@ -54,6 +55,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [status, setStatus] = useState<PostStatus[]>(["em_desenvolvimento"]);
   const [columnId, setColumnId] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [artType, setArtType] = useState<string>("single_post");
   const [uploading, setUploading] = useState(false);
   const [retainFiles, setRetainFiles] = useState(false);
   const [externalLink, setExternalLink] = useState("");
@@ -90,6 +92,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       setStatus(Array.isArray(post.status) ? post.status : [post.status]);
       setColumnId(post.columnId);
       setSelectedTags(post.tags);
+      setArtType(post.artType || "single_post");
       supabase.from("posts").select("retain_files").eq("id", post.id).maybeSingle().then(({ data }) => {
         setRetainFiles((data as any)?.retain_files ?? false);
       });
@@ -159,6 +162,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         caption,
         deadline: deadline ? createPostDeadlineFromInput(deadline) : null,
         tags: selectedTags,
+        artType,
       });
       // Update retain_files flag
       await supabase.from("posts").update({ retain_files: retainFiles } as any).eq("id", post.id);
@@ -426,6 +430,40 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
             {/* RIGHT COLUMN — Settings */}
             <div className="md:w-[35%] p-6 space-y-4">
+              {/* Art type dropdown */}
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tipo de arte</Label>
+                <Select value={artType} onValueChange={setArtType}>
+                  <SelectTrigger className="mt-1 h-9 text-xs">
+                    <SelectValue>
+                      {(() => {
+                        const cfg = getArtTypeConfig(artType);
+                        const Icon = cfg.icon;
+                        return (
+                          <span className="inline-flex items-center gap-2">
+                            <Icon className={`h-3.5 w-3.5 ${cfg.color}`} />
+                            {cfg.fallbackLabel}
+                          </span>
+                        );
+                      })()}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ART_TYPES.map((a) => {
+                      const Icon = a.icon;
+                      return (
+                        <SelectItem key={a.value} value={a.value}>
+                          <span className="inline-flex items-center gap-2">
+                            <Icon className={`h-4 w-4 ${a.color}`} />
+                            {a.fallbackLabel}
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Status dropdown */}
               <div>
                 <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</Label>

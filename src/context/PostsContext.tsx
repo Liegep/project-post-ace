@@ -76,6 +76,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     archived: row.archived ?? false,
     archivedAt: row.archived_at ? new Date(row.archived_at) : null,
     trelloCardId: row.trello_card_id || null,
+    artType: row.art_type || "single_post",
   };
 }
 
@@ -246,6 +247,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       client_id: clientId,
       column_id: resolvedColumnId,
       position: nextPosition,
+      art_type: post.artType || 'single_post',
     };
     if (post.deadline) {
       insertData.deadline = serializePostDeadline(post.deadline);
@@ -607,6 +609,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.mediaType !== undefined) dbUpdates.media_type = updates.mediaType;
     if (updates.mediaUrls !== undefined) dbUpdates.media_urls = updates.mediaUrls;
     if (updates.caption !== undefined) dbUpdates.caption = updates.caption;
+    if (updates.artType !== undefined) dbUpdates.art_type = updates.artType;
     if (updates.deadline !== undefined) dbUpdates.deadline = serializePostDeadline(updates.deadline);
     if (updates.tags !== undefined) {
       dbUpdates.tags = updates.tags;
