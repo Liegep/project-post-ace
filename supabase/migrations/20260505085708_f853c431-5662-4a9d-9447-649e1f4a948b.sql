@@ -1,0 +1,1 @@
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS art_type text NOT NULL DEFAULT 'single_post';

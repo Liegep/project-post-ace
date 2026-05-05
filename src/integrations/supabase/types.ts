@@ -1913,6 +1913,7 @@ export type Database = {
         Row: {
           archived: boolean
           archived_at: string | null
+          art_type: string
           caption: string
           client_created_at: string | null
           client_id: string | null
@@ -1937,6 +1938,7 @@ export type Database = {
         Insert: {
           archived?: boolean
           archived_at?: string | null
+          art_type?: string
           caption?: string
           client_created_at?: string | null
           client_id?: string | null
@@ -1961,6 +1963,7 @@ export type Database = {
         Update: {
           archived?: boolean
           archived_at?: string | null
+          art_type?: string
           caption?: string
           client_created_at?: string | null
           client_id?: string | null
