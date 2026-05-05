@@ -35,7 +35,7 @@ interface InvoiceDetailProps {
   canDownloadAttachments?: boolean;
 }
 
-function InvoiceDetail({ invoice, canDownloadInvoices = true, canViewAttachments = true, canDownloadAttachments = true }: InvoiceDetailProps) {
+export function InvoiceDetail({ invoice, canDownloadInvoices = true, canViewAttachments = true, canDownloadAttachments = true }: InvoiceDetailProps) {
   const { items, loading } = useInvoiceItems(invoice.id);
   const { attachments } = useInvoiceAttachments(invoice.id);
   const cur = invoice.clients?.billing_currency;

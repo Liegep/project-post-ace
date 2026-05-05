@@ -4,10 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, FileBarChart, Eye, Check, Bell } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { FileText, FileBarChart, Eye, Check, Bell, Download } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR, enUS, it as itLocale, es as esLocale, sv as svLocale } from "date-fns/locale";
 import type { Locale as DateLocale } from "date-fns";
+import { InvoiceDetail } from "@/components/billing/ClientInvoicesPanel";
+import type { Invoice } from "@/hooks/useInvoices";
+import { generateInvoicePDF } from "@/lib/invoicePdf";
+import { logBillingAccess } from "@/hooks/useBillingPermissions";
 
 interface NewsItem {
   id: string;
@@ -28,56 +33,32 @@ const TRANSLATIONS: Record<LocaleKey, {
   issuedOn: string;
   view: string;
   ok: string;
+  download: string;
 }> = {
   pt: {
-    news: "Novidades",
-    newInvoice: "Nova fatura disponível",
-    newReport: "Novo relatório disponível",
-    invoiceFallback: (n) => `Fatura #${n}`,
-    reportFallback: "Relatório de Mídias",
-    issuedOn: "Emitida em",
-    view: "Visualizar",
-    ok: "OK",
+    news: "Novidades", newInvoice: "Nova fatura disponível", newReport: "Novo relatório disponível",
+    invoiceFallback: (n) => `Fatura #${n}`, reportFallback: "Relatório de Mídias",
+    issuedOn: "Emitida em", view: "Visualizar", ok: "OK", download: "Baixar fatura",
   },
   en: {
-    news: "What's new",
-    newInvoice: "New invoice available",
-    newReport: "New report available",
-    invoiceFallback: (n) => `Invoice #${n}`,
-    reportFallback: "Social Report",
-    issuedOn: "Issued on",
-    view: "View",
-    ok: "OK",
+    news: "What's new", newInvoice: "New invoice available", newReport: "New report available",
+    invoiceFallback: (n) => `Invoice #${n}`, reportFallback: "Social Report",
+    issuedOn: "Issued on", view: "View", ok: "OK", download: "Download invoice",
   },
   it: {
-    news: "Novità",
-    newInvoice: "Nuova fattura disponibile",
-    newReport: "Nuovo report disponibile",
-    invoiceFallback: (n) => `Fattura #${n}`,
-    reportFallback: "Report Social",
-    issuedOn: "Emessa il",
-    view: "Visualizza",
-    ok: "OK",
+    news: "Novità", newInvoice: "Nuova fattura disponibile", newReport: "Nuovo report disponibile",
+    invoiceFallback: (n) => `Fattura #${n}`, reportFallback: "Report Social",
+    issuedOn: "Emessa il", view: "Visualizza", ok: "OK", download: "Scarica fattura",
   },
   es: {
-    news: "Novedades",
-    newInvoice: "Nueva factura disponible",
-    newReport: "Nuevo informe disponible",
-    invoiceFallback: (n) => `Factura #${n}`,
-    reportFallback: "Informe de Medios",
-    issuedOn: "Emitida el",
-    view: "Ver",
-    ok: "OK",
+    news: "Novedades", newInvoice: "Nueva factura disponible", newReport: "Nuevo informe disponible",
+    invoiceFallback: (n) => `Factura #${n}`, reportFallback: "Informe de Medios",
+    issuedOn: "Emitida el", view: "Ver", ok: "OK", download: "Descargar factura",
   },
   sv: {
-    news: "Nyheter",
-    newInvoice: "Ny faktura tillgänglig",
-    newReport: "Ny rapport tillgänglig",
-    invoiceFallback: (n) => `Faktura #${n}`,
-    reportFallback: "Sociala medierapport",
-    issuedOn: "Utfärdad den",
-    view: "Visa",
-    ok: "OK",
+    news: "Nyheter", newInvoice: "Ny faktura tillgänglig", newReport: "Ny rapport tillgänglig",
+    invoiceFallback: (n) => `Faktura #${n}`, reportFallback: "Sociala medierapport",
+    issuedOn: "Utfärdad den", view: "Visa", ok: "OK", download: "Ladda ner faktura",
   },
 };
 
@@ -96,6 +77,7 @@ export const ClientNewsWidget = ({ clientId, showInvoices, locale }: ClientNewsW
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
 
   const localeKey = ((locale as LocaleKey) in TRANSLATIONS ? (locale as LocaleKey) : "pt");
   const t = TRANSLATIONS[localeKey];
@@ -174,10 +156,53 @@ export const ClientNewsWidget = ({ clientId, showInvoices, locale }: ClientNewsW
     setNewsItems((prev) => prev.filter((n) => n.id !== item.id));
   };
 
+  const fetchFullInvoice = async (invoiceId: string): Promise<Invoice | null> => {
+    const { data } = await supabase
+      .from("invoices")
+      .select("*, clients(name, logo_url, slug, billing_currency, address, country, tax_id, locale)")
+      .eq("id", invoiceId)
+      .maybeSingle();
+    return (data as any) || null;
+  };
+
+  const handleViewInvoice = async (item: NewsItem) => {
+    const inv = await fetchFullInvoice(item.id);
+    if (inv) setViewInvoice(inv);
+  };
+
+  const handleDownloadInvoice = async (item: NewsItem) => {
+    const inv = await fetchFullInvoice(item.id);
+    if (!inv) return;
+    const { data: items } = await supabase
+      .from("invoice_items")
+      .select("*")
+      .eq("invoice_id", inv.id)
+      .order("created_at", { ascending: true });
+    const itemsList = (items as any[]) || [];
+    const subtotal = itemsList.reduce((s, i) => s + Number(i.total_price || 0), 0);
+    const total = subtotal - Number(inv.discount || 0) + Number(inv.surcharge || 0);
+    generateInvoicePDF(inv, itemsList, total, subtotal, inv.clients?.billing_currency);
+
+    if (userId) {
+      const { data: profile } = await supabase.from("profiles").select("full_name, email").eq("id", userId).maybeSingle();
+      await logBillingAccess({
+        client_id: inv.client_id,
+        user_id: userId,
+        user_name: (profile as any)?.full_name || (profile as any)?.email || "",
+        action: "download_invoice",
+        document_type: "invoice",
+        document_id: inv.id,
+        document_name: inv.title || `Fatura #${inv.invoice_number}`,
+      });
+    }
+  };
+
   const handleView = (item: NewsItem) => {
-    markAsSeen(item);
     if (item.type === "report") {
+      markAsSeen(item);
       navigate(`/reports/${item.id}`);
+    } else {
+      handleViewInvoice(item);
     }
   };
 
@@ -185,9 +210,25 @@ export const ClientNewsWidget = ({ clientId, showInvoices, locale }: ClientNewsW
     markAsSeen(item);
   };
 
-  if (loading || newsItems.length === 0) return null;
+  if (loading || newsItems.length === 0) {
+    return (
+      <Dialog open={!!viewInvoice} onOpenChange={(v) => { if (!v) setViewInvoice(null); }}>
+        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              {viewInvoice?.title || `Fatura #${viewInvoice?.invoice_number}`}
+            </DialogTitle>
+            <DialogDescription>Detalhes da fatura</DialogDescription>
+          </DialogHeader>
+          {viewInvoice && <InvoiceDetail invoice={viewInvoice} />}
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
+    <>
     <Card className="mb-8 border-primary/20 bg-primary/5 p-4">
       <div className="flex items-center gap-2 mb-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15">
@@ -223,17 +264,26 @@ export const ClientNewsWidget = ({ clientId, showInvoices, locale }: ClientNewsW
               </div>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              {item.type === "report" && (
+              {item.type === "invoice" && (
                 <Button
                   variant="outline"
                   size="sm"
                   className="h-8 text-xs gap-1"
-                  onClick={() => handleView(item)}
+                  onClick={() => handleDownloadInvoice(item)}
                 >
-                  <Eye className="h-3.5 w-3.5" />
-                  {t.view}
+                  <Download className="h-3.5 w-3.5" />
+                  {t.download}
                 </Button>
               )}
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs gap-1"
+                onClick={() => handleView(item)}
+              >
+                <Eye className="h-3.5 w-3.5" />
+                {t.view}
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
@@ -248,5 +298,19 @@ export const ClientNewsWidget = ({ clientId, showInvoices, locale }: ClientNewsW
         ))}
       </div>
     </Card>
+
+    <Dialog open={!!viewInvoice} onOpenChange={(v) => { if (!v) setViewInvoice(null); }}>
+      <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            {viewInvoice?.title || `Fatura #${viewInvoice?.invoice_number}`}
+          </DialogTitle>
+          <DialogDescription>Detalhes da fatura</DialogDescription>
+        </DialogHeader>
+        {viewInvoice && <InvoiceDetail invoice={viewInvoice} />}
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
