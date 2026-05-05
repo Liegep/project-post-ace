@@ -43,6 +43,7 @@ const TRANSLATIONS: Record<LocaleKey, {
     issuedOn: "Emitida em",
     view: "Visualizar",
     ok: "OK",
+    download: "Baixar fatura",
   },
   en: {
     news: "What's new",
