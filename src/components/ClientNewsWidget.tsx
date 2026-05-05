@@ -4,10 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, FileBarChart, Eye, Check, Bell } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { FileText, FileBarChart, Eye, Check, Bell, Download } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR, enUS, it as itLocale, es as esLocale, sv as svLocale } from "date-fns/locale";
 import type { Locale as DateLocale } from "date-fns";
+import { InvoiceDetail } from "@/components/billing/ClientInvoicesPanel";
+import type { Invoice } from "@/hooks/useInvoices";
+import { generateInvoicePDF } from "@/lib/invoicePdf";
+import { logBillingAccess } from "@/hooks/useBillingPermissions";
 
 interface NewsItem {
   id: string;
