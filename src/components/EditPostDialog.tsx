@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { CommentContent } from "@/components/CommentContent";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Smile, Send as SendIcon, Pencil, Trash2 as CommentTrash, Check, X } from "lucide-react";
+import { Smile, Send as SendIcon, Pencil, Trash2 as CommentTrash, Check, X, ExternalLink as ExternalLinkIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -59,6 +59,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [uploading, setUploading] = useState(false);
   const [retainFiles, setRetainFiles] = useState(false);
   const [externalLink, setExternalLink] = useState("");
+  const [editingLink, setEditingLink] = useState(false);
   const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
   const [commentHtml, setCommentHtml] = useState("");
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
@@ -225,38 +226,60 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                 </div>
                 <div className="mt-2 border-primary-foreground text-black bg-transparent">
                   <Label htmlFor="edit-external-link" className="font-medium peer-disabled:cursor-not-allowed text-xs text-primary-foreground opacity-100">Ou usar link externo</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="edit-external-link"
-                      value={externalLink}
-                      onChange={(e) => setExternalLink(e.target.value)}
-                      placeholder="https://drive.google.com/..."
-                      disabled={mediaItems.length > 0}
-                      className="flex-1"
-                    />
-                    {externalLink.trim() && /^https?:\/\//i.test(externalLink.trim()) && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(externalLink.trim(), "_blank", "noopener,noreferrer")}
-                        title="Abrir link em nova aba"
-                      >
-                        Abrir
-                      </Button>
-                    )}
-                  </div>
-                  {externalLink.trim() && /^https?:\/\//i.test(externalLink.trim()) && (
-                    <a
-                      href={externalLink.trim()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-1 inline-block text-xs hover:underline truncate max-w-full bg-transparent text-primary-foreground"
-                      title={externalLink.trim()}
-                    >
-                      🔗 {externalLink.trim()}
-                    </a>
-                  )}
+                  {(() => {
+                    const link = externalLink.trim();
+                    const valid = link && /^https?:\/\//i.test(link);
+                    const showInput = editingLink || !valid;
+                    if (showInput) {
+                      return (
+                        <div className="flex gap-2">
+                          <Input
+                            id="edit-external-link"
+                            value={externalLink}
+                            onChange={(e) => setExternalLink(e.target.value)}
+                            onBlur={() => valid && setEditingLink(false)}
+                            placeholder="https://drive.google.com/..."
+                            disabled={mediaItems.length > 0}
+                            autoFocus={editingLink}
+                            className="flex-1 bg-primary text-white placeholder:text-white/60 border-primary focus-visible:ring-white/40"
+                          />
+                          {valid && (
+                            <Button
+                              type="button"
+                              size="sm"
+                              onClick={() => setEditingLink(false)}
+                              title="Confirmar link"
+                            >
+                              OK
+                            </Button>
+                          )}
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="group relative flex items-center gap-2 rounded-md bg-primary text-white px-3 py-2 border border-primary">
+                        <a
+                          href={link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 flex-1 min-w-0 text-sm font-medium hover:underline"
+                          title={link}
+                        >
+                          <ExternalLinkIcon className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{link}</span>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => setEditingLink(true)}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-white/20 text-white"
+                          title="Editar link"
+                          aria-label="Editar link"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                      </div>
+                    );
+                  })()}
                   {mediaItems.length > 0 && externalLink && (
                     <p className="text-xs text-muted-foreground mt-1">Arquivos enviados têm prioridade sobre o link.</p>
                   )}
