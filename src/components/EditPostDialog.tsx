@@ -318,7 +318,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                                 </div>
                               </div>
                               <div className="flex items-center gap-1 flex-shrink-0">
-                                <span className="text-[10px] text-black/70">
+                                <span className="text-[10px] text-black font-medium">
                                   {c.createdAt.toLocaleDateString("pt-BR")} {c.createdAt.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                                 </span>
                                 {editingCommentId !== c.id && (
