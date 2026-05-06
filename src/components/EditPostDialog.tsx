@@ -154,7 +154,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
       await updatePost(post.id, {
         title,
-        imageUrl: mediaItems[coverIndex]?.url || finalUrls[0] || "",
+        imageUrl: finalUrls[coverIndex] || finalUrls[0] || "",
         mediaType: mediaItems[0]?.type || "image",
         mediaUrls: finalUrls,
         caption,
