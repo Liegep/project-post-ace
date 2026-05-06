@@ -114,9 +114,11 @@ const SortableItem = ({
           e.stopPropagation();
           onRemove();
         }}
-        className="absolute top-1 right-1 z-20 rounded-full bg-background/80 p-0.5 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+        className="absolute top-1.5 right-1.5 z-20 rounded-full bg-white text-black p-1 shadow-md ring-1 ring-black/10 opacity-100 hover:bg-white hover:scale-110 transition-transform"
+        aria-label="Remover"
+        title="Remover"
       >
-        <X className="h-3 w-3" />
+        <X className="h-4 w-4 stroke-[3]" />
       </button>
     </div>
   );
