@@ -236,7 +236,6 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                             onChange={(e) => setExternalLink(e.target.value)}
                             onBlur={() => valid && setEditingLink(false)}
                             placeholder="https://drive.google.com/..."
-                            disabled={mediaItems.length > 0}
                             autoFocus={editingLink}
                             className="flex-1 bg-primary text-white placeholder:text-white/60 border-primary focus-visible:ring-white/40"
                           />
