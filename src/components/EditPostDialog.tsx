@@ -276,9 +276,6 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                       </div>
                     );
                   })()}
-                  {mediaItems.length > 0 && externalLink && (
-                    <p className="text-xs text-muted-foreground mt-1">Arquivos enviados têm prioridade sobre o link.</p>
-                  )}
                 </div>
               </div>
 
