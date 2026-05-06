@@ -73,20 +73,17 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
     if (post) {
       setTitle(post.title);
       const urls = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
-      // Check if the only URL is an external link (not from storage)
-      const isExternal = urls.length === 1 && urls[0] && !urls[0].includes("supabase") && (urls[0].startsWith("http://") || urls[0].startsWith("https://"));
-      if (isExternal && !urls[0].includes("storage")) {
-        setMediaItems([]);
-        setExternalLink(urls[0]);
-      } else {
-        setMediaItems(urls.map((url) => ({
-          id: `existing-${mediaIdCounter++}`,
-          url,
-          type: url.match(/\.(mp4|webm|mov|avi)/i) ? "video" as MediaType : "image" as MediaType,
-        })));
-        setExternalLink("");
-      }
-      const coverIdx = post.imageUrl ? urls.indexOf(post.imageUrl) : 0;
+      // Separate external links from storage media
+      const isStorageUrl = (u: string) => u.includes("supabase") || u.includes("/storage/");
+      const externals = urls.filter((u) => u && /^https?:\/\//i.test(u) && !isStorageUrl(u));
+      const mediaUrls = urls.filter((u) => u && !externals.includes(u));
+      setMediaItems(mediaUrls.map((url) => ({
+        id: `existing-${mediaIdCounter++}`,
+        url,
+        type: url.match(/\.(mp4|webm|mov|avi)/i) ? "video" as MediaType : "image" as MediaType,
+      })));
+      setExternalLink(externals[0] || "");
+      const coverIdx = post.imageUrl ? mediaUrls.indexOf(post.imageUrl) : 0;
       setCoverIndex(coverIdx >= 0 ? coverIdx : 0);
       setCaption(post.caption);
       setDeadline(formatPostDeadlineInput(post.deadline));
@@ -142,22 +139,22 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
     try {
       let finalUrls: string[] = [];
 
-      if (mediaItems.length === 0 && externalLink.trim()) {
-        finalUrls = [externalLink.trim()];
-      } else {
-        for (const item of mediaItems) {
-          if (item.file) {
-            const url = await uploadMedia(item.file);
-            finalUrls.push(url);
-          } else {
-            finalUrls.push(item.url);
-          }
+      for (const item of mediaItems) {
+        if (item.file) {
+          const url = await uploadMedia(item.file);
+          finalUrls.push(url);
+        } else {
+          finalUrls.push(item.url);
         }
+      }
+      const link = externalLink.trim();
+      if (link && /^https?:\/\//i.test(link)) {
+        finalUrls.push(link);
       }
 
       await updatePost(post.id, {
         title,
-        imageUrl: finalUrls[0] || "",
+        imageUrl: finalUrls[coverIndex] || finalUrls[0] || "",
         mediaType: mediaItems[0]?.type || "image",
         mediaUrls: finalUrls,
         caption,
@@ -239,7 +236,6 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                             onChange={(e) => setExternalLink(e.target.value)}
                             onBlur={() => valid && setEditingLink(false)}
                             placeholder="https://drive.google.com/..."
-                            disabled={mediaItems.length > 0}
                             autoFocus={editingLink}
                             className="flex-1 bg-primary text-white placeholder:text-white/60 border-primary focus-visible:ring-white/40"
                           />
@@ -280,9 +276,6 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                       </div>
                     );
                   })()}
-                  {mediaItems.length > 0 && externalLink && (
-                    <p className="text-xs text-muted-foreground mt-1">Arquivos enviados têm prioridade sobre o link.</p>
-                  )}
                 </div>
               </div>
 
