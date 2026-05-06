@@ -73,20 +73,17 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
     if (post) {
       setTitle(post.title);
       const urls = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
-      // Check if the only URL is an external link (not from storage)
-      const isExternal = urls.length === 1 && urls[0] && !urls[0].includes("supabase") && (urls[0].startsWith("http://") || urls[0].startsWith("https://"));
-      if (isExternal && !urls[0].includes("storage")) {
-        setMediaItems([]);
-        setExternalLink(urls[0]);
-      } else {
-        setMediaItems(urls.map((url) => ({
-          id: `existing-${mediaIdCounter++}`,
-          url,
-          type: url.match(/\.(mp4|webm|mov|avi)/i) ? "video" as MediaType : "image" as MediaType,
-        })));
-        setExternalLink("");
-      }
-      const coverIdx = post.imageUrl ? urls.indexOf(post.imageUrl) : 0;
+      // Separate external links from storage media
+      const isStorageUrl = (u: string) => u.includes("supabase") || u.includes("/storage/");
+      const externals = urls.filter((u) => u && /^https?:\/\//i.test(u) && !isStorageUrl(u));
+      const mediaUrls = urls.filter((u) => u && !externals.includes(u));
+      setMediaItems(mediaUrls.map((url) => ({
+        id: `existing-${mediaIdCounter++}`,
+        url,
+        type: url.match(/\.(mp4|webm|mov|avi)/i) ? "video" as MediaType : "image" as MediaType,
+      })));
+      setExternalLink(externals[0] || "");
+      const coverIdx = post.imageUrl ? mediaUrls.indexOf(post.imageUrl) : 0;
       setCoverIndex(coverIdx >= 0 ? coverIdx : 0);
       setCaption(post.caption);
       setDeadline(formatPostDeadlineInput(post.deadline));
