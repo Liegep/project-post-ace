@@ -28,11 +28,12 @@ export function CommentContent({ text, className }: CommentContentProps) {
     return (
       <div
         className={cn(
-          "prose prose-sm max-w-none break-words",
+          "prose prose-sm max-w-none break-words text-black",
+          "[&_*]:text-black",
           "[&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_ul]:pl-5 [&_ol]:pl-5",
           "[&_ul]:list-disc [&_ol]:list-decimal",
           "[&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_h1]:font-semibold [&_h2]:font-semibold [&_h3]:font-semibold",
-          "[&_a]:underline [&_a]:text-primary",
+          "[&_a]:underline [&_a]:!text-primary",
           className,
         )}
         dangerouslySetInnerHTML={{ __html: clean }}
