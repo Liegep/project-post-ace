@@ -59,6 +59,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [uploading, setUploading] = useState(false);
   const [retainFiles, setRetainFiles] = useState(false);
   const [externalLink, setExternalLink] = useState("");
+  const [editingLink, setEditingLink] = useState(false);
   const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
   const [commentHtml, setCommentHtml] = useState("");
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
