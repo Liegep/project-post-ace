@@ -139,17 +139,17 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
     try {
       let finalUrls: string[] = [];
 
-      if (mediaItems.length === 0 && externalLink.trim()) {
-        finalUrls = [externalLink.trim()];
-      } else {
-        for (const item of mediaItems) {
-          if (item.file) {
-            const url = await uploadMedia(item.file);
-            finalUrls.push(url);
-          } else {
-            finalUrls.push(item.url);
-          }
+      for (const item of mediaItems) {
+        if (item.file) {
+          const url = await uploadMedia(item.file);
+          finalUrls.push(url);
+        } else {
+          finalUrls.push(item.url);
         }
+      }
+      const link = externalLink.trim();
+      if (link && /^https?:\/\//i.test(link)) {
+        finalUrls.push(link);
       }
 
       await updatePost(post.id, {
