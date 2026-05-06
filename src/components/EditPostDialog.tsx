@@ -261,8 +261,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                           className="flex items-center gap-2 flex-1 min-w-0 text-sm font-medium hover:underline"
                           title={link}
                         >
-                          <ExternalLinkIcon className="h-4 w-4 shrink-0" />
-                          <span className="truncate">{link}</span>
+                          <ExternalLinkIcon className="h-4 w-4 shrink-0 text-primary-foreground" />
+                          <span className="truncate text-primary-foreground">{link}</span>
                         </a>
                         <button
                           type="button"
