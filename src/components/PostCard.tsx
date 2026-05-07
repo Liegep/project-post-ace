@@ -316,6 +316,12 @@ export const PostCard = memo(
               <span className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${labelConfig.color}`}>
                 {t(LABEL_KEYS[post.clientLabel] as any)}
               </span>
+              {post.comments.length > 0 && (
+                <span className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[9px] font-bold bg-foreground/10 text-foreground" title={`${post.comments.length} comentário(s)`}>
+                  <MessageCircle className="h-3 w-3" />
+                  {post.comments.length}
+                </span>
+              )}
             </div>
           )}
 
