@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/context-menu";
 import { LinkedText } from "@/components/LinkedText";
 import { MediaLightbox } from "@/components/MediaLightbox";
-import { Archive, Calendar, Copy, Download, Pencil, Play, Send, SendHorizontal, Tag as TagIcon, Trash2, X, Check, ListChecks } from "lucide-react";
+import { Archive, Calendar, Copy, Download, MessageCircle, Pencil, Play, Send, SendHorizontal, Tag as TagIcon, Trash2, X, Check, ListChecks } from "lucide-react";
 import { SendPostToClientDialog } from "@/components/SendPostToClientDialog";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
