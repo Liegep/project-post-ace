@@ -843,7 +843,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
             <div className="min-w-0">
               <h1 className="text-lg sm:text-2xl font-bold text-foreground cursor-pointer hover:text-primary transition-colors truncate" onClick={() => navigate(`/client/${clientData.slug}`)}>{clientData.name}</h1>
-              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">{t("adminSubtitle")}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground hidden lg:block truncate">{t("adminSubtitle")}</p>
             </div>
           </div>
 
