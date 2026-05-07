@@ -322,6 +322,20 @@
   background: hsl(220 10% 60% / 0.65);
 }
 
+/* On touch devices (no hover), keep the scrollbar permanently visible
+   so tablet/mobile users have a clear affordance to scroll horizontally. */
+@media (hover: none), (pointer: coarse) {
+  .kanban-scroll {
+    scrollbar-color: hsl(220 10% 70% / 0.55) transparent;
+  }
+  .kanban-scroll::-webkit-scrollbar {
+    height: 10px;
+  }
+  .kanban-scroll::-webkit-scrollbar-thumb {
+    background: hsl(220 10% 70% / 0.55);
+  }
+}
+
 /* Tiptap editor styles */
 .tiptap p.is-editor-empty:first-child::before,
 .ProseMirror p.is-editor-empty:first-child::before {

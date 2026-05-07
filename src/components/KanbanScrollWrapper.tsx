@@ -50,6 +50,8 @@ export function KanbanScrollWrapper({ children, className, fillHeight }: KanbanS
   const onPointerDown = (e: React.PointerEvent) => {
     // Only left mouse / primary touch
     if (e.button !== 0) return;
+    // Let touch/pen use native scrolling — pointer-capture would hijack vertical/horizontal panning
+    if (e.pointerType !== "mouse") return;
     // Don't interfere with interactive elements or dnd-kit
     const target = e.target as HTMLElement;
     if (target.closest("button, a, input, textarea, [data-dnd-kit-draggable], [role='button']")) return;
