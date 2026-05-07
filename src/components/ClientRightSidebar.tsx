@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink } from "lucide-react";
 import { GradientHeartIcon } from "@/components/GradientHeartIcon";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ClientNotes } from "@/components/ClientNotes";
 import { ClientLinksPanel } from "@/components/ClientLinksPanel";
@@ -14,11 +13,26 @@ interface Props {
   clientId: string;
 }
 
+// Use Sheet (drawer) on anything below desktop (lg = 1024px) to avoid the
+// fixed side panel covering kanban content on tablets.
+function useUseSheet() {
+  const [useSheet, setUseSheet] = useState<boolean>(() =>
+    typeof window !== "undefined" ? window.innerWidth < 1024 : false
+  );
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 1023px)");
+    const onChange = () => setUseSheet(mql.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+  return useSheet;
+}
+
 export function ClientRightSidebar({ clientId }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(null);
   const [notesCount, setNotesCount] = useState(0);
   const [linksCount, setLinksCount] = useState(0);
-  const isMobile = useIsMobile();
+  const isMobile = useUseSheet();
 
   const open = activeTab !== null;
 
