@@ -847,8 +847,8 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             </div>
           </div>
 
-          {/* Desktop actions */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop actions (lg+) */}
+          <div className="hidden lg:flex items-center gap-3">
             <LanguageSelector />
             <div className="flex rounded-lg border bg-muted p-1">
               <button
@@ -877,6 +877,45 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             )}
             <Button onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newPost")}
+            </Button>
+            <Button variant="outline" size="icon" onClick={() => setSettingsDrawerOpen(true)} title="Configurações">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Tablet actions (md to lg): icon-only, compact */}
+          <div className="hidden md:flex lg:hidden items-center gap-1.5 shrink-0">
+            <div className="flex rounded-lg border bg-muted p-0.5">
+              <button
+                onClick={() => setView("kanban")}
+                className={`rounded-md px-2 py-1.5 transition-colors ${view === "kanban" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+                title="Kanban"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setView("list")}
+                className={`rounded-md px-2 py-1.5 transition-colors ${view === "list" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
+                title="Lista"
+              >
+                <List className="h-4 w-4" />
+              </button>
+            </div>
+            <Button
+              variant={selectionMode ? "default" : "outline"}
+              size="icon"
+              onClick={() => selectionMode ? exitSelectionMode() : setSelectionMode(true)}
+              title={selectionMode ? t("cancel") : t("select")}
+            >
+              <CheckSquare className="h-4 w-4" />
+            </Button>
+            {!trackingEnabled && (
+              <Button variant="outline" size="icon" onClick={enableTracking} title={t("createTracking")}>
+                <ClipboardList className="h-4 w-4" />
+              </Button>
+            )}
+            <Button onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90" title={t("newPost")}>
+              <Plus className="h-4 w-4 mr-1.5" /> <span className="text-sm">{t("newPost")}</span>
             </Button>
             <Button variant="outline" size="icon" onClick={() => setSettingsDrawerOpen(true)} title="Configurações">
               <Settings className="h-4 w-4" />
