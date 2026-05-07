@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/context-menu";
 import { LinkedText } from "@/components/LinkedText";
 import { MediaLightbox } from "@/components/MediaLightbox";
-import { Archive, Calendar, Copy, Download, Pencil, Play, Send, SendHorizontal, Tag as TagIcon, Trash2, X, Check, ListChecks } from "lucide-react";
+import { Archive, Calendar, Copy, Download, MessageCircle, Pencil, Play, Send, SendHorizontal, Tag as TagIcon, Trash2, X, Check, ListChecks } from "lucide-react";
 import { SendPostToClientDialog } from "@/components/SendPostToClientDialog";
 import { format } from "date-fns";
 import { isExternalLink } from "@/components/ExternalLinkCard";
@@ -259,6 +259,12 @@ export const PostCard = memo(
                 <span className={`inline-flex rounded px-1.5 py-0.5 text-[8px] font-bold ${labelConfig.color}`}>
                   {t(LABEL_KEYS[post.clientLabel] as any)}
                 </span>
+                {post.comments.length > 0 && (
+                  <span className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[9px] font-bold bg-white/90 text-black" title={`${post.comments.length} comentário(s)`}>
+                    <MessageCircle className="h-2.5 w-2.5" />
+                    {post.comments.length}
+                  </span>
+                )}
               </div>
             </div>
           </div>
@@ -310,6 +316,12 @@ export const PostCard = memo(
               <span className={`inline-flex rounded px-1.5 py-0.5 text-[9px] font-semibold ${labelConfig.color}`}>
                 {t(LABEL_KEYS[post.clientLabel] as any)}
               </span>
+              {post.comments.length > 0 && (
+                <span className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[9px] font-bold bg-foreground/10 text-foreground" title={`${post.comments.length} comentário(s)`}>
+                  <MessageCircle className="h-3 w-3" />
+                  {post.comments.length}
+                </span>
+              )}
             </div>
           )}
 
