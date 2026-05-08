@@ -292,7 +292,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                     {/* Existing comments */}
                     {comments.length > 0 && (
                       <div className="mt-2 space-y-2 max-h-[200px] overflow-y-auto">
-                        {comments.map((c) => {
+                        {[...comments].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((c) => {
                           const author = c.userId ? commentAuthors[c.userId] : undefined;
                           const isClient = author?.role === "client" || c.author === "Cliente";
                           const displayName = author?.fullName || c.author;
