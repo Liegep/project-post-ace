@@ -185,7 +185,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[92vh] overflow-y-auto p-0 gap-0">
+      <DialogContent className="sm:max-w-4xl max-h-[92vh] overflow-y-auto overflow-x-hidden p-0 gap-0 [&_*]:min-w-0 [&_a]:break-all">
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col md:flex-row">
             {/* LEFT COLUMN — Title + Caption + Media */}
