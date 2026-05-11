@@ -141,16 +141,30 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
         </div>
       )}
 
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-          <ChevronLeft className="h-4 w-4 text-primary-foreground" />
-        </Button>
-        <h3 className="font-semibold text-lg capitalize">
-          {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
-        </h3>
-        <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-          <ChevronRight className="h-4 w-4 text-primary-foreground" />
-        </Button>
+      <div className="flex items-center justify-center">
+        <div className="flex items-center gap-1 bg-card rounded-md p-1 border border-border">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+            aria-label="Anterior"
+          >
+            <ChevronLeft className="h-4 w-4 text-foreground" />
+          </Button>
+          <h3 className="font-semibold text-lg capitalize text-center min-w-[160px] text-foreground">
+            {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
+          </h3>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+            aria-label="Próximo"
+          >
+            <ChevronRight className="h-4 w-4 text-foreground" />
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-7 gap-px bg-border rounded-lg">
