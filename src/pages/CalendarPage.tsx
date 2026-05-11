@@ -485,9 +485,11 @@ export default function CalendarPage() {
 
           <div className="flex items-center gap-1 md:gap-2 flex-wrap">
             <Button variant="outline" size="sm" className="text-xs h-7 md:h-8" onClick={goToToday}>Hoje</Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 md:h-8 md:w-8" onClick={() => navigate_date("prev")}><ChevronLeft className="h-4 w-4 text-primary-foreground" /></Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7 md:h-8 md:w-8" onClick={() => navigate_date("next")}><ChevronRight className="h-4 w-4 text-primary-foreground" /></Button>
-            <span className="text-xs md:text-sm font-semibold capitalize text-center">{headerLabel}</span>
+            <div className="flex items-center gap-1">
+              <Button variant="outline" size="icon" className="h-7 w-7 md:h-8 md:w-8 bg-card hover:bg-accent border-border" onClick={() => navigate_date("prev")} aria-label="Anterior"><ChevronLeft className="h-4 w-4 text-foreground" /></Button>
+              <span className="text-xs md:text-sm font-semibold capitalize text-center min-w-[120px] md:min-w-[160px]">{headerLabel}</span>
+              <Button variant="outline" size="icon" className="h-7 w-7 md:h-8 md:w-8 bg-card hover:bg-accent border-border" onClick={() => navigate_date("next")} aria-label="Próximo"><ChevronRight className="h-4 w-4 text-foreground" /></Button>
+            </div>
           </div>
 
           <div className="flex items-center gap-1.5 md:gap-2 flex-wrap">
