@@ -504,6 +504,25 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                         </span>
                       </div>
                     ))}
+                    <div className="my-1 h-px bg-border" />
+                    <div
+                      role="button"
+                      onClick={async () => {
+                        if (!post) return;
+                        try {
+                          await updatePost(post.id, { archived: true, archivedAt: new Date() });
+                          toast({ title: "Card arquivado" });
+                          onOpenChange(false);
+                        } catch (err: any) {
+                          toast({ title: "Erro ao arquivar", description: err?.message, variant: "destructive" });
+                        }
+                      }}
+                      className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs hover:bg-muted cursor-pointer"
+                    >
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-muted text-muted-foreground">
+                        🗄️ Arquivar
+                      </span>
+                    </div>
                   </PopoverContent>
                 </Popover>
               </div>
