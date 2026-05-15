@@ -266,7 +266,17 @@ export default function PublicProposalPage() {
               <h2 className="text-[11px] uppercase tracking-[0.3em] text-amber-200/60 mb-4">{t("projectScope")}</h2>
               <div className="relative rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl p-7 md:p-9 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.6)]">
                 <div
-                  className="prose prose-sm md:prose-base prose-invert max-w-none text-white/80 leading-relaxed [&_h2]:font-light [&_h2]:text-white [&_h2]:tracking-wide [&_h3]:font-light [&_h3]:text-white/90 [&_strong]:text-white [&_a]:text-amber-200 [&_blockquote]:border-l-amber-200/40 [&_blockquote]:text-white/70"
+                  className="prose prose-invert prose-sm md:prose-base max-w-none text-white/80 leading-relaxed
+                    [&_p]:my-3 [&_p]:leading-relaxed
+                    [&_h1]:mt-6 [&_h1]:mb-3 [&_h1]:font-light [&_h1]:tracking-wide [&_h1]:text-white [&_h1]:text-2xl
+                    [&_h2]:mt-6 [&_h2]:mb-3 [&_h2]:font-light [&_h2]:tracking-wide [&_h2]:text-white [&_h2]:text-xl
+                    [&_h3]:mt-5 [&_h3]:mb-2 [&_h3]:font-light [&_h3]:text-white/95 [&_h3]:text-lg
+                    [&_ul]:my-3 [&_ul]:pl-5 [&_ul]:list-disc [&_ul>li]:my-1
+                    [&_ol]:my-3 [&_ol]:pl-5 [&_ol]:list-decimal [&_ol>li]:my-1
+                    [&_strong]:text-white [&_strong]:font-semibold
+                    [&_em]:italic [&_a]:text-amber-200 [&_a]:underline [&_a]:underline-offset-2
+                    [&_blockquote]:border-l-2 [&_blockquote]:border-amber-200/40 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-white/70 [&_blockquote]:my-4
+                    [&_hr]:my-6 [&_hr]:border-white/10"
                   dangerouslySetInnerHTML={{ __html: proposal.scope_description }}
                 />
               </div>
