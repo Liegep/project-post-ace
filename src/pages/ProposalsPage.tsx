@@ -558,7 +558,7 @@ export default function ProposalsPage() {
 
             <div className="flex gap-2">
               <Button className="flex-1" onClick={handleCreate} disabled={saving}>
-                {saving ? "Criando..." : "Criar Proposta"}
+                {saving ? (editingId ? "Salvando..." : "Criando...") : (editingId ? "Salvar Alterações" : "Criar Proposta")}
               </Button>
               <Button
                 variant="outline"
