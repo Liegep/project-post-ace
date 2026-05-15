@@ -48,7 +48,7 @@ export function RichTextEditor({ content, onChange, placeholder, editable = true
   if (!editor) return null;
 
   return (
-    <div className={`rounded-lg border bg-card overflow-hidden ${className || ""}`}>
+    <div className={`rounded-lg border bg-white overflow-hidden ${className || ""}`}>
       {editable && (
         <div className="flex flex-wrap items-center gap-0.5 border-b bg-muted/50 px-2 py-1.5">
           <Toggle
