@@ -43,6 +43,7 @@ export default function ProposalsPage() {
   const { proposals, loading, refetch } = useProposals();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Templates
   const [templates, setTemplates] = useState<ProposalTemplate[]>([]);
