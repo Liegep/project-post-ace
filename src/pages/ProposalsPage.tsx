@@ -357,10 +357,10 @@ export default function ProposalsPage() {
       </main>
 
       {/* Create Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) resetForm(); }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Nova Proposta Comercial</DialogTitle>
+            <DialogTitle>{editingId ? "Editar Proposta" : "Nova Proposta Comercial"}</DialogTitle>
             <DialogDescription>Preencha os dados do cliente e serviços oferecidos.</DialogDescription>
           </DialogHeader>
 
