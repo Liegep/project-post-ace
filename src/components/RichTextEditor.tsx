@@ -34,7 +34,7 @@ export function RichTextEditor({ content, onChange, placeholder, editable = true
     },
     editorProps: {
       attributes: {
-        class: "prose prose-sm sm:prose max-w-none focus:outline-none min-h-[180px] px-4 py-3 text-foreground leading-relaxed",
+        class: "prose prose-sm sm:prose max-w-none focus:outline-none min-h-[180px] px-4 py-3 leading-relaxed bg-white text-black [&_*]:text-black",
       },
     },
   });
