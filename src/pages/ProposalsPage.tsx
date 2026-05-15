@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Trash2, Copy, Send, Eye, Clock, FileText, X, Save, FolderOpen } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Copy, Send, Eye, Clock, FileText, X, Save, FolderOpen, Pencil } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CURRENCIES } from "@/lib/currency";
