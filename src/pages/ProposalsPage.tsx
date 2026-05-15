@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, Trash2, Copy, Send, Eye, Clock, FileText, X, Save, FolderOpen } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Copy, Send, Eye, Clock, FileText, X, Save, FolderOpen, Pencil } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CURRENCIES } from "@/lib/currency";
@@ -43,6 +43,7 @@ export default function ProposalsPage() {
   const { proposals, loading, refetch } = useProposals();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // Templates
   const [templates, setTemplates] = useState<ProposalTemplate[]>([]);
@@ -84,6 +85,7 @@ export default function ProposalsPage() {
   useEffect(() => { fetchTemplates(); }, [fetchTemplates]);
 
   const resetForm = () => {
+    setEditingId(null);
     setClientName("");
     setClientEmail("");
     setScopeDescription("");
@@ -95,6 +97,22 @@ export default function ProposalsPage() {
     setPlan("");
     setPiecesQuantity(0);
     setServices([{ name: "", description: "", value: 0 }]);
+  };
+
+  const openEdit = (p: any) => {
+    setEditingId(p.id);
+    setClientName(p.client_name || "");
+    setClientEmail(p.client_email || "");
+    setScopeDescription(p.scope_description || "");
+    setInvestmentDescription(p.investment_description || "");
+    setCurrency(p.currency || "BRL");
+    setDeadlineDays(p.deadline_days || 7);
+    setLocale((p.locale || "pt") as ProposalLocale);
+    setProposalType(p.proposal_type || "project");
+    setPlan(p.plan || "");
+    setPiecesQuantity(p.pieces_quantity || 0);
+    setServices(p.services?.length ? p.services : [{ name: "", description: "", value: 0 }]);
+    setDialogOpen(true);
   };
 
   const loadTemplate = (tpl: ProposalTemplate) => {
@@ -148,8 +166,7 @@ export default function ProposalsPage() {
       return;
     }
     setSaving(true);
-    const { error } = await supabase.from("proposals").insert({
-      user_id: userId!,
+    const payload = {
       client_name: clientName.trim(),
       client_email: clientEmail.trim(),
       scope_description: scopeDescription.trim(),
@@ -162,12 +179,15 @@ export default function ProposalsPage() {
       pieces_quantity: piecesQuantity,
       services: services.filter((s) => s.name.trim()) as any,
       total_value: totalValue,
-    });
+    };
+    const { error } = editingId
+      ? await supabase.from("proposals").update(payload).eq("id", editingId)
+      : await supabase.from("proposals").insert({ ...payload, user_id: userId! });
     setSaving(false);
     if (error) {
-      toast({ title: "Erro ao criar proposta", description: error.message, variant: "destructive" });
+      toast({ title: editingId ? "Erro ao atualizar proposta" : "Erro ao criar proposta", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Proposta criada com sucesso!" });
+      toast({ title: editingId ? "Proposta atualizada!" : "Proposta criada com sucesso!" });
       setDialogOpen(false);
       resetForm();
       refetch();
@@ -306,6 +326,9 @@ export default function ProposalsPage() {
                           <Send className="h-3.5 w-3.5 mr-1.5" /> Enviar
                         </Button>
                       )}
+                      <Button size="sm" variant="outline" onClick={() => openEdit(p)}>
+                        <Pencil className="h-3.5 w-3.5 mr-1.5" /> Editar
+                      </Button>
                       <Button size="sm" variant="outline" onClick={() => copyLink(p.token)}>
                         <Copy className="h-3.5 w-3.5 mr-1.5" /> Link
                       </Button>
@@ -334,10 +357,10 @@ export default function ProposalsPage() {
       </main>
 
       {/* Create Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={(o) => { setDialogOpen(o); if (!o) resetForm(); }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Nova Proposta Comercial</DialogTitle>
+            <DialogTitle>{editingId ? "Editar Proposta" : "Nova Proposta Comercial"}</DialogTitle>
             <DialogDescription>Preencha os dados do cliente e serviços oferecidos.</DialogDescription>
           </DialogHeader>
 
@@ -535,7 +558,7 @@ export default function ProposalsPage() {
 
             <div className="flex gap-2">
               <Button className="flex-1" onClick={handleCreate} disabled={saving}>
-                {saving ? "Criando..." : "Criar Proposta"}
+                {saving ? (editingId ? "Salvando..." : "Criando...") : (editingId ? "Salvar Alterações" : "Criar Proposta")}
               </Button>
               <Button
                 variant="outline"
