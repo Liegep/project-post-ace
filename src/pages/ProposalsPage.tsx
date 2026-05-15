@@ -429,21 +429,19 @@ export default function ProposalsPage() {
 
             <div className="space-y-1.5">
               <Label>Escopo do Projeto</Label>
-              <Textarea
-                value={scopeDescription}
-                onChange={(e) => setScopeDescription(e.target.value)}
-                placeholder="Descreva o escopo dos serviços..."
-                rows={3}
+              <RichTextEditor
+                content={scopeDescription}
+                onChange={setScopeDescription}
+                placeholder="Descreva o escopo dos serviços... Use títulos, listas e negrito para organizar."
               />
             </div>
 
             <div className="space-y-1.5">
               <Label>Descrição do Investimento</Label>
-              <Textarea
-                value={investmentDescription}
-                onChange={(e) => setInvestmentDescription(e.target.value)}
+              <RichTextEditor
+                content={investmentDescription}
+                onChange={setInvestmentDescription}
                 placeholder="Condições de pagamento, observações..."
-                rows={2}
               />
             </div>
 
