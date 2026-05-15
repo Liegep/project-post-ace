@@ -34,7 +34,7 @@ export function RichTextEditor({ content, onChange, placeholder, editable = true
     },
     editorProps: {
       attributes: {
-        class: "prose prose-sm sm:prose max-w-none focus:outline-none min-h-[180px] px-4 py-3 text-foreground leading-relaxed",
+        class: "prose prose-sm sm:prose max-w-none focus:outline-none min-h-[180px] px-4 py-3 leading-relaxed bg-white text-black [&_*]:text-black",
       },
     },
   });
@@ -48,7 +48,7 @@ export function RichTextEditor({ content, onChange, placeholder, editable = true
   if (!editor) return null;
 
   return (
-    <div className={`rounded-lg border bg-card overflow-hidden ${className || ""}`}>
+    <div className={`rounded-lg border bg-white overflow-hidden ${className || ""}`}>
       {editable && (
         <div className="flex flex-wrap items-center gap-0.5 border-b bg-muted/50 px-2 py-1.5">
           <Toggle
