@@ -326,7 +326,17 @@ export default function PublicProposalPage() {
               </div>
               {proposal.investment_description && (
                 <div
-                  className="relative prose prose-sm prose-invert max-w-none text-white/60 leading-relaxed border-t border-white/10 pt-4 [&_strong]:text-white/90 [&_a]:text-amber-200"
+                  className="relative prose prose-invert prose-sm max-w-none text-white/70 leading-relaxed border-t border-white/10 pt-5
+                    [&_p]:my-2.5 [&_p]:leading-relaxed
+                    [&_h1]:mt-5 [&_h1]:mb-2 [&_h1]:font-light [&_h1]:text-white [&_h1]:text-xl
+                    [&_h2]:mt-5 [&_h2]:mb-2 [&_h2]:font-light [&_h2]:text-white [&_h2]:text-lg
+                    [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:font-light [&_h3]:text-white/95 [&_h3]:text-base
+                    [&_ul]:my-2.5 [&_ul]:pl-5 [&_ul]:list-disc [&_ul>li]:my-1
+                    [&_ol]:my-2.5 [&_ol]:pl-5 [&_ol]:list-decimal [&_ol>li]:my-1
+                    [&_strong]:text-white [&_strong]:font-semibold
+                    [&_em]:italic [&_a]:text-amber-200 [&_a]:underline [&_a]:underline-offset-2
+                    [&_blockquote]:border-l-2 [&_blockquote]:border-amber-200/40 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-white/70 [&_blockquote]:my-3
+                    [&_hr]:my-5 [&_hr]:border-white/10"
                   dangerouslySetInnerHTML={{ __html: proposal.investment_description }}
                 />
               )}
