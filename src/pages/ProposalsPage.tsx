@@ -166,8 +166,7 @@ export default function ProposalsPage() {
       return;
     }
     setSaving(true);
-    const { error } = await supabase.from("proposals").insert({
-      user_id: userId!,
+    const payload = {
       client_name: clientName.trim(),
       client_email: clientEmail.trim(),
       scope_description: scopeDescription.trim(),
@@ -180,12 +179,15 @@ export default function ProposalsPage() {
       pieces_quantity: piecesQuantity,
       services: services.filter((s) => s.name.trim()) as any,
       total_value: totalValue,
-    });
+    };
+    const { error } = editingId
+      ? await supabase.from("proposals").update(payload).eq("id", editingId)
+      : await supabase.from("proposals").insert({ ...payload, user_id: userId! });
     setSaving(false);
     if (error) {
-      toast({ title: "Erro ao criar proposta", description: error.message, variant: "destructive" });
+      toast({ title: editingId ? "Erro ao atualizar proposta" : "Erro ao criar proposta", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Proposta criada com sucesso!" });
+      toast({ title: editingId ? "Proposta atualizada!" : "Proposta criada com sucesso!" });
       setDialogOpen(false);
       resetForm();
       refetch();
