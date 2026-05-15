@@ -62,7 +62,7 @@ export const NotificationBell = () => {
     let query = supabase
       .from("admin_notifications")
       .select("*")
-      .in("type", ["deadline_warning", "deadline_today", "deadline_overdue", "internal_approval", "invoice_sent"])
+      .in("type", ["deadline_warning", "deadline_today", "deadline_overdue", "internal_approval", "invoice_sent", "proposal_accepted"])
       .eq("read", false)
       .order("created_at", { ascending: false })
       .limit(30);
@@ -112,6 +112,7 @@ export const NotificationBell = () => {
       case "deadline_today": return <CalendarClock className="h-3.5 w-3.5 text-amber-500" />;
       case "deadline_warning": return <Clock className="h-3.5 w-3.5 text-primary" />;
       case "internal_approval": return <Users className="h-3.5 w-3.5 text-primary" />;
+      case "proposal_accepted": return <Check className="h-3.5 w-3.5 text-emerald-600" />;
       default: return <Bell className="h-3.5 w-3.5 text-muted-foreground" />;
     }
   };
@@ -122,6 +123,7 @@ export const NotificationBell = () => {
       case "deadline_today": return "border-amber-400/20 bg-amber-500/5";
       case "deadline_warning": return "border-primary/20 bg-primary/5";
       case "internal_approval": return "border-primary/20 bg-primary/5";
+      case "proposal_accepted": return "border-emerald-400/20 bg-emerald-500/5";
       default: return "bg-muted/50";
     }
   };
@@ -167,6 +169,8 @@ export const NotificationBell = () => {
                     setOpen(false);
                     if (n.type === "internal_approval" && n.postId) {
                       setReviewPostId(n.postId);
+                    } else if (n.type === "proposal_accepted") {
+                      navigate("/propostas");
                     }
                   }}
                 >

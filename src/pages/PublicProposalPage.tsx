@@ -130,6 +130,10 @@ export default function PublicProposalPage() {
       setAccepted(true);
       setAcceptOpen(false);
       toast({ title: t("proposalAccepted") });
+      // Notify the proposal owner via in-app bell (fire-and-forget)
+      supabase.functions.invoke("notify-proposal-accepted", {
+        body: { proposal_id: proposal!.id },
+      }).catch(() => {});
     }
   };
 
