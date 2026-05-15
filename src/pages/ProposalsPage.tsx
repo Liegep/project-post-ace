@@ -7,8 +7,8 @@ import { formatCurrency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -335,7 +335,7 @@ export default function ProposalsPage() {
 
       {/* Create Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Nova Proposta Comercial</DialogTitle>
             <DialogDescription>Preencha os dados do cliente e serviços oferecidos.</DialogDescription>
@@ -429,21 +429,19 @@ export default function ProposalsPage() {
 
             <div className="space-y-1.5">
               <Label>Escopo do Projeto</Label>
-              <Textarea
-                value={scopeDescription}
-                onChange={(e) => setScopeDescription(e.target.value)}
-                placeholder="Descreva o escopo dos serviços..."
-                rows={3}
+              <RichTextEditor
+                content={scopeDescription}
+                onChange={setScopeDescription}
+                placeholder="Descreva o escopo dos serviços... Use títulos, listas e negrito para organizar."
               />
             </div>
 
             <div className="space-y-1.5">
               <Label>Descrição do Investimento</Label>
-              <Textarea
-                value={investmentDescription}
-                onChange={(e) => setInvestmentDescription(e.target.value)}
+              <RichTextEditor
+                content={investmentDescription}
+                onChange={setInvestmentDescription}
                 placeholder="Condições de pagamento, observações..."
-                rows={2}
               />
             </div>
 
