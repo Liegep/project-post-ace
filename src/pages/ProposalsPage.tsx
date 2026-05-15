@@ -85,6 +85,7 @@ export default function ProposalsPage() {
   useEffect(() => { fetchTemplates(); }, [fetchTemplates]);
 
   const resetForm = () => {
+    setEditingId(null);
     setClientName("");
     setClientEmail("");
     setScopeDescription("");
@@ -96,6 +97,22 @@ export default function ProposalsPage() {
     setPlan("");
     setPiecesQuantity(0);
     setServices([{ name: "", description: "", value: 0 }]);
+  };
+
+  const openEdit = (p: any) => {
+    setEditingId(p.id);
+    setClientName(p.client_name || "");
+    setClientEmail(p.client_email || "");
+    setScopeDescription(p.scope_description || "");
+    setInvestmentDescription(p.investment_description || "");
+    setCurrency(p.currency || "BRL");
+    setDeadlineDays(p.deadline_days || 7);
+    setLocale((p.locale || "pt") as ProposalLocale);
+    setProposalType(p.proposal_type || "project");
+    setPlan(p.plan || "");
+    setPiecesQuantity(p.pieces_quantity || 0);
+    setServices(p.services?.length ? p.services : [{ name: "", description: "", value: 0 }]);
+    setDialogOpen(true);
   };
 
   const loadTemplate = (tpl: ProposalTemplate) => {
