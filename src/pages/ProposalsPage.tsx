@@ -335,7 +335,7 @@ export default function ProposalsPage() {
 
       {/* Create Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Nova Proposta Comercial</DialogTitle>
             <DialogDescription>Preencha os dados do cliente e serviços oferecidos.</DialogDescription>
