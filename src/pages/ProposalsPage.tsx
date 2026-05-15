@@ -326,6 +326,9 @@ export default function ProposalsPage() {
                           <Send className="h-3.5 w-3.5 mr-1.5" /> Enviar
                         </Button>
                       )}
+                      <Button size="sm" variant="outline" onClick={() => openEdit(p)}>
+                        <Pencil className="h-3.5 w-3.5 mr-1.5" /> Editar
+                      </Button>
                       <Button size="sm" variant="outline" onClick={() => copyLink(p.token)}>
                         <Copy className="h-3.5 w-3.5 mr-1.5" /> Link
                       </Button>
