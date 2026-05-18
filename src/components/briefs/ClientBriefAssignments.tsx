@@ -142,7 +142,17 @@ export default function ClientBriefAssignments({ clientId, locale = "pt" }: Prop
         onSave={async (answers, submit) => {
           if (!current || !currentTpl) return;
           const ok = await upsertResponse(current.id, current.client_id, currentTpl.id, answers, submit);
-          if (ok) toast({ title: submit ? "Brief enviado!" : "Rascunho salvo" });
+          if (ok) {
+            if (submit) {
+              toast({
+                title: tUI("submitted_success_title", briefLocale),
+                description: tUI("submitted_success_desc", briefLocale),
+              });
+              setOpenId(null);
+            } else {
+              toast({ title: tUI("draft_saved", briefLocale) });
+            }
+          }
         }}
       />
     </>
