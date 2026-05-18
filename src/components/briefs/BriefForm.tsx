@@ -28,6 +28,7 @@ export default function BriefForm({ template, initialAnswers = {}, initialTitle 
   const [title, setTitle] = useState(initialTitle);
   const [locale, setLocale] = useState<BriefLocale>(initialLocale);
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
+  const [previewOpen, setPreviewOpen] = useState(false);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const getLabel = (questionId: string, defaultLabel: string) => {
