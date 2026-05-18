@@ -17,12 +17,13 @@ interface Props {
   assignment: BriefAssignmentRow | null;
   response: BriefResponseRow | null;
   readOnly?: boolean;
+  templateLoading?: boolean;
   onSave: (answers: Record<string, any>, submit: boolean) => Promise<void>;
 }
 
 const OTHER_KEY = "__other__";
 
-export default function FillBriefDialog({ open, onOpenChange, template, assignment, response, readOnly, onSave }: Props) {
+export default function FillBriefDialog({ open, onOpenChange, template, assignment, response, readOnly, templateLoading, onSave }: Props) {
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
 
@@ -30,7 +31,7 @@ export default function FillBriefDialog({ open, onOpenChange, template, assignme
     if (open) setAnswers(response?.answers || {});
   }, [open, response]);
 
-  if (!template || !assignment) return null;
+  if (!assignment) return null;
 
   const update = (qid: string, val: any) => setAnswers(prev => ({ ...prev, [qid]: val }));
 
@@ -46,20 +47,29 @@ export default function FillBriefDialog({ open, onOpenChange, template, assignme
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card backdrop-blur-2xl border-border">
         <DialogHeader>
           <DialogTitle>{assignment.title}</DialogTitle>
-          {template.description && <p className="text-sm text-muted-foreground">{template.description}</p>}
+          {template?.description && <p className="text-sm text-muted-foreground">{template.description}</p>}
         </DialogHeader>
 
-        <div className="space-y-4">
-          {template.questions.map((q) => (
-            <QuestionField
-              key={q.id}
-              question={q}
-              value={answers[q.id]}
-              onChange={(v) => update(q.id, v)}
-              readOnly={readOnly}
-            />
-          ))}
-        </div>
+        {!template ? (
+          <div className="py-12 flex flex-col items-center justify-center gap-3 text-center">
+            <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-muted-foreground">
+              {templateLoading ? "Carregando formulário..." : "Não foi possível carregar este formulário. Recarregue a página."}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {template.questions.map((q) => (
+              <QuestionField
+                key={q.id}
+                question={q}
+                value={answers[q.id]}
+                onChange={(v) => update(q.id, v)}
+                readOnly={readOnly}
+              />
+            ))}
+          </div>
+        )}
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
