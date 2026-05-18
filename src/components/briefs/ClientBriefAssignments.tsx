@@ -6,17 +6,25 @@ import { format } from "date-fns";
 import { useBriefTemplates, useBriefAssignments } from "@/hooks/useBriefTemplates";
 import FillBriefDialog from "./FillBriefDialog";
 import { toast } from "@/hooks/use-toast";
+import { tUI, type BriefLocale } from "@/lib/briefTranslations";
 
 interface Props {
   clientId: string;
+  locale?: string;
 }
 
-export default function ClientBriefAssignments({ clientId }: Props) {
+export default function ClientBriefAssignments({ clientId, locale = "pt" }: Props) {
   const { templates, loading: tplLoading } = useBriefTemplates();
   const { assignments, responses, upsertResponse } = useBriefAssignments({ clientId });
   const [openId, setOpenId] = useState<string | null>(null);
 
-  if (assignments.length === 0) return null;
+  const briefLocale = (["pt", "en", "es", "it", "sv"].includes(locale) ? locale : "pt") as BriefLocale;
+
+  // Hide submitted briefs from client view — they go to the admin only
+  const visibleAssignments = assignments.filter(a => a.status !== "submitted");
+
+  if (visibleAssignments.length === 0) return null;
+
 
   const current = assignments.find(a => a.id === openId) || null;
   const currentTpl = current ? templates.find(t => t.id === current.template_id) || null : null;
