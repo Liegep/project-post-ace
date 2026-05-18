@@ -134,9 +134,19 @@ export default function TemplateEditor({ open, onOpenChange, template, onSave }:
         </DialogHeader>
 
         <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="edit"><Pencil className="h-3.5 w-3.5 mr-1.5" />Editar</TabsTrigger>
-            <TabsTrigger value="preview"><Eye className="h-3.5 w-3.5 mr-1.5" />Pré-visualizar</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-zinc-900/60 border border-white/10">
+            <TabsTrigger
+              value="edit"
+              className="text-white/70 data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm"
+            >
+              <Pencil className="h-3.5 w-3.5 mr-1.5" />Editar
+            </TabsTrigger>
+            <TabsTrigger
+              value="preview"
+              className="text-white/70 data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm"
+            >
+              <Eye className="h-3.5 w-3.5 mr-1.5" />Pré-visualizar
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="edit" className="space-y-4">
@@ -465,34 +475,180 @@ function ListEditor({ items, onChange, placeholder }: { items: string[]; onChang
 
 function PreviewPanel({ name, description, questions }: { name: string; description: string; questions: BriefQuestion[] }) {
   return (
-    <div className="space-y-4 p-2">
-      <div>
-        <h2 className="text-lg font-semibold">{name || "Sem título"}</h2>
-        {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
+    <div className="rounded-2xl bg-white text-zinc-900 p-6 sm:p-8 shadow-inner space-y-6 max-h-[70vh] overflow-y-auto">
+      <div className="space-y-2 pb-4 border-b border-zinc-200">
+        <h2 className="text-2xl font-bold tracking-tight">{name || "Sem título"}</h2>
+        {description && <p className="text-sm text-zinc-600 leading-relaxed">{description}</p>}
       </div>
+
       {questions.map((q) => {
         if (q.type === "section") {
           return (
-            <div key={q.id} className="border-t border-border pt-3 mt-3">
-              <h3 className="font-semibold">{q.label}</h3>
-              {q.helpText && <p className="text-xs text-muted-foreground mt-0.5">{q.helpText}</p>}
+            <div key={q.id} className="pt-4 mt-2 border-t border-zinc-200">
+              <h3 className="text-lg font-semibold text-zinc-900">{q.label}</h3>
+              {q.helpText && <p className="text-sm text-zinc-500 mt-1">{q.helpText}</p>}
             </div>
           );
         }
-        return (
-          <div key={q.id} className="space-y-1.5">
-            <Label className="text-sm">
+
+        const labelEl = (
+          <div>
+            <Label className="text-sm font-medium text-zinc-900">
               {q.label}
-              {q.required && <span className="text-destructive ml-1">*</span>}
+              {q.required && <span className="text-red-500 ml-1">*</span>}
             </Label>
-            {q.helpText && <p className="text-xs text-muted-foreground -mt-0.5">{q.helpText}</p>}
-            <div className="text-xs text-muted-foreground italic">[ campo: {FIELD_TYPES.find(t => t.value === q.type)?.label} ]</div>
+            {q.helpText && <p className="text-xs text-zinc-500 mt-1">{q.helpText}</p>}
+          </div>
+        );
+
+        const inputBase = "w-full bg-white border border-zinc-300 text-zinc-900 placeholder:text-zinc-400 focus-visible:ring-2 focus-visible:ring-zinc-900/20";
+
+        let field: JSX.Element;
+        switch (q.type) {
+          case "long_text":
+            field = <Textarea disabled placeholder={q.placeholder || "Scrivi qui la tua risposta…"} rows={4} className={inputBase} />;
+            break;
+          case "email":
+            field = <Input type="email" disabled placeholder={q.placeholder || "nome@email.com"} className={inputBase} />;
+            break;
+          case "link":
+            field = <Input type="url" disabled placeholder={q.placeholder || "https://"} className={inputBase} />;
+            break;
+          case "number":
+            field = <Input type="number" disabled placeholder={q.placeholder || "0"} min={q.min} max={q.max} className={inputBase} />;
+            break;
+          case "date":
+            field = <Input type="date" disabled className={inputBase} />;
+            break;
+          case "time":
+            field = <Input type="time" disabled className={inputBase} />;
+            break;
+          case "file_upload":
+            field = (
+              <div className="border-2 border-dashed border-zinc-300 rounded-lg p-6 text-center text-sm text-zinc-500 bg-zinc-50">
+                Trascina un file qui o clicca per caricare
+              </div>
+            );
+            break;
+          case "yes_no":
+            field = (
+              <div className="flex gap-2">
+                {["Sì", "No"].map((opt) => (
+                  <div key={opt} className="flex-1 border border-zinc-300 rounded-md px-4 py-2.5 text-sm text-zinc-700 bg-white text-center">
+                    {opt}
+                  </div>
+                ))}
+              </div>
+            );
+            break;
+          case "multiple_choice":
+          case "checkbox": {
+            const isMulti = q.type === "checkbox";
+            const opts = [...(q.options || []), ...(q.allowOther ? ["Altro…"] : [])];
+            field = (
+              <div className="space-y-2">
+                {opts.map((opt, i) => (
+                  <div key={i} className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-zinc-200 bg-white">
+                    <div className={`h-4 w-4 shrink-0 border border-zinc-400 ${isMulti ? "rounded-sm" : "rounded-full"}`} />
+                    <span className="text-sm text-zinc-700">{opt}</span>
+                  </div>
+                ))}
+              </div>
+            );
+            break;
+          }
+          case "dropdown":
+            field = (
+              <div className={`${inputBase} h-10 px-3 flex items-center justify-between rounded-md text-sm text-zinc-400`}>
+                <span>Seleziona…</span>
+                <ChevronDown className="h-4 w-4" />
+              </div>
+            );
+            break;
+          case "scale": {
+            const min = q.min ?? 1;
+            const max = q.max ?? 5;
+            const steps = [];
+            for (let i = min; i <= max; i++) steps.push(i);
+            field = (
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  {steps.map((n) => (
+                    <div key={n} className="flex flex-col items-center gap-1.5 flex-1">
+                      <div className="h-8 w-8 rounded-full border border-zinc-300 bg-white flex items-center justify-center text-xs text-zinc-600">
+                        {n}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {(q.scaleMinLabel || q.scaleMaxLabel) && (
+                  <div className="flex items-center justify-between mt-2 text-xs text-zinc-500">
+                    <span>{q.scaleMinLabel}</span>
+                    <span>{q.scaleMaxLabel}</span>
+                  </div>
+                )}
+              </div>
+            );
+            break;
+          }
+          case "grid": {
+            const rows = q.gridRows || [];
+            const cols = q.gridCols || [];
+            field = (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-zinc-200">
+                      <th></th>
+                      {cols.map((c, i) => (
+                        <th key={i} className="px-2 py-2 text-zinc-600 font-medium text-center text-xs">{c}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r, i) => (
+                      <tr key={i} className="border-b border-zinc-100">
+                        <td className="py-2 pr-2 text-zinc-700">{r}</td>
+                        {cols.map((_, j) => (
+                          <td key={j} className="px-2 py-2 text-center">
+                            <div className="h-4 w-4 mx-auto rounded-full border border-zinc-400" />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            );
+            break;
+          }
+          case "short_text":
+          default:
+            field = <Input disabled placeholder={q.placeholder || "La tua risposta"} className={inputBase} />;
+        }
+
+        return (
+          <div key={q.id} className="space-y-2">
+            {labelEl}
+            {field}
           </div>
         );
       })}
+
       {questions.length === 0 && (
-        <p className="text-sm text-muted-foreground text-center py-6">Nenhuma pergunta para visualizar.</p>
+        <p className="text-sm text-zinc-500 text-center py-8">Nenhuma pergunta para visualizar.</p>
       )}
+
+      <div className="pt-4 border-t border-zinc-200">
+        <button
+          type="button"
+          disabled
+          className="w-full h-11 rounded-md bg-zinc-900 text-white text-sm font-medium opacity-90"
+        >
+          Invia risposte
+        </button>
+      </div>
     </div>
   );
 }
+
