@@ -474,30 +474,33 @@ function ListEditor({ items, onChange, placeholder }: { items: string[]; onChang
 // ======================= Preview =======================
 
 function PreviewPanel({ name, description, questions }: { name: string; description: string; questions: BriefQuestion[] }) {
+  const DARK = { color: "#18181b" } as const;
+  const MUTED = { color: "#52525b" } as const;
+  const FAINT = { color: "#71717a" } as const;
   return (
-    <div className="rounded-2xl bg-white text-zinc-900 p-6 sm:p-8 shadow-inner space-y-6 max-h-[70vh] overflow-y-auto">
+    <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-inner space-y-6 max-h-[70vh] overflow-y-auto" style={DARK}>
       <div className="space-y-2 pb-4 border-b border-zinc-200">
-        <h2 className="text-2xl font-bold tracking-tight">{name || "Sem título"}</h2>
-        {description && <p className="text-sm text-zinc-600 leading-relaxed">{description}</p>}
+        <h2 className="text-2xl font-bold tracking-tight" style={DARK}>{name || "Sem título"}</h2>
+        {description && <p className="text-sm leading-relaxed" style={MUTED}>{description}</p>}
       </div>
 
       {questions.map((q) => {
         if (q.type === "section") {
           return (
             <div key={q.id} className="pt-4 mt-2 border-t border-zinc-200">
-              <h3 className="text-lg font-semibold text-zinc-900">{q.label}</h3>
-              {q.helpText && <p className="text-sm text-zinc-500 mt-1">{q.helpText}</p>}
+              <h3 className="text-lg font-semibold" style={DARK}>{q.label}</h3>
+              {q.helpText && <p className="text-sm mt-1" style={FAINT}>{q.helpText}</p>}
             </div>
           );
         }
 
         const labelEl = (
           <div>
-            <Label className="text-sm font-medium text-zinc-900">
-              {q.label}
-              {q.required && <span className="text-red-500 ml-1">*</span>}
+            <Label className="text-sm font-medium" style={DARK}>
+              <span style={DARK}>{q.label}</span>
+              {q.required && <span className="ml-1" style={{ color: "#ef4444" }}>*</span>}
             </Label>
-            {q.helpText && <p className="text-xs text-zinc-500 mt-1">{q.helpText}</p>}
+            {q.helpText && <p className="text-xs mt-1" style={FAINT}>{q.helpText}</p>}
           </div>
         );
 
