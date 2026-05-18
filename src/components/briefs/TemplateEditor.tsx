@@ -134,9 +134,19 @@ export default function TemplateEditor({ open, onOpenChange, template, onSave }:
         </DialogHeader>
 
         <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="edit"><Pencil className="h-3.5 w-3.5 mr-1.5" />Editar</TabsTrigger>
-            <TabsTrigger value="preview"><Eye className="h-3.5 w-3.5 mr-1.5" />Pré-visualizar</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-zinc-900/60 border border-white/10">
+            <TabsTrigger
+              value="edit"
+              className="text-white/70 data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm"
+            >
+              <Pencil className="h-3.5 w-3.5 mr-1.5" />Editar
+            </TabsTrigger>
+            <TabsTrigger
+              value="preview"
+              className="text-white/70 data-[state=active]:bg-white data-[state=active]:text-zinc-900 data-[state=active]:shadow-sm"
+            >
+              <Eye className="h-3.5 w-3.5 mr-1.5" />Pré-visualizar
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="edit" className="space-y-4">
