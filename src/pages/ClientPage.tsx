@@ -345,7 +345,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
         {/* Brief Assignments (templates enviados) */}
         <div className="mb-8">
-          <ClientBriefAssignments clientId={clientData.id} />
+          <ClientBriefAssignments clientId={clientData.id} locale={clientData.locale} />
         </div>
 
         {/* Text Contents for Approval */}

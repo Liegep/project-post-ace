@@ -6,17 +6,25 @@ import { format } from "date-fns";
 import { useBriefTemplates, useBriefAssignments } from "@/hooks/useBriefTemplates";
 import FillBriefDialog from "./FillBriefDialog";
 import { toast } from "@/hooks/use-toast";
+import { tUI, type BriefLocale } from "@/lib/briefTranslations";
 
 interface Props {
   clientId: string;
+  locale?: string;
 }
 
-export default function ClientBriefAssignments({ clientId }: Props) {
+export default function ClientBriefAssignments({ clientId, locale = "pt" }: Props) {
   const { templates, loading: tplLoading } = useBriefTemplates();
   const { assignments, responses, upsertResponse } = useBriefAssignments({ clientId });
   const [openId, setOpenId] = useState<string | null>(null);
 
-  if (assignments.length === 0) return null;
+  const briefLocale = (["pt", "en", "es", "it", "sv"].includes(locale) ? locale : "pt") as BriefLocale;
+
+  // Hide submitted briefs from client view — they go to the admin only
+  const visibleAssignments = assignments.filter(a => a.status !== "submitted");
+
+  if (visibleAssignments.length === 0) return null;
+
 
   const current = assignments.find(a => a.id === openId) || null;
   const currentTpl = current ? templates.find(t => t.id === current.template_id) || null : null;
@@ -42,11 +50,11 @@ export default function ClientBriefAssignments({ clientId }: Props) {
         <div className="flex items-center gap-2">
           <ClipboardList className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-bold text-foreground">Briefs para preencher</h2>
-          <Badge variant="secondary" className="text-[10px]">{assignments.length}</Badge>
+          <Badge variant="secondary" className="text-[10px]">{visibleAssignments.length}</Badge>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {assignments.map(a => {
+          {visibleAssignments.map(a => {
             const tpl = templates.find(t => t.id === a.template_id);
             const resp = responses.find(r => r.assignment_id === a.id);
             const isSubmitted = a.status === "submitted";
@@ -134,7 +142,17 @@ export default function ClientBriefAssignments({ clientId }: Props) {
         onSave={async (answers, submit) => {
           if (!current || !currentTpl) return;
           const ok = await upsertResponse(current.id, current.client_id, currentTpl.id, answers, submit);
-          if (ok) toast({ title: submit ? "Brief enviado!" : "Rascunho salvo" });
+          if (ok) {
+            if (submit) {
+              toast({
+                title: tUI("submitted_success_title", briefLocale),
+                description: tUI("submitted_success_desc", briefLocale),
+              });
+              setOpenId(null);
+            } else {
+              toast({ title: tUI("draft_saved", briefLocale) });
+            }
+          }
         }}
       />
     </>

@@ -40,6 +40,10 @@ const uiStrings: Record<string, Record<string, string>> = {
     upload_hint: 'Clique para enviar arquivos (máx. 20MB)',
     uploading: 'Enviando...',
     brief_language: 'Idioma do Brief',
+    submitted_success_title: 'Brief enviado com sucesso!',
+    submitted_success_desc: 'Obrigado! Recebemos as suas respostas.',
+    draft_saved: 'Rascunho salvo',
+
   },
   en: {
     save: 'Save Brief',
@@ -52,6 +56,10 @@ const uiStrings: Record<string, Record<string, string>> = {
     upload_hint: 'Click to upload files (max 20MB)',
     uploading: 'Uploading...',
     brief_language: 'Brief Language',
+    submitted_success_title: 'Brief submitted successfully!',
+    submitted_success_desc: 'Thank you! We have received your answers.',
+    draft_saved: 'Draft saved',
+
   },
   es: {
     save: 'Guardar Brief',
@@ -64,6 +72,10 @@ const uiStrings: Record<string, Record<string, string>> = {
     upload_hint: 'Haga clic para subir archivos (máx. 20MB)',
     uploading: 'Subiendo...',
     brief_language: 'Idioma del Brief',
+    submitted_success_title: '¡Brief enviado con éxito!',
+    submitted_success_desc: '¡Gracias! Hemos recibido sus respuestas.',
+    draft_saved: 'Borrador guardado',
+
   },
   it: {
     save: 'Salva Brief',
@@ -76,6 +88,10 @@ const uiStrings: Record<string, Record<string, string>> = {
     upload_hint: 'Clicca per caricare file (max 20MB)',
     uploading: 'Caricamento...',
     brief_language: 'Lingua del Brief',
+    submitted_success_title: 'Brief inviato con successo!',
+    submitted_success_desc: 'Grazie! Abbiamo ricevuto le tue risposte.',
+    draft_saved: 'Bozza salvata',
+
   },
   sv: {
     save: 'Spara Brief',
@@ -88,6 +104,10 @@ const uiStrings: Record<string, Record<string, string>> = {
     upload_hint: 'Klicka för att ladda upp filer (max 20MB)',
     uploading: 'Laddar upp...',
     brief_language: 'Briefspråk',
+    submitted_success_title: 'Brief skickat!',
+    submitted_success_desc: 'Tack! Vi har tagit emot dina svar.',
+    draft_saved: 'Utkast sparat',
+
   },
 };
 
