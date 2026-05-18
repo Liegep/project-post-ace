@@ -6,11 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Save, Upload, X, Link as LinkIcon, Globe } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Save, Upload, X, Link as LinkIcon, Globe, Eye, User, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { BriefTemplate } from "@/lib/briefTemplates";
-import { tLabel, tOptions, tUI, briefLocaleNames, type BriefLocale } from "@/lib/briefTranslations";
+import { tLabel, tOptions, tMeta, tUI, briefLocaleNames, type BriefLocale } from "@/lib/briefTranslations";
 
 interface BriefFormProps {
   template: BriefTemplate;
@@ -26,6 +28,7 @@ export default function BriefForm({ template, initialAnswers = {}, initialTitle 
   const [title, setTitle] = useState(initialTitle);
   const [locale, setLocale] = useState<BriefLocale>(initialLocale);
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
+  const [previewOpen, setPreviewOpen] = useState(false);
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const getLabel = (questionId: string, defaultLabel: string) => {
@@ -269,14 +272,182 @@ export default function BriefForm({ template, initialAnswers = {}, initialTitle 
         );
       })}
 
-      <Button
-        onClick={handleSubmit}
-        disabled={saving || (!template.isBase && !title.trim()) || !hasRequired}
-        className="w-full bg-gradient-to-r from-[hsl(var(--gradient-start))] via-[hsl(var(--gradient-mid))] to-[hsl(var(--gradient-end))] text-white hover:opacity-90"
-      >
-        <Save className="h-4 w-4 mr-2" />
-        {saving ? tUI('saving', locale) : tUI('save', locale)}
-      </Button>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setPreviewOpen(true)}
+          className="sm:w-auto"
+        >
+          <Eye className="h-4 w-4 mr-2" />
+          {tUI('preview' as any, locale) || "Visualizar como cliente"}
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={saving || (!template.isBase && !title.trim()) || !hasRequired}
+          className="flex-1 bg-gradient-to-r from-[hsl(var(--gradient-start))] via-[hsl(var(--gradient-mid))] to-[hsl(var(--gradient-end))] text-white hover:opacity-90"
+        >
+          <Save className="h-4 w-4 mr-2" />
+          {saving ? tUI('saving', locale) : tUI('save', locale)}
+        </Button>
+      </div>
+
+      <ClientPreviewDialog
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        template={template}
+        title={title}
+        answers={answers}
+        locale={locale}
+        getLabel={getLabel}
+        getOpts={getOpts}
+      />
     </div>
+  );
+}
+
+interface PreviewProps {
+  open: boolean;
+  onClose: () => void;
+  template: BriefTemplate;
+  title: string;
+  answers: Record<string, any>;
+  locale: BriefLocale;
+  getLabel: (id: string, def: string) => string;
+  getOpts: (id: string, def?: string[]) => string[] | undefined;
+}
+
+function ClientPreviewDialog({ open, onClose, template, title, answers, locale, getLabel, getOpts }: PreviewProps) {
+  const templateName = tMeta(template.id, "name", locale) || template.name;
+  const displayTitle = title || templateName;
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-background p-0">
+        <DialogHeader className="px-6 pt-6 pb-2 border-b">
+          <DialogTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <Eye className="h-4 w-4" />
+            Pré-visualização — assim o cliente verá este formulário
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="p-4 md:p-6 bg-muted/30">
+          <div className="rounded-2xl border border-border bg-card shadow-xl p-6 md:p-8 space-y-6">
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold text-foreground">{displayTitle}</h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="secondary" className="text-[10px]">{templateName}</Badge>
+                <Badge variant="outline" className="text-[10px] flex items-center gap-1">
+                  <Globe className="h-3 w-3" />
+                  {briefLocaleNames[locale] || locale}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="rounded-xl bg-muted/50 border border-border p-4 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Identificação
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs flex items-center gap-1.5">
+                    <User className="h-3 w-3" /> Nome <span className="text-destructive">*</span>
+                  </Label>
+                  <Input disabled placeholder="Seu nome completo" className="bg-background" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs flex items-center gap-1.5">
+                    <Mail className="h-3 w-3" /> E-mail <span className="text-destructive">*</span>
+                  </Label>
+                  <Input disabled placeholder="seu@email.com" className="bg-background" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {template.questions.map(q => {
+                const label = getLabel(q.id, q.label);
+                const questionOptions = getOpts(q.id, q.options);
+                const val = answers[q.id];
+
+                return (
+                  <div key={q.id} className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {label} {q.required && <span className="text-destructive">*</span>}
+                    </Label>
+
+                    {q.type === "short_text" && (
+                      <Input disabled value={val || ""} className="bg-background" />
+                    )}
+                    {q.type === "long_text" && (
+                      <Textarea disabled value={val || ""} rows={3} className="bg-background" />
+                    )}
+                    {q.type === "link" && (
+                      <div className="relative">
+                        <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input disabled value={val || ""} placeholder="https://..." className="pl-10 bg-background" />
+                      </div>
+                    )}
+                    {q.type === "yes_no" && (
+                      <div className="flex items-center gap-3 py-1">
+                        <Switch disabled checked={val === true} />
+                        <span className="text-sm text-foreground">
+                          {val === true ? tUI('yes', locale) : val === false ? tUI('no', locale) : tUI('not_informed', locale)}
+                        </span>
+                      </div>
+                    )}
+                    {q.type === "multiple_choice" && questionOptions && (
+                      <Select disabled value={val || ""}>
+                        <SelectTrigger className="bg-background">
+                          <SelectValue placeholder={tUI('select_option', locale)} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {questionOptions.map(opt => (
+                            <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    {q.type === "checkbox" && questionOptions && (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {questionOptions.map(opt => {
+                          const checked = (val || []).includes(opt);
+                          return (
+                            <label
+                              key={opt}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm ${
+                                checked
+                                  ? "border-primary/40 bg-primary/10 text-foreground"
+                                  : "border-border bg-background text-muted-foreground"
+                              }`}
+                            >
+                              <Checkbox disabled checked={checked} />
+                              {opt}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {q.type === "file_upload" && (
+                      <div className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border rounded-xl bg-muted/30">
+                        <Upload className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">
+                          {tUI('upload_hint', locale)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <Button disabled className="w-full" size="lg">
+              <Save className="h-4 w-4 mr-2" />
+              {locale === 'pt' ? 'Enviar brief' : locale === 'en' ? 'Submit brief' : locale === 'it' ? 'Invia brief' : locale === 'es' ? 'Enviar brief' : 'Envoyer le brief'}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
