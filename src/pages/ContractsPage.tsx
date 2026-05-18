@@ -149,15 +149,15 @@ const ContractsPage = () => {
                     <Badge className={st.class + " gap-1"}>
                       <StIcon className="h-3 w-3" /> {st.label}
                     </Badge>
+                    <Button variant="ghost" size="icon" title="Visualizar como cliente" onClick={() => { setPreviewContract(c); setPreviewOpen(true); }}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => openEdit(c)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(c.id)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
                   <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-4">{c.body}</p>
                   <p className="text-xs text-muted-foreground mt-3">
                     Criado em {new Date(c.created_at).toLocaleDateString("pt-BR")}
