@@ -46,9 +46,16 @@ export function ContractGateModal() {
 
         {/* Body */}
         <ScrollArea className="px-8 py-6 max-h-[50vh]">
-          <div className="prose prose-sm dark:prose-invert max-w-none font-serif leading-relaxed whitespace-pre-wrap">
-            {pendingContract.body}
-          </div>
+          {/^\s*</.test(pendingContract.body) ? (
+            <div
+              className="prose prose-sm dark:prose-invert max-w-none font-serif leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: pendingContract.body }}
+            />
+          ) : (
+            <div className="prose prose-sm dark:prose-invert max-w-none font-serif leading-relaxed whitespace-pre-wrap">
+              {pendingContract.body}
+            </div>
+          )}
         </ScrollArea>
 
         {/* Footer */}
