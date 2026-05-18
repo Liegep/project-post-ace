@@ -55,7 +55,29 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { email, password, client_id, client_name, mode, user_id: existingUserId } = await req.json();
+    const body = await req.json();
+    const rawEmail = body.email;
+    const password = body.password;
+    const client_id = body.client_id;
+    const client_name = body.client_name;
+    const mode = body.mode;
+    const existingUserId = body.user_id;
+
+    // Normalize email: trim, lowercase, strip invisible/zero-width chars
+    const email = typeof rawEmail === "string"
+      ? rawEmail.trim().toLowerCase().replace(/[\u200B-\u200D\uFEFF\s]/g, "")
+      : rawEmail;
+
+    // Validate email format before hitting auth API (gives clearer error message)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email && !emailRegex.test(email)) {
+      return new Response(JSON.stringify({
+        error: `E-mail inválido: "${rawEmail}". Verifique se não há espaços, vírgulas ou caracteres especiais.`
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Mode: "create" or "update"
     if (mode === "update" && existingUserId) {
