@@ -190,6 +190,38 @@
     color: hsl(0 0% 100% / 0.92) !important;
   }
 
+  /* Light preview cards inside glass modals (e.g. brief template preview) */
+  .glass-modal .brief-preview,
+  .glass-modal .brief-preview h1,
+  .glass-modal .brief-preview h2,
+  .glass-modal .brief-preview h3,
+  .glass-modal .brief-preview h4,
+  .glass-modal .brief-preview p,
+  .glass-modal .brief-preview span,
+  .glass-modal .brief-preview label,
+  .glass-modal .brief-preview td,
+  .glass-modal .brief-preview th,
+  .glass-modal .brief-preview div {
+    color: inherit;
+  }
+  .glass-modal .brief-preview { color: hsl(240 6% 10%); }
+  .glass-modal .brief-preview .text-zinc-400 { color: hsl(240 5% 65%) !important; }
+  .glass-modal .brief-preview .text-zinc-500 { color: hsl(240 4% 46%) !important; }
+  .glass-modal .brief-preview .text-zinc-600 { color: hsl(240 5% 35%) !important; }
+  .glass-modal .brief-preview .text-zinc-700 { color: hsl(240 5% 26%) !important; }
+  .glass-modal .brief-preview .text-zinc-900 { color: hsl(240 6% 10%) !important; }
+  .glass-modal .brief-preview .text-red-500 { color: hsl(0 84% 60%) !important; }
+  .glass-modal .brief-preview input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  .glass-modal .brief-preview textarea {
+    background: #fff !important;
+    color: hsl(240 6% 10%) !important;
+    border-color: hsl(240 6% 83%) !important;
+  }
+  .glass-modal .brief-preview input::placeholder,
+  .glass-modal .brief-preview textarea::placeholder {
+    color: hsl(240 5% 65%) !important;
+  }
+
   /* Glass modal inputs & textareas: white bg, black text */
   .glass-modal input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
   .glass-modal textarea,
