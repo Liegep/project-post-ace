@@ -478,7 +478,7 @@ function PreviewPanel({ name, description, questions }: { name: string; descript
   const MUTED = { color: "#52525b" } as const;
   const FAINT = { color: "#71717a" } as const;
   return (
-    <div className="rounded-2xl bg-white p-6 sm:p-8 shadow-inner space-y-6 max-h-[70vh] overflow-y-auto" style={DARK}>
+    <div className="brief-preview rounded-2xl bg-white p-6 sm:p-8 shadow-inner space-y-6 max-h-[70vh] overflow-y-auto" style={DARK}>
       <div className="space-y-2 pb-4 border-b border-zinc-200">
         <h2 className="text-2xl font-bold tracking-tight" style={DARK}>{name || "Sem título"}</h2>
         {description && <p className="text-sm leading-relaxed" style={MUTED}>{description}</p>}
