@@ -6,11 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Save, Upload, X, Link as LinkIcon, Globe } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Save, Upload, X, Link as LinkIcon, Globe, Eye, User, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { BriefTemplate } from "@/lib/briefTemplates";
-import { tLabel, tOptions, tUI, briefLocaleNames, type BriefLocale } from "@/lib/briefTranslations";
+import { tLabel, tOptions, tMeta, tUI, briefLocaleNames, type BriefLocale } from "@/lib/briefTranslations";
 
 interface BriefFormProps {
   template: BriefTemplate;
