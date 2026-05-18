@@ -50,11 +50,11 @@ export default function ClientBriefAssignments({ clientId, locale = "pt" }: Prop
         <div className="flex items-center gap-2">
           <ClipboardList className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-bold text-foreground">Briefs para preencher</h2>
-          <Badge variant="secondary" className="text-[10px]">{assignments.length}</Badge>
+          <Badge variant="secondary" className="text-[10px]">{visibleAssignments.length}</Badge>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {assignments.map(a => {
+          {visibleAssignments.map(a => {
             const tpl = templates.find(t => t.id === a.template_id);
             const resp = responses.find(r => r.assignment_id === a.id);
             const isSubmitted = a.status === "submitted";
