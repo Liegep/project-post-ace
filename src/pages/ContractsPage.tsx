@@ -197,20 +197,63 @@ const ContractsPage = () => {
             </div>
             <div>
               <Label>Texto do Contrato</Label>
-              <Textarea
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
+              <RichTextEditor
+                content={body}
+                onChange={setBody}
                 placeholder="Digite o texto completo do contrato..."
-                className="min-h-[300px] font-serif"
+                className="min-h-[300px]"
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => {
+                if (!title.trim() || !body.trim()) {
+                  toast({ title: "Preencha título e texto para visualizar", variant: "destructive" });
+                  return;
+                }
+                setPreviewContract({
+                  id: "preview", client_id: clientId, title, body,
+                  status: "pending", created_by: "", created_at: new Date().toISOString(), updated_at: "",
+                });
+                setPreviewOpen(true);
+              }}
+            >
+              <Eye className="h-4 w-4" /> Visualizar
+            </Button>
             <Button onClick={handleSave} disabled={saving} className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
-              {saving ? "Salvando..." : editing ? "Atualizar" : "Criar Contrato"}
+              {saving ? "Salvando..." : editing ? "Atualizar" : "Criar e Enviar"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Preview Dialog — replicates client view */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden p-0 bg-background/95 backdrop-blur-xl border-white/10">
+          <DialogHeader className="px-8 pt-8 pb-4 text-center border-b border-white/10">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mx-auto mb-4">
+              <FileText className="h-8 w-8 text-primary" />
+            </div>
+            <DialogTitle className="text-2xl font-bold font-serif tracking-tight text-center">
+              {previewContract?.title || "Contrato"}
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground mt-2">Pré-visualização — assim o cliente verá o contrato no login</p>
+          </DialogHeader>
+          <ScrollArea className="px-8 py-6 max-h-[55vh]">
+            <div
+              className="prose prose-sm dark:prose-invert max-w-none font-serif leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: previewContract?.body || "" }}
+            />
+          </ScrollArea>
+          <div className="px-8 pb-8 pt-4 border-t border-white/10 text-center">
+            <Button disabled size="lg" className="w-full max-w-sm gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-base h-12 rounded-xl">
+              <CheckCircle2 className="h-5 w-5" /> Li e Aceito os Termos
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
