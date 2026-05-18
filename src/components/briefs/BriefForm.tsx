@@ -128,7 +128,7 @@ export default function BriefForm({ template, initialAnswers = {}, initialTitle 
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder={`Ex: ${template.name} - Cliente X`}
-            className="bg-white/50 dark:bg-white/5 border-white/30 backdrop-blur-sm"
+            className="bg-white text-black placeholder:text-black/40 border-white/30"
           />
         </div>
       )}
