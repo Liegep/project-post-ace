@@ -34,6 +34,8 @@ const ContractsPage = () => {
   const [clients, setClients] = useState<ClientOption[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Contract | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewContract, setPreviewContract] = useState<Contract | null>(null);
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
