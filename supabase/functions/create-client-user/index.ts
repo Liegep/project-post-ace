@@ -100,9 +100,32 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check if user already exists
-    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const existingUser = existingUsers?.users?.find((u: any) => u.email === email);
+    // Check if user already exists — paginate through all auth users
+    // (default listUsers page size is 50, which misses existing users beyond page 1)
+    let existingUser: any = null;
+    const normalizedEmail = String(email).trim().toLowerCase();
+
+    // First try via profiles table (fast path)
+    const { data: existingProfileByEmail } = await supabaseAdmin
+      .from("profiles")
+      .select("id, email")
+      .ilike("email", normalizedEmail)
+      .maybeSingle();
+    if (existingProfileByEmail?.id) {
+      const { data: userById } = await supabaseAdmin.auth.admin.getUserById(existingProfileByEmail.id);
+      if (userById?.user) existingUser = userById.user;
+    }
+
+    // Fallback: paginate auth users (handles users without a profile row)
+    if (!existingUser) {
+      for (let page = 1; page <= 20; page++) {
+        const { data: pageData, error: pageErr } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 200 });
+        if (pageErr) break;
+        const match = pageData?.users?.find((u: any) => (u.email || "").toLowerCase() === normalizedEmail);
+        if (match) { existingUser = match; break; }
+        if (!pageData?.users || pageData.users.length < 200) break;
+      }
+    }
 
     let targetUserId: string;
 
