@@ -158,9 +158,12 @@ const ContractsPage = () => {
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(c.id)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-4">{c.body}</p>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm text-muted-foreground line-clamp-4 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: c.body }} />
                   <p className="text-xs text-muted-foreground mt-3">
-                    Criado em {new Date(c.created_at).toLocaleDateString("pt-BR")}
+                    Criado em {new Date(c.created_at).toLocaleDateString("pt-BR")} · O contrato aparece automaticamente para o cliente no próximo login.
                   </p>
                 </CardContent>
               </Card>
