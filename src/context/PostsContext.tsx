@@ -108,12 +108,19 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       const { DEFAULT_TAGS } = await import("@/types/post");
       const defaultTagIds = DEFAULT_TAGS.map((tag) => tag.id);
 
-      const [postsRes, commentsRes, tagsRes, columnsRes] = await Promise.all([
+      // Fetch posts/tags/columns first, then fetch ONLY the comments for those posts.
+      // Previously this loaded every comment the user could see across all clients,
+      // which was the single largest recurring DB cost.
+      const [postsRes, tagsRes, columnsRes] = await Promise.all([
         supabase.from("posts").select("*").eq("client_id", clientId).order("position", { ascending: true }).order("created_at", { ascending: false }),
-        supabase.from("comments").select("*").order("created_at", { ascending: true }),
         supabase.from("tags").select("*").or(`client_id.eq.${clientId},id.in.(${defaultTagIds.join(",")})`),
         supabase.from("columns").select("*").eq("client_id", clientId).order("position", { ascending: true }),
       ]);
+
+      const postIds = (postsRes.data || []).map((p: any) => p.id);
+      const commentsRes = postIds.length > 0
+        ? await supabase.from("comments").select("*").in("post_id", postIds).order("created_at", { ascending: true })
+        : { data: [] as any[] };
 
       const commentsMap: Record<string, Comment[]> = {};
       const userIds = new Set<string>();
