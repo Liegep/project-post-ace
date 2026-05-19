@@ -254,16 +254,27 @@ const AdminDashboard = () => {
     toast({ title: "Logo atualizado com sucesso!" });
   };
 
-  useEffect(() => {
-    if (roleLoading || !currentUserId) return; // wait for role to fully load
-    fetchClients().then(() => fetchClientUsers());
-    fetchFeedbacks();
-    fetchUnarchiveNotifs();
-    fetchClientCreatedNotifs();
-    fetchTodayPosts();
-    fetchStatusNotifs();
+  // Cache allowed client IDs for the lifetime of this mount to avoid repeated
+  // 2–3 query roundtrips for every notification fetcher.
+  const allowedClientIdsRef = useRef<string[] | null>(null);
 
-    // Realtime: refresh feedbacks when any post's client_label changes
+  useEffect(() => {
+    if (roleLoading || !currentUserId) return;
+    allowedClientIdsRef.current = null; // reset on user/role change
+    (async () => {
+      await fetchClients();
+      await fetchClientUsers();
+      // Run the notification fetchers serially so they share the cached allowed-ids
+      await fetchFeedbacks();
+      await fetchUnarchiveNotifs();
+      await fetchClientCreatedNotifs();
+      await fetchTodayPosts();
+      await fetchStatusNotifs();
+    })();
+
+    // Realtime: refresh feedbacks when a post's client_label changes.
+    // Debounced so a burst of edits collapses into a single refetch.
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     const channel = supabase
       .channel("feedback-realtime")
       .on(
@@ -273,13 +284,15 @@ const AdminDashboard = () => {
           const oldLabel = (payload.old as any)?.client_label;
           const newLabel = (payload.new as any)?.client_label;
           if (oldLabel !== newLabel) {
-            fetchFeedbacks();
+            if (debounceTimer) clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => { fetchFeedbacks(); }, 800);
           }
         }
       )
       .subscribe();
 
     return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
       supabase.removeChannel(channel);
     };
   }, [roleLoading, role, currentUserId]);
@@ -477,28 +490,23 @@ const AdminDashboard = () => {
 
   const getAllowedClientIds = async (): Promise<string[]> => {
     if (!currentUserId) return [];
-    const { data: assignments } = await supabase
-      .from("user_client_assignments")
-      .select("client_id")
-      .eq("user_id", currentUserId);
-    const assignedIds = (assignments || []).map((a: any) => a.client_id);
+    if (allowedClientIdsRef.current) return allowedClientIdsRef.current;
 
-    const { data: ownedClients } = await supabase
-      .from("clients")
-      .select("id")
-      .eq("owner_id", currentUserId);
-    const ownedIds = (ownedClients || []).map((c: any) => c.id);
+    const [assignmentsRes, ownedRes, sharedRes] = await Promise.all([
+      supabase.from("user_client_assignments").select("client_id").eq("user_id", currentUserId),
+      supabase.from("clients").select("id").eq("owner_id", currentUserId),
+      isSuperAdmin
+        ? supabase.from("clients").select("id").eq("shared", true)
+        : Promise.resolve({ data: [] as any[] }),
+    ]);
 
-    let sharedIds: string[] = [];
-    if (isSuperAdmin) {
-      const { data: sharedClients } = await supabase
-        .from("clients")
-        .select("id")
-        .eq("shared", true);
-      sharedIds = (sharedClients || []).map((c: any) => c.id);
-    }
+    const assignedIds = (assignmentsRes.data || []).map((a: any) => a.client_id);
+    const ownedIds = (ownedRes.data || []).map((c: any) => c.id);
+    const sharedIds = (sharedRes.data || []).map((c: any) => c.id);
 
-    return [...new Set([...assignedIds, ...ownedIds, ...sharedIds])];
+    const merged = [...new Set([...assignedIds, ...ownedIds, ...sharedIds])];
+    allowedClientIdsRef.current = merged;
+    return merged;
   };
 
   const fetchUnarchiveNotifs = async () => {
