@@ -2496,6 +2496,8 @@ export type Database = {
           created_by: string | null
           id: string
           observations: string
+          pdf_name: string | null
+          pdf_url: string | null
           planned_date: string | null
           status: Database["public"]["Enums"]["text_content_status"]
           subtitle: string
@@ -2511,6 +2513,8 @@ export type Database = {
           created_by?: string | null
           id?: string
           observations?: string
+          pdf_name?: string | null
+          pdf_url?: string | null
           planned_date?: string | null
           status?: Database["public"]["Enums"]["text_content_status"]
           subtitle?: string
@@ -2526,6 +2530,8 @@ export type Database = {
           created_by?: string | null
           id?: string
           observations?: string
+          pdf_name?: string | null
+          pdf_url?: string | null
           planned_date?: string | null
           status?: Database["public"]["Enums"]["text_content_status"]
           subtitle?: string

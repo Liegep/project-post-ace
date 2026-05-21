@@ -17,7 +17,7 @@ import {
 } from "@/hooks/useTextContents";
 import {
   FileText, BookOpen, Type, PenTool, FileCheck,
-  Calendar, Check, X, Send, MessageCircle,
+  Calendar, Check, X, Send, MessageCircle, Download,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -124,10 +124,26 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
 
       {/* Article body */}
       <ScrollArea className="flex-1 px-6 py-6">
+        {content.pdf_url && (
+          <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <FileText className="h-4 w-4 text-primary shrink-0" />
+              <span className="text-sm font-medium text-foreground truncate">
+                {content.pdf_name || "Documento PDF"}
+              </span>
+            </div>
+            <Button asChild size="sm" className="shrink-0">
+              <a href={content.pdf_url} target="_blank" rel="noopener noreferrer" download={content.pdf_name || true}>
+                <Download className="mr-2 h-4 w-4" /> Baixar PDF
+              </a>
+            </Button>
+          </div>
+        )}
         <article
           className="prose prose-sm sm:prose max-w-none text-foreground leading-[1.8]"
           dangerouslySetInnerHTML={{ __html: content.body }}
         />
+
 
         {content.observations && (
           <div className="mt-8 rounded-lg border bg-muted/50 p-4">
