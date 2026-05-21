@@ -9,8 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/hooks/use-toast";
 import { TextContentType, TextContentStatus, CONTENT_TYPE_LABELS, TEXT_STATUS_LABELS } from "@/hooks/useTextContents";
 import { supabase } from "@/integrations/supabase/client";
-import { extractPdfAsHtml } from "@/lib/pdfExtract";
-import { FileUp, FileText, X, Loader2 } from "lucide-react";
+import { extractPdfAsHtml, renderPdfAsImagesHtml } from "@/lib/pdfExtract";
+import { FileUp, FileText, X, Loader2, Image as ImageIcon } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -52,8 +52,9 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
   const [pdfUrl, setPdfUrl] = useState<string | null>(initial?.pdf_url || null);
   const [pdfName, setPdfName] = useState<string | null>(initial?.pdf_name || null);
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState<string>("");
 
-  const handlePdfFile = async (file: File) => {
+  const handlePdfFile = async (file: File, mode: "text" | "visual") => {
     if (file.type !== "application/pdf") {
       toast({ title: "Arquivo inválido", description: "Selecione um arquivo PDF.", variant: "destructive" });
       return;
@@ -63,13 +64,22 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
       return;
     }
     setPdfBusy(true);
+    setPdfProgress(mode === "visual" ? "Renderizando páginas..." : "Extraindo texto...");
     try {
-      // 1) Extract text into the editor
-      const html = await extractPdfAsHtml(file);
+      let html: string;
+      if (mode === "visual") {
+        html = await renderPdfAsImagesHtml(file, {
+          scale: 2,
+          onProgress: (c, t) => setPdfProgress(`Renderizando página ${c}/${t}...`),
+        });
+      } else {
+        html = await extractPdfAsHtml(file);
+      }
       setBody((prev) => (prev && prev.replace(/<[^>]+>/g, "").trim() ? prev + "\n" + html : html));
       if (!title.trim()) setTitle(file.name.replace(/\.pdf$/i, ""));
 
-      // 2) Upload original PDF so the client can download it
+      // Upload original PDF so the client can download it
+      setPdfProgress("Anexando PDF...");
       const path = `text_contents/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
       const { error: upErr } = await supabase.storage.from("media").upload(path, file, {
         contentType: "application/pdf",
@@ -79,11 +89,15 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
       const { data: pub } = supabase.storage.from("media").getPublicUrl(path);
       setPdfUrl(pub.publicUrl);
       setPdfName(file.name);
-      toast({ title: "PDF importado", description: "Texto extraído e arquivo anexado." });
+      toast({
+        title: "PDF importado",
+        description: mode === "visual" ? "Páginas convertidas com layout original e fotos." : "Texto extraído e arquivo anexado.",
+      });
     } catch (e: any) {
       toast({ title: "Falha ao importar PDF", description: e.message || String(e), variant: "destructive" });
     } finally {
       setPdfBusy(false);
+      setPdfProgress("");
     }
   };
 
@@ -175,9 +189,9 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
                     </button>
                   </span>
                 )}
-                <label className="inline-flex items-center gap-1 text-[11px] text-white/90 bg-white/10 hover:bg-white/20 rounded px-2 py-1 cursor-pointer">
-                  {pdfBusy ? <Loader2 className="h-3 w-3 animate-spin" /> : <FileUp className="h-3 w-3" />}
-                  {pdfBusy ? "Importando..." : "Importar PDF"}
+                <label className="inline-flex items-center gap-1 text-[11px] text-white/90 bg-white/10 hover:bg-white/20 rounded px-2 py-1 cursor-pointer" title="Renderiza cada página como imagem fiel (preserva fontes, layout e fotos)">
+                  {pdfBusy ? <Loader2 className="h-3 w-3 animate-spin" /> : <ImageIcon className="h-3 w-3" />}
+                  PDF visual
                   <input
                     type="file"
                     accept="application/pdf"
@@ -185,7 +199,22 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
                     disabled={pdfBusy}
                     onChange={(e) => {
                       const f = e.target.files?.[0];
-                      if (f) handlePdfFile(f);
+                      if (f) handlePdfFile(f, "visual");
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+                <label className="inline-flex items-center gap-1 text-[11px] text-white/90 bg-white/10 hover:bg-white/20 rounded px-2 py-1 cursor-pointer" title="Extrai apenas o texto editável (sem fotos)">
+                  {pdfBusy ? <Loader2 className="h-3 w-3 animate-spin" /> : <FileUp className="h-3 w-3" />}
+                  PDF texto
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    className="hidden"
+                    disabled={pdfBusy}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handlePdfFile(f, "text");
                       e.target.value = "";
                     }}
                   />
@@ -195,12 +224,15 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
             <RichTextEditor
               content={body}
               onChange={setBody}
-              placeholder="Escreva o conteúdo completo aqui... ou importe um PDF para extrair o texto automaticamente."
+              placeholder="Escreva o conteúdo aqui... ou importe um PDF (use 'PDF visual' para preservar layout e fotos)."
             />
             <p className="text-[10px] text-white/50 mt-1">
-              Ao importar um PDF, o texto é copiado para o editor e o arquivo fica disponível para o cliente baixar.
+              {pdfBusy && pdfProgress
+                ? pdfProgress
+                : "PDF visual: páginas viram imagens fiéis (com fotos). PDF texto: extrai apenas texto editável. Em ambos, o arquivo fica disponível para o cliente baixar."}
             </p>
           </div>
+
 
 
           <div>

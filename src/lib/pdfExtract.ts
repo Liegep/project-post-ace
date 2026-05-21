@@ -1,8 +1,63 @@
 import * as pdfjsLib from "pdfjs-dist";
 // Vite-friendly worker import
 import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import { supabase } from "@/integrations/supabase/client";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+
+/**
+ * Renders each PDF page to a high-DPI PNG, uploads to the `media` bucket
+ * and returns HTML with one <img> per page (preserves layout, fonts, photos).
+ */
+export async function renderPdfAsImagesHtml(
+  file: File,
+  opts: { scale?: number; onProgress?: (current: number, total: number) => void } = {}
+): Promise<string> {
+  const scale = opts.scale ?? 2;
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+
+  const baseName = file.name.replace(/\.pdf$/i, "").replace(/[^a-zA-Z0-9._-]/g, "_");
+  const folder = `text_contents/pages/${Date.now()}_${baseName}`;
+  const parts: string[] = [];
+
+  for (let p = 1; p <= pdf.numPages; p++) {
+    opts.onProgress?.(p, pdf.numPages);
+    const page = await pdf.getPage(p);
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(viewport.width);
+    canvas.height = Math.ceil(viewport.height);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) continue;
+    // White background for transparent PDFs
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    await page.render({ canvasContext: ctx, viewport, canvas } as any).promise;
+
+    const blob: Blob = await new Promise((res) =>
+      canvas.toBlob((b) => res(b as Blob), "image/png", 0.92)!
+    );
+
+    const path = `${folder}/page_${String(p).padStart(3, "0")}.png`;
+    const { error } = await supabase.storage.from("media").upload(path, blob, {
+      contentType: "image/png",
+      upsert: false,
+    });
+    if (error) throw error;
+    const { data: pub } = supabase.storage.from("media").getPublicUrl(path);
+
+    parts.push(
+      `<figure class="pdf-page" style="margin:0 0 16px 0;page-break-after:always;">` +
+        `<img src="${pub.publicUrl}" alt="Página ${p}" style="display:block;width:100%;height:auto;border:1px solid #e5e7eb;border-radius:6px;" />` +
+      `</figure>`
+    );
+  }
+
+  return parts.join("\n");
+}
+
+
 
 interface Token {
   str: string;
