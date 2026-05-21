@@ -1,9 +1,9 @@
 import * as pdfjsLib from "pdfjs-dist";
-// Vite-friendly worker import
-import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+// Bundle the worker via Vite so it is served with the correct MIME type in production
+import PdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?worker";
 import { supabase } from "@/integrations/supabase/client";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+pdfjsLib.GlobalWorkerOptions.workerPort = new PdfWorker();
 
 /**
  * Renders each PDF page to a high-DPI PNG, uploads to the `media` bucket
