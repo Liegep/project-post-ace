@@ -269,10 +269,10 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
       {/* Preview — what the client will see */}
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
         <DialogContent className="max-w-3xl max-h-[90vh] p-0 overflow-hidden flex flex-col !bg-white/95 !backdrop-blur-xl !text-black !border-white/30">
-          <div className="px-6 pt-6 pb-3 border-b">
-            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Pré-visualização do cliente</div>
-            <h2 className="text-2xl font-bold text-foreground leading-tight">{title || "Sem título"}</h2>
-            {subtitle && <p className="text-base text-muted-foreground mt-1">{subtitle}</p>}
+          <div className="px-6 pt-6 pb-3 border-b border-black/10">
+            <div className="text-[10px] uppercase tracking-wide text-black/60 mb-1">Pré-visualização do cliente</div>
+            <h2 className="text-2xl font-bold !text-black leading-tight">{title || "Sem título"}</h2>
+            {subtitle && <p className="text-base text-black/70 mt-1">{subtitle}</p>}
           </div>
           <div className="overflow-y-auto px-6 py-5">
             {pdfUrl && (
