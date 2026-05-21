@@ -18,6 +18,8 @@ export interface TextContent {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  pdf_url?: string | null;
+  pdf_name?: string | null;
 }
 
 export interface TextContentComment {
