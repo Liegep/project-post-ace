@@ -23,6 +23,8 @@ interface Props {
     status: TextContentStatus;
     planned_date: string | null;
     observations: string;
+    pdf_url?: string | null;
+    pdf_name?: string | null;
   }) => Promise<boolean>;
   initial?: {
     content_type?: TextContentType;
@@ -32,6 +34,8 @@ interface Props {
     status?: TextContentStatus;
     planned_date?: string | null;
     observations?: string;
+    pdf_url?: string | null;
+    pdf_name?: string | null;
   };
   mode?: "create" | "edit";
 }
