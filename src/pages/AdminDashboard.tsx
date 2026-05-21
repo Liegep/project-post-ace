@@ -272,14 +272,15 @@ const AdminDashboard = () => {
       await fetchStatusNotifs();
     })();
 
-    // Realtime: refresh feedbacks when a post's client_label changes.
-    // Debounced so a burst of edits collapses into a single refetch.
+    // Realtime: refresh feedbacks when a post becomes actionable for the dashboard.
+    // Keep this narrowed to feedback-label updates so unrelated post edits do not
+    // keep the Realtime WAL listener busy or trigger broad dashboard refetches.
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     const channel = supabase
       .channel("feedback-realtime")
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "posts" },
+        { event: "UPDATE", schema: "public", table: "posts", filter: "client_label=neq.pendente" },
         (payload) => {
           const oldLabel = (payload.old as any)?.client_label;
           const newLabel = (payload.new as any)?.client_label;
