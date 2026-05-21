@@ -17,7 +17,7 @@ import {
 } from "@/hooks/useTextContents";
 import {
   FileText, BookOpen, Type, PenTool, FileCheck,
-  Calendar, Check, X, Send, MessageCircle,
+  Calendar, Check, X, Send, MessageCircle, Download,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
