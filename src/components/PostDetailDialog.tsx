@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle, Tag as TagIcon, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle, Tag as TagIcon, RotateCcw, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { useUserRole } from "@/hooks/useUserRole";
