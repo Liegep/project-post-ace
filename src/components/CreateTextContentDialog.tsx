@@ -49,6 +49,43 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
   const [plannedDate, setPlannedDate] = useState(initial?.planned_date || "");
   const [observations, setObservations] = useState(initial?.observations || "");
   const [saving, setSaving] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(initial?.pdf_url || null);
+  const [pdfName, setPdfName] = useState<string | null>(initial?.pdf_name || null);
+  const [pdfBusy, setPdfBusy] = useState(false);
+
+  const handlePdfFile = async (file: File) => {
+    if (file.type !== "application/pdf") {
+      toast({ title: "Arquivo inválido", description: "Selecione um arquivo PDF.", variant: "destructive" });
+      return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      toast({ title: "Arquivo muito grande", description: "Máximo 20MB.", variant: "destructive" });
+      return;
+    }
+    setPdfBusy(true);
+    try {
+      // 1) Extract text into the editor
+      const html = await extractPdfAsHtml(file);
+      setBody((prev) => (prev && prev.replace(/<[^>]+>/g, "").trim() ? prev + "\n" + html : html));
+      if (!title.trim()) setTitle(file.name.replace(/\.pdf$/i, ""));
+
+      // 2) Upload original PDF so the client can download it
+      const path = `text_contents/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+      const { error: upErr } = await supabase.storage.from("media").upload(path, file, {
+        contentType: "application/pdf",
+        upsert: false,
+      });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("media").getPublicUrl(path);
+      setPdfUrl(pub.publicUrl);
+      setPdfName(file.name);
+      toast({ title: "PDF importado", description: "Texto extraído e arquivo anexado." });
+    } catch (e: any) {
+      toast({ title: "Falha ao importar PDF", description: e.message || String(e), variant: "destructive" });
+    } finally {
+      setPdfBusy(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -64,12 +101,15 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
       status,
       planned_date: plannedDate || null,
       observations: observations.trim(),
+      pdf_url: pdfUrl,
+      pdf_name: pdfName,
     });
     setSaving(false);
     if (ok) {
       if (mode === "create") {
         setTitle(""); setSubtitle(""); setBody(""); setObservations(""); setPlannedDate("");
         setContentType("texto"); setStatus("draft");
+        setPdfUrl(null); setPdfName(null);
       }
       onOpenChange(false);
     }
