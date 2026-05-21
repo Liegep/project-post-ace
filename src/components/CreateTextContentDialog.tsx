@@ -252,12 +252,62 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
 
           <div className="flex justify-end gap-2 pt-2 border-t border-white/15 mt-2">
             <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/30 text-white hover:bg-white/10 hover:text-white">Cancelar</Button>
+            <Button
+              variant="outline"
+              onClick={() => setPreviewOpen(true)}
+              className="border-white/30 text-white hover:bg-white/10 hover:text-white"
+            >
+              <Eye className="mr-2 h-4 w-4" /> Pré-visualizar
+            </Button>
             <Button onClick={handleSave} disabled={saving} className="bg-accent text-accent-foreground hover:bg-accent/90">
               {saving ? "Salvando..." : mode === "edit" ? "Salvar" : "Criar Conteúdo"}
             </Button>
           </div>
         </div>
       </DialogContent>
+
+      {/* Preview — what the client will see */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] p-0 overflow-hidden flex flex-col !bg-white/95 !backdrop-blur-xl !text-black !border-white/30">
+          <div className="px-6 pt-6 pb-3 border-b">
+            <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Pré-visualização do cliente</div>
+            <h2 className="text-2xl font-bold text-foreground leading-tight">{title || "Sem título"}</h2>
+            {subtitle && <p className="text-base text-muted-foreground mt-1">{subtitle}</p>}
+          </div>
+          <div className="overflow-y-auto px-6 py-5">
+            {pdfUrl && (
+              <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <FileText className="h-4 w-4 text-primary shrink-0" />
+                  <span className="text-sm font-medium text-foreground truncate">{pdfName || "Documento PDF"}</span>
+                </div>
+                <a
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 inline-flex items-center text-sm font-medium text-primary hover:underline"
+                >
+                  Baixar PDF
+                </a>
+              </div>
+            )}
+            <article
+              className="prose prose-sm sm:prose max-w-none text-foreground leading-[1.8] [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
+              dangerouslySetInnerHTML={{ __html: body || "<p><em>Sem conteúdo ainda.</em></p>" }}
+            />
+            {observations && (
+              <div className="mt-6 rounded-lg border bg-muted/50 p-4">
+                <p className="text-xs font-semibold text-muted-foreground mb-1">Observações (visíveis para o cliente)</p>
+                <p className="text-sm text-foreground whitespace-pre-wrap">{observations}</p>
+              </div>
+            )}
+          </div>
+          <div className="border-t bg-card px-6 py-3 flex justify-end">
+            <Button onClick={() => setPreviewOpen(false)}>Fechar pré-visualização</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </Dialog>
   );
 }
