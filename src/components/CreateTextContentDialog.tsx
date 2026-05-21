@@ -292,7 +292,7 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
               </div>
             )}
             <article
-              className="prose prose-sm sm:prose max-w-none text-foreground leading-[1.8] [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
+              className="prose prose-sm sm:prose max-w-none leading-[1.8] !text-black [&_*]:!text-black [&_a]:!text-blue-600 [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
               dangerouslySetInnerHTML={{ __html: body || "<p><em>Sem conteúdo ainda.</em></p>" }}
             />
             {observations && (
