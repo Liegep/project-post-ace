@@ -65,6 +65,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
   const [showHistory, setShowHistory] = useState(false);
   const [showChangeForm, setShowChangeForm] = useState(false);
   const [changeComment, setChangeComment] = useState("");
+  const [copied, setCopied] = useState(false);
   const activityLogs = useActivityLogs({ itemId: post?.id || "", enabled: open && showHistory && !!post });
   const { isAdmin } = useUserRole();
   const { locale } = useI18n();
