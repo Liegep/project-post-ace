@@ -159,13 +159,49 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
           </div>
 
           <div>
-            <Label className="text-xs text-white/70">Texto Completo</Label>
+            <div className="flex items-center justify-between mb-1">
+              <Label className="text-xs text-white/70">Texto Completo</Label>
+              <div className="flex items-center gap-2">
+                {pdfName && (
+                  <span className="flex items-center gap-1 text-[11px] text-white/80 bg-white/10 rounded px-2 py-0.5">
+                    <FileText className="h-3 w-3" /> {pdfName}
+                    <button
+                      type="button"
+                      onClick={() => { setPdfUrl(null); setPdfName(null); }}
+                      className="ml-1 hover:text-white"
+                      title="Remover PDF"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                )}
+                <label className="inline-flex items-center gap-1 text-[11px] text-white/90 bg-white/10 hover:bg-white/20 rounded px-2 py-1 cursor-pointer">
+                  {pdfBusy ? <Loader2 className="h-3 w-3 animate-spin" /> : <FileUp className="h-3 w-3" />}
+                  {pdfBusy ? "Importando..." : "Importar PDF"}
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    className="hidden"
+                    disabled={pdfBusy}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handlePdfFile(f);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
             <RichTextEditor
               content={body}
               onChange={setBody}
-              placeholder="Escreva o conteúdo completo aqui..."
+              placeholder="Escreva o conteúdo completo aqui... ou importe um PDF para extrair o texto automaticamente."
             />
+            <p className="text-[10px] text-white/50 mt-1">
+              Ao importar um PDF, o texto é copiado para o editor e o arquivo fica disponível para o cliente baixar.
+            </p>
           </div>
+
 
           <div>
             <Label className="text-xs text-white/70">Data Planejada</Label>
