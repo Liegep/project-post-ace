@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle, Tag as TagIcon, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, History, CheckCircle2, AlertTriangle, Tag as TagIcon, RotateCcw, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -65,6 +65,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
   const [showHistory, setShowHistory] = useState(false);
   const [showChangeForm, setShowChangeForm] = useState(false);
   const [changeComment, setChangeComment] = useState("");
+  const [copied, setCopied] = useState(false);
   const activityLogs = useActivityLogs({ itemId: post?.id || "", enabled: open && showHistory && !!post });
   const { isAdmin } = useUserRole();
   const { locale } = useI18n();
@@ -177,10 +178,30 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
           )}
 
           {post.caption && (
-            <div className="rounded-xl p-4 sm:p-5 bg-white text-black shadow-sm border border-white/20">
-              <p className="text-[11px] uppercase tracking-wider font-semibold text-black/50 mb-2">
-                {t("fullCaption")}
-              </p>
+            <div className="relative rounded-xl p-4 sm:p-5 bg-white text-black shadow-sm border border-white/20">
+              <div className="flex items-center justify-between mb-2 gap-2">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-black/50">
+                  {t("fullCaption")}
+                </p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(post.caption || "");
+                      setCopied(true);
+                      toast.success(t("copied") || "Copiado!");
+                      setTimeout(() => setCopied(false), 2000);
+                    } catch {
+                      toast.error("Erro ao copiar");
+                    }
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-black/70 hover:text-black hover:bg-black/5 transition-colors"
+                  aria-label="Copiar legenda"
+                >
+                  {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copied ? "Copiado" : "Copiar"}
+                </button>
+              </div>
               <div className="text-[18px] sm:text-[19px] leading-[1.6] whitespace-pre-wrap font-medium">
                 <LinkedText text={post.caption} />
               </div>
