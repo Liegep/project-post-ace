@@ -53,6 +53,7 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
   const [pdfName, setPdfName] = useState<string | null>(initial?.pdf_name || null);
   const [pdfBusy, setPdfBusy] = useState(false);
   const [pdfProgress, setPdfProgress] = useState<string>("");
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const handlePdfFile = async (file: File, mode: "text" | "visual") => {
     if (file.type !== "application/pdf") {
