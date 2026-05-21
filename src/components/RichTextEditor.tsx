@@ -2,6 +2,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
+import Image from "@tiptap/extension-image";
 import { Toggle } from "@/components/ui/toggle";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -25,6 +26,7 @@ export function RichTextEditor({ content, onChange, placeholder, editable = true
         heading: { levels: [2, 3] },
       }),
       Underline,
+      Image.configure({ inline: false, allowBase64: true, HTMLAttributes: { class: "max-w-full h-auto rounded my-2" } }),
       Placeholder.configure({ placeholder: placeholder || "Escreva aqui..." }),
     ],
     content,
