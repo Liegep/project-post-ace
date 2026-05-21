@@ -252,11 +252,10 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
           </div>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-white/15 mt-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/30 text-white hover:bg-white/10 hover:text-white">Cancelar</Button>
+            <Button onClick={() => onOpenChange(false)} className="bg-white text-black border border-black/10 hover:bg-white/90">Cancelar</Button>
             <Button
-              variant="outline"
               onClick={() => setPreviewOpen(true)}
-              className="border-white/30 text-white hover:bg-white/10 hover:text-white"
+              className="bg-black text-white hover:bg-black/85"
             >
               <Eye className="mr-2 h-4 w-4" /> Pré-visualizar
             </Button>
