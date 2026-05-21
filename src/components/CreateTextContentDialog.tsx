@@ -9,8 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "@/hooks/use-toast";
 import { TextContentType, TextContentStatus, CONTENT_TYPE_LABELS, TEXT_STATUS_LABELS } from "@/hooks/useTextContents";
 import { supabase } from "@/integrations/supabase/client";
-import { extractPdfAsHtml } from "@/lib/pdfExtract";
-import { FileUp, FileText, X, Loader2 } from "lucide-react";
+import { extractPdfAsHtml, renderPdfAsImagesHtml } from "@/lib/pdfExtract";
+import { FileUp, FileText, X, Loader2, Image as ImageIcon } from "lucide-react";
 
 interface Props {
   open: boolean;
