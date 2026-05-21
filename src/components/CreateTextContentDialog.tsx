@@ -252,11 +252,10 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
           </div>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-white/15 mt-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="border-white/30 text-white hover:bg-white/10 hover:text-white">Cancelar</Button>
+            <Button onClick={() => onOpenChange(false)} className="bg-white text-black border border-black/10 hover:bg-white/90">Cancelar</Button>
             <Button
-              variant="outline"
               onClick={() => setPreviewOpen(true)}
-              className="border-white/30 text-white hover:bg-white/10 hover:text-white"
+              className="bg-black text-white hover:bg-black/85"
             >
               <Eye className="mr-2 h-4 w-4" /> Pré-visualizar
             </Button>
@@ -293,7 +292,7 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
               </div>
             )}
             <article
-              className="prose prose-sm sm:prose max-w-none text-foreground leading-[1.8] [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
+              className="prose prose-sm sm:prose max-w-none leading-[1.8] !text-black [&_*]:!text-black [&_a]:!text-blue-600 [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
               dangerouslySetInnerHTML={{ __html: body || "<p><em>Sem conteúdo ainda.</em></p>" }}
             />
             {observations && (
