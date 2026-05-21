@@ -1,3 +1,22 @@
+// ⚠️ AUTOMATIC PUBLISHING DISABLED (Meta app not yet approved).
+// The cron job `social-scheduler-every-minute` has been unscheduled and
+// `social_posts` was removed from the `supabase_realtime` publication to
+// stop background IO. The edge function code, social_posts table, RLS,
+// calendar UI and planned post data remain intact.
+//
+// To re-enable when Meta permissions are approved:
+//   1) Ensure secrets META_APP_ID / META_APP_SECRET are set and the Meta app
+//      has `pages_manage_posts` + `instagram_content_publish` approved.
+//   2) Reschedule cron (run as SQL):
+//        SELECT cron.schedule(
+//          'social-scheduler-every-minute', '*/5 * * * *',
+//          $$ SELECT net.http_post(
+//               url:='https://<PROJECT_REF>.supabase.co/functions/v1/social-scheduler',
+//               headers:='{"Content-Type":"application/json","apikey":"<ANON_KEY>"}'::jsonb,
+//               body:='{}'::jsonb) $$);
+//   3) Re-add realtime:
+//        ALTER PUBLICATION supabase_realtime ADD TABLE public.social_posts;
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
