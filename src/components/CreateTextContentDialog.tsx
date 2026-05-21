@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { TextContentType, TextContentStatus, CONTENT_TYPE_LABELS, TEXT_STATUS_LABELS } from "@/hooks/useTextContents";
+import { supabase } from "@/integrations/supabase/client";
+import { extractPdfAsHtml } from "@/lib/pdfExtract";
+import { FileUp, FileText, X, Loader2 } from "lucide-react";
 
 interface Props {
   open: boolean;
