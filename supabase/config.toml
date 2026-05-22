@@ -18,11 +18,8 @@ verify_jwt = false
 [functions.create-team-member]
 verify_jwt = false
 
-[functions.trello-push]
-verify_jwt = false
+# Trello edge functions removed — integration is intentionally disabled (see docs/TRELLO_DISABLED.md)
 
-[functions.trello-sync]
-verify_jwt = false
 
 [functions.send-admin-invite]
 verify_jwt = false
