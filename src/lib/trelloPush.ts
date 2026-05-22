@@ -1,22 +1,10 @@
-const TRELLO_PUSH_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/trello-push`;
-
-export async function pushToTrello(postId: string, action: "update" | "move_column" | "update_description") {
-  try {
-    const res = await fetch(TRELLO_PUSH_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-      },
-      body: JSON.stringify({ postId, action }),
-    });
-    const data = await res.json();
-    if (!data.success && !data.skipped) {
-      console.warn("Trello push failed:", data.error);
-    }
-    return data;
-  } catch (err) {
-    console.warn("Trello push error:", err);
-    return { success: false };
-  }
+// Trello integration is disabled (per project policy).
+// This is a no-op stub kept so existing call sites in PostsContext compile
+// without firing edge function requests that would fail due to missing
+// TRELLO_API_KEY / TRELLO_TOKEN secrets.
+export async function pushToTrello(
+  _postId: string,
+  _action: "update" | "move_column" | "update_description",
+) {
+  return { success: true, skipped: true as const };
 }
