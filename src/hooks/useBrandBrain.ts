@@ -40,6 +40,7 @@ export interface ContentPillar {
 export interface BrandVoice {
   id: string;
   client_id: string;
+  brand_name: string;
   emotional_tone: string;
   archetype: string;
   writing_rhythm: string;
