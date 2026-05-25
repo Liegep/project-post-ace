@@ -62,7 +62,7 @@ const HEADER_MAP: Record<string, keyof VocabImportRow> = {
   "palabras relacionadas": "related_words",
   "frases aprobadas": "approved_phrases",
   "¿se puede usar?": "can_be_used", "se puede usar": "can_be_used",
-  "notas técnicas": "technical_notes", "notas tecnicas es": "technical_notes",
+  "notas tecnicas es": "technical_notes",
 };
 
 function norm(s: string) {
