@@ -256,6 +256,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
       column_id: resolvedColumnId,
       position: nextPosition,
       art_type: post.artType || 'single_post',
+      content_pillar_id: post.contentPillarId ?? null,
     };
     if (post.deadline) {
       insertData.deadline = serializePostDeadline(post.deadline);
