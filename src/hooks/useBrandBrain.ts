@@ -40,6 +40,7 @@ export interface ContentPillar {
 export interface BrandVoice {
   id: string;
   client_id: string;
+  brand_name: string;
   emotional_tone: string;
   archetype: string;
   writing_rhythm: string;
@@ -81,7 +82,7 @@ export function useBrandBrain(clientId: string | undefined) {
   const [brain, setBrain] = useState<BrandBrain | null>(null);
   const [vocabulary, setVocabulary] = useState<VocabularyItem[]>([]);
   const [pillars, setPillars] = useState<ContentPillar[]>([]);
-  const [voice, setVoice] = useState<BrandVoice | null>(null);
+  const [voices, setVoices] = useState<BrandVoice[]>([]);
   const [avoid, setAvoid] = useState<AvoidWord[]>([]);
   const [expressions, setExpressions] = useState<ApprovedExpression[]>([]);
   const [visuals, setVisuals] = useState<VisualDirection[]>([]);
@@ -93,7 +94,7 @@ export function useBrandBrain(clientId: string | undefined) {
       supabase.from("brand_brains").select("*").eq("client_id", clientId).maybeSingle(),
       supabase.from("brand_vocabulary").select("*").eq("client_id", clientId).order("created_at", { ascending: false }),
       supabase.from("content_pillars").select("*").eq("client_id", clientId).order("created_at", { ascending: true }),
-      supabase.from("brand_voice").select("*").eq("client_id", clientId).maybeSingle(),
+      supabase.from("brand_voice").select("*").eq("client_id", clientId).order("created_at", { ascending: true }),
       supabase.from("words_to_avoid").select("*").eq("client_id", clientId).order("created_at", { ascending: false }),
       supabase.from("approved_expressions").select("*").eq("client_id", clientId).order("created_at", { ascending: false }),
       supabase.from("visual_directions").select("*").eq("client_id", clientId).order("created_at", { ascending: false }),
@@ -101,7 +102,7 @@ export function useBrandBrain(clientId: string | undefined) {
     setBrain((b.data as any) || null);
     setVocabulary((vo.data as any) || []);
     setPillars((p.data as any) || []);
-    setVoice((vc.data as any) || null);
+    setVoices((vc.data as any) || []);
     setAvoid((a.data as any) || []);
     setExpressions((e.data as any) || []);
     setVisuals((vd.data as any) || []);
@@ -110,5 +111,5 @@ export function useBrandBrain(clientId: string | undefined) {
 
   useEffect(() => { void refresh(); }, [refresh]);
 
-  return { loading, brain, vocabulary, pillars, voice, avoid, expressions, visuals, refresh };
+  return { loading, brain, vocabulary, pillars, voices, voice: voices[0] || null, avoid, expressions, visuals, refresh };
 }
