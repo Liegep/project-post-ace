@@ -127,7 +127,7 @@ type DataBundle = ReturnType<typeof useBrandBrain>;
 type Dict = ReturnType<typeof getBbDict>;
 
 /* -------------------- Overview -------------------- */
-function OverviewTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function OverviewTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [mission, setMission] = useState("");
   const [vision, setVision] = useState("");
   const [summary, setSummary] = useState("");
@@ -147,16 +147,16 @@ function OverviewTab({ clientId, canEdit, data }: { clientId: string; canEdit: b
       : await supabase.from("brand_brains").insert(payload);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Brand Brain salvo");
+    toast.success("OK");
     data.refresh();
   };
 
   const counters = [
-    { label: "Vocabulário", value: data.vocabulary.length },
-    { label: "Pilares", value: data.pillars.length },
-    { label: "Palavras a evitar", value: data.avoid.length },
-    { label: "Expressões aprovadas", value: data.expressions.length },
-    { label: "Direções visuais", value: data.visuals.length },
+    { label: t.counters.vocab, value: data.vocabulary.length },
+    { label: t.counters.pillars, value: data.pillars.length },
+    { label: t.counters.avoid, value: data.avoid.length },
+    { label: t.counters.expr, value: data.expressions.length },
+    { label: t.counters.visuals, value: data.visuals.length },
   ];
 
   return (
@@ -173,23 +173,23 @@ function OverviewTab({ clientId, canEdit, data }: { clientId: string; canEdit: b
       </div>
 
       <Card>
-        <CardHeader><CardTitle>Identidade da marca</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t.identity}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label>Missão</Label>
+            <Label>{t.mission}</Label>
             <Textarea value={mission} onChange={(e) => setMission(e.target.value)} disabled={!canEdit} rows={3} maxLength={1000} />
           </div>
           <div>
-            <Label>Visão</Label>
+            <Label>{t.vision}</Label>
             <Textarea value={vision} onChange={(e) => setVision(e.target.value)} disabled={!canEdit} rows={3} maxLength={1000} />
           </div>
           <div>
-            <Label>Resumo estratégico</Label>
+            <Label>{t.summary}</Label>
             <Textarea value={summary} onChange={(e) => setSummary(e.target.value)} disabled={!canEdit} rows={5} maxLength={3000} />
           </div>
           {canEdit && (
             <div className="flex justify-end">
-              <Button onClick={save} disabled={saving}>{saving ? "Salvando…" : "Salvar"}</Button>
+              <Button onClick={save} disabled={saving}>{saving ? t.saving : t.save}</Button>
             </div>
           )}
         </CardContent>
@@ -197,6 +197,7 @@ function OverviewTab({ clientId, canEdit, data }: { clientId: string; canEdit: b
     </div>
   );
 }
+
 
 /* -------------------- Vocabulary -------------------- */
 function VocabularyTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
