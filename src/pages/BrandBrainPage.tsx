@@ -42,13 +42,14 @@ export default function BrandBrainPage() {
 
   useEffect(() => {
     if (!slug) return;
-    supabase.from("clients").select("id, name, logo_url, slug, locale").eq("slug", slug).maybeSingle().then(({ data }) => {
+    supabase.from("clients").select("id, name, logo_url, slug, locale, allow_client_edit_brand_brain").eq("slug", slug).maybeSingle().then(({ data }) => {
       setClient((data as ClientLite) || null);
       setLoadingClient(false);
     });
   }, [slug]);
 
-  const canEdit = role === "super_admin" || role === "admin" || role === "colaborador";
+  const isTeam = role === "super_admin" || role === "admin" || role === "colaborador";
+  const canEdit = isTeam || (role === "cliente" && !!(client as any)?.allow_client_edit_brand_brain);
   const data = useBrandBrain(client?.id);
   const t = useMemo(() => getBbDict(client?.locale), [client?.locale]);
   const [tab, setTab] = useState<string>("home");
