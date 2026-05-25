@@ -143,6 +143,7 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
       setDeadline("");
       setStatus(["entrada"]);
       setSelectedTags([]);
+      setContentPillarId(null);
       if (createAnother) {
         setColumnId(keepColumnId);
       } else {
