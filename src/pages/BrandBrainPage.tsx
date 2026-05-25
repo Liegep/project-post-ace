@@ -200,52 +200,124 @@ function OverviewTab({ clientId, canEdit, data, t }: { clientId: string; canEdit
 
 
 /* -------------------- Vocabulary -------------------- */
-function VocabularyTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function VocabularyTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const [form, setForm] = useState({ term: "", category: "keyword", emotion: "", status: "approved" as VocabularyStatus, notes: "" });
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
 
-  const openNew = () => { setEditing(null); setForm({ term: "", category: "keyword", emotion: "", status: "approved", notes: "" }); setOpen(true); };
-  const openEdit = (item: any) => { setEditing(item); setForm(item); setOpen(true); };
+  const emptyForm = {
+    term: "", category: "keyword", emotion: "", status: "approved" as VocabularyStatus, notes: "",
+    brand: "", content_type: "", priority: "", frequency: "",
+    related_words: "", approved_phrases: "", can_be_used: true, technical_notes: "",
+  };
+  const [form, setForm] = useState(emptyForm);
+
+  const openNew = () => { setEditing(null); setForm(emptyForm); setOpen(true); };
+  const openEdit = (item: any) => {
+    setEditing(item);
+    setForm({
+      term: item.term || "",
+      category: item.category || "keyword",
+      emotion: item.emotion || "",
+      status: item.status || "approved",
+      notes: item.notes || "",
+      brand: item.brand || "",
+      content_type: item.content_type || "",
+      priority: item.priority || "",
+      frequency: item.frequency || "",
+      related_words: (item.related_words || []).join(", "),
+      approved_phrases: (item.approved_phrases || []).join(" | "),
+      can_be_used: item.can_be_used !== false,
+      technical_notes: item.technical_notes || "",
+    });
+    setOpen(true);
+  };
 
   const save = async () => {
-    if (!form.term.trim()) return toast.error("Termo é obrigatório");
-    const payload = { ...form, client_id: clientId };
+    if (!form.term.trim()) return toast.error("Termo / Termine *");
+    const payload = {
+      client_id: clientId,
+      term: form.term.trim(),
+      category: form.category,
+      emotion: form.emotion,
+      status: form.status,
+      notes: form.notes,
+      brand: form.brand,
+      content_type: form.content_type,
+      priority: form.priority,
+      frequency: form.frequency,
+      related_words: form.related_words.split(/[,;]/).map((s) => s.trim()).filter(Boolean),
+      approved_phrases: form.approved_phrases.split(/\||\n/).map((s) => s.trim()).filter(Boolean),
+      can_be_used: form.can_be_used,
+      technical_notes: form.technical_notes,
+    };
     const { error } = editing
       ? await supabase.from("brand_vocabulary").update(payload).eq("id", editing.id)
       : await supabase.from("brand_vocabulary").insert(payload);
     if (error) return toast.error(error.message);
-    toast.success("Salvo");
+    toast.success("OK");
     setOpen(false); data.refresh();
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Remover este termo?")) return;
+    if (!confirm("?")) return;
     const { error } = await supabase.from("brand_vocabulary").delete().eq("id", id);
     if (error) return toast.error(error.message);
     data.refresh();
   };
 
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setImporting(true);
+    try {
+      const rows = await parseSpreadsheetFile(file);
+      if (!rows.length) { toast.error("Nenhuma linha válida"); return; }
+      const { inserted } = await importVocabularyRows(clientId, rows);
+      toast.success(`${inserted} ${t.tab_vocabulary.toLowerCase()} → OK`);
+      data.refresh();
+    } catch (err: any) {
+      toast.error(err?.message || "Erro");
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {canEdit && (
-        <div className="flex justify-end">
-          <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> Novo termo</Button>
+        <div className="flex flex-wrap justify-end gap-2">
+          <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleFile} className="hidden" />
+          <Button variant="outline" size="sm" onClick={downloadVocabularyTemplate}>
+            <Download className="mr-2 h-4 w-4" /> {t.vocab_template}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={importing}>
+            <Upload className="mr-2 h-4 w-4" /> {importing ? "..." : t.vocab_import}
+          </Button>
+          <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> {t.vocab_new}</Button>
         </div>
       )}
       {data.vocabulary.length === 0 ? (
-        <EmptyState message="Ainda não há vocabulário cadastrado para esta marca." />
+        <EmptyState message={t.vocab_empty} />
       ) : (
-        <Card>
+        <Card className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Termo</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Emoção</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Observações</TableHead>
-                {canEdit && <TableHead className="w-24"></TableHead>}
+                <TableHead>{t.cols.term}</TableHead>
+                <TableHead>{t.cols.category}</TableHead>
+                <TableHead>{t.cols.brand}</TableHead>
+                <TableHead>{t.cols.contentType}</TableHead>
+                <TableHead>{t.cols.priority}</TableHead>
+                <TableHead>{t.cols.frequency}</TableHead>
+                <TableHead>{t.cols.emotion}</TableHead>
+                <TableHead>{t.cols.related}</TableHead>
+                <TableHead>{t.cols.phrases}</TableHead>
+                <TableHead>{t.cols.canUse}</TableHead>
+                <TableHead>{t.cols.notes}</TableHead>
+                {canEdit && <TableHead className="w-20"></TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -253,11 +325,19 @@ function VocabularyTab({ clientId, canEdit, data }: { clientId: string; canEdit:
                 <TableRow key={v.id}>
                   <TableCell className="font-medium">{v.term}</TableCell>
                   <TableCell><Badge variant="secondary">{v.category}</Badge></TableCell>
-                  <TableCell>{v.emotion}</TableCell>
+                  <TableCell className="text-sm">{v.brand}</TableCell>
+                  <TableCell className="text-sm">{v.content_type}</TableCell>
+                  <TableCell className="text-sm">{v.priority}</TableCell>
+                  <TableCell className="text-sm">{v.frequency}</TableCell>
+                  <TableCell className="text-sm">{v.emotion}</TableCell>
+                  <TableCell className="text-xs max-w-[160px] truncate">{(v.related_words || []).join(", ")}</TableCell>
+                  <TableCell className="text-xs max-w-[200px] truncate">{(v.approved_phrases || []).join(" | ")}</TableCell>
                   <TableCell>
-                    <Badge className={STATUS_LABEL[v.status]?.className}>{STATUS_LABEL[v.status]?.label || v.status}</Badge>
+                    <Badge className={v.can_be_used ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-red-500/15 text-red-700 dark:text-red-300"}>
+                      {v.can_be_used ? t.yes : t.no}
+                    </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground max-w-xs truncate">{v.notes}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">{v.technical_notes || v.notes}</TableCell>
                   {canEdit && (
                     <TableCell>
                       <div className="flex gap-1">
@@ -274,45 +354,57 @@ function VocabularyTab({ clientId, canEdit, data }: { clientId: string; canEdit:
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>{editing ? "Editar termo" : "Novo termo"}</DialogTitle></DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{editing ? t.cols.term : t.vocab_new}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Termo *</Label><Input value={form.term} onChange={(e) => setForm({ ...form, term: e.target.value })} maxLength={120} /></div>
+            <div><Label>{t.cols.term} *</Label><Input value={form.term} onChange={(e) => setForm({ ...form, term: e.target.value })} maxLength={120} /></div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Categoria</Label>
-                <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="keyword">Palavra-chave</SelectItem>
-                    <SelectItem value="concept">Conceito</SelectItem>
-                    <SelectItem value="technical">Termo técnico</SelectItem>
-                    <SelectItem value="phrase">Frase da marca</SelectItem>
-                    <SelectItem value="forbidden">Palavra proibida</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>{t.cols.category}</Label>
+                <Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} maxLength={120} />
               </div>
               <div>
-                <Label>Status</Label>
-                <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as VocabularyStatus })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="approved">Aprovado</SelectItem>
-                    <SelectItem value="avoid">Evitar</SelectItem>
-                    <SelectItem value="forbidden">Proibido</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>{t.cols.brand}</Label>
+                <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} maxLength={120} />
+              </div>
+              <div>
+                <Label>{t.cols.contentType}</Label>
+                <Input value={form.content_type} onChange={(e) => setForm({ ...form, content_type: e.target.value })} maxLength={120} />
+              </div>
+              <div>
+                <Label>{t.cols.priority}</Label>
+                <Input value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} maxLength={60} />
+              </div>
+              <div>
+                <Label>{t.cols.frequency}</Label>
+                <Input value={form.frequency} onChange={(e) => setForm({ ...form, frequency: e.target.value })} maxLength={60} />
+              </div>
+              <div>
+                <Label>{t.cols.emotion}</Label>
+                <Input value={form.emotion} onChange={(e) => setForm({ ...form, emotion: e.target.value })} maxLength={120} />
               </div>
             </div>
-            <div><Label>Emoção associada</Label><Input value={form.emotion} onChange={(e) => setForm({ ...form, emotion: e.target.value })} maxLength={120} /></div>
-            <div><Label>Observações</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} maxLength={500} /></div>
+            <div>
+              <Label>{t.cols.related}</Label>
+              <Input value={form.related_words} onChange={(e) => setForm({ ...form, related_words: e.target.value })} placeholder="a, b, c" />
+            </div>
+            <div>
+              <Label>{t.cols.phrases}</Label>
+              <Textarea value={form.approved_phrases} onChange={(e) => setForm({ ...form, approved_phrases: e.target.value })} placeholder="Frase 1 | Frase 2" rows={2} />
+            </div>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <Label>{t.cols.canUse}</Label>
+              <Switch checked={form.can_be_used} onCheckedChange={(c) => setForm({ ...form, can_be_used: c, status: c ? "approved" : "avoid" })} />
+            </div>
+            <div><Label>{t.cols.notes}</Label><Textarea value={form.technical_notes} onChange={(e) => setForm({ ...form, technical_notes: e.target.value })} maxLength={500} rows={2} /></div>
           </div>
-          <DialogFooter><Button onClick={save}>Salvar</Button></DialogFooter>
+          <DialogFooter><Button onClick={save}>{t.save}</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
 }
+
 
 /* -------------------- Pillars -------------------- */
 function PillarsTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
