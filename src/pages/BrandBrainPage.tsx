@@ -80,15 +80,15 @@ export default function BrandBrainPage() {
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="flex w-full flex-wrap h-auto justify-start gap-1 bg-muted/50 p-1">
-            <TabsTrigger value="overview">{t.tab_overview}</TabsTrigger>
-            <TabsTrigger value="vocabulary">{t.tab_vocabulary}</TabsTrigger>
-            <TabsTrigger value="pillars">{t.tab_pillars}</TabsTrigger>
-            <TabsTrigger value="voice">{t.tab_voice}</TabsTrigger>
-            <TabsTrigger value="avoid">{t.tab_avoid}</TabsTrigger>
-            <TabsTrigger value="expressions">{t.tab_expressions}</TabsTrigger>
-            <TabsTrigger value="visual">{t.tab_visual}</TabsTrigger>
-            {canEdit && <TabsTrigger value="ai">{t.tab_ai}</TabsTrigger>}
+          <TabsList className="flex w-full overflow-x-auto sm:flex-wrap h-auto justify-start gap-1 bg-muted/50 p-1">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_overview}</TabsTrigger>
+            <TabsTrigger value="vocabulary" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_vocabulary}</TabsTrigger>
+            <TabsTrigger value="pillars" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_pillars}</TabsTrigger>
+            <TabsTrigger value="voice" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_voice}</TabsTrigger>
+            <TabsTrigger value="avoid" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_avoid}</TabsTrigger>
+            <TabsTrigger value="expressions" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_expressions}</TabsTrigger>
+            <TabsTrigger value="visual" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_visual}</TabsTrigger>
+            {canEdit && <TabsTrigger value="ai" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_ai}</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
