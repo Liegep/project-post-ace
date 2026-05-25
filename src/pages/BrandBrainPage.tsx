@@ -49,7 +49,7 @@ export default function BrandBrainPage() {
   }, [slug]);
 
   const isTeam = role === "super_admin" || role === "admin" || role === "colaborador";
-  const canEdit = isTeam || (role === "cliente" && !!(client as any)?.allow_client_edit_brand_brain);
+  const canEdit = isTeam || (role === "client" && !!(client as any)?.allow_client_edit_brand_brain);
   const data = useBrandBrain(client?.id);
   const t = useMemo(() => getBbDict(client?.locale), [client?.locale]);
   const [tab, setTab] = useState<string>("home");
