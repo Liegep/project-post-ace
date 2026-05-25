@@ -407,7 +407,7 @@ function VocabularyTab({ clientId, canEdit, data, t }: { clientId: string; canEd
 
 
 /* -------------------- Pillars -------------------- */
-function PillarsTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function PillarsTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const empty = { name: "", objective: "", themes: "", main_emotion: "", suggested_frequency: "", notes: "" };
@@ -561,7 +561,7 @@ function VoiceTab({ clientId, canEdit, data }: { clientId: string; canEdit: bool
 }
 
 /* -------------------- Avoid -------------------- */
-function AvoidTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function AvoidTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const empty = { word: "", reason: "", recommended_alternative: "", category: "" };
@@ -639,7 +639,7 @@ function AvoidTab({ clientId, canEdit, data }: { clientId: string; canEdit: bool
 }
 
 /* -------------------- Expressions -------------------- */
-function ExpressionsTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function ExpressionsTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const empty = { expression: "", usage_context: "", emotion: "", notes: "" };
@@ -706,7 +706,7 @@ function ExpressionsTab({ clientId, canEdit, data }: { clientId: string; canEdit
 }
 
 /* -------------------- Visual -------------------- */
-function VisualTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function VisualTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const empty = { category: "", direction: "", colors: "", image_style: "", lighting: "", composition: "", things_to_avoid: "" };
