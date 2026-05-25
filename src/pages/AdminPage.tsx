@@ -1157,6 +1157,12 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             >
               <History className="mr-1.5 inline h-4 w-4" /> Atividades
             </button>
+            <button
+              onClick={() => navigate(`/client/${clientData.slug}/brand-brain`)}
+              className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors text-muted-foreground hover:text-foreground"
+            >
+              <Sparkles className="mr-1.5 inline h-4 w-4" /> Brand Brain
+            </button>
           </div>
           {/* Compact search popover */}
           <Popover>
