@@ -1074,7 +1074,10 @@ function VisualTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: 
           {data.visuals.map((v) => (
             <Card key={v.id}>
               <CardHeader className="flex flex-row items-start justify-between gap-2">
-                <CardTitle className="text-base">{v.category}</CardTitle>
+                <div>
+                  <CardTitle className="text-base">{v.category}</CardTitle>
+                  {v.brand_name && <p className="mt-0.5 text-xs font-medium text-muted-foreground">{v.brand_name}</p>}
+                </div>
                 {canEdit && (
                   <div className="flex gap-1">
                     <Button size="icon" variant="ghost" onClick={() => openEdit(v)}><Pencil className="h-4 w-4" /></Button>
@@ -1094,11 +1097,13 @@ function VisualTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: 
                     ))}
                   </div>
                 )}
+                {v.typography && <p><span className="font-medium">Tipografia:</span> {v.typography}</p>}
                 {v.image_style && <p><span className="font-medium">Estilo:</span> {v.image_style}</p>}
                 {v.lighting && <p><span className="font-medium">Iluminação:</span> {v.lighting}</p>}
                 {v.composition && <p><span className="font-medium">Composição:</span> {v.composition}</p>}
                 {v.things_to_avoid && <p className="text-muted-foreground"><span className="font-medium">Evitar:</span> {v.things_to_avoid}</p>}
               </CardContent>
+
             </Card>
           ))}
         </div>
