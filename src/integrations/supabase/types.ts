@@ -3013,6 +3013,7 @@ export type Database = {
       }
       visual_directions: {
         Row: {
+          brand_name: string
           category: string
           client_id: string
           colors: string[]
@@ -3024,9 +3025,11 @@ export type Database = {
           image_style: string
           lighting: string
           things_to_avoid: string
+          typography: string
           updated_at: string
         }
         Insert: {
+          brand_name?: string
           category: string
           client_id: string
           colors?: string[]
@@ -3038,9 +3041,11 @@ export type Database = {
           image_style?: string
           lighting?: string
           things_to_avoid?: string
+          typography?: string
           updated_at?: string
         }
         Update: {
+          brand_name?: string
           category?: string
           client_id?: string
           colors?: string[]
@@ -3052,6 +3057,7 @@ export type Database = {
           image_style?: string
           lighting?: string
           things_to_avoid?: string
+          typography?: string
           updated_at?: string
         }
         Relationships: []

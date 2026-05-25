@@ -68,14 +68,17 @@ export interface ApprovedExpression {
 export interface VisualDirection {
   id: string;
   client_id: string;
+  brand_name: string;
   category: string;
   direction: string;
   colors: string[];
   image_style: string;
   lighting: string;
   composition: string;
+  typography: string;
   things_to_avoid: string;
 }
+
 
 export function useBrandBrain(clientId: string | undefined) {
   const [loading, setLoading] = useState(true);
