@@ -276,10 +276,84 @@ function HomeTab({ data, t, clientName, logoUrl, goTo }: { data: DataBundle; t: 
         );
       })()}
 
+      {/* Visual identity by brand */}
+      {visuals.length > 0 && (() => {
+        const groups = new Map<string, typeof visuals>();
+        visuals.forEach((v) => {
+          const key = v.brand_name?.trim() || "—";
+          if (!groups.has(key)) groups.set(key, [] as any);
+          (groups.get(key) as any).push(v);
+        });
+        return (
+          <div className="space-y-3">
+            <button onClick={() => goTo("visual")} className="group flex w-full items-center justify-between gap-3 text-left">
+              <h3 className="text-base font-semibold text-foreground">{t.tab_visual}</h3>
+              <div className="flex items-center gap-1 text-sm text-muted-foreground transition-transform group-hover:translate-x-1">
+                {t.home_open} <ArrowRight className="h-4 w-4" />
+              </div>
+            </button>
+            <div className="grid gap-3 lg:grid-cols-2">
+              {Array.from(groups.entries()).map(([brand, items]) => {
+                const allColors = Array.from(new Set(items.flatMap((v) => v.colors || []))).slice(0, 12);
+                const typographies = Array.from(new Set(items.map((v) => v.typography).filter(Boolean)));
+                return (
+                  <div key={brand} className="glass-card relative overflow-hidden p-5">
+                    <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-fuchsia-500/10 blur-3xl" />
+                    <div className="relative">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-fuchsia-500/15 text-fuchsia-600 dark:text-fuchsia-300">
+                          <Palette className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">{t.tab_visual}</div>
+                          <div className="truncate text-base font-semibold text-foreground">{brand}</div>
+                        </div>
+                      </div>
 
+                      {allColors.length > 0 && (
+                        <div className="mt-4">
+                          <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Paleta</div>
+                          <div className="flex flex-wrap gap-2">
+                            {allColors.map((c) => (
+                              <div key={c} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-card/60 px-2 py-1 text-[11px] text-foreground backdrop-blur">
+                                <span className="h-4 w-4 rounded-full border border-white/20" style={{ background: c }} />
+                                <span className="font-mono tabular-nums">{c}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {typographies.length > 0 && (
+                        <div className="mt-4">
+                          <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Tipografia</div>
+                          <div className="space-y-1">
+                            {typographies.map((tp) => (
+                              <p key={tp} className="text-sm text-foreground">{tp}</p>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="mt-4 flex flex-wrap gap-1.5">
+                        {items.map((v) => (
+                          <span key={v.id} className="rounded-full bg-muted/60 px-2 py-0.5 text-[11px] text-muted-foreground">
+                            {v.category}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Navigation grid (includes Visual) */}
       <div>
+
         <h3 className="mb-3 text-base font-semibold text-foreground">{t.home_explore}</h3>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {sections.map((s) => {
