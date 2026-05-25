@@ -501,50 +501,132 @@ function PillarsTab({ clientId, canEdit, data, t }: { clientId: string; canEdit:
 
 /* -------------------- Voice -------------------- */
 function VoiceTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
-  const [form, setForm] = useState({
-    emotional_tone: "", archetype: "", writing_rhythm: "", formality_level: "",
+  const voices = data.voices || [];
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const empty = {
+    brand_name: "", emotional_tone: "", archetype: "", writing_rhythm: "", formality_level: "",
     things_to_avoid: "", good_examples: "", bad_examples: "",
-  });
+  };
+  const [form, setForm] = useState(empty);
   const [saving, setSaving] = useState(false);
+  const [isNew, setIsNew] = useState(false);
 
   useEffect(() => {
-    if (data.voice) {
+    if (voices.length && !selectedId && !isNew) setSelectedId(voices[0].id);
+  }, [voices, selectedId, isNew]);
+
+  const current = isNew ? null : voices.find((v) => v.id === selectedId) || null;
+
+  useEffect(() => {
+    if (current) {
       setForm({
-        emotional_tone: data.voice.emotional_tone,
-        archetype: data.voice.archetype,
-        writing_rhythm: data.voice.writing_rhythm,
-        formality_level: data.voice.formality_level,
-        things_to_avoid: data.voice.things_to_avoid,
-        good_examples: (data.voice.good_examples || []).join("\n"),
-        bad_examples: (data.voice.bad_examples || []).join("\n"),
+        brand_name: current.brand_name || "",
+        emotional_tone: current.emotional_tone,
+        archetype: current.archetype,
+        writing_rhythm: current.writing_rhythm,
+        formality_level: current.formality_level,
+        things_to_avoid: current.things_to_avoid,
+        good_examples: (current.good_examples || []).join("\n"),
+        bad_examples: (current.bad_examples || []).join("\n"),
       });
+    } else if (isNew) {
+      setForm(empty);
     }
-  }, [data.voice]);
+  }, [current, isNew]);
+
+  const buildPayload = () => ({
+    client_id: clientId,
+    brand_name: form.brand_name,
+    emotional_tone: form.emotional_tone,
+    archetype: form.archetype,
+    writing_rhythm: form.writing_rhythm,
+    formality_level: form.formality_level,
+    things_to_avoid: form.things_to_avoid,
+    good_examples: form.good_examples.split("\n").map((s) => s.trim()).filter(Boolean),
+    bad_examples: form.bad_examples.split("\n").map((s) => s.trim()).filter(Boolean),
+  });
 
   const save = async () => {
     setSaving(true);
-    const payload = {
-      client_id: clientId,
-      emotional_tone: form.emotional_tone,
-      archetype: form.archetype,
-      writing_rhythm: form.writing_rhythm,
-      formality_level: form.formality_level,
-      things_to_avoid: form.things_to_avoid,
-      good_examples: form.good_examples.split("\n").map((s) => s.trim()).filter(Boolean),
-      bad_examples: form.bad_examples.split("\n").map((s) => s.trim()).filter(Boolean),
-    };
-    const { error } = data.voice
-      ? await supabase.from("brand_voice").update(payload).eq("id", data.voice.id)
-      : await supabase.from("brand_voice").insert(payload);
+    const payload = buildPayload();
+    const { data: res, error } = current
+      ? await supabase.from("brand_voice").update(payload).eq("id", current.id).select().single()
+      : await supabase.from("brand_voice").insert(payload).select().single();
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Voz da marca salva"); data.refresh();
+    toast.success("Voz da marca salva");
+    setIsNew(false);
+    if (res?.id) setSelectedId(res.id);
+    data.refresh();
+  };
+
+  const duplicate = async () => {
+    if (!current) return;
+    setSaving(true);
+    const payload = {
+      ...buildPayload(),
+      brand_name: (form.brand_name || "Marca") + " (cópia)",
+    };
+    const { data: res, error } = await supabase.from("brand_voice").insert(payload).select().single();
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Voz duplicada");
+    if (res?.id) setSelectedId(res.id);
+    data.refresh();
+  };
+
+  const remove = async () => {
+    if (!current) return;
+    if (!confirm("Remover esta voz?")) return;
+    const { error } = await supabase.from("brand_voice").delete().eq("id", current.id);
+    if (error) return toast.error(error.message);
+    setSelectedId(null);
+    data.refresh();
   };
 
   return (
     <Card>
-      <CardHeader><CardTitle>Tom de voz</CardTitle></CardHeader>
+      <CardHeader>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <CardTitle>Tom de voz</CardTitle>
+          <div className="flex flex-wrap items-center gap-2">
+            {voices.length > 0 && (
+              <select
+                className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                value={isNew ? "__new__" : (selectedId || "")}
+                onChange={(e) => {
+                  if (e.target.value === "__new__") { setIsNew(true); setSelectedId(null); }
+                  else { setIsNew(false); setSelectedId(e.target.value); }
+                }}
+              >
+                {voices.map((v) => (
+                  <option key={v.id} value={v.id}>{v.brand_name || "(sem nome)"}</option>
+                ))}
+                {isNew && <option value="__new__">Nova voz…</option>}
+              </select>
+            )}
+            {canEdit && (
+              <>
+                <Button size="sm" variant="outline" onClick={() => { setIsNew(true); setSelectedId(null); }}>
+                  <Plus className="mr-1 h-4 w-4" /> Nova
+                </Button>
+                {current && (
+                  <Button size="sm" variant="outline" onClick={duplicate} disabled={saving}>
+                    Duplicar
+                  </Button>
+                )}
+                {current && voices.length > 1 && (
+                  <Button size="sm" variant="ghost" onClick={remove} className="text-destructive">
+                    Remover
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </CardHeader>
       <CardContent className="space-y-4">
+        <div><Label>Nome da marca / conta</Label><Input placeholder="Ex.: @kynagogi_main" value={form.brand_name} onChange={(e) => setForm({ ...form, brand_name: e.target.value })} disabled={!canEdit} /></div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div><Label>Tom emocional</Label><Input value={form.emotional_tone} onChange={(e) => setForm({ ...form, emotional_tone: e.target.value })} disabled={!canEdit} /></div>
           <div><Label>Arquétipo da marca</Label><Input value={form.archetype} onChange={(e) => setForm({ ...form, archetype: e.target.value })} disabled={!canEdit} /></div>
