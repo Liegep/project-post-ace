@@ -619,6 +619,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.mediaUrls !== undefined) dbUpdates.media_urls = updates.mediaUrls;
     if (updates.caption !== undefined) dbUpdates.caption = updates.caption;
     if (updates.artType !== undefined) dbUpdates.art_type = updates.artType;
+    if (updates.contentPillarId !== undefined) dbUpdates.content_pillar_id = updates.contentPillarId;
     if (updates.deadline !== undefined) dbUpdates.deadline = serializePostDeadline(updates.deadline);
     if (updates.tags !== undefined) {
       dbUpdates.tags = updates.tags;
