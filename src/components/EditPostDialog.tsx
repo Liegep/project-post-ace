@@ -466,8 +466,25 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               })()}
             </div>
 
-            {/* RIGHT COLUMN — Settings */}
-            <div className="md:w-[35%] p-6 space-y-4">
+            {/* MIDDLE COLUMN — Settings */}
+            <div className="lg:w-[28%] p-6 space-y-4 lg:border-r lg:border-border">
+              {/* Pilar de Conteúdo */}
+              {pillars.length > 0 && (
+                <div>
+                  <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
+                    <Sparkles className="h-3 w-3" /> Pilar de Conteúdo
+                  </Label>
+                  <Select value={contentPillarId ?? "none"} onValueChange={(v) => setContentPillarId(v === "none" ? null : v)}>
+                    <SelectTrigger className="mt-1 h-9 text-xs"><SelectValue placeholder="Sem pilar" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Sem pilar</SelectItem>
+                      {pillars.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               {/* Art type dropdown */}
               <div>
                 <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tipo de arte</Label>
