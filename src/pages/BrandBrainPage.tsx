@@ -1027,12 +1027,12 @@ function ExpressionsTab({ clientId, canEdit, data, t }: { clientId: string; canE
 function VisualTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const empty = { category: "", direction: "", colors: "", image_style: "", lighting: "", composition: "", things_to_avoid: "" };
+  const empty = { brand_name: "", category: "", direction: "", colors: "", image_style: "", lighting: "", composition: "", typography: "", things_to_avoid: "" };
   const [form, setForm] = useState(empty);
 
   const openEdit = (v: any) => {
     setEditing(v);
-    setForm({ ...v, colors: (v.colors || []).join(", ") });
+    setForm({ ...empty, ...v, colors: (v.colors || []).join(", ") });
     setOpen(true);
   };
 
@@ -1040,12 +1040,14 @@ function VisualTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: 
     if (!form.category.trim()) return toast.error("Categoria é obrigatória");
     const payload = {
       client_id: clientId,
+      brand_name: form.brand_name,
       category: form.category,
       direction: form.direction,
       colors: form.colors.split(",").map((s) => s.trim()).filter(Boolean),
       image_style: form.image_style,
       lighting: form.lighting,
       composition: form.composition,
+      typography: form.typography,
       things_to_avoid: form.things_to_avoid,
     };
     const { error } = editing
@@ -1054,6 +1056,7 @@ function VisualTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: 
     if (error) return toast.error(error.message);
     toast.success("Salvo"); setOpen(false); data.refresh();
   };
+
   const remove = async (id: string) => {
     if (!confirm("Remover?")) return;
     const { error } = await supabase.from("visual_directions").delete().eq("id", id);
