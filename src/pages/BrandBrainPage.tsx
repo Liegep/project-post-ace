@@ -327,13 +327,30 @@ function HomeTab({ data, t, clientName, logoUrl, goTo }: { data: DataBundle; t: 
                       {typographies.length > 0 && (
                         <div className="mt-4">
                           <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Tipografia</div>
-                          <div className="space-y-1">
-                            {typographies.map((tp) => (
-                              <p key={tp} className="text-sm text-foreground">{tp}</p>
-                            ))}
+                          <div className="space-y-3">
+                            {typographies.map((tp) => {
+                              const fonts = Array.from(tp.matchAll(/([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9 \-]+?)(?=\s*\(|,|$)/g))
+                                .map((m) => m[1].trim())
+                                .filter(Boolean);
+                              const headingFont = fonts[0];
+                              const bodyFont = fonts[1] || fonts[0];
+                              const ff = (f?: string) => f ? `'${f}', ui-sans-serif, system-ui, sans-serif` : undefined;
+                              return (
+                                <div key={tp} className="rounded-lg border border-border/40 bg-background/30 p-3">
+                                  <p className="mb-2 text-[11px] text-muted-foreground">{tp}</p>
+                                  <p className="text-2xl font-semibold leading-tight text-foreground" style={{ fontFamily: ff(headingFont) }}>
+                                    {headingFont || "Título da marca"}
+                                  </p>
+                                  <p className="mt-1 text-sm text-muted-foreground" style={{ fontFamily: ff(bodyFont) }}>
+                                    {bodyFont ? `The quick brown fox jumps over the lazy dog — ${bodyFont}` : "The quick brown fox jumps over the lazy dog"}
+                                  </p>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
+
 
                       <div className="mt-4 flex flex-wrap gap-1.5">
                         {items.map((v) => (
