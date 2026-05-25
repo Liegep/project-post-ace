@@ -25,6 +25,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { createPostDeadlineFromInput, formatPostDeadlineInput } from "@/lib/postDeadline";
 import { ART_TYPES, getArtTypeConfig } from "@/lib/artTypes";
+import { BrandBrainSidePanel } from "@/components/BrandBrainSidePanel";
+import { useBrandBrain } from "@/hooks/useBrandBrain";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Sparkles } from "lucide-react";
 
 const STATUS_KEYS: Record<PostStatus, string> = {
   entrada: "statusEntry",
