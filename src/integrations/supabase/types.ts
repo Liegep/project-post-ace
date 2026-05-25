@@ -567,6 +567,7 @@ export type Database = {
         Row: {
           archetype: string
           bad_examples: string[]
+          brand_name: string
           client_id: string
           created_at: string
           emotional_tone: string
@@ -581,6 +582,7 @@ export type Database = {
         Insert: {
           archetype?: string
           bad_examples?: string[]
+          brand_name?: string
           client_id: string
           created_at?: string
           emotional_tone?: string
@@ -595,6 +597,7 @@ export type Database = {
         Update: {
           archetype?: string
           bad_examples?: string[]
+          brand_name?: string
           client_id?: string
           created_at?: string
           emotional_tone?: string

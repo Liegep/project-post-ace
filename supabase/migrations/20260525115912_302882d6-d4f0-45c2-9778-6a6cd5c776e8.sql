@@ -1,0 +1,1 @@
+ALTER TABLE public.brand_voice ADD COLUMN IF NOT EXISTS brand_name text NOT NULL DEFAULT '';
