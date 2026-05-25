@@ -449,7 +449,7 @@ function PillarsTab({ clientId, canEdit, data, t }: { clientId: string; canEdit:
     <div className="space-y-4">
       {canEdit && <div className="flex justify-end"><Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> Novo pilar</Button></div>}
       {data.pillars.length === 0 ? (
-        <EmptyState message="Ainda não há pilares de conteúdo cadastrados para esta marca." />
+        <EmptyState message={t.pillars_empty} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {data.pillars.map((p) => (
@@ -587,7 +587,7 @@ function AvoidTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: b
     <div className="space-y-4">
       {canEdit && <div className="flex justify-end"><Button onClick={() => { setEditing(null); setForm(empty); setOpen(true); }}><Plus className="mr-2 h-4 w-4" /> Nova palavra</Button></div>}
       {data.avoid.length === 0 ? (
-        <EmptyState message="Ainda não há palavras a evitar cadastradas." />
+        <EmptyState message={t.avoid_empty} />
       ) : (
         <Card>
           <Table>
@@ -665,7 +665,7 @@ function ExpressionsTab({ clientId, canEdit, data, t }: { clientId: string; canE
     <div className="space-y-4">
       {canEdit && <div className="flex justify-end"><Button onClick={() => { setEditing(null); setForm(empty); setOpen(true); }}><Plus className="mr-2 h-4 w-4" /> Nova expressão</Button></div>}
       {data.expressions.length === 0 ? (
-        <EmptyState message="Ainda não há expressões aprovadas cadastradas." />
+        <EmptyState message={t.expr_empty} />
       ) : (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {data.expressions.map((e) => (
@@ -747,7 +747,7 @@ function VisualTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: 
     <div className="space-y-4">
       {canEdit && <div className="flex justify-end"><Button onClick={() => { setEditing(null); setForm(empty); setOpen(true); }}><Plus className="mr-2 h-4 w-4" /> Nova direção</Button></div>}
       {data.visuals.length === 0 ? (
-        <EmptyState message="Ainda não há direções visuais cadastradas para esta marca." />
+        <EmptyState message={t.visual_empty} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {data.visuals.map((v) => (
