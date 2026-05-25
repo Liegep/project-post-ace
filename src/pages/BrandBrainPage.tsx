@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useBrandBrain, VocabularyStatus } from "@/hooks/useBrandBrain";
+import { getBbDict } from "@/lib/brandBrainI18n";
+import { parseSpreadsheetFile, importVocabularyRows, downloadVocabularyTemplate } from "@/lib/brandVocabularyImport";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,13 +12,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Pencil, Trash2, Copy, Sparkles } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Copy, Sparkles, Upload, Download } from "lucide-react";
 
-interface ClientLite { id: string; name: string; logo_url: string; slug: string }
+interface ClientLite { id: string; name: string; logo_url: string; slug: string; locale: string }
 
 const EmptyState = ({ message }: { message: string }) => (
   <div className="rounded-xl border border-dashed border-border bg-muted/30 p-10 text-center text-sm text-muted-foreground">
@@ -39,7 +42,7 @@ export default function BrandBrainPage() {
 
   useEffect(() => {
     if (!slug) return;
-    supabase.from("clients").select("id, name, logo_url, slug").eq("slug", slug).maybeSingle().then(({ data }) => {
+    supabase.from("clients").select("id, name, logo_url, slug, locale").eq("slug", slug).maybeSingle().then(({ data }) => {
       setClient((data as ClientLite) || null);
       setLoadingClient(false);
     });
@@ -47,9 +50,10 @@ export default function BrandBrainPage() {
 
   const canEdit = role === "super_admin" || role === "admin" || role === "colaborador";
   const data = useBrandBrain(client?.id);
+  const t = useMemo(() => getBbDict(client?.locale), [client?.locale]);
 
   if (loadingClient || roleLoading) {
-    return <div className="p-10 text-center text-muted-foreground">Carregando…</div>;
+    return <div className="p-10 text-center text-muted-foreground">…</div>;
   }
   if (!client) {
     return <div className="p-10 text-center text-muted-foreground">Cliente não encontrado.</div>;
@@ -67,7 +71,7 @@ export default function BrandBrainPage() {
             <div>
               <h1 className="text-xl font-bold sm:text-2xl">{client.name}</h1>
               <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5" /> Brand Brain — memória estratégica da marca
+                <Sparkles className="h-3.5 w-3.5" /> {t.subtitle}
               </p>
             </div>
           </div>
@@ -77,40 +81,42 @@ export default function BrandBrainPage() {
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="flex w-full flex-wrap h-auto justify-start gap-1 bg-muted/50 p-1">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="vocabulary">Vocabulary</TabsTrigger>
-            <TabsTrigger value="pillars">Pilares</TabsTrigger>
-            <TabsTrigger value="voice">Voz</TabsTrigger>
-            <TabsTrigger value="avoid">Avoid</TabsTrigger>
-            <TabsTrigger value="expressions">Expressões</TabsTrigger>
-            <TabsTrigger value="visual">Visual</TabsTrigger>
-            <TabsTrigger value="ai">AI Prompts</TabsTrigger>
+            <TabsTrigger value="overview">{t.tab_overview}</TabsTrigger>
+            <TabsTrigger value="vocabulary">{t.tab_vocabulary}</TabsTrigger>
+            <TabsTrigger value="pillars">{t.tab_pillars}</TabsTrigger>
+            <TabsTrigger value="voice">{t.tab_voice}</TabsTrigger>
+            <TabsTrigger value="avoid">{t.tab_avoid}</TabsTrigger>
+            <TabsTrigger value="expressions">{t.tab_expressions}</TabsTrigger>
+            <TabsTrigger value="visual">{t.tab_visual}</TabsTrigger>
+            {canEdit && <TabsTrigger value="ai">{t.tab_ai}</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
-            <OverviewTab clientId={client.id} canEdit={canEdit} data={data} />
+            <OverviewTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
           <TabsContent value="vocabulary" className="mt-6">
-            <VocabularyTab clientId={client.id} canEdit={canEdit} data={data} />
+            <VocabularyTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
           <TabsContent value="pillars" className="mt-6">
-            <PillarsTab clientId={client.id} canEdit={canEdit} data={data} />
+            <PillarsTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
           <TabsContent value="voice" className="mt-6">
             <VoiceTab clientId={client.id} canEdit={canEdit} data={data} />
           </TabsContent>
           <TabsContent value="avoid" className="mt-6">
-            <AvoidTab clientId={client.id} canEdit={canEdit} data={data} />
+            <AvoidTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
           <TabsContent value="expressions" className="mt-6">
-            <ExpressionsTab clientId={client.id} canEdit={canEdit} data={data} />
+            <ExpressionsTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
           <TabsContent value="visual" className="mt-6">
-            <VisualTab clientId={client.id} canEdit={canEdit} data={data} />
+            <VisualTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
-          <TabsContent value="ai" className="mt-6">
-            <AiPromptsTab clientName={client.name} data={data} />
-          </TabsContent>
+          {canEdit && (
+            <TabsContent value="ai" className="mt-6">
+              <AiPromptsTab clientName={client.name} data={data} />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>
@@ -118,9 +124,10 @@ export default function BrandBrainPage() {
 }
 
 type DataBundle = ReturnType<typeof useBrandBrain>;
+type Dict = ReturnType<typeof getBbDict>;
 
 /* -------------------- Overview -------------------- */
-function OverviewTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function OverviewTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [mission, setMission] = useState("");
   const [vision, setVision] = useState("");
   const [summary, setSummary] = useState("");
@@ -140,16 +147,16 @@ function OverviewTab({ clientId, canEdit, data }: { clientId: string; canEdit: b
       : await supabase.from("brand_brains").insert(payload);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Brand Brain salvo");
+    toast.success("OK");
     data.refresh();
   };
 
   const counters = [
-    { label: "Vocabulário", value: data.vocabulary.length },
-    { label: "Pilares", value: data.pillars.length },
-    { label: "Palavras a evitar", value: data.avoid.length },
-    { label: "Expressões aprovadas", value: data.expressions.length },
-    { label: "Direções visuais", value: data.visuals.length },
+    { label: t.counters.vocab, value: data.vocabulary.length },
+    { label: t.counters.pillars, value: data.pillars.length },
+    { label: t.counters.avoid, value: data.avoid.length },
+    { label: t.counters.expr, value: data.expressions.length },
+    { label: t.counters.visuals, value: data.visuals.length },
   ];
 
   return (
@@ -166,23 +173,23 @@ function OverviewTab({ clientId, canEdit, data }: { clientId: string; canEdit: b
       </div>
 
       <Card>
-        <CardHeader><CardTitle>Identidade da marca</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t.identity}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label>Missão</Label>
+            <Label>{t.mission}</Label>
             <Textarea value={mission} onChange={(e) => setMission(e.target.value)} disabled={!canEdit} rows={3} maxLength={1000} />
           </div>
           <div>
-            <Label>Visão</Label>
+            <Label>{t.vision}</Label>
             <Textarea value={vision} onChange={(e) => setVision(e.target.value)} disabled={!canEdit} rows={3} maxLength={1000} />
           </div>
           <div>
-            <Label>Resumo estratégico</Label>
+            <Label>{t.summary}</Label>
             <Textarea value={summary} onChange={(e) => setSummary(e.target.value)} disabled={!canEdit} rows={5} maxLength={3000} />
           </div>
           {canEdit && (
             <div className="flex justify-end">
-              <Button onClick={save} disabled={saving}>{saving ? "Salvando…" : "Salvar"}</Button>
+              <Button onClick={save} disabled={saving}>{saving ? t.saving : t.save}</Button>
             </div>
           )}
         </CardContent>
@@ -191,53 +198,126 @@ function OverviewTab({ clientId, canEdit, data }: { clientId: string; canEdit: b
   );
 }
 
+
 /* -------------------- Vocabulary -------------------- */
-function VocabularyTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function VocabularyTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const [form, setForm] = useState({ term: "", category: "keyword", emotion: "", status: "approved" as VocabularyStatus, notes: "" });
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
 
-  const openNew = () => { setEditing(null); setForm({ term: "", category: "keyword", emotion: "", status: "approved", notes: "" }); setOpen(true); };
-  const openEdit = (item: any) => { setEditing(item); setForm(item); setOpen(true); };
+  const emptyForm = {
+    term: "", category: "keyword", emotion: "", status: "approved" as VocabularyStatus, notes: "",
+    brand: "", content_type: "", priority: "", frequency: "",
+    related_words: "", approved_phrases: "", can_be_used: true, technical_notes: "",
+  };
+  const [form, setForm] = useState(emptyForm);
+
+  const openNew = () => { setEditing(null); setForm(emptyForm); setOpen(true); };
+  const openEdit = (item: any) => {
+    setEditing(item);
+    setForm({
+      term: item.term || "",
+      category: item.category || "keyword",
+      emotion: item.emotion || "",
+      status: item.status || "approved",
+      notes: item.notes || "",
+      brand: item.brand || "",
+      content_type: item.content_type || "",
+      priority: item.priority || "",
+      frequency: item.frequency || "",
+      related_words: (item.related_words || []).join(", "),
+      approved_phrases: (item.approved_phrases || []).join(" | "),
+      can_be_used: item.can_be_used !== false,
+      technical_notes: item.technical_notes || "",
+    });
+    setOpen(true);
+  };
 
   const save = async () => {
-    if (!form.term.trim()) return toast.error("Termo é obrigatório");
-    const payload = { ...form, client_id: clientId };
+    if (!form.term.trim()) return toast.error("Termo / Termine *");
+    const payload = {
+      client_id: clientId,
+      term: form.term.trim(),
+      category: form.category,
+      emotion: form.emotion,
+      status: form.status,
+      notes: form.notes,
+      brand: form.brand,
+      content_type: form.content_type,
+      priority: form.priority,
+      frequency: form.frequency,
+      related_words: form.related_words.split(/[,;]/).map((s) => s.trim()).filter(Boolean),
+      approved_phrases: form.approved_phrases.split(/\||\n/).map((s) => s.trim()).filter(Boolean),
+      can_be_used: form.can_be_used,
+      technical_notes: form.technical_notes,
+    };
     const { error } = editing
       ? await supabase.from("brand_vocabulary").update(payload).eq("id", editing.id)
       : await supabase.from("brand_vocabulary").insert(payload);
     if (error) return toast.error(error.message);
-    toast.success("Salvo");
+    toast.success("OK");
     setOpen(false); data.refresh();
   };
 
   const remove = async (id: string) => {
-    if (!confirm("Remover este termo?")) return;
+    if (!confirm("?")) return;
     const { error } = await supabase.from("brand_vocabulary").delete().eq("id", id);
     if (error) return toast.error(error.message);
     data.refresh();
   };
 
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setImporting(true);
+    try {
+      const rows = await parseSpreadsheetFile(file);
+      if (!rows.length) { toast.error("Nenhuma linha válida"); return; }
+      const { inserted } = await importVocabularyRows(clientId, rows);
+      toast.success(`${inserted} ${t.tab_vocabulary.toLowerCase()} → OK`);
+      data.refresh();
+    } catch (err: any) {
+      toast.error(err?.message || "Erro");
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {canEdit && (
-        <div className="flex justify-end">
-          <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> Novo termo</Button>
+        <div className="flex flex-wrap justify-end gap-2">
+          <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleFile} className="hidden" />
+          <Button variant="outline" size="sm" onClick={downloadVocabularyTemplate}>
+            <Download className="mr-2 h-4 w-4" /> {t.vocab_template}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={importing}>
+            <Upload className="mr-2 h-4 w-4" /> {importing ? "..." : t.vocab_import}
+          </Button>
+          <Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> {t.vocab_new}</Button>
         </div>
       )}
       {data.vocabulary.length === 0 ? (
-        <EmptyState message="Ainda não há vocabulário cadastrado para esta marca." />
+        <EmptyState message={t.vocab_empty} />
       ) : (
-        <Card>
+        <Card className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Termo</TableHead>
-                <TableHead>Categoria</TableHead>
-                <TableHead>Emoção</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Observações</TableHead>
-                {canEdit && <TableHead className="w-24"></TableHead>}
+                <TableHead>{t.cols.term}</TableHead>
+                <TableHead>{t.cols.category}</TableHead>
+                <TableHead>{t.cols.brand}</TableHead>
+                <TableHead>{t.cols.contentType}</TableHead>
+                <TableHead>{t.cols.priority}</TableHead>
+                <TableHead>{t.cols.frequency}</TableHead>
+                <TableHead>{t.cols.emotion}</TableHead>
+                <TableHead>{t.cols.related}</TableHead>
+                <TableHead>{t.cols.phrases}</TableHead>
+                <TableHead>{t.cols.canUse}</TableHead>
+                <TableHead>{t.cols.notes}</TableHead>
+                {canEdit && <TableHead className="w-20"></TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -245,11 +325,19 @@ function VocabularyTab({ clientId, canEdit, data }: { clientId: string; canEdit:
                 <TableRow key={v.id}>
                   <TableCell className="font-medium">{v.term}</TableCell>
                   <TableCell><Badge variant="secondary">{v.category}</Badge></TableCell>
-                  <TableCell>{v.emotion}</TableCell>
+                  <TableCell className="text-sm">{v.brand}</TableCell>
+                  <TableCell className="text-sm">{v.content_type}</TableCell>
+                  <TableCell className="text-sm">{v.priority}</TableCell>
+                  <TableCell className="text-sm">{v.frequency}</TableCell>
+                  <TableCell className="text-sm">{v.emotion}</TableCell>
+                  <TableCell className="text-xs max-w-[160px] truncate">{(v.related_words || []).join(", ")}</TableCell>
+                  <TableCell className="text-xs max-w-[200px] truncate">{(v.approved_phrases || []).join(" | ")}</TableCell>
                   <TableCell>
-                    <Badge className={STATUS_LABEL[v.status]?.className}>{STATUS_LABEL[v.status]?.label || v.status}</Badge>
+                    <Badge className={v.can_be_used ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300" : "bg-red-500/15 text-red-700 dark:text-red-300"}>
+                      {v.can_be_used ? t.yes : t.no}
+                    </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground max-w-xs truncate">{v.notes}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">{v.technical_notes || v.notes}</TableCell>
                   {canEdit && (
                     <TableCell>
                       <div className="flex gap-1">
@@ -266,48 +354,60 @@ function VocabularyTab({ clientId, canEdit, data }: { clientId: string; canEdit:
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>{editing ? "Editar termo" : "Novo termo"}</DialogTitle></DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{editing ? t.cols.term : t.vocab_new}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Termo *</Label><Input value={form.term} onChange={(e) => setForm({ ...form, term: e.target.value })} maxLength={120} /></div>
+            <div><Label>{t.cols.term} *</Label><Input value={form.term} onChange={(e) => setForm({ ...form, term: e.target.value })} maxLength={120} /></div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Categoria</Label>
-                <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="keyword">Palavra-chave</SelectItem>
-                    <SelectItem value="concept">Conceito</SelectItem>
-                    <SelectItem value="technical">Termo técnico</SelectItem>
-                    <SelectItem value="phrase">Frase da marca</SelectItem>
-                    <SelectItem value="forbidden">Palavra proibida</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>{t.cols.category}</Label>
+                <Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} maxLength={120} />
               </div>
               <div>
-                <Label>Status</Label>
-                <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as VocabularyStatus })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="approved">Aprovado</SelectItem>
-                    <SelectItem value="avoid">Evitar</SelectItem>
-                    <SelectItem value="forbidden">Proibido</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>{t.cols.brand}</Label>
+                <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} maxLength={120} />
+              </div>
+              <div>
+                <Label>{t.cols.contentType}</Label>
+                <Input value={form.content_type} onChange={(e) => setForm({ ...form, content_type: e.target.value })} maxLength={120} />
+              </div>
+              <div>
+                <Label>{t.cols.priority}</Label>
+                <Input value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} maxLength={60} />
+              </div>
+              <div>
+                <Label>{t.cols.frequency}</Label>
+                <Input value={form.frequency} onChange={(e) => setForm({ ...form, frequency: e.target.value })} maxLength={60} />
+              </div>
+              <div>
+                <Label>{t.cols.emotion}</Label>
+                <Input value={form.emotion} onChange={(e) => setForm({ ...form, emotion: e.target.value })} maxLength={120} />
               </div>
             </div>
-            <div><Label>Emoção associada</Label><Input value={form.emotion} onChange={(e) => setForm({ ...form, emotion: e.target.value })} maxLength={120} /></div>
-            <div><Label>Observações</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} maxLength={500} /></div>
+            <div>
+              <Label>{t.cols.related}</Label>
+              <Input value={form.related_words} onChange={(e) => setForm({ ...form, related_words: e.target.value })} placeholder="a, b, c" />
+            </div>
+            <div>
+              <Label>{t.cols.phrases}</Label>
+              <Textarea value={form.approved_phrases} onChange={(e) => setForm({ ...form, approved_phrases: e.target.value })} placeholder="Frase 1 | Frase 2" rows={2} />
+            </div>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <Label>{t.cols.canUse}</Label>
+              <Switch checked={form.can_be_used} onCheckedChange={(c) => setForm({ ...form, can_be_used: c, status: c ? "approved" : "avoid" })} />
+            </div>
+            <div><Label>{t.cols.notes}</Label><Textarea value={form.technical_notes} onChange={(e) => setForm({ ...form, technical_notes: e.target.value })} maxLength={500} rows={2} /></div>
           </div>
-          <DialogFooter><Button onClick={save}>Salvar</Button></DialogFooter>
+          <DialogFooter><Button onClick={save}>{t.save}</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
   );
 }
 
+
 /* -------------------- Pillars -------------------- */
-function PillarsTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function PillarsTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const empty = { name: "", objective: "", themes: "", main_emotion: "", suggested_frequency: "", notes: "" };
@@ -349,7 +449,7 @@ function PillarsTab({ clientId, canEdit, data }: { clientId: string; canEdit: bo
     <div className="space-y-4">
       {canEdit && <div className="flex justify-end"><Button onClick={openNew}><Plus className="mr-2 h-4 w-4" /> Novo pilar</Button></div>}
       {data.pillars.length === 0 ? (
-        <EmptyState message="Ainda não há pilares de conteúdo cadastrados para esta marca." />
+        <EmptyState message={t.pillars_empty} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {data.pillars.map((p) => (
@@ -461,7 +561,7 @@ function VoiceTab({ clientId, canEdit, data }: { clientId: string; canEdit: bool
 }
 
 /* -------------------- Avoid -------------------- */
-function AvoidTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function AvoidTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const empty = { word: "", reason: "", recommended_alternative: "", category: "" };
@@ -487,7 +587,7 @@ function AvoidTab({ clientId, canEdit, data }: { clientId: string; canEdit: bool
     <div className="space-y-4">
       {canEdit && <div className="flex justify-end"><Button onClick={() => { setEditing(null); setForm(empty); setOpen(true); }}><Plus className="mr-2 h-4 w-4" /> Nova palavra</Button></div>}
       {data.avoid.length === 0 ? (
-        <EmptyState message="Ainda não há palavras a evitar cadastradas." />
+        <EmptyState message={t.avoid_empty} />
       ) : (
         <Card>
           <Table>
@@ -539,7 +639,7 @@ function AvoidTab({ clientId, canEdit, data }: { clientId: string; canEdit: bool
 }
 
 /* -------------------- Expressions -------------------- */
-function ExpressionsTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function ExpressionsTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const empty = { expression: "", usage_context: "", emotion: "", notes: "" };
@@ -565,7 +665,7 @@ function ExpressionsTab({ clientId, canEdit, data }: { clientId: string; canEdit
     <div className="space-y-4">
       {canEdit && <div className="flex justify-end"><Button onClick={() => { setEditing(null); setForm(empty); setOpen(true); }}><Plus className="mr-2 h-4 w-4" /> Nova expressão</Button></div>}
       {data.expressions.length === 0 ? (
-        <EmptyState message="Ainda não há expressões aprovadas cadastradas." />
+        <EmptyState message={t.expr_empty} />
       ) : (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {data.expressions.map((e) => (
@@ -606,7 +706,7 @@ function ExpressionsTab({ clientId, canEdit, data }: { clientId: string; canEdit
 }
 
 /* -------------------- Visual -------------------- */
-function VisualTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
+function VisualTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const empty = { category: "", direction: "", colors: "", image_style: "", lighting: "", composition: "", things_to_avoid: "" };
@@ -647,7 +747,7 @@ function VisualTab({ clientId, canEdit, data }: { clientId: string; canEdit: boo
     <div className="space-y-4">
       {canEdit && <div className="flex justify-end"><Button onClick={() => { setEditing(null); setForm(empty); setOpen(true); }}><Plus className="mr-2 h-4 w-4" /> Nova direção</Button></div>}
       {data.visuals.length === 0 ? (
-        <EmptyState message="Ainda não há direções visuais cadastradas para esta marca." />
+        <EmptyState message={t.visual_empty} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {data.visuals.map((v) => (

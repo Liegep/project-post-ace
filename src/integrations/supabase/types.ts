@@ -502,38 +502,62 @@ export type Database = {
       }
       brand_vocabulary: {
         Row: {
+          approved_phrases: string[]
+          brand: string
+          can_be_used: boolean
           category: string
           client_id: string
+          content_type: string
           created_at: string
           created_by: string | null
           emotion: string
+          frequency: string
           id: string
           notes: string
+          priority: string
+          related_words: string[]
           status: string
+          technical_notes: string
           term: string
           updated_at: string
         }
         Insert: {
+          approved_phrases?: string[]
+          brand?: string
+          can_be_used?: boolean
           category?: string
           client_id: string
+          content_type?: string
           created_at?: string
           created_by?: string | null
           emotion?: string
+          frequency?: string
           id?: string
           notes?: string
+          priority?: string
+          related_words?: string[]
           status?: string
+          technical_notes?: string
           term: string
           updated_at?: string
         }
         Update: {
+          approved_phrases?: string[]
+          brand?: string
+          can_be_used?: boolean
           category?: string
           client_id?: string
+          content_type?: string
           created_at?: string
           created_by?: string | null
           emotion?: string
+          frequency?: string
           id?: string
           notes?: string
+          priority?: string
+          related_words?: string[]
           status?: string
+          technical_notes?: string
           term?: string
           updated_at?: string
         }

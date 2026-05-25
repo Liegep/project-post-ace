@@ -18,6 +18,14 @@ export interface VocabularyItem {
   emotion: string;
   status: VocabularyStatus;
   notes: string;
+  brand: string;
+  content_type: string;
+  priority: string;
+  frequency: string;
+  related_words: string[];
+  approved_phrases: string[];
+  can_be_used: boolean;
+  technical_notes: string;
 }
 export interface ContentPillar {
   id: string;
