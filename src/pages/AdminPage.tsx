@@ -607,6 +607,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
   const [trackingVisibleToClient, setTrackingVisibleToClient] = useState(clientData.tracking_visible_to_client ?? false);
   const [showUpcomingPosts, setShowUpcomingPosts] = useState((clientData as any).show_upcoming_posts ?? false);
+  const [allowClientEditBrandBrain, setAllowClientEditBrandBrain] = useState((clientData as any).allow_client_edit_brand_brain ?? false);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -1054,6 +1055,16 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <Switch checked={showUpcomingPosts} onCheckedChange={async (checked) => {
                   setShowUpcomingPosts(checked);
                   await supabase.from("clients").update({ show_upcoming_posts: checked } as any).eq("id", clientData.id);
+                }} />
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground flex items-center gap-2">
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                  Editar Brand Brain
+                </label>
+                <Switch checked={allowClientEditBrandBrain} onCheckedChange={async (checked) => {
+                  setAllowClientEditBrandBrain(checked);
+                  await supabase.from("clients").update({ allow_client_edit_brand_brain: checked } as any).eq("id", clientData.id);
                 }} />
               </div>
               {trackingEnabled && (
