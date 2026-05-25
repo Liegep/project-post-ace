@@ -1057,6 +1057,16 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                   await supabase.from("clients").update({ show_upcoming_posts: checked } as any).eq("id", clientData.id);
                 }} />
               </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground flex items-center gap-2">
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                  Editar Brand Brain
+                </label>
+                <Switch checked={allowClientEditBrandBrain} onCheckedChange={async (checked) => {
+                  setAllowClientEditBrandBrain(checked);
+                  await supabase.from("clients").update({ allow_client_edit_brand_brain: checked } as any).eq("id", clientData.id);
+                }} />
+              </div>
               {trackingEnabled && (
                 <>
                   <div className="flex items-center justify-between">
