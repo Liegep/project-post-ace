@@ -21,7 +21,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings, History, Download, CalendarClock, FileText, Search } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings, History, Download, CalendarClock, FileText, Search, Sparkles } from "lucide-react";
 import { ClientRightSidebar } from "@/components/ClientRightSidebar";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -1156,6 +1156,12 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "activity" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
               <History className="mr-1.5 inline h-4 w-4" /> Atividades
+            </button>
+            <button
+              onClick={() => navigate(`/client/${clientData.slug}/brand-brain`)}
+              className="rounded-md px-4 py-1.5 text-sm font-medium transition-colors text-muted-foreground hover:text-foreground"
+            >
+              <Sparkles className="mr-1.5 inline h-4 w-4" /> Brand Brain
             </button>
           </div>
           {/* Compact search popover */}
