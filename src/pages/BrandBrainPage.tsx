@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useBrandBrain, VocabularyStatus } from "@/hooks/useBrandBrain";
 import { getBbDict } from "@/lib/brandBrainI18n";
-import { parseSpreadsheetFile, importVocabularyRows, downloadVocabularyTemplate } from "@/lib/brandVocabularyImport";
+import { parseSpreadsheetFile, importVocabularyRows, downloadVocabularyTemplate, parseExpressionsFile, importExpressionRows, downloadExpressionsTemplate } from "@/lib/brandVocabularyImport";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -80,15 +80,15 @@ export default function BrandBrainPage() {
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="flex w-full flex-wrap h-auto justify-start gap-1 bg-muted/50 p-1">
-            <TabsTrigger value="overview">{t.tab_overview}</TabsTrigger>
-            <TabsTrigger value="vocabulary">{t.tab_vocabulary}</TabsTrigger>
-            <TabsTrigger value="pillars">{t.tab_pillars}</TabsTrigger>
-            <TabsTrigger value="voice">{t.tab_voice}</TabsTrigger>
-            <TabsTrigger value="avoid">{t.tab_avoid}</TabsTrigger>
-            <TabsTrigger value="expressions">{t.tab_expressions}</TabsTrigger>
-            <TabsTrigger value="visual">{t.tab_visual}</TabsTrigger>
-            {canEdit && <TabsTrigger value="ai">{t.tab_ai}</TabsTrigger>}
+          <TabsList className="flex w-full overflow-x-auto sm:flex-wrap h-auto justify-start gap-1 bg-muted/50 p-1">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_overview}</TabsTrigger>
+            <TabsTrigger value="vocabulary" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_vocabulary}</TabsTrigger>
+            <TabsTrigger value="pillars" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_pillars}</TabsTrigger>
+            <TabsTrigger value="voice" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_voice}</TabsTrigger>
+            <TabsTrigger value="avoid" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_avoid}</TabsTrigger>
+            <TabsTrigger value="expressions" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_expressions}</TabsTrigger>
+            <TabsTrigger value="visual" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_visual}</TabsTrigger>
+            {canEdit && <TabsTrigger value="ai" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_ai}</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
@@ -644,61 +644,105 @@ function ExpressionsTab({ clientId, canEdit, data, t }: { clientId: string; canE
   const [editing, setEditing] = useState<any>(null);
   const empty = { expression: "", usage_context: "", emotion: "", notes: "" };
   const [form, setForm] = useState(empty);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
 
   const save = async () => {
-    if (!form.expression.trim()) return toast.error("Expressão é obrigatória");
+    if (!form.expression.trim()) return toast.error("*");
     const payload = { ...form, client_id: clientId };
     const { error } = editing
       ? await supabase.from("approved_expressions").update(payload).eq("id", editing.id)
       : await supabase.from("approved_expressions").insert(payload);
     if (error) return toast.error(error.message);
-    toast.success("Salvo"); setOpen(false); data.refresh();
+    toast.success("OK"); setOpen(false); data.refresh();
   };
   const remove = async (id: string) => {
-    if (!confirm("Remover?")) return;
+    if (!confirm("?")) return;
     const { error } = await supabase.from("approved_expressions").delete().eq("id", id);
     if (error) return toast.error(error.message);
     data.refresh();
   };
 
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setImporting(true);
+    try {
+      const rows = await parseExpressionsFile(file);
+      if (!rows.length) { toast.error("Nenhuma linha válida"); return; }
+      const { inserted } = await importExpressionRows(clientId, rows);
+      toast.success(`${inserted} → OK`);
+      data.refresh();
+    } catch (err: any) {
+      toast.error(err?.message || "Erro");
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
-      {canEdit && <div className="flex justify-end"><Button onClick={() => { setEditing(null); setForm(empty); setOpen(true); }}><Plus className="mr-2 h-4 w-4" /> Nova expressão</Button></div>}
+      {canEdit && (
+        <div className="flex flex-wrap justify-end gap-2">
+          <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" onChange={handleFile} className="hidden" />
+          <Button variant="outline" size="sm" onClick={downloadExpressionsTemplate}>
+            <Download className="mr-2 h-4 w-4" /> {t.expr_template}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()} disabled={importing}>
+            <Upload className="mr-2 h-4 w-4" /> {importing ? "..." : t.expr_import}
+          </Button>
+          <Button onClick={() => { setEditing(null); setForm(empty); setOpen(true); }}>
+            <Plus className="mr-2 h-4 w-4" /> {t.expr_new}
+          </Button>
+        </div>
+      )}
       {data.expressions.length === 0 ? (
         <EmptyState message={t.expr_empty} />
       ) : (
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {data.expressions.map((e) => (
-            <Card key={e.id}>
-              <CardContent className="p-4 space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="font-medium leading-snug">"{e.expression}"</p>
+        <Card className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t.cols.expression}</TableHead>
+                <TableHead>{t.cols.context}</TableHead>
+                <TableHead>{t.cols.emotion}</TableHead>
+                <TableHead>{t.cols.obs}</TableHead>
+                {canEdit && <TableHead className="w-20"></TableHead>}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.expressions.map((e) => (
+                <TableRow key={e.id}>
+                  <TableCell className="font-medium max-w-[320px]">{e.expression}</TableCell>
+                  <TableCell className="text-sm">{e.usage_context}</TableCell>
+                  <TableCell className="text-sm">{e.emotion && <Badge variant="secondary">{e.emotion}</Badge>}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground max-w-[260px] truncate">{e.notes}</TableCell>
                   {canEdit && (
-                    <div className="flex gap-1 shrink-0">
-                      <Button size="icon" variant="ghost" onClick={() => { setEditing(e); setForm(e); setOpen(true); }}><Pencil className="h-3.5 w-3.5" /></Button>
-                      <Button size="icon" variant="ghost" onClick={() => remove(e.id)}><Trash2 className="h-3.5 w-3.5" /></Button>
-                    </div>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button size="icon" variant="ghost" onClick={() => { setEditing(e); setForm({ expression: e.expression, usage_context: e.usage_context, emotion: e.emotion, notes: e.notes }); setOpen(true); }}><Pencil className="h-4 w-4" /></Button>
+                        <Button size="icon" variant="ghost" onClick={() => remove(e.id)}><Trash2 className="h-4 w-4" /></Button>
+                      </div>
+                    </TableCell>
                   )}
-                </div>
-                {e.emotion && <Badge variant="secondary">{e.emotion}</Badge>}
-                {e.usage_context && <p className="text-xs text-muted-foreground"><span className="font-medium">Contexto:</span> {e.usage_context}</p>}
-                {e.notes && <p className="text-xs text-muted-foreground">{e.notes}</p>}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>{editing ? "Editar" : "Nova expressão"}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editing ? t.cols.expression : t.expr_new}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Expressão *</Label><Textarea value={form.expression} onChange={(e) => setForm({ ...form, expression: e.target.value })} maxLength={500} /></div>
-            <div><Label>Contexto de uso</Label><Input value={form.usage_context} onChange={(e) => setForm({ ...form, usage_context: e.target.value })} maxLength={200} /></div>
-            <div><Label>Emoção transmitida</Label><Input value={form.emotion} onChange={(e) => setForm({ ...form, emotion: e.target.value })} maxLength={120} /></div>
-            <div><Label>Observações</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} maxLength={500} /></div>
+            <div><Label>{t.cols.expression} *</Label><Textarea value={form.expression} onChange={(e) => setForm({ ...form, expression: e.target.value })} maxLength={500} /></div>
+            <div><Label>{t.cols.context}</Label><Input value={form.usage_context} onChange={(e) => setForm({ ...form, usage_context: e.target.value })} maxLength={200} /></div>
+            <div><Label>{t.cols.emotion}</Label><Input value={form.emotion} onChange={(e) => setForm({ ...form, emotion: e.target.value })} maxLength={120} /></div>
+            <div><Label>{t.cols.obs}</Label><Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} maxLength={500} /></div>
           </div>
-          <DialogFooter><Button onClick={save}>Salvar</Button></DialogFooter>
+          <DialogFooter><Button onClick={save}>{t.save}</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -147,3 +147,75 @@ export function downloadVocabularyTemplate() {
   XLSX.utils.book_append_sheet(wb, ws, "Vocabolario");
   XLSX.writeFile(wb, "brand-vocabulary-template.xlsx");
 }
+
+/* ---------------- Expressions import ---------------- */
+export interface ExpressionImportRow {
+  expression: string;
+  usage_context: string;
+  emotion: string;
+  notes: string;
+}
+
+const EXPR_HEADER_MAP: Record<string, keyof ExpressionImportRow> = {
+  "expressao": "expression", "expressão": "expression", "frase": "expression",
+  "contexto de uso": "usage_context", "contexto": "usage_context",
+  "emocao": "emotion", "emoção": "emotion", "tom emotivo": "emotion",
+  "observacoes": "notes", "observações": "notes", "notas": "notes",
+  "espressione": "expression", "frase approvata": "expression",
+  "contesto d'uso": "usage_context", "contesto di utilizzo": "usage_context",
+  "emozione": "emotion", "tono emotivo": "emotion",
+  "note": "notes",
+  "expression": "expression", "phrase": "expression", "sentence": "expression",
+  "usage context": "usage_context", "context": "usage_context",
+  "emotion": "emotion", "emotional tone": "emotion",
+  "notes": "notes",
+  "expresion": "expression", "expresión": "expression",
+  "emocion": "emotion", "emoción": "emotion",
+};
+
+export async function parseExpressionsFile(file: File): Promise<ExpressionImportRow[]> {
+  const buffer = await file.arrayBuffer();
+  const wb = XLSX.read(buffer, { type: "array" });
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  const rows: any[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+  return rows
+    .map((raw) => {
+      const mapped: any = { expression: "", usage_context: "", emotion: "", notes: "" };
+      for (const [k, v] of Object.entries(raw)) {
+        const field = EXPR_HEADER_MAP[norm(k)];
+        if (!field) continue;
+        mapped[field] = String(v ?? "").trim();
+      }
+      return mapped as ExpressionImportRow;
+    })
+    .filter((r) => r.expression);
+}
+
+export async function importExpressionRows(clientId: string, rows: ExpressionImportRow[]) {
+  if (!rows.length) return { inserted: 0 };
+  const payload = rows.map((r) => ({
+    client_id: clientId,
+    expression: r.expression,
+    usage_context: r.usage_context || "",
+    emotion: r.emotion || "",
+    notes: r.notes || "",
+  }));
+  const { error, count } = await supabase.from("approved_expressions").insert(payload, { count: "exact" });
+  if (error) throw error;
+  return { inserted: count ?? payload.length };
+}
+
+export function downloadExpressionsTemplate() {
+  const rows = [
+    {
+      "Espressione": "La fiducia si costruisce con la costanza.",
+      "Contesto di utilizzo": "Post istituzionali",
+      "Tono emotivo": "Affidabilità",
+      "Note": "Usare nei contenuti di apertura",
+    },
+  ];
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Espressioni");
+  XLSX.writeFile(wb, "brand-expressions-template.xlsx");
+}
