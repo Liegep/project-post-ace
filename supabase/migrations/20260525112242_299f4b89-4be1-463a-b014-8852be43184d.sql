@@ -1,0 +1,2 @@
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS content_pillar_id uuid REFERENCES public.content_pillars(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_posts_content_pillar_id ON public.posts(content_pillar_id);
