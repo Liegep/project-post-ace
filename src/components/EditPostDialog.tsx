@@ -647,6 +647,14 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                 <Save className="mr-2 h-4 w-4" /> {uploading ? "..." : t("saveChanges")}
               </Button>
             </div>
+
+            {/* RIGHT COLUMN — Brand Brain (desktop only) */}
+            <aside className="hidden lg:block lg:w-[22%] p-4 max-h-[92vh] overflow-y-auto bg-muted/20">
+              <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5 text-primary" /> Brand Brain
+              </div>
+              <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
+            </aside>
           </div>
         </form>
 
