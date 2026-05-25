@@ -147,54 +147,48 @@ function HomeTab({ data, t, clientName, logoUrl, goTo }: { data: DataBundle; t: 
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Hero — premium glassmorphism */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[hsl(0_0%_12%/0.55)] backdrop-blur-2xl shadow-[0_20px_80px_-20px_rgba(0,0,0,0.6)]">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-fuchsia-500/10" />
-        <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/30 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-fuchsia-500/20 blur-3xl" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-        <div className="relative flex flex-col items-start gap-6 p-6 sm:flex-row sm:items-center sm:p-10">
+    <div className="space-y-6">
+      {/* Hero */}
+      <div className="glass-card relative overflow-hidden p-6 sm:p-8">
+        <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/15 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-fuchsia-500/10 blur-3xl" />
+        <div className="relative flex flex-col items-start gap-5 sm:flex-row sm:items-center">
           {logoUrl && (
-            <div className="relative">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/40 to-fuchsia-500/30 blur-xl" />
-              <img src={logoUrl} alt="" className="relative h-20 w-20 rounded-2xl border border-white/20 bg-white/95 object-contain p-2 shadow-2xl sm:h-24 sm:w-24" />
-            </div>
+            <img src={logoUrl} alt="" className="h-16 w-16 rounded-2xl border bg-card object-contain p-1.5 shadow-md sm:h-20 sm:w-20" />
           )}
           <div className="flex-1">
-            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
               <Sparkles className="h-3 w-3" /> Brand Brain
             </div>
-            <h2 className="text-3xl font-bold leading-tight tracking-tight text-white sm:text-5xl">{t.home_welcome}</h2>
-            {clientName && <p className="mt-1 text-sm font-medium text-white/70 sm:text-base">{clientName}</p>}
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base">{t.home_intro}</p>
+            <h2 className="text-2xl font-bold leading-tight tracking-tight sm:text-4xl">{t.home_welcome}</h2>
+            {clientName && <p className="mt-1 text-sm font-medium text-muted-foreground">{clientName}</p>}
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">{t.home_intro}</p>
           </div>
         </div>
       </div>
 
-      {/* Identity summary — glass cards with high contrast */}
+      {/* Identity summary — horizontal stack */}
       {hasIdentity ? (
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="space-y-3">
           {[
-            { label: t.mission, value: brain?.mission, accent: "from-sky-400 to-blue-500", icon: "✦" },
-            { label: t.vision, value: brain?.vision, accent: "from-violet-400 to-fuchsia-500", icon: "◈" },
-            { label: t.summary, value: brain?.summary, accent: "from-emerald-400 to-teal-500", icon: "❖" },
+            { label: t.mission, value: brain?.mission, accent: "bg-sky-500" },
+            { label: t.vision, value: brain?.vision, accent: "bg-violet-500" },
+            { label: t.summary, value: brain?.summary, accent: "bg-emerald-500" },
           ].filter((c) => c.value).map((c) => (
-            <div key={c.label} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[hsl(0_0%_20%/0.65)] backdrop-blur-xl shadow-xl transition-all hover:border-white/20 hover:shadow-2xl">
-              <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${c.accent}`} />
-              <div className="p-5">
-                <div className="mb-3 flex items-center gap-2">
-                  <span className={`bg-gradient-to-br ${c.accent} bg-clip-text text-lg font-bold text-transparent`}>{c.icon}</span>
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/60">{c.label}</span>
+            <div key={c.label} className="glass-card relative overflow-hidden p-5">
+              <div className={`absolute inset-y-0 left-0 w-1 ${c.accent}`} />
+              <div className="pl-3 sm:flex sm:items-start sm:gap-6">
+                <div className="mb-2 sm:mb-0 sm:w-40 sm:shrink-0">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">{c.label}</span>
                 </div>
-                <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-white">{c.value}</p>
+                <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-foreground">{c.value}</p>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-dashed border-white/15 bg-[hsl(0_0%_20%/0.5)] p-8 text-center backdrop-blur-xl">
-          <p className="text-sm text-white/80">{t.home_empty}</p>
+        <div className="glass-card p-8 text-center">
+          <p className="text-sm text-muted-foreground">{t.home_empty}</p>
           <Button variant="outline" size="sm" className="mt-4" onClick={() => goTo("overview")}>
             {t.tab_overview} <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
@@ -203,31 +197,29 @@ function HomeTab({ data, t, clientName, logoUrl, goTo }: { data: DataBundle; t: 
 
       {/* Voice highlight */}
       {primaryVoice && (primaryVoice.emotional_tone || primaryVoice.archetype) && (
-        <button onClick={() => goTo("voice")} className="group relative block w-full overflow-hidden rounded-2xl border border-white/10 bg-[hsl(0_0%_20%/0.65)] backdrop-blur-xl p-5 text-left shadow-xl transition-all hover:border-white/25">
-          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-rose-500/20 blur-3xl" />
-          <div className="relative flex flex-wrap items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-gradient-to-br from-rose-400/30 to-pink-500/20 text-white shadow-inner">
+        <button onClick={() => goTo("voice")} className="glass-card group relative block w-full overflow-hidden p-5 text-left transition-all hover:shadow-lg">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-600 dark:text-rose-300">
               <Mic className="h-5 w-5" />
             </div>
-            <div className="flex-1 min-w-[200px]">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/60">{t.tab_voice}{primaryVoice.brand_name ? ` · ${primaryVoice.brand_name}` : ""}</div>
-              <div className="mt-0.5 text-base font-semibold text-white">
+            <div className="min-w-[200px] flex-1">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                {t.tab_voice}{primaryVoice.brand_name ? ` · ${primaryVoice.brand_name}` : ""}
+              </div>
+              <div className="mt-0.5 text-base font-semibold text-foreground">
                 {[primaryVoice.archetype, primaryVoice.emotional_tone].filter(Boolean).join(" · ")}
               </div>
             </div>
-            <div className="flex items-center gap-1 text-sm text-white/80 transition-transform group-hover:translate-x-1">
+            <div className="flex items-center gap-1 text-sm text-muted-foreground transition-transform group-hover:translate-x-1">
               {t.home_open} <ArrowRight className="h-4 w-4" />
             </div>
           </div>
         </button>
       )}
 
-      {/* Navigation grid — premium glass tiles (includes Visual) */}
+      {/* Navigation grid (includes Visual) */}
       <div>
-        <div className="mb-4 flex items-end justify-between">
-          <h3 className="text-lg font-semibold text-white">{t.home_explore}</h3>
-          <div className="ml-4 h-px flex-1 bg-gradient-to-r from-white/20 to-transparent" />
-        </div>
+        <h3 className="mb-3 text-base font-semibold text-foreground">{t.home_explore}</h3>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {sections.map((s) => {
             const Icon = s.icon;
@@ -235,23 +227,22 @@ function HomeTab({ data, t, clientName, logoUrl, goTo }: { data: DataBundle; t: 
               <button
                 key={s.key}
                 onClick={() => goTo(s.key)}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[hsl(0_0%_20%/0.65)] p-5 text-left backdrop-blur-xl shadow-lg transition-all hover:-translate-y-1 hover:border-white/25 hover:shadow-2xl"
+                className="glass-card group relative overflow-hidden p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${s.gradient} opacity-60 transition-opacity group-hover:opacity-100`} />
-                <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/5 blur-2xl transition-all group-hover:bg-white/10" />
+                <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${s.gradient} opacity-50 transition-opacity group-hover:opacity-80`} />
                 <div className="relative">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-white shadow-inner backdrop-blur">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-card/90 text-foreground shadow-sm backdrop-blur">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <span className="text-3xl font-bold tabular-nums text-white/90">{s.count}</span>
+                    <span className="text-2xl font-bold tabular-nums text-foreground/80">{s.count}</span>
                   </div>
-                  <div className="mt-5">
-                    <div className="flex items-center gap-1.5 text-base font-semibold text-white">
+                  <div className="mt-4">
+                    <div className="flex items-center gap-1.5 text-base font-semibold text-foreground">
                       {s.label}
                       <ArrowRight className="h-4 w-4 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
                     </div>
-                    <p className="mt-1 text-xs leading-relaxed text-white/80 line-clamp-2">{s.desc}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground line-clamp-2">{s.desc}</p>
                   </div>
                 </div>
               </button>
@@ -260,6 +251,7 @@ function HomeTab({ data, t, clientName, logoUrl, goTo }: { data: DataBundle; t: 
         </div>
       </div>
     </div>
+
   );
 }
 
