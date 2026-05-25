@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useBrandBrain, VocabularyStatus } from "@/hooks/useBrandBrain";
 import { getBbDict } from "@/lib/brandBrainI18n";
-import { parseSpreadsheetFile, importVocabularyRows, downloadVocabularyTemplate } from "@/lib/brandVocabularyImport";
+import { parseSpreadsheetFile, importVocabularyRows, downloadVocabularyTemplate, parseExpressionsFile, importExpressionRows, downloadExpressionsTemplate } from "@/lib/brandVocabularyImport";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
