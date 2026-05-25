@@ -51,6 +51,7 @@ export default function BrandBrainPage() {
   const canEdit = role === "super_admin" || role === "admin" || role === "colaborador";
   const data = useBrandBrain(client?.id);
   const t = useMemo(() => getBbDict(client?.locale), [client?.locale]);
+  const [tab, setTab] = useState<string>("home");
 
   if (loadingClient || roleLoading) {
     return <div className="p-10 text-center text-muted-foreground">…</div>;
