@@ -1,115 +1,71 @@
+## Brand Brain — Módulo de Memória Estratégica da Marca
 
+Novo módulo dentro da página de cada cliente, com 8 abas e integração opcional na criação de posts.
 
-# Plano: Faturas Profissionais com Emissor + Cliente + Logo
+### 1. Banco de dados (Lovable Cloud)
 
-## Objetivo
-Transformar o PDF da fatura em um documento profissional completo, com dados do emissor (você), dados expandidos do cliente, métodos de pagamento e logo do cliente — tudo no estilo Apple minimalista.
+Uma migration única criando todas as tabelas, todas vinculadas a `client_id` com RLS seguindo o padrão atual (admin/super_admin gerencia; equipe gerencia clientes atribuídos via `get_user_client_ids`; cliente lê quando atribuído via `user_client_assignments`).
 
-## 1. Banco de Dados
+Tabelas:
+- `brand_brains` — registro mestre por cliente (1:1), com campos gerais (mission, vision, summary, updated_by).
+- `brand_vocabulary` — term, category, emotion, status (`approved`|`avoid`|`forbidden`), notes.
+- `content_pillars` — name, objective, themes (text[]), main_emotion, suggested_frequency, notes.
+- `brand_voice` — 1 linha por cliente: emotional_tone, archetype, writing_rhythm, formality_level, things_to_avoid, good_examples (text[]), bad_examples (text[]).
+- `words_to_avoid` — word, reason, recommended_alternative, category.
+- `approved_expressions` — expression, usage_context, emotion, notes.
+- `visual_directions` — category, direction, colors (text[]), image_style, lighting, composition, things_to_avoid.
+- `ai_prompt_templates` — name, template_text, variables (jsonb), created_by (para reuso).
+- `generated_prompts` — opcional: histórico (client_id, pillar_id, params jsonb, output text, created_by, created_at).
 
-### Configurações globais do emissor (você)
-Reaproveitar a tabela existente `app_settings` (key/value) para salvar os dados do negócio como JSON sob a chave `issuer_details`:
-- `business_name`, `address`, `country`, `email`, `tax_id`, `payment_method`, `payment_details`
+Cada tabela tem `created_at`, `updated_at`, trigger `update_updated_at_column`. RLS espelhado do padrão `client_notes`/`hashtag_groups`.
 
-Sem necessidade de nova tabela — `app_settings` já existe e é editável por admins.
+### 2. UI — Página Brand Brain
 
-### Expandir tabela `clients` (migração)
-Adicionar colunas opcionais:
-- `address` (text, default '')
-- `country` (text, default '')
-- `tax_id` (text, default '')
+Rota: aba/seção dentro de `ClientPage.tsx` (ou nova rota `/cliente/:slug/brand-brain` se mais limpo). Componente principal `BrandBrainPanel.tsx` com `Tabs` (shadcn) seguindo o estilo glassmorphism atual:
 
-Não quebra nada: todos com default vazio.
+- **Overview** — resumo, contadores de cada seção, missão/visão editáveis.
+- **Vocabulary** — tabela + dialog de criação, badges para status (verde/âmbar/vermelho).
+- **Content Pillars** — cards com pilar, objetivo, emoção, frequência.
+- **Voice** — formulário único (1 registro por cliente).
+- **Avoid** — tabela "evitar → usar".
+- **Expressions** — cards.
+- **Visual Direction** — cards com swatches de cor.
+- **AI Prompts** — gerador (selects de pilar/tipo/emoção/objetivo/formato) + textarea com prompt gerado + botão copiar (reaproveitar lógica do botão de copiar do PostDetailDialog). Geração local (string template) usando dados do Brand Brain do cliente; sem chamar IA externa nesta primeira versão.
 
-## 2. UI — Configurações do Emissor
+Componentes:
+- `src/components/brand-brain/BrandBrainPanel.tsx` (tabs root)
+- `src/components/brand-brain/tabs/Overview.tsx`, `Vocabulary.tsx`, `Pillars.tsx`, `Voice.tsx`, `Avoid.tsx`, `Expressions.tsx`, `VisualDirection.tsx`, `AiPrompts.tsx`
+- Hook: `src/hooks/useBrandBrain.ts` (fetch + mutations por cliente).
+- Estados vazios elegantes em cada aba.
 
-Nova aba/seção **"Dados da Empresa"** dentro de `BillingPage.tsx` (ou no menu admin), com formulário:
-- Nome do negócio, endereço, país, e-mail, Tax ID/VAT
-- Forma de pagamento padrão (ex: "Transferência Bancária")
-- Detalhes de pagamento (IBAN, PayPal, PIX, etc.)
-- Botão "Salvar" → grava em `app_settings`
+Estilo: tokens semânticos atuais, cards com `bg-card/glass`, badges para status, dialogs shadcn para criar/editar.
 
-Hook novo: `useIssuerDetails()` para ler/salvar.
+### 3. Integração com criação de posts
 
-## 3. UI — Dados Expandidos do Cliente
+Em `CreatePostDialog.tsx` e `EditPostDialog.tsx`: adicionar toggle "Usar Brand Brain". Quando ativo, mostra 4 selects (pilar, tom, emoção, direção visual) carregando do Brand Brain do cliente e botão "Inserir sugestão na legenda" que injeta texto formatado no campo de caption. Sem mudar nenhuma lógica existente — apenas opcional.
 
-Em `ClientBillingConfig.tsx` (ou no editor do cliente), adicionar campos opcionais:
-- Endereço, País, Tax ID/VAT
+### 4. Permissões
 
-## 4. UI — Editor de Fatura (`InvoiceDetailDialog.tsx`)
+- Admin/super_admin: CRUD total via RLS.
+- Colaborador (equipe): CRUD nos clientes atribuídos.
+- Cliente: somente leitura (RLS `SELECT` baseado em `get_user_client_ids`).
 
-Adicionar campos editáveis por fatura (sobrescrevem padrões se preenchidos):
-- Forma de pagamento (input)
-- Detalhes de pagamento (textarea)
-- Notas/observações já existem (`notes`)
+UI esconde botões de editar/criar para `role === 'client'` via `useUserRole`.
 
-Migração extra na tabela `invoices`:
-- `payment_method` (text, default '')
-- `payment_details` (text, default '')
+### 5. Detalhes técnicos
 
-## 5. PDF — Novo Layout (`src/lib/invoicePdf.ts`)
+- Reaproveitar `RichTextEditor` quando útil (campos longos).
+- Reaproveitar padrão de toasts (`use-toast`) e dialogs.
+- Nenhuma funcionalidade existente removida.
+- Sem realtime nas tabelas novas (manter IO de DB sob controle, alinhado ao baseline atual).
+- Nenhum cron novo, nenhuma edge function nova nesta primeira fase.
 
-```text
-┌─────────────────────────────────────────────┐
-│  [LOGO CLIENTE]              FATURA #001    │
-│                              Status: Paga   │
-├─────────────────────────────────────────────┤
-│  DE (Emissor)          PARA (Cliente)       │
-│  Liege Studio          Nome do Cliente      │
-│  Endereço              Endereço             │
-│  País                  País                  │
-│  email@...             Tax ID                │
-│  VAT: ...                                   │
-├─────────────────────────────────────────────┤
-│  Emissão: ...    Vencimento: ...            │
-├─────────────────────────────────────────────┤
-│  [TABELA DE ITENS — mantida igual]          │
-├─────────────────────────────────────────────┤
-│  Subtotal / Desconto / Total                │
-├─────────────────────────────────────────────┤
-│  PAGAMENTO                                  │
-│  Método: Transferência                      │
-│  IBAN: IT00...                              │
-├─────────────────────────────────────────────┤
-│  Observações: ...                           │
-├─────────────────────────────────────────────┤
-│  www.liegestudio.com                        │
-└─────────────────────────────────────────────┘
-```
+### Entregáveis
 
-- Logo do cliente: usar `invoice.clients.logo_url` (já existe no schema), exibido no canto superior esquerdo (max 80px altura).
-- `generateInvoicePDF` recebe novos parâmetros: `issuer` (do `app_settings`) e usa dados expandidos do cliente.
-- Estilo Apple: tipografia limpa, espaçamento generoso, divisores sutis, sem cores chamativas.
+1. Migration SQL criando 9 tabelas + RLS + triggers.
+2. Hook `useBrandBrain` e componentes da aba.
+3. Aba "Brand Brain" adicionada à `ClientPage`.
+4. Integração opcional nos dialogs de criação/edição de posts.
+5. Estados vazios e validações básicas (Zod nos formulários).
 
-## 6. Fluxo Geral
-
-1. Admin abre **Faturamento → Dados da Empresa**, preenche uma vez.
-2. Admin edita cliente → preenche endereço/Tax ID (opcional).
-3. Ao gerar PDF, o sistema carrega:
-   - `app_settings` → emissor
-   - `invoice.clients` → cliente expandido + logo
-   - `invoice.payment_method/details` (sobrescreve padrão se houver)
-4. PDF renderiza tudo no novo layout.
-
-## Arquivos a alterar/criar
-
-**Migrações:**
-- Adicionar colunas em `clients` (address, country, tax_id)
-- Adicionar colunas em `invoices` (payment_method, payment_details)
-
-**Código novo:**
-- `src/hooks/useIssuerDetails.ts` — ler/salvar dados do emissor
-- `src/components/billing/IssuerSettingsPanel.tsx` — formulário de configuração
-
-**Código alterado:**
-- `src/lib/invoicePdf.ts` — novo layout completo com logo + emissor + cliente expandido + pagamento
-- `src/components/billing/InvoiceDetailDialog.tsx` — campos payment_method/details, passar issuer ao gerar PDF
-- `src/components/billing/ClientBillingConfig.tsx` — campos de endereço/Tax ID do cliente
-- `src/pages/BillingPage.tsx` — aba/botão para abrir configurações do emissor
-- `src/hooks/useInvoices.ts` — incluir novos campos no tipo `Invoice`
-
-## Garantias
-- Nenhum campo existente removido.
-- Todos os novos campos opcionais com default vazio → faturas antigas continuam funcionando.
-- Funcionalidade atual (criar/editar/baixar/enviar ao cliente) intacta.
-
+Confirma para eu seguir com a migration e implementação?

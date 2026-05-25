@@ -154,6 +154,39 @@ export type Database = {
           },
         ]
       }
+      ai_prompt_templates: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          template_text: string
+          updated_at: string
+          variables: Json
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          template_text?: string
+          updated_at?: string
+          variables?: Json
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          template_text?: string
+          updated_at?: string
+          variables?: Json
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           key: string
@@ -354,6 +387,42 @@ export type Database = {
           },
         ]
       }
+      approved_expressions: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_by: string | null
+          emotion: string
+          expression: string
+          id: string
+          notes: string
+          updated_at: string
+          usage_context: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          emotion?: string
+          expression: string
+          id?: string
+          notes?: string
+          updated_at?: string
+          usage_context?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          emotion?: string
+          expression?: string
+          id?: string
+          notes?: string
+          updated_at?: string
+          usage_context?: string
+        }
+        Relationships: []
+      }
       billing_access_logs: {
         Row: {
           action: string
@@ -397,6 +466,123 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      brand_brains: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          mission: string
+          summary: string
+          updated_at: string
+          updated_by: string | null
+          vision: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          mission?: string
+          summary?: string
+          updated_at?: string
+          updated_by?: string | null
+          vision?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          mission?: string
+          summary?: string
+          updated_at?: string
+          updated_by?: string | null
+          vision?: string
+        }
+        Relationships: []
+      }
+      brand_vocabulary: {
+        Row: {
+          category: string
+          client_id: string
+          created_at: string
+          created_by: string | null
+          emotion: string
+          id: string
+          notes: string
+          status: string
+          term: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          emotion?: string
+          id?: string
+          notes?: string
+          status?: string
+          term: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          emotion?: string
+          id?: string
+          notes?: string
+          status?: string
+          term?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      brand_voice: {
+        Row: {
+          archetype: string
+          bad_examples: string[]
+          client_id: string
+          created_at: string
+          emotional_tone: string
+          formality_level: string
+          good_examples: string[]
+          id: string
+          things_to_avoid: string
+          updated_at: string
+          updated_by: string | null
+          writing_rhythm: string
+        }
+        Insert: {
+          archetype?: string
+          bad_examples?: string[]
+          client_id: string
+          created_at?: string
+          emotional_tone?: string
+          formality_level?: string
+          good_examples?: string[]
+          id?: string
+          things_to_avoid?: string
+          updated_at?: string
+          updated_by?: string | null
+          writing_rhythm?: string
+        }
+        Update: {
+          archetype?: string
+          bad_examples?: string[]
+          client_id?: string
+          created_at?: string
+          emotional_tone?: string
+          formality_level?: string
+          good_examples?: string[]
+          id?: string
+          things_to_avoid?: string
+          updated_at?: string
+          updated_by?: string | null
+          writing_rhythm?: string
+        }
+        Relationships: []
       }
       brief_assignments: {
         Row: {
@@ -1131,6 +1317,48 @@ export type Database = {
           },
         ]
       }
+      content_pillars: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          main_emotion: string
+          name: string
+          notes: string
+          objective: string
+          suggested_frequency: string
+          themes: string[]
+          updated_at: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          main_emotion?: string
+          name: string
+          notes?: string
+          objective?: string
+          suggested_frequency?: string
+          themes?: string[]
+          updated_at?: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          main_emotion?: string
+          name?: string
+          notes?: string
+          objective?: string
+          suggested_frequency?: string
+          themes?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contract_acceptances: {
         Row: {
           accepted_at: string
@@ -1318,6 +1546,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      generated_prompts: {
+        Row: {
+          client_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          output: string
+          params: Json
+          pillar_id: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          output?: string
+          params?: Json
+          pillar_id?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          output?: string
+          params?: Json
+          pillar_id?: string | null
+        }
+        Relationships: []
       }
       hashtag_groups: {
         Row: {
@@ -2713,6 +2971,87 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      visual_directions: {
+        Row: {
+          category: string
+          client_id: string
+          colors: string[]
+          composition: string
+          created_at: string
+          created_by: string | null
+          direction: string
+          id: string
+          image_style: string
+          lighting: string
+          things_to_avoid: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          client_id: string
+          colors?: string[]
+          composition?: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          id?: string
+          image_style?: string
+          lighting?: string
+          things_to_avoid?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          client_id?: string
+          colors?: string[]
+          composition?: string
+          created_at?: string
+          created_by?: string | null
+          direction?: string
+          id?: string
+          image_style?: string
+          lighting?: string
+          things_to_avoid?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      words_to_avoid: {
+        Row: {
+          category: string
+          client_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          reason: string
+          recommended_alternative: string
+          updated_at: string
+          word: string
+        }
+        Insert: {
+          category?: string
+          client_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          reason?: string
+          recommended_alternative?: string
+          updated_at?: string
+          word: string
+        }
+        Update: {
+          category?: string
+          client_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          reason?: string
+          recommended_alternative?: string
+          updated_at?: string
+          word?: string
         }
         Relationships: []
       }

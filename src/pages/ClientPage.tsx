@@ -21,7 +21,7 @@ import { Locale, translations } from "@/i18n/translations";
 import { I18nProvider } from "@/i18n/I18nContext";
 import { format, startOfMonth, endOfMonth, addMonths, subMonths, isSameMonth } from "date-fns";
 import { ptBR, it, enUS, es, sv } from "date-fns/locale";
-import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound, Menu, FileBarChart, ArrowRight, ChevronLeft, ChevronRight as ChevronRightIcon } from "lucide-react";
+import { Archive, LayoutGrid, RotateCcw, Plus, LogOut, KeyRound, Menu, FileBarChart, ArrowRight, ChevronLeft, ChevronRight as ChevronRightIcon, Sparkles } from "lucide-react";
 import { ClientNewsWidget } from "@/components/ClientNewsWidget";
 import { UpcomingPostsWidget } from "@/components/UpcomingPostsWidget";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
@@ -229,6 +229,10 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => navigate(`/client/${clientData.slug}/brand-brain`)}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Brand Brain
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setPasswordOpen(true)}>
                 <KeyRound className="mr-2 h-4 w-4" />
                 Alterar senha
