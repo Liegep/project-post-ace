@@ -42,7 +42,7 @@ export default function BrandBrainPage() {
 
   useEffect(() => {
     if (!slug) return;
-    supabase.from("clients").select("id, name, logo_url, slug").eq("slug", slug).maybeSingle().then(({ data }) => {
+    supabase.from("clients").select("id, name, logo_url, slug, locale").eq("slug", slug).maybeSingle().then(({ data }) => {
       setClient((data as ClientLite) || null);
       setLoadingClient(false);
     });
@@ -50,9 +50,10 @@ export default function BrandBrainPage() {
 
   const canEdit = role === "super_admin" || role === "admin" || role === "colaborador";
   const data = useBrandBrain(client?.id);
+  const t = useMemo(() => getBbDict(client?.locale), [client?.locale]);
 
   if (loadingClient || roleLoading) {
-    return <div className="p-10 text-center text-muted-foreground">Carregando…</div>;
+    return <div className="p-10 text-center text-muted-foreground">…</div>;
   }
   if (!client) {
     return <div className="p-10 text-center text-muted-foreground">Cliente não encontrado.</div>;
@@ -70,7 +71,7 @@ export default function BrandBrainPage() {
             <div>
               <h1 className="text-xl font-bold sm:text-2xl">{client.name}</h1>
               <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5" /> Brand Brain — memória estratégica da marca
+                <Sparkles className="h-3.5 w-3.5" /> {t.subtitle}
               </p>
             </div>
           </div>
@@ -80,40 +81,42 @@ export default function BrandBrainPage() {
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="flex w-full flex-wrap h-auto justify-start gap-1 bg-muted/50 p-1">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="vocabulary">Vocabulary</TabsTrigger>
-            <TabsTrigger value="pillars">Pilares</TabsTrigger>
-            <TabsTrigger value="voice">Voz</TabsTrigger>
-            <TabsTrigger value="avoid">Avoid</TabsTrigger>
-            <TabsTrigger value="expressions">Expressões</TabsTrigger>
-            <TabsTrigger value="visual">Visual</TabsTrigger>
-            <TabsTrigger value="ai">AI Prompts</TabsTrigger>
+            <TabsTrigger value="overview">{t.tab_overview}</TabsTrigger>
+            <TabsTrigger value="vocabulary">{t.tab_vocabulary}</TabsTrigger>
+            <TabsTrigger value="pillars">{t.tab_pillars}</TabsTrigger>
+            <TabsTrigger value="voice">{t.tab_voice}</TabsTrigger>
+            <TabsTrigger value="avoid">{t.tab_avoid}</TabsTrigger>
+            <TabsTrigger value="expressions">{t.tab_expressions}</TabsTrigger>
+            <TabsTrigger value="visual">{t.tab_visual}</TabsTrigger>
+            {canEdit && <TabsTrigger value="ai">{t.tab_ai}</TabsTrigger>}
           </TabsList>
 
           <TabsContent value="overview" className="mt-6">
-            <OverviewTab clientId={client.id} canEdit={canEdit} data={data} />
+            <OverviewTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
           <TabsContent value="vocabulary" className="mt-6">
-            <VocabularyTab clientId={client.id} canEdit={canEdit} data={data} />
+            <VocabularyTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
           <TabsContent value="pillars" className="mt-6">
-            <PillarsTab clientId={client.id} canEdit={canEdit} data={data} />
+            <PillarsTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
           <TabsContent value="voice" className="mt-6">
             <VoiceTab clientId={client.id} canEdit={canEdit} data={data} />
           </TabsContent>
           <TabsContent value="avoid" className="mt-6">
-            <AvoidTab clientId={client.id} canEdit={canEdit} data={data} />
+            <AvoidTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
           <TabsContent value="expressions" className="mt-6">
-            <ExpressionsTab clientId={client.id} canEdit={canEdit} data={data} />
+            <ExpressionsTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
           <TabsContent value="visual" className="mt-6">
-            <VisualTab clientId={client.id} canEdit={canEdit} data={data} />
+            <VisualTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
-          <TabsContent value="ai" className="mt-6">
-            <AiPromptsTab clientName={client.name} data={data} />
-          </TabsContent>
+          {canEdit && (
+            <TabsContent value="ai" className="mt-6">
+              <AiPromptsTab clientName={client.name} data={data} />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>
@@ -121,6 +124,7 @@ export default function BrandBrainPage() {
 }
 
 type DataBundle = ReturnType<typeof useBrandBrain>;
+type Dict = ReturnType<typeof getBbDict>;
 
 /* -------------------- Overview -------------------- */
 function OverviewTab({ clientId, canEdit, data }: { clientId: string; canEdit: boolean; data: DataBundle }) {
