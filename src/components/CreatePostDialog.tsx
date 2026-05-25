@@ -13,6 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { TagSelector } from "@/components/TagSelector";
 import { SortableMediaGrid, SortableMediaItem } from "@/components/SortableMediaGrid";
 import { createPostDeadlineFromInput } from "@/lib/postDeadline";
+import { BrandBrainSidePanel } from "@/components/BrandBrainSidePanel";
+import { useBrandBrain } from "@/hooks/useBrandBrain";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Sparkles, ChevronDown } from "lucide-react";
 
 interface CreatePostDialogProps {
   open: boolean;
