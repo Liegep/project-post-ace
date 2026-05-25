@@ -80,8 +80,9 @@ export default function BrandBrainPage() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        <Tabs defaultValue="overview" className="w-full">
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="flex w-full overflow-x-auto sm:flex-wrap h-auto justify-start gap-1 bg-muted/50 p-1">
+            <TabsTrigger value="home" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_home}</TabsTrigger>
             <TabsTrigger value="overview" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_overview}</TabsTrigger>
             <TabsTrigger value="vocabulary" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_vocabulary}</TabsTrigger>
             <TabsTrigger value="pillars" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_pillars}</TabsTrigger>
@@ -92,6 +93,9 @@ export default function BrandBrainPage() {
             {canEdit && <TabsTrigger value="ai" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_ai}</TabsTrigger>}
           </TabsList>
 
+          <TabsContent value="home" className="mt-6">
+            <HomeTab data={data} t={t} clientName={client.name} logoUrl={client.logo_url} goTo={setTab} />
+          </TabsContent>
           <TabsContent value="overview" className="mt-6">
             <OverviewTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
