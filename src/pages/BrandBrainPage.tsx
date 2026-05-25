@@ -1113,9 +1113,13 @@ function VisualTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: 
         <DialogContent>
           <DialogHeader><DialogTitle>{editing ? "Editar direção visual" : "Nova direção visual"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div><Label>Categoria/tipo de conteúdo *</Label><Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} maxLength={120} /></div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label>Marca</Label><Input value={form.brand_name} onChange={(e) => setForm({ ...form, brand_name: e.target.value })} maxLength={120} placeholder="Nome da marca" /></div>
+              <div><Label>Categoria/tipo de conteúdo *</Label><Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} maxLength={120} /></div>
+            </div>
             <div><Label>Direção visual</Label><Textarea value={form.direction} onChange={(e) => setForm({ ...form, direction: e.target.value })} maxLength={500} /></div>
             <div><Label>Cores (hex, separadas por vírgula)</Label><Input value={form.colors} onChange={(e) => setForm({ ...form, colors: e.target.value })} placeholder="#0d1b2a, #2dd4a8" /></div>
+            <div><Label>Tipografia</Label><Input value={form.typography} onChange={(e) => setForm({ ...form, typography: e.target.value })} maxLength={200} placeholder="ex.: Inter (títulos), Lora (corpo)" /></div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label>Estilo de imagem</Label><Input value={form.image_style} onChange={(e) => setForm({ ...form, image_style: e.target.value })} maxLength={200} /></div>
               <div><Label>Iluminação</Label><Input value={form.lighting} onChange={(e) => setForm({ ...form, lighting: e.target.value })} maxLength={200} /></div>
@@ -1123,6 +1127,7 @@ function VisualTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: 
             <div><Label>Composição</Label><Input value={form.composition} onChange={(e) => setForm({ ...form, composition: e.target.value })} maxLength={200} /></div>
             <div><Label>O que evitar visualmente</Label><Textarea value={form.things_to_avoid} onChange={(e) => setForm({ ...form, things_to_avoid: e.target.value })} maxLength={500} /></div>
           </div>
+
           <DialogFooter><Button onClick={save}>Salvar</Button></DialogFooter>
         </DialogContent>
       </Dialog>
