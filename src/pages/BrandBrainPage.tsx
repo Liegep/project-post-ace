@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Pencil, Trash2, Copy, Sparkles, Upload, Download } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Copy, Sparkles, Upload, Download, BookOpen, Layers, Mic, Ban, MessageSquareQuote, Palette, ArrowRight, Home } from "lucide-react";
 
 interface ClientLite { id: string; name: string; logo_url: string; slug: string; locale: string }
 
