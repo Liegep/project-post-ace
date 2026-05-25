@@ -1,0 +1,1 @@
+ALTER TABLE public.brand_voice DROP CONSTRAINT IF EXISTS brand_voice_client_id_key;
