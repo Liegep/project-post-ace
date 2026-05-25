@@ -169,6 +169,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         deadline: deadline ? createPostDeadlineFromInput(deadline) : null,
         tags: selectedTags,
         artType,
+        contentPillarId,
       });
       // Update retain_files flag
       await supabase.from("posts").update({ retain_files: retainFiles } as any).eq("id", post.id);
