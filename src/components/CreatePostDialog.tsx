@@ -40,6 +40,9 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [externalLink, setExternalLink] = useState("");
+  const [contentPillarId, setContentPillarId] = useState<string | null>(null);
+  const [brainOpen, setBrainOpen] = useState(false);
+  const { pillars } = useBrandBrain(clientId || undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync columnId when defaultColumnId changes (e.g., opening from a specific column)
