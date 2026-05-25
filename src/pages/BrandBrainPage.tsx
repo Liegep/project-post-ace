@@ -217,6 +217,67 @@ function HomeTab({ data, t, clientName, logoUrl, goTo }: { data: DataBundle; t: 
         </button>
       )}
 
+      {/* Pillars distribution */}
+      {pillars.length > 0 && (() => {
+        const palette = ["bg-violet-500", "bg-sky-500", "bg-emerald-500", "bg-amber-500", "bg-rose-500", "bg-fuchsia-500", "bg-teal-500", "bg-orange-500"];
+        const parsed = pillars.map((p, i) => {
+          const m = (p.suggested_frequency || "").match(/(\d+(?:[.,]\d+)?)/);
+          const pct = m ? parseFloat(m[1].replace(",", ".")) : 0;
+          return { ...p, pct, color: palette[i % palette.length] };
+        });
+        const total = parsed.reduce((s, p) => s + p.pct, 0);
+        const hasPct = total > 0;
+        const max = Math.max(...parsed.map((p) => p.pct), 1);
+        return (
+          <div className="glass-card relative overflow-hidden p-5 sm:p-6">
+            <button onClick={() => goTo("pillars")} className="group mb-4 flex w-full items-center justify-between gap-3 text-left">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/15 text-violet-600 dark:text-violet-300">
+                  <Layers className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">{t.tab_pillars}</div>
+                  <div className="text-base font-semibold text-foreground">{pillars.length} {t.counters.pillars.toLowerCase()}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-sm text-muted-foreground transition-transform group-hover:translate-x-1">
+                {t.home_open} <ArrowRight className="h-4 w-4" />
+              </div>
+            </button>
+
+            {hasPct && (
+              <div className="mb-4 flex h-3 w-full overflow-hidden rounded-full bg-muted">
+                {parsed.filter((p) => p.pct > 0).map((p) => (
+                  <div key={p.id} className={`${p.color} transition-all`} style={{ width: `${(p.pct / total) * 100}%` }} title={`${p.name} · ${p.pct}%`} />
+                ))}
+              </div>
+            )}
+
+            <div className="space-y-2.5">
+              {parsed.map((p) => (
+                <div key={p.id} className="flex items-center gap-3">
+                  <div className="flex min-w-0 flex-1 items-center gap-2">
+                    <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${p.color}`} />
+                    <span className="truncate text-sm font-medium text-foreground">{p.name}</span>
+                    {p.main_emotion && <span className="hidden truncate text-xs text-muted-foreground sm:inline">· {p.main_emotion}</span>}
+                  </div>
+                  <div className="flex w-32 items-center gap-2 sm:w-48">
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                      <div className={`h-full ${p.color}`} style={{ width: `${(p.pct / max) * 100}%` }} />
+                    </div>
+                    <span className="w-10 text-right text-xs font-semibold tabular-nums text-foreground">
+                      {p.pct > 0 ? `${p.pct}%` : "—"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
+
+
       {/* Navigation grid (includes Visual) */}
       <div>
         <h3 className="mb-3 text-base font-semibold text-foreground">{t.home_explore}</h3>
