@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Pencil, Trash2, Copy, Sparkles, Upload, Download } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Copy, Sparkles, Upload, Download, BookOpen, Layers, Mic, Ban, MessageSquareQuote, Palette, ArrowRight, Home } from "lucide-react";
 
 interface ClientLite { id: string; name: string; logo_url: string; slug: string; locale: string }
 
@@ -51,6 +51,7 @@ export default function BrandBrainPage() {
   const canEdit = role === "super_admin" || role === "admin" || role === "colaborador";
   const data = useBrandBrain(client?.id);
   const t = useMemo(() => getBbDict(client?.locale), [client?.locale]);
+  const [tab, setTab] = useState<string>("home");
 
   if (loadingClient || roleLoading) {
     return <div className="p-10 text-center text-muted-foreground">…</div>;
@@ -79,8 +80,9 @@ export default function BrandBrainPage() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        <Tabs defaultValue="overview" className="w-full">
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="flex w-full overflow-x-auto sm:flex-wrap h-auto justify-start gap-1 bg-muted/50 p-1">
+            <TabsTrigger value="home" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_home}</TabsTrigger>
             <TabsTrigger value="overview" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_overview}</TabsTrigger>
             <TabsTrigger value="vocabulary" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_vocabulary}</TabsTrigger>
             <TabsTrigger value="pillars" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_pillars}</TabsTrigger>
@@ -91,6 +93,9 @@ export default function BrandBrainPage() {
             {canEdit && <TabsTrigger value="ai" className="text-xs sm:text-sm whitespace-nowrap">{t.tab_ai}</TabsTrigger>}
           </TabsList>
 
+          <TabsContent value="home" className="mt-6">
+            <HomeTab data={data} t={t} clientName={client.name} logoUrl={client.logo_url} goTo={setTab} />
+          </TabsContent>
           <TabsContent value="overview" className="mt-6">
             <OverviewTab clientId={client.id} canEdit={canEdit} data={data} t={t} />
           </TabsContent>
@@ -125,6 +130,123 @@ export default function BrandBrainPage() {
 
 type DataBundle = ReturnType<typeof useBrandBrain>;
 type Dict = ReturnType<typeof getBbDict>;
+
+/* -------------------- Home -------------------- */
+function HomeTab({ data, t, clientName, logoUrl, goTo }: { data: DataBundle; t: Dict; clientName: string; logoUrl?: string; goTo: (v: string) => void }) {
+  const { brain, voices, pillars, vocabulary, avoid, expressions, visuals } = data;
+  const hasIdentity = !!(brain?.mission || brain?.vision || brain?.summary);
+  const primaryVoice = voices?.[0];
+
+  const sections: { key: string; label: string; desc: string; count: number; icon: typeof BookOpen; gradient: string }[] = [
+    { key: "vocabulary", label: t.tab_vocabulary, desc: t.nav.vocabulary, count: vocabulary.length, icon: BookOpen, gradient: "from-sky-500/20 to-blue-500/5" },
+    { key: "pillars", label: t.tab_pillars, desc: t.nav.pillars, count: pillars.length, icon: Layers, gradient: "from-violet-500/20 to-purple-500/5" },
+    { key: "voice", label: t.tab_voice, desc: t.nav.voice, count: voices.length, icon: Mic, gradient: "from-rose-500/20 to-pink-500/5" },
+    { key: "avoid", label: t.tab_avoid, desc: t.nav.avoid, count: avoid.length, icon: Ban, gradient: "from-amber-500/20 to-orange-500/5" },
+    { key: "expressions", label: t.tab_expressions, desc: t.nav.expressions, count: expressions.length, icon: MessageSquareQuote, gradient: "from-emerald-500/20 to-teal-500/5" },
+    { key: "visual", label: t.tab_visual, desc: t.nav.visual, count: visuals.length, icon: Palette, gradient: "from-fuchsia-500/20 to-pink-500/5" },
+  ];
+
+  return (
+    <div className="space-y-8">
+      {/* Hero */}
+      <div className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/10 via-background to-background p-6 sm:p-10">
+        <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-purple-500/10 blur-3xl" />
+        <div className="relative flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+          {logoUrl && <img src={logoUrl} alt="" className="h-16 w-16 rounded-2xl border bg-card object-contain shadow-lg sm:h-20 sm:w-20" />}
+          <div className="flex-1">
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              <Sparkles className="h-3 w-3" /> Brand Brain
+            </div>
+            <h2 className="text-2xl font-bold leading-tight sm:text-4xl">{t.home_welcome}</h2>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">{t.home_intro}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Identity summary */}
+      {hasIdentity ? (
+        <div className="grid gap-4 md:grid-cols-3">
+          {brain?.mission && (
+            <Card className="border-l-4 border-l-primary">
+              <CardHeader className="pb-2"><CardTitle className="text-sm uppercase tracking-wider text-muted-foreground">{t.mission}</CardTitle></CardHeader>
+              <CardContent><p className="whitespace-pre-wrap text-base leading-relaxed">{brain.mission}</p></CardContent>
+            </Card>
+          )}
+          {brain?.vision && (
+            <Card className="border-l-4 border-l-violet-500">
+              <CardHeader className="pb-2"><CardTitle className="text-sm uppercase tracking-wider text-muted-foreground">{t.vision}</CardTitle></CardHeader>
+              <CardContent><p className="whitespace-pre-wrap text-base leading-relaxed">{brain.vision}</p></CardContent>
+            </Card>
+          )}
+          {brain?.summary && (
+            <Card className="border-l-4 border-l-emerald-500 md:col-span-3 lg:col-span-1">
+              <CardHeader className="pb-2"><CardTitle className="text-sm uppercase tracking-wider text-muted-foreground">{t.summary}</CardTitle></CardHeader>
+              <CardContent><p className="whitespace-pre-wrap text-base leading-relaxed">{brain.summary}</p></CardContent>
+            </Card>
+          )}
+        </div>
+      ) : (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
+            <p className="text-sm text-muted-foreground">{t.home_empty}</p>
+            <Button variant="outline" size="sm" onClick={() => goTo("overview")}>{t.tab_overview} <ArrowRight className="ml-2 h-4 w-4" /></Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Voice quick highlight */}
+      {primaryVoice && (primaryVoice.emotional_tone || primaryVoice.archetype) && (
+        <Card className="bg-gradient-to-br from-rose-500/5 to-transparent">
+          <CardContent className="flex flex-wrap items-center gap-4 p-5">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-300">
+              <Mic className="h-5 w-5" />
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <div className="text-xs uppercase tracking-wider text-muted-foreground">{t.tab_voice}</div>
+              <div className="font-medium">
+                {[primaryVoice.archetype, primaryVoice.emotional_tone].filter(Boolean).join(" · ")}
+              </div>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => goTo("voice")}>{t.home_open} <ArrowRight className="ml-1 h-4 w-4" /></Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Navigation */}
+      <div>
+        <h3 className="mb-4 text-lg font-semibold">{t.home_explore}</h3>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {sections.map((s) => {
+            const Icon = s.icon;
+            return (
+              <button
+                key={s.key}
+                onClick={() => goTo(s.key)}
+                className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${s.gradient} p-5 text-left transition-all hover:-translate-y-1 hover:shadow-lg`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-card/80 backdrop-blur shadow-sm">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <span className="text-2xl font-bold tabular-nums text-foreground/80">{s.count}</span>
+                </div>
+                <div className="mt-4">
+                  <div className="flex items-center gap-1 font-semibold">
+                    {s.label}
+                    <ArrowRight className="h-4 w-4 opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{s.desc}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 /* -------------------- Overview -------------------- */
 function OverviewTab({ clientId, canEdit, data, t }: { clientId: string; canEdit: boolean; data: DataBundle; t: Dict }) {
