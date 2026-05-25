@@ -9,6 +9,7 @@ import AuthGuard from "@/components/AuthGuard";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
 import ClientPage from "./pages/ClientPage.tsx";
+import BrandBrainPage from "./pages/BrandBrainPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.tsx";
 import AcceptInvitePage from "./pages/AcceptInvitePage.tsx";
@@ -73,6 +74,7 @@ const App = () => (
               <Route path="/contracts" element={<AuthGuard allowedRoles={["super_admin"]}><ContractsPage /></AuthGuard>} />
               <Route path="/design-briefs" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><DesignBriefsPage /></AuthGuard>} />
               <Route path="/client/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><ClientPage /></AuthGuard>} />
+              <Route path="/client/:slug/brand-brain" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><BrandBrainPage /></AuthGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

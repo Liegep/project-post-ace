@@ -229,6 +229,10 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => navigate(`/client/${clientData.slug}/brand-brain`)}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Brand Brain
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setPasswordOpen(true)}>
                 <KeyRound className="mr-2 h-4 w-4" />
                 Alterar senha
