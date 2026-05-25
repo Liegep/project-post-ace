@@ -77,6 +77,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     archivedAt: row.archived_at ? new Date(row.archived_at) : null,
     trelloCardId: row.trello_card_id || null,
     artType: row.art_type || "single_post",
+    contentPillarId: row.content_pillar_id || null,
   };
 }
 
