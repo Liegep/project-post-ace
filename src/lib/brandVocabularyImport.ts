@@ -59,7 +59,6 @@ const HEADER_MAP: Record<string, keyof VocabImportRow> = {
   "tipo de contenido": "content_type",
   "prioridad": "priority",
   "frecuencia": "frequency",
-  "tono emotivo": "emotion",
   "palabras relacionadas": "related_words",
   "frases aprobadas": "approved_phrases",
   "¿se puede usar?": "can_be_used", "se puede usar": "can_be_used",
