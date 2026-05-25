@@ -1044,6 +1044,7 @@ export type Database = {
           allow_client_create_post: boolean
           allow_client_create_tags: boolean
           allow_client_download: boolean
+          allow_client_edit_brand_brain: boolean
           allow_client_edit_caption: boolean
           allow_quick_access: boolean
           billing_currency: string
@@ -1088,6 +1089,7 @@ export type Database = {
           allow_client_create_post?: boolean
           allow_client_create_tags?: boolean
           allow_client_download?: boolean
+          allow_client_edit_brand_brain?: boolean
           allow_client_edit_caption?: boolean
           allow_quick_access?: boolean
           billing_currency?: string
@@ -1132,6 +1134,7 @@ export type Database = {
           allow_client_create_post?: boolean
           allow_client_create_tags?: boolean
           allow_client_download?: boolean
+          allow_client_edit_brand_brain?: boolean
           allow_client_edit_caption?: boolean
           allow_quick_access?: boolean
           billing_currency?: string
@@ -3103,6 +3106,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      client_can_edit_brand_brain: {
+        Args: { _client_id: string }
+        Returns: boolean
+      }
       delete_orphaned_media_files: {
         Args: { older_than_hours?: number }
         Returns: number
