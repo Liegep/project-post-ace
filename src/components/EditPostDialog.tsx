@@ -98,6 +98,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       setColumnId(post.columnId);
       setSelectedTags(post.tags);
       setArtType(post.artType || "single_post");
+      setContentPillarId(post.contentPillarId ?? null);
       supabase.from("posts").select("retain_files").eq("id", post.id).maybeSingle().then(({ data }) => {
         setRetainFiles((data as any)?.retain_files ?? false);
       });
