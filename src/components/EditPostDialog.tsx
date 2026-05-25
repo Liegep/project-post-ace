@@ -194,11 +194,24 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[92vh] overflow-y-auto overflow-x-hidden p-0 gap-0 [&_*]:min-w-0 [&_a]:break-all">
+      <DialogContent className="sm:max-w-6xl max-h-[92vh] overflow-y-auto overflow-x-hidden p-0 gap-0 [&_*]:min-w-0 [&_a]:break-all">
         <form onSubmit={handleSubmit}>
-          <div className="flex flex-col md:flex-row">
+          <div className="flex flex-col lg:flex-row">
             {/* LEFT COLUMN — Title + Caption + Media */}
-            <div className="flex-1 md:w-[65%] p-6 space-y-4 border-r border-border">
+            <div className="flex-1 lg:w-[50%] p-6 space-y-4 border-r border-border">
+              {/* Mobile Brand Brain collapsible */}
+              <div className="lg:hidden">
+                <Collapsible open={brainOpen} onOpenChange={setBrainOpen}>
+                  <CollapsibleTrigger asChild>
+                    <Button type="button" variant="outline" size="sm" className="w-full justify-between">
+                      <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> Brand Brain do Cliente</span>
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-3">
+                    <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
               <div>
                 <Label htmlFor="edit-title" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("title")}</Label>
                 <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} className="text-lg font-bold mt-1" />
