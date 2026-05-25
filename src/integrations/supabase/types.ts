@@ -2178,6 +2178,7 @@ export type Database = {
           client_label: string
           client_unarchived_at: string | null
           column_id: string | null
+          content_pillar_id: string | null
           created_at: string
           deadline: string | null
           id: string
@@ -2203,6 +2204,7 @@ export type Database = {
           client_label?: string
           client_unarchived_at?: string | null
           column_id?: string | null
+          content_pillar_id?: string | null
           created_at?: string
           deadline?: string | null
           id?: string
@@ -2228,6 +2230,7 @@ export type Database = {
           client_label?: string
           client_unarchived_at?: string | null
           column_id?: string | null
+          content_pillar_id?: string | null
           created_at?: string
           deadline?: string | null
           id?: string
@@ -2256,6 +2259,13 @@ export type Database = {
             columns: ["column_id"]
             isOneToOne: false
             referencedRelation: "columns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_content_pillar_id_fkey"
+            columns: ["content_pillar_id"]
+            isOneToOne: false
+            referencedRelation: "content_pillars"
             referencedColumns: ["id"]
           },
         ]

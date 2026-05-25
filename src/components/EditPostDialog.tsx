@@ -25,6 +25,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { createPostDeadlineFromInput, formatPostDeadlineInput } from "@/lib/postDeadline";
 import { ART_TYPES, getArtTypeConfig } from "@/lib/artTypes";
+import { BrandBrainSidePanel } from "@/components/BrandBrainSidePanel";
+import { useBrandBrain } from "@/hooks/useBrandBrain";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Sparkles } from "lucide-react";
 
 const STATUS_KEYS: Record<PostStatus, string> = {
   entrada: "statusEntry",
@@ -59,6 +63,9 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [uploading, setUploading] = useState(false);
   const [retainFiles, setRetainFiles] = useState(false);
   const [externalLink, setExternalLink] = useState("");
+  const [contentPillarId, setContentPillarId] = useState<string | null>(null);
+  const [brainOpen, setBrainOpen] = useState(false);
+  const { pillars } = useBrandBrain(clientId || undefined);
   const [editingLink, setEditingLink] = useState(false);
   const [internalApprovalOpen, setInternalApprovalOpen] = useState(false);
   const [commentHtml, setCommentHtml] = useState("");
@@ -91,6 +98,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
       setColumnId(post.columnId);
       setSelectedTags(post.tags);
       setArtType(post.artType || "single_post");
+      setContentPillarId(post.contentPillarId ?? null);
       supabase.from("posts").select("retain_files").eq("id", post.id).maybeSingle().then(({ data }) => {
         setRetainFiles((data as any)?.retain_files ?? false);
       });
@@ -161,6 +169,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         deadline: deadline ? createPostDeadlineFromInput(deadline) : null,
         tags: selectedTags,
         artType,
+        contentPillarId,
       });
       // Update retain_files flag
       await supabase.from("posts").update({ retain_files: retainFiles } as any).eq("id", post.id);
@@ -185,11 +194,24 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[92vh] overflow-y-auto overflow-x-hidden p-0 gap-0 [&_*]:min-w-0 [&_a]:break-all">
+      <DialogContent className="sm:max-w-6xl max-h-[92vh] overflow-y-auto overflow-x-hidden p-0 gap-0 [&_*]:min-w-0 [&_a]:break-all">
         <form onSubmit={handleSubmit}>
-          <div className="flex flex-col md:flex-row">
+          <div className="flex flex-col lg:flex-row">
             {/* LEFT COLUMN — Title + Caption + Media */}
-            <div className="flex-1 md:w-[65%] p-6 space-y-4 border-r border-border">
+            <div className="flex-1 lg:w-[50%] p-6 space-y-4 border-r border-border">
+              {/* Mobile Brand Brain collapsible */}
+              <div className="lg:hidden">
+                <Collapsible open={brainOpen} onOpenChange={setBrainOpen}>
+                  <CollapsibleTrigger asChild>
+                    <Button type="button" variant="outline" size="sm" className="w-full justify-between">
+                      <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> Brand Brain do Cliente</span>
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-3">
+                    <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
               <div>
                 <Label htmlFor="edit-title" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("title")}</Label>
                 <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} className="text-lg font-bold mt-1" />
@@ -444,8 +466,25 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               })()}
             </div>
 
-            {/* RIGHT COLUMN — Settings */}
-            <div className="md:w-[35%] p-6 space-y-4">
+            {/* MIDDLE COLUMN — Settings */}
+            <div className="lg:w-[28%] p-6 space-y-4 lg:border-r lg:border-border">
+              {/* Pilar de Conteúdo */}
+              {pillars.length > 0 && (
+                <div>
+                  <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
+                    <Sparkles className="h-3 w-3" /> Pilar de Conteúdo
+                  </Label>
+                  <Select value={contentPillarId ?? "none"} onValueChange={(v) => setContentPillarId(v === "none" ? null : v)}>
+                    <SelectTrigger className="mt-1 h-9 text-xs"><SelectValue placeholder="Sem pilar" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Sem pilar</SelectItem>
+                      {pillars.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               {/* Art type dropdown */}
               <div>
                 <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tipo de arte</Label>
@@ -608,6 +647,14 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                 <Save className="mr-2 h-4 w-4" /> {uploading ? "..." : t("saveChanges")}
               </Button>
             </div>
+
+            {/* RIGHT COLUMN — Brand Brain (desktop only) */}
+            <aside className="hidden lg:block lg:w-[22%] p-4 max-h-[92vh] overflow-y-auto bg-muted/20">
+              <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5 text-primary" /> Brand Brain
+              </div>
+              <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
+            </aside>
           </div>
         </form>
 
