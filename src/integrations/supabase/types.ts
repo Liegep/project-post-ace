@@ -3106,6 +3106,48 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_proposal: {
+        Args: {
+          p_email: string
+          p_ip: string
+          p_name: string
+          p_signature: string
+          p_token: string
+        }
+        Returns: {
+          accepted_at: string | null
+          accepted_email: string
+          accepted_ip: string
+          accepted_name: string
+          accepted_signature: string
+          client_email: string
+          client_name: string
+          created_at: string
+          currency: string
+          deadline_days: number
+          expires_at: string
+          id: string
+          investment_description: string
+          locale: string
+          pieces_quantity: number
+          plan: string
+          proposal_type: string
+          scope_description: string
+          services: Json
+          status: Database["public"]["Enums"]["proposal_status"]
+          token: string
+          total_value: number
+          updated_at: string
+          user_id: string
+          viewed_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "proposals"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       client_can_edit_brand_brain: {
         Args: { _client_id: string }
         Returns: boolean
@@ -3117,6 +3159,42 @@ export type Database = {
       extract_media_storage_paths: {
         Args: { urls: string[] }
         Returns: string[]
+      }
+      get_proposal_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          accepted_at: string | null
+          accepted_email: string
+          accepted_ip: string
+          accepted_name: string
+          accepted_signature: string
+          client_email: string
+          client_name: string
+          created_at: string
+          currency: string
+          deadline_days: number
+          expires_at: string
+          id: string
+          investment_description: string
+          locale: string
+          pieces_quantity: number
+          plan: string
+          proposal_type: string
+          scope_description: string
+          services: Json
+          status: Database["public"]["Enums"]["proposal_status"]
+          token: string
+          total_value: number
+          updated_at: string
+          user_id: string
+          viewed_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "proposals"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       get_user_client_ids: { Args: { _user_id: string }; Returns: string[] }
       has_role: {
@@ -3135,6 +3213,8 @@ export type Database = {
           size: number
         }[]
       }
+      mark_proposal_expired: { Args: { p_token: string }; Returns: undefined }
+      mark_proposal_viewed: { Args: { p_token: string }; Returns: undefined }
     }
     Enums: {
       app_role:

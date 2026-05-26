@@ -55,35 +55,30 @@ export default function PublicProposalPage() {
     if (!token) return;
     (async () => {
       const { data, error } = await supabase
-        .from("proposals")
-        .select("*")
-        .eq("token", token)
-        .single();
+        .rpc("get_proposal_by_token", { p_token: token } as any);
 
-      if (error || !data) {
+      const row: any = Array.isArray(data) ? data[0] : data;
+      if (error || !row) {
         setLoading(false);
         return;
       }
 
       const p: ProposalData = {
-        ...data,
-        services: Array.isArray(data.services) ? data.services as any : JSON.parse(data.services as string || "[]"),
-        locale: ((data as any).locale || "pt") as ProposalLocale,
+        ...row,
+        services: Array.isArray(row.services) ? row.services as any : JSON.parse(row.services as string || "[]"),
+        locale: ((row as any).locale || "pt") as ProposalLocale,
       };
 
       if (new Date(p.expires_at) < new Date()) {
         setExpired(true);
         if (p.status !== "expired") {
-          await supabase.from("proposals").update({ status: "expired" as any }).eq("id", p.id);
+          await supabase.rpc("mark_proposal_expired", { p_token: token } as any);
         }
       } else if (p.status === "accepted") {
         setAccepted(true);
       } else {
         if (p.status === "sent" || p.status === "draft") {
-          await supabase
-            .from("proposals")
-            .update({ status: "viewed" as any, viewed_at: new Date().toISOString() })
-            .eq("id", p.id);
+          await supabase.rpc("mark_proposal_viewed", { p_token: token } as any);
         }
       }
 
@@ -112,17 +107,13 @@ export default function PublicProposalPage() {
       clientIp = ipData.ip || "";
     } catch {}
 
-    const { error } = await supabase
-      .from("proposals")
-      .update({
-        status: "accepted" as any,
-        accepted_at: new Date().toISOString(),
-        accepted_name: acceptName.trim(),
-        accepted_signature: acceptSignature.trim(),
-        accepted_email: acceptEmail.trim(),
-        accepted_ip: clientIp,
-      })
-      .eq("id", proposal!.id);
+    const { error } = await supabase.rpc("accept_proposal", {
+      p_token: token!,
+      p_name: acceptName.trim(),
+      p_email: acceptEmail.trim(),
+      p_signature: acceptSignature.trim(),
+      p_ip: clientIp,
+    } as any);
     setSubmitting(false);
     if (error) {
       toast({ title: t("errorAccepting"), variant: "destructive" });
