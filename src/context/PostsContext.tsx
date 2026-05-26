@@ -166,10 +166,12 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       const fetchedPosts = (postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || []));
       
-      // Auto-archive posts past their deadline
+      // Auto-archive posts past their deadline — but ONLY posts that were never archived before.
+      // If archived_at is set on a non-archived post, it means it was manually restored and must NOT
+      // be auto-archived again (otherwise restore appears to fail).
       const now = new Date();
-      const toArchive = fetchedPosts.filter((p: Post) => 
-        p.deadline && new Date(p.deadline) < now && !p.archived
+      const toArchive = fetchedPosts.filter((p: Post) =>
+        p.deadline && new Date(p.deadline) < now && !p.archived && !p.archivedAt
       );
       if (toArchive.length > 0) {
         for (const p of toArchive) {
@@ -181,6 +183,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
           p.archivedAt = new Date();
         }
       }
+
 
       setPosts(fetchedPosts);
       
