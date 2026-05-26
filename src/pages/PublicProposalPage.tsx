@@ -107,17 +107,13 @@ export default function PublicProposalPage() {
       clientIp = ipData.ip || "";
     } catch {}
 
-    const { error } = await supabase
-      .from("proposals")
-      .update({
-        status: "accepted" as any,
-        accepted_at: new Date().toISOString(),
-        accepted_name: acceptName.trim(),
-        accepted_signature: acceptSignature.trim(),
-        accepted_email: acceptEmail.trim(),
-        accepted_ip: clientIp,
-      })
-      .eq("id", proposal!.id);
+    const { error } = await supabase.rpc("accept_proposal", {
+      p_token: token!,
+      p_name: acceptName.trim(),
+      p_email: acceptEmail.trim(),
+      p_signature: acceptSignature.trim(),
+      p_ip: clientIp,
+    } as any);
     setSubmitting(false);
     if (error) {
       toast({ title: t("errorAccepting"), variant: "destructive" });
