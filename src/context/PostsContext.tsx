@@ -166,10 +166,12 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       const fetchedPosts = (postsRes.data || []).map((p: any) => dbPostToPost(p, commentsMap[p.id] || []));
       
-      // Auto-archive posts past their deadline
+      // Auto-archive posts past their deadline — but ONLY posts that were never archived before.
+      // If archived_at is set on a non-archived post, it means it was manually restored and must NOT
+      // be auto-archived again (otherwise restore appears to fail).
       const now = new Date();
-      const toArchive = fetchedPosts.filter((p: Post) => 
-        p.deadline && new Date(p.deadline) < now && !p.archived
+      const toArchive = fetchedPosts.filter((p: Post) =>
+        p.deadline && new Date(p.deadline) < now && !p.archived && !p.archivedAt
       );
       if (toArchive.length > 0) {
         for (const p of toArchive) {
@@ -181,6 +183,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
           p.archivedAt = new Date();
         }
       }
+
 
       setPosts(fetchedPosts);
       
@@ -787,14 +790,18 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
   const unarchivePost = useCallback(async (id: string, columnId?: string | null, clientInitiated?: boolean) => {
     const post = [...posts, ...posts].find(p => p.id === id); // check active+archived
-    const updates: Partial<Post> = { archived: false, archivedAt: null, status: ["pronto"] as PostStatus[] };
+    // Keep archived_at populated as a "was previously archived" marker so the auto-archive
+    // routine on load doesn't immediately re-archive this post when its deadline is in the past.
+    const keepArchivedAt = post?.archivedAt ?? new Date();
+    const updates: Partial<Post> = { archived: false, archivedAt: keepArchivedAt, status: ["pronto"] as PostStatus[] };
     if (columnId !== undefined) updates.columnId = columnId;
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
-    const dbUpdates: Record<string, any> = { archived: false, archived_at: null, status: ["pronto"] };
+    const dbUpdates: Record<string, any> = { archived: false, archived_at: keepArchivedAt instanceof Date ? keepArchivedAt.toISOString() : keepArchivedAt, status: ["pronto"] };
     if (columnId !== undefined) dbUpdates.column_id = columnId;
     if (clientInitiated) dbUpdates.client_unarchived_at = new Date().toISOString();
     await supabase.from("posts").update(dbUpdates as any).eq("id", id);
   }, [posts, clientId]);
+
 
   const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus[]) => {
     const updates: Record<string, any> = { status };
