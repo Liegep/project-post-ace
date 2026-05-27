@@ -279,30 +279,8 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
             </Button>
           </div>
           </form>
-
-          {/* Brand Brain side panel — sidebar on desktop, collapsible on mobile */}
-          <aside className="lg:border-l lg:pl-4 lg:max-h-[80vh] lg:overflow-y-auto">
-            <div className="hidden lg:block">
-              <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                <Sparkles className="h-4 w-4 text-primary" /> Brand Brain do Cliente
-              </div>
-              <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
-            </div>
-            <div className="lg:hidden">
-              <Collapsible open={brainOpen} onOpenChange={setBrainOpen}>
-                <CollapsibleTrigger asChild>
-                  <Button type="button" variant="outline" size="sm" className="w-full justify-between">
-                    <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> Brand Brain do Cliente</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${brainOpen ? "rotate-180" : ""}`} />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pt-3">
-                  <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
-          </aside>
         </div>
+
       </DialogContent>
     </Dialog>
   );
