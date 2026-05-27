@@ -5,6 +5,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { HashtagManager } from "@/components/HashtagManager";
 import { Post, PostStatus, MediaType, STATUS_CONFIG, ClientLabel } from "@/types/post";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -198,21 +199,9 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col lg:flex-row">
             {/* LEFT COLUMN — Title + Caption + Media */}
-            <div className="flex-1 lg:w-[50%] p-6 space-y-4 border-r border-border">
-              {/* Mobile Brand Brain collapsible */}
-              <div className="lg:hidden">
-                <Collapsible open={brainOpen} onOpenChange={setBrainOpen}>
-                  <CollapsibleTrigger asChild>
-                    <Button type="button" variant="outline" size="sm" className="w-full justify-between">
-                      <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> Brand Brain do Cliente</span>
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-3">
-                    <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
-                  </CollapsibleContent>
-                </Collapsible>
-              </div>
+            <div className="flex-1 lg:w-[58%] p-6 space-y-4 border-r border-border">
               <div>
+
                 <Label htmlFor="edit-title" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("title")}</Label>
                 <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} className="text-lg font-bold mt-1" />
               </div>
@@ -467,7 +456,26 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
             </div>
 
             {/* MIDDLE COLUMN — Settings */}
-            <div className="lg:w-[28%] p-6 space-y-4 lg:border-r lg:border-border">
+            <div className="lg:w-[42%] p-6 space-y-4">
+              {/* Brand Brain drawer trigger */}
+              <Sheet open={brainOpen} onOpenChange={setBrainOpen}>
+                <SheetTrigger asChild>
+                  <Button type="button" variant="outline" size="sm" className="w-full justify-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" /> Abrir Brand Brain
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-1.5">
+                      <Sparkles className="h-4 w-4 text-primary" /> Brand Brain do Cliente
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-4">
+                    <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+
               {/* Pilar de Conteúdo */}
               {pillars.length > 0 && (
                 <div>
@@ -648,13 +656,6 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               </Button>
             </div>
 
-            {/* RIGHT COLUMN — Brand Brain (desktop only) */}
-            <aside className="hidden lg:block lg:w-[22%] p-4 max-h-[92vh] overflow-y-auto bg-muted/20">
-              <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5 text-primary" /> Brand Brain
-              </div>
-              <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
-            </aside>
           </div>
         </form>
 

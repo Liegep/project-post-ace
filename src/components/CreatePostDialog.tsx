@@ -5,6 +5,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import { HashtagManager } from "@/components/HashtagManager";
 import { PostStatus, MediaType } from "@/types/post";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -162,12 +163,32 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-4xl max-h-[92vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl max-h-[92vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{t("createNewPost")}</DialogTitle>
+          <div className="flex items-center justify-between gap-2 pr-6">
+            <DialogTitle>{t("createNewPost")}</DialogTitle>
+            <Sheet open={brainOpen} onOpenChange={setBrainOpen}>
+              <SheetTrigger asChild>
+                <Button type="button" variant="outline" size="sm" className="gap-1.5">
+                  <Sparkles className="h-3.5 w-3.5 text-primary" /> Brand Brain
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle className="flex items-center gap-1.5">
+                    <Sparkles className="h-4 w-4 text-primary" /> Brand Brain do Cliente
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">
+                  <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </DialogHeader>
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4">
+        <div>
           <form onSubmit={handleSubmit} className="space-y-4">
+
           <div>
             <Label htmlFor="title">{t("title")}</Label>
             <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} />
@@ -258,30 +279,8 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
             </Button>
           </div>
           </form>
-
-          {/* Brand Brain side panel — sidebar on desktop, collapsible on mobile */}
-          <aside className="lg:border-l lg:pl-4 lg:max-h-[80vh] lg:overflow-y-auto">
-            <div className="hidden lg:block">
-              <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                <Sparkles className="h-4 w-4 text-primary" /> Brand Brain do Cliente
-              </div>
-              <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
-            </div>
-            <div className="lg:hidden">
-              <Collapsible open={brainOpen} onOpenChange={setBrainOpen}>
-                <CollapsibleTrigger asChild>
-                  <Button type="button" variant="outline" size="sm" className="w-full justify-between">
-                    <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5" /> Brand Brain do Cliente</span>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${brainOpen ? "rotate-180" : ""}`} />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pt-3">
-                  <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
-          </aside>
         </div>
+
       </DialogContent>
     </Dialog>
   );
