@@ -440,9 +440,38 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         {/* Actions */}
         <div className="flex flex-wrap gap-2 border-t border-white/15 pt-3 text-primary-foreground">
           {invStatus !== "paid" ? (
-            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleMarkPaid()}>
-              <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Marcar como Paga
-            </Button>
+            <Popover open={markPaidOpen} onOpenChange={(o) => { setMarkPaidOpen(o); if (o) setMarkPaidDate(format(new Date(), "yyyy-MM-dd")); }}>
+              <PopoverTrigger asChild>
+                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                  <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Marcar como Paga
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-72 space-y-3" align="start">
+                <div>
+                  <Label className="text-xs">Data do pagamento</Label>
+                  <Input
+                    type="date"
+                    value={markPaidDate}
+                    onChange={(e) => setMarkPaidDate(e.target.value)}
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    Esta data aparece no recibo enviado ao cliente.
+                  </p>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button size="sm" variant="ghost" onClick={() => setMarkPaidOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    onClick={() => handleMarkPaid(markPaidDate)}
+                  >
+                    Confirmar
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           ) : (
             <Button size="sm" variant="outline" onClick={handleRevertOpen} className="invoice-action-light">
               <Clock className="h-3.5 w-3.5 mr-1" /> <span>Reverter para Aberta</span>
