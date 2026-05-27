@@ -530,6 +530,13 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
                 <Input type="date" value={invDueDate} onChange={e => setInvDueDate(e.target.value)} />
               </div>
             </div>
+            {invStatus === "paid" && (
+              <div>
+                <Label className="text-xs">Data do pagamento</Label>
+                <Input type="date" value={invPaidAt} onChange={e => setInvPaidAt(e.target.value)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Esta data aparece no recibo enviado ao cliente.</p>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label className="text-xs">Desconto</Label>
