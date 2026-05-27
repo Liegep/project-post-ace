@@ -456,7 +456,26 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
             </div>
 
             {/* MIDDLE COLUMN — Settings */}
-            <div className="lg:w-[28%] p-6 space-y-4 lg:border-r lg:border-border">
+            <div className="lg:w-[42%] p-6 space-y-4">
+              {/* Brand Brain drawer trigger */}
+              <Sheet open={brainOpen} onOpenChange={setBrainOpen}>
+                <SheetTrigger asChild>
+                  <Button type="button" variant="outline" size="sm" className="w-full justify-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" /> Abrir Brand Brain
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-1.5">
+                      <Sparkles className="h-4 w-4 text-primary" /> Brand Brain do Cliente
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-4">
+                    <BrandBrainSidePanel clientId={clientId} highlightedPillarId={contentPillarId} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+
               {/* Pilar de Conteúdo */}
               {pillars.length > 0 && (
                 <div>
