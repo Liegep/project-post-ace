@@ -14,7 +14,7 @@ const T: Record<Locale, Record<string, string>> = {
     invoice: "FATURA",
     statusOpen: "Aberta", statusPaid: "Paga", statusOverdue: "Atrasada", statusCancelled: "Cancelada",
     from: "De", to: "Para", taxId: "NIF",
-    issueDate: "Emissão", dueDate: "Vencimento", period: "Período",
+    issueDate: "Emissão", dueDate: "Vencimento", paidDate: "Pago em", period: "Período",
     item: "Item", category: "Categoria", date: "Data", qty: "Qtd", unitPrice: "Unitário", total: "Total",
     subtotal: "Subtotal", discount: "Desconto", surcharge: "Acréscimo",
     payment: "Pagamento", notes: "Observações",
@@ -23,7 +23,7 @@ const T: Record<Locale, Record<string, string>> = {
     invoice: "INVOICE",
     statusOpen: "Open", statusPaid: "Paid", statusOverdue: "Overdue", statusCancelled: "Cancelled",
     from: "From", to: "Bill To", taxId: "Tax ID",
-    issueDate: "Issue Date", dueDate: "Due Date", period: "Period",
+    issueDate: "Issue Date", dueDate: "Due Date", paidDate: "Paid On", period: "Period",
     item: "Item", category: "Category", date: "Date", qty: "Qty", unitPrice: "Unit Price", total: "Total",
     subtotal: "Subtotal", discount: "Discount", surcharge: "Surcharge",
     payment: "Payment", notes: "Notes",
@@ -32,7 +32,7 @@ const T: Record<Locale, Record<string, string>> = {
     invoice: "FATTURA",
     statusOpen: "Aperta", statusPaid: "Pagata", statusOverdue: "Scaduta", statusCancelled: "Annullata",
     from: "Da", to: "A", taxId: "P. IVA",
-    issueDate: "Data Emissione", dueDate: "Scadenza", period: "Periodo",
+    issueDate: "Data Emissione", dueDate: "Scadenza", paidDate: "Pagata il", period: "Periodo",
     item: "Voce", category: "Categoria", date: "Data", qty: "Qtà", unitPrice: "Prezzo Unit.", total: "Totale",
     subtotal: "Subtotale", discount: "Sconto", surcharge: "Maggiorazione",
     payment: "Pagamento", notes: "Note",
@@ -41,7 +41,7 @@ const T: Record<Locale, Record<string, string>> = {
     invoice: "FACTURA",
     statusOpen: "Abierta", statusPaid: "Pagada", statusOverdue: "Vencida", statusCancelled: "Cancelada",
     from: "De", to: "Para", taxId: "NIF",
-    issueDate: "Emisión", dueDate: "Vencimiento", period: "Período",
+    issueDate: "Emisión", dueDate: "Vencimiento", paidDate: "Pagada el", period: "Período",
     item: "Ítem", category: "Categoría", date: "Fecha", qty: "Cant.", unitPrice: "Unitario", total: "Total",
     subtotal: "Subtotal", discount: "Descuento", surcharge: "Recargo",
     payment: "Pago", notes: "Observaciones",
@@ -50,7 +50,7 @@ const T: Record<Locale, Record<string, string>> = {
     invoice: "FAKTURA",
     statusOpen: "Öppen", statusPaid: "Betald", statusOverdue: "Försenad", statusCancelled: "Avbruten",
     from: "Från", to: "Till", taxId: "Org.nr",
-    issueDate: "Utfärdad", dueDate: "Förfallodatum", period: "Period",
+    issueDate: "Utfärdad", dueDate: "Förfallodatum", paidDate: "Betald den", period: "Period",
     item: "Artikel", category: "Kategori", date: "Datum", qty: "Antal", unitPrice: "Pris/st", total: "Totalt",
     subtotal: "Delsumma", discount: "Rabatt", surcharge: "Tillägg",
     payment: "Betalning", notes: "Anteckningar",
@@ -279,6 +279,7 @@ export async function generateInvoicePDF(
   <div class="dates">
     <div class="item"><span>${t.issueDate}</span><strong>${fd(invoice.issue_date)}</strong></div>
     <div class="item"><span>${t.dueDate}</span><strong>${fd(invoice.due_date)}</strong></div>
+    ${invoice.status === "paid" && invoice.paid_at ? `<div class="item"><span>${t.paidDate}</span><strong style="color:#00875a">${fd(invoice.paid_at)}</strong></div>` : ""}
     ${invoice.period_start && invoice.period_end ? `<div class="item"><span>${t.period}</span><strong>${fd(invoice.period_start)} – ${fd(invoice.period_end)}</strong></div>` : ""}
   </div>
 

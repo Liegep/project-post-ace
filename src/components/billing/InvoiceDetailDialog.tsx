@@ -26,8 +26,9 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import {
   Plus, Trash2, Pencil, Download, Upload, FileText, Eye, EyeOff,
-  CheckCircle2, AlertCircle, XCircle, Clock, Paperclip, X, Link2, Send
+  CheckCircle2, AlertCircle, XCircle, Clock, Paperclip, X, Link2, Send, Calendar
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { generateInvoicePDF } from "@/lib/invoicePdf";
 import { formatCurrency } from "@/lib/currency";
@@ -91,9 +92,12 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
   const [invSurcharge, setInvSurcharge] = useState(String(invoice.surcharge || 0));
   const [invNotes, setInvNotes] = useState(invoice.notes || "");
   const [invDueDate, setInvDueDate] = useState(invoice.due_date);
+  const [invPaidAt, setInvPaidAt] = useState(invoice.paid_at ? invoice.paid_at.slice(0, 10) : "");
   const [invPaymentMethod, setInvPaymentMethod] = useState(invoice.payment_method || "none");
   const [invPaymentDetails, setInvPaymentDetails] = useState(invoice.payment_details || "");
   const [invClientVisible, setInvClientVisible] = useState(invoice.client_visible !== false);
+  const [markPaidOpen, setMarkPaidOpen] = useState(false);
+  const [markPaidDate, setMarkPaidDate] = useState(format(new Date(), "yyyy-MM-dd"));
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -124,6 +128,7 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     setInvSurcharge(String(invoice.surcharge || 0));
     setInvNotes(invoice.notes || "");
     setInvDueDate(invoice.due_date);
+    setInvPaidAt(invoice.paid_at ? invoice.paid_at.slice(0, 10) : "");
     setInvPaymentMethod(invoice.payment_method || "none");
     setInvPaymentDetails(invoice.payment_details || "");
     setInvClientVisible(invoice.client_visible !== false);
@@ -211,12 +216,22 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
 
   const handleSaveInvoice = async () => {
     try {
+      // If marking as paid via edit, ensure paid_at is set; if reverting from paid, clear it.
+      let paidAtValue: string | null | undefined = undefined;
+      if (invStatus === "paid") {
+        paidAtValue = invPaidAt
+          ? new Date(`${invPaidAt}T12:00:00`).toISOString()
+          : (invoice.paid_at || new Date().toISOString());
+      } else {
+        paidAtValue = null;
+      }
       await updateInvoice(invoice.id, {
         status: invStatus as any,
         discount: Number(invDiscount) || 0,
         surcharge: Number(invSurcharge) || 0,
         notes: invNotes,
         due_date: invDueDate,
+        paid_at: paidAtValue,
         payment_method: invPaymentMethod === "none" ? "" : invPaymentMethod,
         payment_details: invPaymentDetails,
         client_visible: invClientVisible,
@@ -237,13 +252,18 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
     onUpdate();
   };
 
-  const handleMarkPaid = async (method?: string) => {
+  const handleMarkPaid = async (dateStr?: string, method?: string) => {
+    const paidIso = dateStr
+      ? new Date(`${dateStr}T12:00:00`).toISOString()
+      : new Date().toISOString();
     await updateInvoice(invoice.id, {
       status: "paid",
-      paid_at: new Date().toISOString(),
+      paid_at: paidIso,
       payment_method: method || (invPaymentMethod === "none" ? "" : invPaymentMethod) || "",
     } as any);
     setInvStatus("paid");
+    setInvPaidAt(paidIso.slice(0, 10));
+    setMarkPaidOpen(false);
     toast({ title: "Fatura marcada como paga" });
     onUpdate();
   };
@@ -420,9 +440,38 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
         {/* Actions */}
         <div className="flex flex-wrap gap-2 border-t border-white/15 pt-3 text-primary-foreground">
           {invStatus !== "paid" ? (
-            <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleMarkPaid()}>
-              <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Marcar como Paga
-            </Button>
+            <Popover open={markPaidOpen} onOpenChange={(o) => { setMarkPaidOpen(o); if (o) setMarkPaidDate(format(new Date(), "yyyy-MM-dd")); }}>
+              <PopoverTrigger asChild>
+                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                  <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Marcar como Paga
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-72 space-y-3" align="start">
+                <div>
+                  <Label className="text-xs">Data do pagamento</Label>
+                  <Input
+                    type="date"
+                    value={markPaidDate}
+                    onChange={(e) => setMarkPaidDate(e.target.value)}
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    Esta data aparece no recibo enviado ao cliente.
+                  </p>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button size="sm" variant="ghost" onClick={() => setMarkPaidOpen(false)}>
+                    Cancelar
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    onClick={() => handleMarkPaid(markPaidDate)}
+                  >
+                    Confirmar
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           ) : (
             <Button size="sm" variant="outline" onClick={handleRevertOpen} className="invoice-action-light">
               <Clock className="h-3.5 w-3.5 mr-1" /> <span>Reverter para Aberta</span>
@@ -481,6 +530,13 @@ export default function InvoiceDetailDialog({ invoice, open, onOpenChange, onUpd
                 <Input type="date" value={invDueDate} onChange={e => setInvDueDate(e.target.value)} />
               </div>
             </div>
+            {invStatus === "paid" && (
+              <div>
+                <Label className="text-xs">Data do pagamento</Label>
+                <Input type="date" value={invPaidAt} onChange={e => setInvPaidAt(e.target.value)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Esta data aparece no recibo enviado ao cliente.</p>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label className="text-xs">Desconto</Label>
