@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Authenticated can read posts via approval" ON public.posts;
