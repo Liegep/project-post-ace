@@ -3160,6 +3160,15 @@ export type Database = {
         Args: { urls: string[] }
         Returns: string[]
       }
+      get_client_by_approval_token: {
+        Args: { p_token: string }
+        Returns: {
+          id: string
+          locale: string
+          logo_url: string
+          name: string
+        }[]
+      }
       get_proposal_by_token: {
         Args: { p_token: string }
         Returns: {
