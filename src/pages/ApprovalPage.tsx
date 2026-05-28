@@ -78,18 +78,17 @@ const ApprovalPage = () => {
 
       setTokenData(td as TokenData);
 
-      // Load client info including locale
+      // Load client info including locale (safe fields only via SECURITY DEFINER RPC)
       const { data: client } = await supabase
-        .from("clients")
-        .select("name, logo_url, locale")
-        .eq("id", td.client_id)
+        .rpc("get_client_by_approval_token", { p_token: token as string })
         .maybeSingle();
 
       if (client) {
-        setClientName(client.name);
-        setClientLogo(client.logo_url || "");
-        if (client.locale && ["pt", "en", "it", "es", "sv"].includes(client.locale)) {
-          setLocale(client.locale as Locale);
+        setClientName((client as any).name);
+        setClientLogo((client as any).logo_url || "");
+        const loc = (client as any).locale;
+        if (loc && ["pt", "en", "it", "es", "sv"].includes(loc)) {
+          setLocale(loc as Locale);
         }
       }
 
