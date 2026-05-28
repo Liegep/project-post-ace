@@ -44,9 +44,11 @@ describe("text content dialogs — contrast guards", () => {
     });
 
     it("never uses text-white inside the preview block", () => {
-      // Pega o trecho entre o open do Dialog preview e o close
-      const previewStart = createDlg.indexOf("previewOpen");
-      const sliced = createDlg.slice(previewStart);
+      // Recorta apenas o JSX do Dialog de preview do cliente
+      const previewStart = createDlg.indexOf("<Dialog open={previewOpen}");
+      const previewEnd = createDlg.indexOf("</Dialog>", previewStart);
+      expect(previewStart).toBeGreaterThan(-1);
+      const sliced = createDlg.slice(previewStart, previewEnd);
       expect(sliced).not.toMatch(/\btext-white\b/);
       // Tons cinza claros (gray-100/200/300) também não passam contraste
       // sobre branco para texto principal.
