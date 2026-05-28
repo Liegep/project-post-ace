@@ -272,7 +272,7 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
           <div className="px-6 pt-6 pb-3 border-b border-black/10">
             <div className="text-[10px] uppercase tracking-wide text-black/60 mb-1">Pré-visualização do cliente</div>
             <h2 className="text-2xl font-bold !text-black leading-tight">{title || "Sem título"}</h2>
-            {subtitle && <p className="text-base text-black/70 mt-1">{subtitle}</p>}
+            {subtitle && <p className="text-base !text-black/70 mt-1">{subtitle}</p>}
           </div>
           <div className="overflow-y-auto px-6 py-5">
             {pdfUrl && (
