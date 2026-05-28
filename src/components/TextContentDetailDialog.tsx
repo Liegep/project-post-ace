@@ -155,8 +155,8 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
         {/* Comments section */}
         <div className="mt-8">
           <div className="flex items-center gap-2 mb-4">
-            <MessageCircle className="h-4 w-4 text-muted-foreground" />
-            <h3 className="text-sm font-semibold text-foreground">
+            <MessageCircle className="h-4 w-4 !text-black/60" />
+            <h3 className="text-sm font-semibold !text-black">
               Comentários ({comments.length})
             </h3>
           </div>
@@ -169,16 +169,16 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
                   className={`rounded-lg p-3 ${
                     c.author_role === "admin"
                       ? "bg-primary/5 border border-primary/10"
-                      : "bg-muted/50 border"
+                      : "bg-black/5 border border-black/10"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-semibold text-foreground">{c.author_name}</span>
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-xs font-semibold !text-black">{c.author_name}</span>
+                    <span className="text-[10px] !text-black/50">
                       {format(new Date(c.created_at), "dd/MM HH:mm")}
                     </span>
                   </div>
-                  <p className="text-sm text-foreground whitespace-pre-wrap">{c.message}</p>
+                  <p className="text-sm !text-black whitespace-pre-wrap">{c.message}</p>
                 </div>
               ))}
             </div>
