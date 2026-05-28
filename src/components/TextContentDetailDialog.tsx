@@ -90,31 +90,31 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
   const statusConfig = TEXT_STATUS_LABELS[content.status];
 
   const body = (
-    <div className="flex flex-col h-full !text-black">
+    <div className="flex flex-col h-full bg-card text-card-foreground">
       {/* Article header */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center gap-2 mb-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-            <Icon className="h-4 w-4 !text-primary" />
+            <Icon className="h-4 w-4 text-primary" />
           </div>
-          <Badge variant="outline" className="text-xs !text-black border-black/20 bg-white/60">
+          <Badge variant="outline" className="text-xs">
             {CONTENT_TYPE_LABELS[content.content_type]}
           </Badge>
           <Badge className={`text-xs ${statusConfig.color}`}>
             {statusConfig.label}
           </Badge>
           {content.planned_date && (
-            <span className="flex items-center gap-1 text-xs !text-black/60 ml-auto">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground ml-auto">
               <Calendar className="h-3 w-3" />
               {format(new Date(content.planned_date), "dd 'de' MMMM, yyyy", { locale: ptBR })}
             </span>
           )}
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold !text-black leading-tight mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight mb-2">
           {content.title}
         </h1>
         {content.subtitle && (
-          <p className="text-lg !text-black/70 leading-relaxed">
+          <p className="text-lg text-muted-foreground leading-relaxed">
             {content.subtitle}
           </p>
         )}
@@ -127,36 +127,36 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
         {content.pdf_url && (
           <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
             <div className="flex items-center gap-2 min-w-0">
-              <FileText className="h-4 w-4 !text-primary shrink-0" />
-              <span className="text-sm font-medium !text-black truncate">
+              <FileText className="h-4 w-4 text-primary shrink-0" />
+              <span className="text-sm font-medium text-foreground truncate">
                 {content.pdf_name || "Documento PDF"}
               </span>
             </div>
             <Button asChild size="sm" className="shrink-0">
-              <a href={content.pdf_url} target="_blank" rel="noopener noreferrer" download={content.pdf_name || true} className="!text-white">
+              <a href={content.pdf_url} target="_blank" rel="noopener noreferrer" download={content.pdf_name || true}>
                 <Download className="mr-2 h-4 w-4" /> Baixar PDF
               </a>
             </Button>
           </div>
         )}
         <article
-          className="prose prose-sm sm:prose max-w-none leading-[1.8] !text-black [&_*]:!text-black [&_a]:!text-blue-600 [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
+          className="prose prose-sm sm:prose dark:prose-invert max-w-none leading-[1.8] text-foreground [&_*]:text-foreground [&_a]:!text-primary [&_a]:underline [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
           dangerouslySetInnerHTML={{ __html: content.body }}
         />
 
 
         {content.observations && (
-          <div className="mt-8 rounded-lg border bg-black/5 p-4">
-            <p className="text-xs font-semibold !text-black/60 mb-1">Observações</p>
-            <p className="text-sm !text-black whitespace-pre-wrap">{content.observations}</p>
+          <div className="mt-8 rounded-lg border bg-muted/40 p-4">
+            <p className="text-xs font-semibold text-muted-foreground mb-1">Observações</p>
+            <p className="text-sm text-foreground whitespace-pre-wrap">{content.observations}</p>
           </div>
         )}
 
         {/* Comments section */}
         <div className="mt-8">
           <div className="flex items-center gap-2 mb-4">
-            <MessageCircle className="h-4 w-4 !text-black/60" />
-            <h3 className="text-sm font-semibold !text-black">
+            <MessageCircle className="h-4 w-4 text-muted-foreground" />
+            <h3 className="text-sm font-semibold text-foreground">
               Comentários ({comments.length})
             </h3>
           </div>
@@ -166,19 +166,19 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
               {comments.map((c) => (
                 <div
                   key={c.id}
-                  className={`rounded-lg p-3 ${
+                  className={`rounded-lg p-3 border ${
                     c.author_role === "admin"
-                      ? "bg-primary/5 border border-primary/10"
-                      : "bg-black/5 border border-black/10"
+                      ? "bg-primary/5 border-primary/20"
+                      : "bg-muted/40 border-border"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-semibold !text-black">{c.author_name}</span>
-                    <span className="text-[10px] !text-black/50">
+                    <span className="text-xs font-semibold text-foreground">{c.author_name}</span>
+                    <span className="text-[10px] text-muted-foreground">
                       {format(new Date(c.created_at), "dd/MM HH:mm")}
                     </span>
                   </div>
-                  <p className="text-sm !text-black whitespace-pre-wrap">{c.message}</p>
+                  <p className="text-sm text-foreground whitespace-pre-wrap">{c.message}</p>
                 </div>
               ))}
             </div>
@@ -189,7 +189,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Escreva um comentário..."
-              className="min-h-[60px] text-sm"
+              className="min-h-[60px] text-sm bg-background text-foreground"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendComment(); }
               }}
@@ -223,7 +223,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-[90vh] p-0 rounded-t-2xl">
+        <SheetContent side="bottom" className="h-[90vh] p-0 rounded-t-2xl bg-card">
           {body}
         </SheetContent>
       </Sheet>
@@ -232,7 +232,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] p-0 overflow-hidden flex flex-col !bg-white/95 !backdrop-blur-xl !text-black !border-white/30">
+      <DialogContent className="max-w-3xl max-h-[85vh] p-0 overflow-hidden flex flex-col bg-card text-card-foreground border-border">
         {body}
       </DialogContent>
     </Dialog>
