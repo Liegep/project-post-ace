@@ -1,0 +1,1 @@
+ALTER TABLE public.content_briefs ADD COLUMN IF NOT EXISTS media_urls text[] NOT NULL DEFAULT ARRAY[]::text[];

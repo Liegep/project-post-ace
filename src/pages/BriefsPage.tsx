@@ -22,7 +22,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import {
   ArrowLeft, Plus, CalendarIcon, Copy, Eye, EyeOff, Send, Check, X,
   Filter, Search, Pencil, MessageCircle, Paperclip, FileText, Trash2,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, Upload, Image as ImageIcon, Video as VideoIcon, Loader2
 } from "lucide-react";
 import { MobileNav } from "@/components/MobileNav";
 import { BriefSimilarityPanel } from "@/components/BriefSimilarityPanel";
@@ -44,6 +44,7 @@ interface Brief {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  media_urls?: string[];
   clients?: { name: string; slug: string; logo_url: string };
   comment_count?: number;
 }
@@ -126,6 +127,8 @@ const BriefsPage = () => {
   const [formStatus, setFormStatus] = useState<BriefStatus>("draft");
   const [formAssignedTo, setFormAssignedTo] = useState("none");
   const [formInternalNotes, setFormInternalNotes] = useState("");
+  const [formMediaUrls, setFormMediaUrls] = useState<string[]>([]);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
 
   useEffect(() => {
     const clientParam = searchParams.get("client");
@@ -207,6 +210,7 @@ const BriefsPage = () => {
     setFormStatus("draft");
     setFormAssignedTo("none");
     setFormInternalNotes("");
+    setFormMediaUrls([]);
     setEditingBrief(null);
   };
 
@@ -226,7 +230,47 @@ const BriefsPage = () => {
     setFormStatus(brief.status);
     setFormAssignedTo(brief.assigned_to || "none");
     setFormInternalNotes(brief.internal_notes);
+    setFormMediaUrls(brief.media_urls || []);
     setDialogOpen(true);
+  };
+
+  const handleMediaUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    setUploadingMedia(true);
+    const allowed = /^(image\/(png|jpe?g|webp|gif|avif)|video\/(mp4|webm|quicktime|ogg))$/i;
+    const uploaded: string[] = [];
+
+    for (const file of Array.from(files)) {
+      if (!allowed.test(file.type)) {
+        toast({ title: "Tipo não suportado", description: `${file.name}: use imagens, webp ou vídeos.`, variant: "destructive" });
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast({ title: "Arquivo muito grande", description: `${file.name} excede 10MB.`, variant: "destructive" });
+        continue;
+      }
+      const ext = file.name.split(".").pop() || "bin";
+      const path = `briefs/${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("media").upload(path, file, { contentType: file.type });
+      if (error) {
+        toast({ title: "Erro no upload", description: error.message, variant: "destructive" });
+        continue;
+      }
+      const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+      uploaded.push(urlData.publicUrl);
+    }
+
+    if (uploaded.length > 0) {
+      setFormMediaUrls((prev) => [...prev, ...uploaded]);
+    }
+    setUploadingMedia(false);
+  };
+
+  const removeMedia = (index: number) => {
+    setFormMediaUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSave = async () => {
@@ -245,6 +289,7 @@ const BriefsPage = () => {
       status: formStatus,
       assigned_to: formAssignedTo === "none" ? null : formAssignedTo,
       internal_notes: formInternalNotes,
+      media_urls: formMediaUrls,
     };
 
     let error;
@@ -678,6 +723,72 @@ const BriefsPage = () => {
               <Label>Observações Internas</Label>
               <Textarea value={formInternalNotes} onChange={(e) => setFormInternalNotes(e.target.value)} placeholder="Notas visíveis apenas para a equipe..." rows={2} />
             </div>
+
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-2">
+                <Paperclip className="h-4 w-4" />
+                Mídias (imagens, webp, vídeos — até 10MB cada)
+              </Label>
+              <div
+                onClick={() => !uploadingMedia && document.getElementById("brief-media-input")?.click()}
+                className={cn(
+                  "flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded-xl cursor-pointer transition-colors",
+                  uploadingMedia ? "opacity-60 cursor-wait" : "hover:border-primary/40 border-muted-foreground/30 bg-muted/30"
+                )}
+              >
+                {uploadingMedia ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm text-muted-foreground">Enviando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      Clique para enviar imagens (JPG, PNG, WEBP, GIF) ou vídeos (MP4, WEBM)
+                    </span>
+                  </>
+                )}
+                <input
+                  id="brief-media-input"
+                  type="file"
+                  multiple
+                  accept="image/*,video/mp4,video/webm,video/quicktime,video/ogg"
+                  className="hidden"
+                  onChange={(e) => {
+                    handleMediaUpload(e.target.files);
+                    e.target.value = "";
+                  }}
+                />
+              </div>
+              {formMediaUrls.length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 pt-2">
+                  {formMediaUrls.map((url, idx) => {
+                    const isVideo = /\.(mp4|webm|mov|ogg)(\?|$)/i.test(url);
+                    return (
+                      <div key={idx} className="relative group rounded-lg overflow-hidden border bg-muted aspect-square">
+                        {isVideo ? (
+                          <div className="flex items-center justify-center h-full bg-black/80 text-white">
+                            <VideoIcon className="h-6 w-6" />
+                          </div>
+                        ) : (
+                          <img src={url} alt="" className="w-full h-full object-cover" />
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeMedia(idx)}
+                          className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          aria-label="Remover"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
 
             <div className="flex gap-2 justify-end pt-2">
               <Button variant="outline" onClick={() => { setDialogOpen(false); resetForm(); }} className="bg-zinc-50 hover:bg-zinc-50">Cancelar</Button>

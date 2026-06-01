@@ -1302,6 +1302,7 @@ export type Database = {
           description: string
           id: string
           internal_notes: string
+          media_urls: string[]
           planned_date: string | null
           status: Database["public"]["Enums"]["brief_status"]
           title: string
@@ -1317,6 +1318,7 @@ export type Database = {
           description?: string
           id?: string
           internal_notes?: string
+          media_urls?: string[]
           planned_date?: string | null
           status?: Database["public"]["Enums"]["brief_status"]
           title: string
@@ -1332,6 +1334,7 @@ export type Database = {
           description?: string
           id?: string
           internal_notes?: string
+          media_urls?: string[]
           planned_date?: string | null
           status?: Database["public"]["Enums"]["brief_status"]
           title?: string
@@ -3159,6 +3162,27 @@ export type Database = {
       extract_media_storage_paths: {
         Args: { urls: string[] }
         Returns: string[]
+      }
+      get_approval_token_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          active: boolean
+          client_id: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          post_id: string | null
+          token: string
+          token_type: string
+          used_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "approval_tokens"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       get_client_by_approval_token: {
         Args: { p_token: string }
