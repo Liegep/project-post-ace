@@ -462,19 +462,19 @@ const BriefsPage = () => {
 
         {/* Month/Year Navigator */}
         <div className="flex items-center justify-between rounded-lg border bg-card px-3 py-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={prevMonth}>
-            <ChevronLeft className="h-4 w-4 text-primary-foreground" />
+          <Button variant="outline" size="icon" className="h-8 w-8" onClick={prevMonth} title="Mês anterior">
+            <ChevronLeft className="h-4 w-4 text-foreground" />
           </Button>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold capitalize">
+            <span className="text-sm font-semibold capitalize text-foreground">
               {format(filterMonth, "MMMM yyyy", { locale: ptBR })}
             </span>
             <Button variant="outline" size="sm" className="h-6 text-[10px] px-2" onClick={goToday}>
               Hoje
             </Button>
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={nextMonth}>
-            <ChevronRight className="h-4 w-4 text-primary-foreground" />
+          <Button variant="outline" size="icon" className="h-8 w-8" onClick={nextMonth} title="Próximo mês">
+            <ChevronRight className="h-4 w-4 text-foreground" />
           </Button>
         </div>
 
