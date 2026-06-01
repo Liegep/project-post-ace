@@ -289,6 +289,7 @@ const BriefsPage = () => {
       status: formStatus,
       assigned_to: formAssignedTo === "none" ? null : formAssignedTo,
       internal_notes: formInternalNotes,
+      media_urls: formMediaUrls,
     };
 
     let error;
