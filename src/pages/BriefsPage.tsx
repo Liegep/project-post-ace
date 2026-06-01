@@ -22,7 +22,7 @@ import { useI18n } from "@/i18n/I18nContext";
 import {
   ArrowLeft, Plus, CalendarIcon, Copy, Eye, EyeOff, Send, Check, X,
   Filter, Search, Pencil, MessageCircle, Paperclip, FileText, Trash2,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, Upload, Image as ImageIcon, Video as VideoIcon, Loader2
 } from "lucide-react";
 import { MobileNav } from "@/components/MobileNav";
 import { BriefSimilarityPanel } from "@/components/BriefSimilarityPanel";
