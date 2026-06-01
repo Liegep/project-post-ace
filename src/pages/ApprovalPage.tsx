@@ -57,12 +57,12 @@ const ApprovalPage = () => {
   const loadTokenData = async () => {
     setLoading(true);
     try {
-      const { data: td, error: tokenErr } = await supabase
-        .from("approval_tokens")
-        .select("*")
-        .eq("token", token)
-        .eq("active", true)
+      const { data: td, error: tokenErr } = await (supabase as any)
+        .rpc("get_approval_token_by_token", { p_token: token as string })
         .maybeSingle();
+
+
+
 
       if (tokenErr || !td) {
         setError("approvalInvalidLink");

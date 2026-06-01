@@ -72,7 +72,7 @@ export function useSocialPosts(clientId: string | null) {
     }
     const { data } = await supabase
       .from("meta_pages")
-      .select("*, meta_accounts(meta_user_name, token_expires_at)")
+      .select("id, meta_account_id, client_id, page_id, page_name, instagram_account_id, instagram_username, platform, created_at, meta_accounts(meta_user_name, token_expires_at)")
       .eq("client_id", clientId) as any;
     setPages(data || []);
   }, [clientId]);
