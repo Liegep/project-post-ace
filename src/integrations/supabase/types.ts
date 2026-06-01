@@ -1302,6 +1302,7 @@ export type Database = {
           description: string
           id: string
           internal_notes: string
+          media_urls: string[]
           planned_date: string | null
           status: Database["public"]["Enums"]["brief_status"]
           title: string
@@ -1317,6 +1318,7 @@ export type Database = {
           description?: string
           id?: string
           internal_notes?: string
+          media_urls?: string[]
           planned_date?: string | null
           status?: Database["public"]["Enums"]["brief_status"]
           title: string
@@ -1332,6 +1334,7 @@ export type Database = {
           description?: string
           id?: string
           internal_notes?: string
+          media_urls?: string[]
           planned_date?: string | null
           status?: Database["public"]["Enums"]["brief_status"]
           title?: string
