@@ -127,6 +127,8 @@ const BriefsPage = () => {
   const [formStatus, setFormStatus] = useState<BriefStatus>("draft");
   const [formAssignedTo, setFormAssignedTo] = useState("none");
   const [formInternalNotes, setFormInternalNotes] = useState("");
+  const [formMediaUrls, setFormMediaUrls] = useState<string[]>([]);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
 
   useEffect(() => {
     const clientParam = searchParams.get("client");
