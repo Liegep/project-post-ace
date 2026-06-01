@@ -123,7 +123,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
       <Separator />
 
       {/* Article body */}
-      <ScrollArea className="flex-1 px-6 py-6">
+      <ScrollArea className="flex-1 min-h-0 px-6 py-6">
         {content.pdf_url && (
           <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
             <div className="flex items-center gap-2 min-w-0">
@@ -139,10 +139,12 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
             </Button>
           </div>
         )}
-        <article
-          className="prose prose-sm sm:prose dark:prose-invert max-w-none leading-[1.8] text-foreground [&_*]:text-foreground [&_a]:!text-primary [&_a]:underline [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
-          dangerouslySetInnerHTML={{ __html: content.body }}
-        />
+        <div className="rounded-lg bg-white p-5 border border-border shadow-sm">
+          <article
+            className="prose prose-sm sm:prose max-w-none leading-[1.8] text-black [&_*]:!text-black [&_a]:!text-primary [&_a]:underline [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
+            dangerouslySetInnerHTML={{ __html: content.body }}
+          />
+        </div>
 
 
         {content.observations && (
