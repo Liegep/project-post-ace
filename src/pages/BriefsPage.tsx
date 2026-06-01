@@ -210,6 +210,7 @@ const BriefsPage = () => {
     setFormStatus("draft");
     setFormAssignedTo("none");
     setFormInternalNotes("");
+    setFormMediaUrls([]);
     setEditingBrief(null);
   };
 
