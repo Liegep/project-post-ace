@@ -209,12 +209,26 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
       </ScrollArea>
 
       {/* Sticky approval footer for client */}
-      {!isAdmin && content.status === "pending_approval" && (
-        <div className="border-t bg-card px-6 py-4 flex items-center gap-3">
-          <Button onClick={handleApprove} className="flex-1 sm:flex-none bg-success text-success-foreground hover:bg-success/90">
+      {!isAdmin && content.status !== "approved" && content.status !== "published" && (
+        <div className="border-t bg-card px-6 py-4 flex flex-wrap items-center gap-2">
+          <Button onClick={handleApprove} className="flex-1 min-w-[140px] bg-success text-success-foreground hover:bg-success/90">
             <Check className="mr-2 h-4 w-4" /> Aprovar
           </Button>
-          <Button onClick={handleReject} variant="outline" className="flex-1 sm:flex-none text-destructive border-destructive/30 hover:bg-destructive/10">
+          <Button
+            onClick={() => {
+              if (!newComment.trim()) {
+                toast({ title: "Escreva um comentário com as alterações", variant: "destructive" });
+                return;
+              }
+              sendComment();
+              if (content && onStatusChange) onStatusChange(content.id, "rejected");
+            }}
+            variant="outline"
+            className="flex-1 min-w-[160px] text-warning border-warning/40 hover:bg-warning/10"
+          >
+            <MessageCircle className="mr-2 h-4 w-4" /> Pedir alterações
+          </Button>
+          <Button onClick={handleReject} variant="outline" className="flex-1 min-w-[140px] text-destructive border-destructive/30 hover:bg-destructive/10">
             <X className="mr-2 h-4 w-4" /> Reprovar
           </Button>
         </div>
