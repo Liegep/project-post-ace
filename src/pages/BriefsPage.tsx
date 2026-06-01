@@ -724,6 +724,72 @@ const BriefsPage = () => {
               <Textarea value={formInternalNotes} onChange={(e) => setFormInternalNotes(e.target.value)} placeholder="Notas visíveis apenas para a equipe..." rows={2} />
             </div>
 
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-2">
+                <Paperclip className="h-4 w-4" />
+                Mídias (imagens, webp, vídeos — até 10MB cada)
+              </Label>
+              <div
+                onClick={() => !uploadingMedia && document.getElementById("brief-media-input")?.click()}
+                className={cn(
+                  "flex items-center justify-center gap-2 p-4 border-2 border-dashed rounded-xl cursor-pointer transition-colors",
+                  uploadingMedia ? "opacity-60 cursor-wait" : "hover:border-primary/40 border-muted-foreground/30 bg-muted/30"
+                )}
+              >
+                {uploadingMedia ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm text-muted-foreground">Enviando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      Clique para enviar imagens (JPG, PNG, WEBP, GIF) ou vídeos (MP4, WEBM)
+                    </span>
+                  </>
+                )}
+                <input
+                  id="brief-media-input"
+                  type="file"
+                  multiple
+                  accept="image/*,video/mp4,video/webm,video/quicktime,video/ogg"
+                  className="hidden"
+                  onChange={(e) => {
+                    handleMediaUpload(e.target.files);
+                    e.target.value = "";
+                  }}
+                />
+              </div>
+              {formMediaUrls.length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 pt-2">
+                  {formMediaUrls.map((url, idx) => {
+                    const isVideo = /\.(mp4|webm|mov|ogg)(\?|$)/i.test(url);
+                    return (
+                      <div key={idx} className="relative group rounded-lg overflow-hidden border bg-muted aspect-square">
+                        {isVideo ? (
+                          <div className="flex items-center justify-center h-full bg-black/80 text-white">
+                            <VideoIcon className="h-6 w-6" />
+                          </div>
+                        ) : (
+                          <img src={url} alt="" className="w-full h-full object-cover" />
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeMedia(idx)}
+                          className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          aria-label="Remover"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+
             <div className="flex gap-2 justify-end pt-2">
               <Button variant="outline" onClick={() => { setDialogOpen(false); resetForm(); }} className="bg-zinc-50 hover:bg-zinc-50">Cancelar</Button>
               <Button onClick={handleSave}>{editingBrief ? "Salvar" : "Criar Pauta"}</Button>
