@@ -44,6 +44,7 @@ interface Brief {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  media_urls?: string[];
   clients?: { name: string; slug: string; logo_url: string };
   comment_count?: number;
 }
