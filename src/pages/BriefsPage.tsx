@@ -230,7 +230,47 @@ const BriefsPage = () => {
     setFormStatus(brief.status);
     setFormAssignedTo(brief.assigned_to || "none");
     setFormInternalNotes(brief.internal_notes);
+    setFormMediaUrls(brief.media_urls || []);
     setDialogOpen(true);
+  };
+
+  const handleMediaUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    setUploadingMedia(true);
+    const allowed = /^(image\/(png|jpe?g|webp|gif|avif)|video\/(mp4|webm|quicktime|ogg))$/i;
+    const uploaded: string[] = [];
+
+    for (const file of Array.from(files)) {
+      if (!allowed.test(file.type)) {
+        toast({ title: "Tipo não suportado", description: `${file.name}: use imagens, webp ou vídeos.`, variant: "destructive" });
+        continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast({ title: "Arquivo muito grande", description: `${file.name} excede 10MB.`, variant: "destructive" });
+        continue;
+      }
+      const ext = file.name.split(".").pop() || "bin";
+      const path = `briefs/${user.id}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from("media").upload(path, file, { contentType: file.type });
+      if (error) {
+        toast({ title: "Erro no upload", description: error.message, variant: "destructive" });
+        continue;
+      }
+      const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+      uploaded.push(urlData.publicUrl);
+    }
+
+    if (uploaded.length > 0) {
+      setFormMediaUrls((prev) => [...prev, ...uploaded]);
+    }
+    setUploadingMedia(false);
+  };
+
+  const removeMedia = (index: number) => {
+    setFormMediaUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSave = async () => {
