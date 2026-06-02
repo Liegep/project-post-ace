@@ -90,7 +90,8 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
   const statusConfig = TEXT_STATUS_LABELS[content.status];
 
   const body = (
-    <div className="flex flex-col h-full bg-card text-card-foreground">
+    <div className="flex flex-col flex-1 min-h-0 h-full bg-card text-card-foreground">
+
       {/* Article header */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center gap-2 mb-3">
