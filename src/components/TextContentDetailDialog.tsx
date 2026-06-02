@@ -90,7 +90,8 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
   const statusConfig = TEXT_STATUS_LABELS[content.status];
 
   const body = (
-    <div className="flex flex-col h-full bg-card text-card-foreground">
+    <div className="flex flex-col flex-1 min-h-0 h-full bg-card text-card-foreground">
+
       {/* Article header */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center gap-2 mb-3">
@@ -248,7 +249,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] p-0 overflow-hidden flex flex-col bg-card text-card-foreground border-border">
+      <DialogContent className="max-w-3xl h-[85vh] p-0 overflow-hidden flex flex-col bg-card text-card-foreground border-border">
         {body}
       </DialogContent>
     </Dialog>
