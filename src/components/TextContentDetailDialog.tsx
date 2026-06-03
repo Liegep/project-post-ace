@@ -124,7 +124,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
       <Separator />
 
       {/* Article body */}
-      <ScrollArea className="flex-1 min-h-0 px-6 py-6">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-6 py-6">
         {content.pdf_url && (
           <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
             <div className="flex items-center gap-2 min-w-0">
@@ -207,7 +207,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
             </Button>
           </div>
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Sticky approval footer for client */}
       {!isAdmin && content.status !== "approved" && content.status !== "published" && (
@@ -249,7 +249,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl h-[85vh] p-0 overflow-hidden flex flex-col bg-card text-card-foreground border-border">
+      <DialogContent className="max-w-3xl h-[85vh] max-h-[85vh] sm:h-[min(85vh,900px)] p-0 overflow-hidden flex flex-col bg-card text-card-foreground border-border">
         {body}
       </DialogContent>
     </Dialog>
