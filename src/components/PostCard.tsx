@@ -170,21 +170,31 @@ export const PostCard = memo(
               {hasMedia && (
                 <button
                   className="text-muted-foreground hover:text-primary transition-colors"
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.stopPropagation();
                     const url = allMedia[0];
                     if (!url || isExternalLink(url)) return;
-                    fetch(url)
-                      .then((res) => res.blob())
-                      .then((blob) => {
-                        const a = document.createElement("a");
-                        a.href = URL.createObjectURL(blob);
-                        a.download = post.title || "download";
-                        a.click();
-                        URL.revokeObjectURL(a.href);
-                      });
+                    try {
+                      const res = await fetch(url, { mode: "cors" });
+                      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                      const blob = await res.blob();
+                      const path = url.split("?")[0];
+                      const extMatch = path.match(/\.([a-z0-9]{2,5})$/i);
+                      const ext = extMatch ? extMatch[1] : "bin";
+                      const safeTitle = (post.title || "download").replace(/[^a-zA-Z0-9-_]+/g, "_");
+                      const a = document.createElement("a");
+                      const objUrl = URL.createObjectURL(blob);
+                      a.href = objUrl;
+                      a.download = `${safeTitle}.${ext}`;
+                      document.body.appendChild(a);
+                      a.click();
+                      a.remove();
+                      setTimeout(() => URL.revokeObjectURL(objUrl), 1000);
+                    } catch {
+                      window.open(url, "_blank", "noopener,noreferrer");
+                    }
                   }}
-                  title="Baixar imagem"
+                  title="Baixar mídia"
                 >
                   <Download className="h-3.5 w-3.5" />
                 </button>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Download } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface MediaLightboxProps {
   urls: string[];
@@ -35,9 +36,40 @@ export function MediaLightbox({ urls, initialIndex = 0, open, onOpenChange }: Me
   const currentUrl = urls[index];
   const isVideo = currentUrl?.match(/\.(mp4|webm|mov|avi)/i);
 
+  const handleDownload = async () => {
+    try {
+      const res = await fetch(currentUrl, { mode: "cors" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const urlPath = currentUrl.split("?")[0];
+      const extMatch = urlPath.match(/\.([a-z0-9]{2,5})$/i);
+      const ext = extMatch ? extMatch[1] : (isVideo ? "mp4" : "jpg");
+      const filename = `download-${Date.now()}.${ext}`;
+      const a = document.createElement("a");
+      const objUrl = URL.createObjectURL(blob);
+      a.href = objUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(objUrl), 1000);
+    } catch (e: any) {
+      // Fallback: open in new tab so the browser handles the download
+      window.open(currentUrl, "_blank", "noopener,noreferrer");
+      toast({ title: "Abrindo em nova aba", description: "Clique com o botão direito e 'Salvar como...' para baixar." });
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-none flex items-center justify-center [&>button]:hidden">
+        <button
+          onClick={handleDownload}
+          className="absolute top-3 right-14 z-50 rounded-full bg-black/60 p-2 hover:bg-black/80 transition-colors"
+          title="Baixar mídia"
+        >
+          <Download className="h-5 w-5 text-white" />
+        </button>
         <button
           onClick={() => onOpenChange(false)}
           className="absolute top-3 right-3 z-50 rounded-full bg-black/60 p-2 hover:bg-black/80 transition-colors"
