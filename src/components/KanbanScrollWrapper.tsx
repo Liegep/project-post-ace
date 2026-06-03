@@ -46,36 +46,47 @@ export function KanbanScrollWrapper({ children, className, fillHeight }: KanbanS
     el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
   };
 
-  // Click & drag
+  // Click & drag — defer pointer capture until the user actually drags
+  // so simple clicks on cards aren't swallowed by the wrapper.
+  const DRAG_THRESHOLD = 5;
+  const pendingDrag = useRef(false);
+
   const onPointerDown = (e: React.PointerEvent) => {
-    // Only left mouse / primary touch
     if (e.button !== 0) return;
-    // Let touch/pen use native scrolling — pointer-capture would hijack vertical/horizontal panning
     if (e.pointerType !== "mouse") return;
-    // Don't interfere with interactive elements or dnd-kit
     const target = e.target as HTMLElement;
     if (target.closest("button, a, input, textarea, [data-dnd-kit-draggable], [role='button']")) return;
 
     const el = scrollRef.current;
     if (!el) return;
     dragState.current = { startX: e.clientX, scrollLeft: el.scrollLeft, moved: false };
-    setIsDragging(true);
-    el.setPointerCapture(e.pointerId);
+    pendingDrag.current = true;
+    // Do NOT capture pointer yet — wait for real movement so click events still fire on cards.
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!isDragging) return;
+    if (!pendingDrag.current && !isDragging) return;
     const dx = e.clientX - dragState.current.startX;
-    if (Math.abs(dx) > 3) dragState.current.moved = true;
+    if (!isDragging) {
+      if (Math.abs(dx) < DRAG_THRESHOLD) return;
+      const el = scrollRef.current;
+      if (!el) return;
+      setIsDragging(true);
+      dragState.current.moved = true;
+      try { el.setPointerCapture(e.pointerId); } catch {}
+    }
     const el = scrollRef.current;
     if (el) el.scrollLeft = dragState.current.scrollLeft - dx;
   };
 
   const onPointerUp = (e: React.PointerEvent) => {
+    pendingDrag.current = false;
     if (!isDragging) return;
     setIsDragging(false);
     const el = scrollRef.current;
-    if (el) el.releasePointerCapture(e.pointerId);
+    if (el) {
+      try { el.releasePointerCapture(e.pointerId); } catch {}
+    }
   };
 
   const arrowBase =
