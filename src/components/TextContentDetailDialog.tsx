@@ -207,7 +207,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
             </Button>
           </div>
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Sticky approval footer for client */}
       {!isAdmin && content.status !== "approved" && content.status !== "published" && (
