@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Download } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface MediaLightboxProps {
   urls: string[];
