@@ -124,7 +124,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
       <Separator />
 
       {/* Article body */}
-      <ScrollArea className="flex-1 min-h-0 px-6 py-6">
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-6 py-6">
         {content.pdf_url && (
           <div className="mb-5 flex items-center justify-between gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
             <div className="flex items-center gap-2 min-w-0">
