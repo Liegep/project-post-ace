@@ -348,7 +348,9 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
                   </div>
                 </div>
               </div>
+              </div>
             </>
+          )}
           )}
         </DialogContent>
       </Dialog>
