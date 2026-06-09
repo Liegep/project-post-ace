@@ -232,6 +232,23 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
                 <PencilLine className="h-3.5 w-3.5" />
                 Pauta para Aprovação
               </div>
+              {brief.media_urls && brief.media_urls.length > 0 && (
+                <div className="relative w-full bg-black/5 border-b-2 border-dashed border-amber-300/60" style={{ aspectRatio: "4/5" }}>
+                  {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(brief.media_urls[0]) ? (
+                    <video src={brief.media_urls[0]} className="absolute inset-0 w-full h-full object-cover" muted />
+                  ) : (
+                    <img src={brief.media_urls[0]} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                  )}
+                  {brief.media_urls.length > 1 && (
+                    <span className="absolute top-2 right-2 bg-black/70 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                      +{brief.media_urls.length - 1}
+                    </span>
+                  )}
+                  <span className="absolute bottom-2 left-2 bg-amber-500/95 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+                    Referência
+                  </span>
+                </div>
+              )}
               <div className="p-4 flex flex-col gap-2 flex-1">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-amber-900/70">{CONTENT_LABELS[brief.content_type] || brief.content_type}</span>
