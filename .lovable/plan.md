@@ -1,71 +1,45 @@
-## Brand Brain — Módulo de Memória Estratégica da Marca
+## Objetivo
 
-Novo módulo dentro da página de cada cliente, com 8 abas e integração opcional na criação de posts.
+Na área do cliente, deixar visualmente óbvio que "Pauta para Aprovar" é uma **ideia/rascunho em discussão**, e não o post final pronto. O kanban de posts permanece igual.
 
-### 1. Banco de dados (Lovable Cloud)
+## O que muda
 
-Uma migration única criando todas as tabelas, todas vinculadas a `client_id` com RLS seguindo o padrão atual (admin/super_admin gerencia; equipe gerencia clientes atribuídos via `get_user_client_ids`; cliente lê quando atribuído via `user_client_assignments`).
+Apenas o componente `src/components/ClientBriefs.tsx` (cards + seção). Nenhuma alteração de dados, regras ou backend.
 
-Tabelas:
-- `brand_brains` — registro mestre por cliente (1:1), com campos gerais (mission, vision, summary, updated_by).
-- `brand_vocabulary` — term, category, emotion, status (`approved`|`avoid`|`forbidden`), notes.
-- `content_pillars` — name, objective, themes (text[]), main_emotion, suggested_frequency, notes.
-- `brand_voice` — 1 linha por cliente: emotional_tone, archetype, writing_rhythm, formality_level, things_to_avoid, good_examples (text[]), bad_examples (text[]).
-- `words_to_avoid` — word, reason, recommended_alternative, category.
-- `approved_expressions` — expression, usage_context, emotion, notes.
-- `visual_directions` — category, direction, colors (text[]), image_style, lighting, composition, things_to_avoid.
-- `ai_prompt_templates` — name, template_text, variables (jsonb), created_by (para reuso).
-- `generated_prompts` — opcional: histórico (client_id, pillar_id, params jsonb, output text, created_by, created_at).
+### 1. Banner explicativo no topo da seção
 
-Cada tabela tem `created_at`, `updated_at`, trigger `update_updated_at_column`. RLS espelhado do padrão `client_notes`/`hashtag_groups`.
+Acima dos cards "Pautas para Aprovar", adicionar uma faixa âmbar/amarela com ícone de lâmpada:
 
-### 2. UI — Página Brand Brain
+> 💡 **Estas são ideias de conteúdo aguardando sua aprovação.** Ainda não são os posts finais — depois de aprovadas, nossa equipe irá produzir as artes e legendas.
 
-Rota: aba/seção dentro de `ClientPage.tsx` (ou nova rota `/cliente/:slug/brand-brain` se mais limpo). Componente principal `BrandBrainPanel.tsx` com `Tabs` (shadcn) seguindo o estilo glassmorphism atual:
+### 2. Novo visual do card de pauta
 
-- **Overview** — resumo, contadores de cada seção, missão/visão editáveis.
-- **Vocabulary** — tabela + dialog de criação, badges para status (verde/âmbar/vermelho).
-- **Content Pillars** — cards com pilar, objetivo, emoção, frequência.
-- **Voice** — formulário único (1 registro por cliente).
-- **Avoid** — tabela "evitar → usar".
-- **Expressions** — cards.
-- **Visual Direction** — cards com swatches de cor.
-- **AI Prompts** — gerador (selects de pilar/tipo/emoção/objetivo/formato) + textarea com prompt gerado + botão copiar (reaproveitar lógica do botão de copiar do PostDetailDialog). Geração local (string template) usando dados do Brand Brain do cliente; sem chamar IA externa nesta primeira versão.
+Diferenças marcantes em relação ao card de post:
 
-Componentes:
-- `src/components/brand-brain/BrandBrainPanel.tsx` (tabs root)
-- `src/components/brand-brain/tabs/Overview.tsx`, `Vocabulary.tsx`, `Pillars.tsx`, `Voice.tsx`, `Avoid.tsx`, `Expressions.tsx`, `VisualDirection.tsx`, `AiPrompts.tsx`
-- Hook: `src/hooks/useBrandBrain.ts` (fetch + mutations por cliente).
-- Estados vazios elegantes em cada aba.
+- **Badge grande "PAUTA" no topo** — barra âmbar/amarela full-width com ícone de documento + texto "PAUTA PARA APROVAÇÃO" em caixa alta, peso bold.
+- **Fundo estilo rascunho** — papel pautado sutil (linhas horizontais via `background-image` CSS) em tom creme/âmbar muito claro.
+- **Borda tracejada** (`border-dashed`) em vez de sólida, reforçando a ideia de "esboço".
+- **Ícone de documento/lápis** ao lado do título, em vez do visual limpo de post.
+- **Sem qualquer preview de imagem** (mesmo se anexada futuramente) — pauta é texto/ideia.
+- Botões Aprovar/Reprovar continuam iguais (já funcionam bem).
 
-Estilo: tokens semânticos atuais, cards com `bg-card/glass`, badges para status, dialogs shadcn para criar/editar.
+### 3. Modal de detalhe
 
-### 3. Integração com criação de posts
+Aplicar a mesma identidade visual no `DialogContent`:
+- Header com a mesma faixa âmbar "PAUTA PARA APROVAÇÃO".
+- Fundo papel pautado no body do modal.
+- Texto auxiliar pequeno: "Esta é uma ideia em discussão. O post final será criado após sua aprovação."
 
-Em `CreatePostDialog.tsx` e `EditPostDialog.tsx`: adicionar toggle "Usar Brand Brain". Quando ativo, mostra 4 selects (pilar, tom, emoção, direção visual) carregando do Brand Brain do cliente e botão "Inserir sugestão na legenda" que injeta texto formatado no campo de caption. Sem mudar nenhuma lógica existente — apenas opcional.
+## Detalhes técnicos
 
-### 4. Permissões
+- Arquivo único editado: `src/components/ClientBriefs.tsx`.
+- Tokens: usar âmbar do design system (`amber-500/15`, `amber-600`, `amber-200`) já presente em outras partes (sticky notes amarelas).
+- Padrão "papel pautado": `repeating-linear-gradient` inline ou utility no className.
+- Sem mudanças em `posts`, `content_briefs`, RLS, ou em qualquer outro componente.
+- Sem nova dependência.
 
-- Admin/super_admin: CRUD total via RLS.
-- Colaborador (equipe): CRUD nos clientes atribuídos.
-- Cliente: somente leitura (RLS `SELECT` baseado em `get_user_client_ids`).
+## Fora de escopo
 
-UI esconde botões de editar/criar para `role === 'client'` via `useUserRole`.
-
-### 5. Detalhes técnicos
-
-- Reaproveitar `RichTextEditor` quando útil (campos longos).
-- Reaproveitar padrão de toasts (`use-toast`) e dialogs.
-- Nenhuma funcionalidade existente removida.
-- Sem realtime nas tabelas novas (manter IO de DB sob controle, alinhado ao baseline atual).
-- Nenhum cron novo, nenhuma edge function nova nesta primeira fase.
-
-### Entregáveis
-
-1. Migration SQL criando 9 tabelas + RLS + triggers.
-2. Hook `useBrandBrain` e componentes da aba.
-3. Aba "Brand Brain" adicionada à `ClientPage`.
-4. Integração opcional nos dialogs de criação/edição de posts.
-5. Estados vazios e validações básicas (Zod nos formulários).
-
-Confirma para eu seguir com a migration e implementação?
+- Layout do kanban de posts (permanece como está).
+- Lógica de aprovação/criação de post na coluna "Pauta" (já funciona).
+- Permissões e RLS.
