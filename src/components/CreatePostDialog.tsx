@@ -131,7 +131,8 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
         columnId,
         contentPillarId,
         clientCreated: clientCreated || false,
-      });
+        isPauta,
+      } as any);
 
       if (clientCreated && success) {
         toast({
@@ -152,8 +153,10 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
       setContentPillarId(null);
       if (createAnother) {
         setColumnId(keepColumnId);
+        // keep isPauta as-is so "+ Outro" continues creating pautas
       } else {
         setColumnId(null);
+        setIsPauta(defaultIsPauta ?? false);
         handleOpenChange(false);
       }
     } finally {
