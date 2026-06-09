@@ -879,7 +879,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             )}
             <Button
               variant="outline"
-              onClick={() => navigate(`/briefs?client=${clientData.id}&create=1`)}
+              onClick={() => { setCreateInColumnId(null); setCreateAsPauta(true); setCreateOpen(true); }}
               className="border-amber-400 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
               title="Nova Pauta"
             >
