@@ -78,6 +78,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     trelloCardId: row.trello_card_id || null,
     artType: row.art_type || "single_post",
     contentPillarId: row.content_pillar_id || null,
+    isPauta: row.is_pauta ?? false,
   };
 }
 
@@ -623,6 +624,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (updates.caption !== undefined) dbUpdates.caption = updates.caption;
     if (updates.artType !== undefined) dbUpdates.art_type = updates.artType;
     if (updates.contentPillarId !== undefined) dbUpdates.content_pillar_id = updates.contentPillarId;
+    if ((updates as any).isPauta !== undefined) dbUpdates.is_pauta = (updates as any).isPauta;
     if (updates.deadline !== undefined) dbUpdates.deadline = serializePostDeadline(updates.deadline);
     if (updates.tags !== undefined) {
       dbUpdates.tags = updates.tags;

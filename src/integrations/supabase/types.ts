@@ -2216,6 +2216,7 @@ export type Database = {
           deadline: string | null
           id: string
           image_url: string
+          is_pauta: boolean
           media_type: string
           media_urls: string[]
           position: number
@@ -2242,6 +2243,7 @@ export type Database = {
           deadline?: string | null
           id?: string
           image_url: string
+          is_pauta?: boolean
           media_type?: string
           media_urls?: string[]
           position?: number
@@ -2268,6 +2270,7 @@ export type Database = {
           deadline?: string | null
           id?: string
           image_url?: string
+          is_pauta?: boolean
           media_type?: string
           media_urls?: string[]
           position?: number

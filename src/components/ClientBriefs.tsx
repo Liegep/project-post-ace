@@ -30,6 +30,7 @@ interface Brief {
   status: BriefStatus;
   created_at: string;
   updated_at: string;
+  media_urls?: string[];
 }
 
 interface BriefComment {
@@ -231,6 +232,23 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
                 <PencilLine className="h-3.5 w-3.5" />
                 Pauta para Aprovação
               </div>
+              {brief.media_urls && brief.media_urls.length > 0 && (
+                <div className="relative w-full bg-black/5 border-b-2 border-dashed border-amber-300/60" style={{ aspectRatio: "4/5" }}>
+                  {/\.(mp4|webm|mov|ogg)(\?|$)/i.test(brief.media_urls[0]) ? (
+                    <video src={brief.media_urls[0]} className="absolute inset-0 w-full h-full object-cover" muted />
+                  ) : (
+                    <img src={brief.media_urls[0]} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                  )}
+                  {brief.media_urls.length > 1 && (
+                    <span className="absolute top-2 right-2 bg-black/70 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                      +{brief.media_urls.length - 1}
+                    </span>
+                  )}
+                  <span className="absolute bottom-2 left-2 bg-amber-500/95 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
+                    Referência
+                  </span>
+                </div>
+              )}
               <div className="p-4 flex flex-col gap-2 flex-1">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-amber-900/70">{CONTENT_LABELS[brief.content_type] || brief.content_type}</span>
@@ -283,6 +301,25 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
               </DialogHeader>
 
               <div className="space-y-4 mt-4">
+                {detailBrief.media_urls && detailBrief.media_urls.length > 0 && (
+                  <div>
+                    <Label className="text-xs text-amber-900/70 mb-1.5 block">Imagens de referência</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {detailBrief.media_urls.map((url, idx) => {
+                        const isVideo = /\.(mp4|webm|mov|ogg)(\?|$)/i.test(url);
+                        return (
+                          <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="block relative rounded-lg overflow-hidden border-2 border-dashed border-amber-300 bg-black/5 aspect-square hover:border-amber-500 transition-colors">
+                            {isVideo ? (
+                              <video src={url} className="absolute inset-0 w-full h-full object-cover" muted />
+                            ) : (
+                              <img src={url} alt={`Referência ${idx + 1}`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                            )}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 {detailBrief.planned_date && (
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <CalendarIcon className="h-4 w-4" />
