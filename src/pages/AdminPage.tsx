@@ -568,6 +568,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [activeTab, setActiveTab] = useState<"board" | "archived" | "activity" | "texts">("board");
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [createAsPauta, setCreateAsPauta] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [detailPost, setDetailPost] = useState<Post | null>(null);
   const [editingPeriod, setEditingPeriod] = useState(false);
@@ -878,13 +879,13 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             )}
             <Button
               variant="outline"
-              onClick={() => navigate(`/briefs?client=${clientData.id}&create=1`)}
+              onClick={() => { setCreateInColumnId(null); setCreateAsPauta(true); setCreateOpen(true); }}
               className="border-amber-400 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
               title="Nova Pauta"
             >
               <FileText className="mr-2 h-4 w-4" /> Nova Pauta
             </Button>
-            <Button onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90">
+            <Button onClick={() => { setCreateInColumnId(null); setCreateAsPauta(false); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newPost")}
             </Button>
             <Button variant="outline" size="icon" onClick={() => setSettingsDrawerOpen(true)} title="Configurações">
@@ -923,7 +924,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <ClipboardList className="h-4 w-4" />
               </Button>
             )}
-            <Button onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90" title={t("newPost")}>
+            <Button onClick={() => { setCreateInColumnId(null); setCreateAsPauta(false); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90" title={t("newPost")}>
               <Plus className="h-4 w-4 mr-1.5" /> <span className="text-sm">{t("newPost")}</span>
             </Button>
             <Button variant="outline" size="icon" onClick={() => setSettingsDrawerOpen(true)} title="Configurações">
@@ -933,7 +934,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
 
           {/* Mobile actions */}
           <div className="flex md:hidden items-center gap-1.5">
-            <Button size="sm" onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90 h-8 px-2.5">
+            <Button size="sm" onClick={() => { setCreateInColumnId(null); setCreateAsPauta(false); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90 h-8 px-2.5">
               <Plus className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setSettingsDrawerOpen(true)}>
@@ -1453,7 +1454,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
         </div>
       )}
 
-      <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} defaultColumnId={createInColumnId} />
+      <CreatePostDialog open={createOpen} onOpenChange={(o) => { setCreateOpen(o); if (!o) setCreateAsPauta(false); }} defaultColumnId={createInColumnId} defaultIsPauta={createAsPauta} />
       <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
       <PostCardDialog
         post={detailPost}

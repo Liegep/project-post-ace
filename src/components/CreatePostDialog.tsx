@@ -24,11 +24,12 @@ interface CreatePostDialogProps {
   onOpenChange: (open: boolean) => void;
   defaultColumnId?: string | null;
   clientCreated?: boolean;
+  defaultIsPauta?: boolean;
 }
 
 let mediaIdCounter = 0;
 
-export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCreated }: CreatePostDialogProps) => {
+export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCreated, defaultIsPauta }: CreatePostDialogProps) => {
   const { addPost, uploadMedia, columns, clientId } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
@@ -42,14 +43,18 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
   const [uploading, setUploading] = useState(false);
   const [externalLink, setExternalLink] = useState("");
   const [contentPillarId, setContentPillarId] = useState<string | null>(null);
+  const [isPauta, setIsPauta] = useState<boolean>(defaultIsPauta ?? false);
   const [brainOpen, setBrainOpen] = useState(false);
   const { pillars } = useBrandBrain(clientId || undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync columnId when defaultColumnId changes (e.g., opening from a specific column)
+  // Sync state when dialog opens (e.g., from "Nova Pauta" vs regular "Novo Post")
   useEffect(() => {
-    if (open) setColumnId(defaultColumnId ?? null);
-  }, [open, defaultColumnId]);
+    if (open) {
+      setColumnId(defaultColumnId ?? null);
+      setIsPauta(defaultIsPauta ?? false);
+    }
+  }, [open, defaultColumnId, defaultIsPauta]);
 
   const handleOpenChange = (isOpen: boolean) => {
     onOpenChange(isOpen);
@@ -126,7 +131,8 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
         columnId,
         contentPillarId,
         clientCreated: clientCreated || false,
-      });
+        isPauta,
+      } as any);
 
       if (clientCreated && success) {
         toast({
@@ -147,8 +153,10 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
       setContentPillarId(null);
       if (createAnother) {
         setColumnId(keepColumnId);
+        // keep isPauta as-is so "+ Outro" continues creating pautas
       } else {
         setColumnId(null);
+        setIsPauta(defaultIsPauta ?? false);
         handleOpenChange(false);
       }
     } finally {
@@ -166,7 +174,14 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
       <DialogContent className="sm:max-w-2xl max-h-[92vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between gap-2 pr-6">
-            <DialogTitle>{t("createNewPost")}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              {isPauta ? "Nova Pauta para Aprovação" : t("createNewPost")}
+              {isPauta && (
+                <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700 border border-amber-400/40">
+                  PAUTA
+                </span>
+              )}
+            </DialogTitle>
             <Sheet open={brainOpen} onOpenChange={setBrainOpen}>
               <SheetTrigger asChild>
                 <Button type="button" variant="outline" size="sm" className="gap-1.5">
@@ -187,6 +202,22 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
           </div>
         </DialogHeader>
         <div>
+          {!clientCreated && (
+            <div className="mb-3 flex items-center justify-between rounded-md border border-amber-300/60 bg-amber-50/60 px-3 py-2">
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-amber-900">Marcar como Pauta para Aprovação</span>
+                <span className="text-xs text-amber-700">O cliente verá este card com aparência de rascunho amarelado.</span>
+              </div>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-amber-600"
+                  checked={isPauta}
+                  onChange={(e) => setIsPauta(e.target.checked)}
+                />
+              </label>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
 
           <div>
@@ -265,8 +296,8 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
             </div>
           </div>
           <div className="flex gap-2">
-            <Button type="submit" disabled={uploading} className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
-              {uploading ? "..." : t("createPost")}
+            <Button type="submit" disabled={uploading} className={`flex-1 ${isPauta ? "bg-amber-500 text-white hover:bg-amber-600" : "bg-accent text-accent-foreground hover:bg-accent/90"}`}>
+              {uploading ? "..." : (isPauta ? "Criar Pauta" : t("createPost"))}
             </Button>
             <Button
               type="button"
