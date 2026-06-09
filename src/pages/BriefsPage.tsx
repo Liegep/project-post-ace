@@ -132,8 +132,14 @@ const BriefsPage = () => {
 
   useEffect(() => {
     const clientParam = searchParams.get("client");
+    const createParam = searchParams.get("create");
     if (clientParam) {
       setFilterClient(clientParam);
+    }
+    if (createParam === "1") {
+      resetForm();
+      if (clientParam) setFormClientId(clientParam);
+      setDialogOpen(true);
     }
     loadData();
   }, []);
