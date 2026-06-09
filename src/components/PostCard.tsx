@@ -134,15 +134,24 @@ export const PostCard = memo(
       toast[ok ? "success" : "error"](ok ? "Card duplicado" : "Erro ao duplicar");
     };
 
+    const isPauta = (post as any).isPauta === true;
+    const showPautaTreatment = isPauta; // sempre que marcado, em qualquer view
+
     const cardEl = (
       <Card
         className={`overflow-hidden transition-all duration-150 hover:shadow-md hover:translate-y-[-1px] cursor-pointer group ${
           selectionMode && isSelected ? "ring-2 ring-accent shadow-lg" : ""
-        }`}
+        } ${showPautaTreatment ? "border-2 border-dashed border-amber-400" : ""}`}
         style={customColor ? { borderColor: customColor, borderWidth: 2, boxShadow: `0 0 0 1px ${customColor}40` } : undefined}
         onClick={() => (selectionMode ? onToggleSelect?.(post.id) : onEdit?.())}
       >
-        {/* Title above thumbnail */}
+        {/* Faixa "PAUTA PARA APROVAÇÃO" */}
+        {showPautaTreatment && (
+          <div className="flex items-center gap-1.5 bg-amber-500 text-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest">
+            <Pencil className="h-3 w-3" />
+            Pauta para Aprovação
+          </div>
+        )}
         {/* Title above thumbnail */}
         <div className="bg-muted/40 px-2.5 pt-2 pb-1.5 flex items-start gap-1.5">
           {selectionMode && (
