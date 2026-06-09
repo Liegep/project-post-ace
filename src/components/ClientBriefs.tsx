@@ -301,6 +301,25 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
               </DialogHeader>
 
               <div className="space-y-4 mt-4">
+                {detailBrief.media_urls && detailBrief.media_urls.length > 0 && (
+                  <div>
+                    <Label className="text-xs text-amber-900/70 mb-1.5 block">Imagens de referência</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {detailBrief.media_urls.map((url, idx) => {
+                        const isVideo = /\.(mp4|webm|mov|ogg)(\?|$)/i.test(url);
+                        return (
+                          <a key={idx} href={url} target="_blank" rel="noopener noreferrer" className="block relative rounded-lg overflow-hidden border-2 border-dashed border-amber-300 bg-black/5 aspect-square hover:border-amber-500 transition-colors">
+                            {isVideo ? (
+                              <video src={url} className="absolute inset-0 w-full h-full object-cover" muted />
+                            ) : (
+                              <img src={url} alt={`Referência ${idx + 1}`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                            )}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 {detailBrief.planned_date && (
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <CalendarIcon className="h-4 w-4" />
