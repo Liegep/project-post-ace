@@ -174,7 +174,14 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
       <DialogContent className="sm:max-w-2xl max-h-[92vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between gap-2 pr-6">
-            <DialogTitle>{t("createNewPost")}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              {isPauta ? "Nova Pauta para Aprovação" : t("createNewPost")}
+              {isPauta && (
+                <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700 border border-amber-400/40">
+                  PAUTA
+                </span>
+              )}
+            </DialogTitle>
             <Sheet open={brainOpen} onOpenChange={setBrainOpen}>
               <SheetTrigger asChild>
                 <Button type="button" variant="outline" size="sm" className="gap-1.5">
@@ -195,6 +202,22 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
           </div>
         </DialogHeader>
         <div>
+          {!clientCreated && (
+            <div className="mb-3 flex items-center justify-between rounded-md border border-amber-300/60 bg-amber-50/60 px-3 py-2">
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-amber-900">Marcar como Pauta para Aprovação</span>
+                <span className="text-xs text-amber-700">O cliente verá este card com aparência de rascunho amarelado.</span>
+              </div>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-amber-600"
+                  checked={isPauta}
+                  onChange={(e) => setIsPauta(e.target.checked)}
+                />
+              </label>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
 
           <div>
