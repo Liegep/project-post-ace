@@ -24,11 +24,12 @@ interface CreatePostDialogProps {
   onOpenChange: (open: boolean) => void;
   defaultColumnId?: string | null;
   clientCreated?: boolean;
+  defaultIsPauta?: boolean;
 }
 
 let mediaIdCounter = 0;
 
-export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCreated }: CreatePostDialogProps) => {
+export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCreated, defaultIsPauta }: CreatePostDialogProps) => {
   const { addPost, uploadMedia, columns, clientId } = usePosts();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
@@ -42,14 +43,18 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
   const [uploading, setUploading] = useState(false);
   const [externalLink, setExternalLink] = useState("");
   const [contentPillarId, setContentPillarId] = useState<string | null>(null);
+  const [isPauta, setIsPauta] = useState<boolean>(defaultIsPauta ?? false);
   const [brainOpen, setBrainOpen] = useState(false);
   const { pillars } = useBrandBrain(clientId || undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync columnId when defaultColumnId changes (e.g., opening from a specific column)
+  // Sync state when dialog opens (e.g., from "Nova Pauta" vs regular "Novo Post")
   useEffect(() => {
-    if (open) setColumnId(defaultColumnId ?? null);
-  }, [open, defaultColumnId]);
+    if (open) {
+      setColumnId(defaultColumnId ?? null);
+      setIsPauta(defaultIsPauta ?? false);
+    }
+  }, [open, defaultColumnId, defaultIsPauta]);
 
   const handleOpenChange = (isOpen: boolean) => {
     onOpenChange(isOpen);
