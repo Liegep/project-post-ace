@@ -30,6 +30,7 @@ interface Brief {
   status: BriefStatus;
   created_at: string;
   updated_at: string;
+  media_urls?: string[];
 }
 
 interface BriefComment {
