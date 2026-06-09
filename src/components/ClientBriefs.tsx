@@ -8,7 +8,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
-import { CalendarIcon, Check, X, MessageCircle, FileText, Send } from "lucide-react";
+import { CalendarIcon, Check, X, MessageCircle, FileText, Send, Lightbulb, PencilLine } from "lucide-react";
+
+// Padrão "papel pautado" para reforçar que é um rascunho/ideia
+const NOTEBOOK_BG: React.CSSProperties = {
+  backgroundColor: "#fffaf0",
+  backgroundImage:
+    "repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(217, 119, 6, 0.18) 27px, rgba(217, 119, 6, 0.18) 28px)",
+};
 
 type BriefStatus = "draft" | "internal" | "pending_approval" | "approved" | "rejected" | "published";
 
