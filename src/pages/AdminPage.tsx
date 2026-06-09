@@ -314,7 +314,7 @@ const KanbanBoard = ({
                       {col.visibleToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                     </button>
                     <button
-                      onClick={() => { setCreateInColumnId(col.id); setCreateAsPauta(false); setCreateOpen(true); }}
+                      onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
                       className="rounded p-1 text-white/70 hover:bg-white/10 hover:text-white"
                       title={t("addPost")}
                     >
