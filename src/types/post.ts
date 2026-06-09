@@ -46,6 +46,8 @@ export interface Post {
   trelloCardId: string | null;
   artType?: string;
   contentPillarId?: string | null;
+  isPauta?: boolean;
+  contentPillarId?: string | null;
 }
 
 export const DEFAULT_TAGS: Tag[] = [
