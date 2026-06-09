@@ -261,20 +261,28 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
 
       {/* Detail Dialog */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto p-0 border-2 border-dashed border-amber-400/70">
           {detailBrief && (
             <>
+              <div className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 text-xs font-bold uppercase tracking-widest">
+                <PencilLine className="h-4 w-4" />
+                Pauta para Aprovação
+              </div>
+              <div style={NOTEBOOK_BG} className="p-6">
               <DialogHeader>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">{CONTENT_LABELS[detailBrief.content_type]}</span>
+                  <span className="text-xs text-amber-900/70">{CONTENT_LABELS[detailBrief.content_type]}</span>
                   <Badge variant="secondary" className={cn("text-xs", STATUS_LABELS[detailBrief.status]?.color)}>
                     {STATUS_LABELS[detailBrief.status]?.label}
                   </Badge>
                 </div>
-                <DialogTitle>{detailBrief.title}</DialogTitle>
+                <DialogTitle className="text-amber-950">{detailBrief.title}</DialogTitle>
+                <p className="text-[11px] text-amber-800/80 italic mt-1">
+                  Esta é uma ideia em discussão. O post final será criado após sua aprovação.
+                </p>
               </DialogHeader>
 
-              <div className="space-y-4">
+              <div className="space-y-4 mt-4">
                 {detailBrief.planned_date && (
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <CalendarIcon className="h-4 w-4" />
