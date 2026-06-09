@@ -1454,7 +1454,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
         </div>
       )}
 
-      <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} defaultColumnId={createInColumnId} />
+      <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} defaultColumnId={createInColumnId} defaultIsPauta={createAsPauta} />
       <EditPostDialog post={editPost} open={!!editPost} onOpenChange={(open) => { if (!open) setEditPost(null); }} />
       <PostCardDialog
         post={detailPost}
