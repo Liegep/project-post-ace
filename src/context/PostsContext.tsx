@@ -351,9 +351,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       const dbUpdates: Record<string, any> = { client_label: label };
       if (newColumnId) dbUpdates.column_id = newColumnId;
+      // When client approves a pauta, promote it to a regular card
+      if (label === "aprovado") dbUpdates.is_pauta = false;
 
       const post = posts.find(p => p.id === id);
-      setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, clientLabel: label, ...(newColumnId ? { columnId: newColumnId } : {}) } : p)));
+      setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, clientLabel: label, ...(newColumnId ? { columnId: newColumnId } : {}), ...(label === "aprovado" ? { isPauta: false } : {}) } : p)));
       await supabase.from("posts").update(dbUpdates as any).eq("id", id);
 
       // Log approval or change request
