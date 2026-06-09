@@ -173,7 +173,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
         tags: selectedTags,
         artType,
         contentPillarId,
-      });
+        isPauta,
+      } as any);
       // Update retain_files flag
       await supabase.from("posts").update({ retain_files: retainFiles } as any).eq("id", post.id);
       await updatePostStatus(post.id, status);
