@@ -568,6 +568,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [activeTab, setActiveTab] = useState<"board" | "archived" | "activity" | "texts">("board");
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [createAsPauta, setCreateAsPauta] = useState(false);
   const [editPost, setEditPost] = useState<Post | null>(null);
   const [detailPost, setDetailPost] = useState<Post | null>(null);
   const [editingPeriod, setEditingPeriod] = useState(false);
