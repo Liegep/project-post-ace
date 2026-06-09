@@ -530,6 +530,25 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                 </Select>
               </div>
 
+              {/* "Esta é uma pauta para aprovar" toggle */}
+              <div className={`flex items-start gap-3 rounded-xl border-2 border-dashed p-3 transition-colors ${isPauta ? "border-amber-400 bg-amber-50" : "border-muted bg-muted/30"}`}>
+                <input
+                  type="checkbox"
+                  id="is-pauta-toggle"
+                  checked={isPauta}
+                  onChange={(e) => setIsPauta(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 accent-amber-500 cursor-pointer"
+                />
+                <label htmlFor="is-pauta-toggle" className="cursor-pointer flex-1">
+                  <span className={`block text-xs font-bold uppercase tracking-wide ${isPauta ? "text-amber-700" : "text-foreground"}`}>
+                    Pauta para aprovação
+                  </span>
+                  <span className="block text-[11px] text-muted-foreground mt-0.5">
+                    O cliente verá este card com visual de pauta (ideia/rascunho), não como post final.
+                  </span>
+                </label>
+              </div>
+
               {/* Status dropdown */}
               <div>
                 <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</Label>
