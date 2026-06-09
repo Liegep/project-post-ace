@@ -296,8 +296,8 @@ export const CreatePostDialog = ({ open, onOpenChange, defaultColumnId, clientCr
             </div>
           </div>
           <div className="flex gap-2">
-            <Button type="submit" disabled={uploading} className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">
-              {uploading ? "..." : t("createPost")}
+            <Button type="submit" disabled={uploading} className={`flex-1 ${isPauta ? "bg-amber-500 text-white hover:bg-amber-600" : "bg-accent text-accent-foreground hover:bg-accent/90"}`}>
+              {uploading ? "..." : (isPauta ? "Criar Pauta" : t("createPost"))}
             </Button>
             <Button
               type="button"
