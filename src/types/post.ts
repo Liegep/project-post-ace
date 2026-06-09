@@ -47,7 +47,6 @@ export interface Post {
   artType?: string;
   contentPillarId?: string | null;
   isPauta?: boolean;
-  contentPillarId?: string | null;
 }
 
 export const DEFAULT_TAGS: Tag[] = [
