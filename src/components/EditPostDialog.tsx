@@ -61,6 +61,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
   const [columnId, setColumnId] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [artType, setArtType] = useState<string>("single_post");
+  const [isPauta, setIsPauta] = useState<boolean>(false);
   const [uploading, setUploading] = useState(false);
   const [retainFiles, setRetainFiles] = useState(false);
   const [externalLink, setExternalLink] = useState("");
