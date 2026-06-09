@@ -78,6 +78,7 @@ function dbPostToPost(row: any, comments: Comment[]): Post {
     trelloCardId: row.trello_card_id || null,
     artType: row.art_type || "single_post",
     contentPillarId: row.content_pillar_id || null,
+    isPauta: row.is_pauta ?? false,
   };
 }
 
