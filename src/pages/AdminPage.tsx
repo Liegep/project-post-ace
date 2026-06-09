@@ -314,7 +314,7 @@ const KanbanBoard = ({
                       {col.visibleToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                     </button>
                     <button
-                      onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
+                      onClick={() => { setCreateInColumnId(col.id); setCreateAsPauta(false); setCreateOpen(true); }}
                       className="rounded p-1 text-white/70 hover:bg-white/10 hover:text-white"
                       title={t("addPost")}
                     >
@@ -885,7 +885,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             >
               <FileText className="mr-2 h-4 w-4" /> Nova Pauta
             </Button>
-            <Button onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90">
+            <Button onClick={() => { setCreateInColumnId(null); setCreateAsPauta(false); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <Plus className="mr-2 h-4 w-4" /> {t("newPost")}
             </Button>
             <Button variant="outline" size="icon" onClick={() => setSettingsDrawerOpen(true)} title="Configurações">
@@ -924,7 +924,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <ClipboardList className="h-4 w-4" />
               </Button>
             )}
-            <Button onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90" title={t("newPost")}>
+            <Button onClick={() => { setCreateInColumnId(null); setCreateAsPauta(false); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90" title={t("newPost")}>
               <Plus className="h-4 w-4 mr-1.5" /> <span className="text-sm">{t("newPost")}</span>
             </Button>
             <Button variant="outline" size="icon" onClick={() => setSettingsDrawerOpen(true)} title="Configurações">
@@ -934,7 +934,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
 
           {/* Mobile actions */}
           <div className="flex md:hidden items-center gap-1.5">
-            <Button size="sm" onClick={() => { setCreateInColumnId(null); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90 h-8 px-2.5">
+            <Button size="sm" onClick={() => { setCreateInColumnId(null); setCreateAsPauta(false); setCreateOpen(true); }} className="bg-accent text-accent-foreground hover:bg-accent/90 h-8 px-2.5">
               <Plus className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setSettingsDrawerOpen(true)}>
