@@ -201,9 +201,20 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <FileText className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-bold">Pautas para Aprovação</h2>
-        <Badge variant="secondary" className="ml-1">{filteredBriefs.filter((b) => b.status === "pending_approval").length} pendentes</Badge>
+        <FileText className="h-5 w-5 text-amber-600" />
+        <h2 className="text-lg font-bold">Pautas para Aprovar</h2>
+        <Badge variant="secondary" className="ml-1 bg-amber-500/15 text-amber-700">
+          {filteredBriefs.filter((b) => b.status === "pending_approval").length} pendentes
+        </Badge>
+      </div>
+
+      {/* Banner explicativo */}
+      <div className="flex gap-3 rounded-xl border-2 border-dashed border-amber-400/60 bg-amber-50 p-3 text-sm text-amber-900">
+        <Lightbulb className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
+        <p>
+          <strong>Estas são ideias de conteúdo aguardando sua aprovação.</strong>{" "}
+          Ainda não são os posts finais — depois de aprovadas, nossa equipe irá produzir as artes e legendas.
+        </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -212,30 +223,37 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
           return (
             <div
               key={brief.id}
-              className="rounded-xl border bg-card p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer flex flex-col gap-2"
+              style={NOTEBOOK_BG}
+              className="rounded-xl border-2 border-dashed border-amber-400/70 overflow-hidden transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer flex flex-col"
               onClick={() => openDetail(brief)}
             >
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">{CONTENT_LABELS[brief.content_type] || brief.content_type}</span>
-                <Badge variant="secondary" className={cn("text-[10px]", sc.color)}>{sc.label}</Badge>
+              <div className="flex items-center gap-2 bg-amber-500 text-white px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest">
+                <PencilLine className="h-3.5 w-3.5" />
+                Pauta para Aprovação
               </div>
-              <h3 className="font-semibold text-sm line-clamp-2">{brief.title}</h3>
-              {brief.planned_date && (
-                <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                  <CalendarIcon className="h-3 w-3" />
-                  {new Date(brief.planned_date + "T00:00:00").toLocaleDateString("pt-BR")}
-                </span>
-              )}
-              {brief.status === "pending_approval" && (
-                <div className="flex gap-2 mt-auto pt-2 border-t">
-                  <Button size="sm" className="flex-1 gap-1 text-xs bg-emerald-500 hover:bg-emerald-600" onClick={(e) => { e.stopPropagation(); handleApprove(brief.id); }}>
-                    <Check className="h-3 w-3" /> Aprovar
-                  </Button>
-                  <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs text-red-500 hover:text-red-600" onClick={(e) => { e.stopPropagation(); handleReject(brief.id); }}>
-                    <X className="h-3 w-3" /> Reprovar
-                  </Button>
+              <div className="p-4 flex flex-col gap-2 flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-amber-900/70">{CONTENT_LABELS[brief.content_type] || brief.content_type}</span>
+                  <Badge variant="secondary" className={cn("text-[10px]", sc.color)}>{sc.label}</Badge>
                 </div>
-              )}
+                <h3 className="font-semibold text-sm line-clamp-2 text-amber-950">{brief.title}</h3>
+                {brief.planned_date && (
+                  <span className="text-[11px] text-amber-900/70 flex items-center gap-1">
+                    <CalendarIcon className="h-3 w-3" />
+                    {new Date(brief.planned_date + "T00:00:00").toLocaleDateString("pt-BR")}
+                  </span>
+                )}
+                {brief.status === "pending_approval" && (
+                  <div className="flex gap-2 mt-auto pt-2 border-t border-amber-300/60">
+                    <Button size="sm" className="flex-1 gap-1 text-xs bg-emerald-500 hover:bg-emerald-600" onClick={(e) => { e.stopPropagation(); handleApprove(brief.id); }}>
+                      <Check className="h-3 w-3" /> Aprovar
+                    </Button>
+                    <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs text-red-500 hover:text-red-600 bg-white" onClick={(e) => { e.stopPropagation(); handleReject(brief.id); }}>
+                      <X className="h-3 w-3" /> Reprovar
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
