@@ -29,6 +29,8 @@ interface TrackingPanelProps {
   isAdmin?: boolean;
   visibleToClient?: boolean;
   onToggleVisibility?: (visible: boolean) => void;
+  trackingColumnIds?: string[];
+  onChangeTrackingColumnIds?: (ids: string[]) => void;
 }
 
 interface ProjectGroup {
