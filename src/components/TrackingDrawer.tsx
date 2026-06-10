@@ -14,6 +14,8 @@ interface TrackingDrawerProps {
   isAdmin?: boolean;
   visibleToClient?: boolean;
   onToggleVisibility?: (visible: boolean) => void;
+  trackingColumnIds?: string[];
+  onChangeTrackingColumnIds?: (ids: string[]) => void;
 }
 
 const PINNED_KEY = "tracking-drawer-pinned";
@@ -29,7 +31,16 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
     }
   });
 
-  const itemCount = props.posts.length;
+  // For client view, filter posts by selected tracking columns (if any configured)
+  const filteredPosts = (() => {
+    if (props.isAdmin) return props.posts;
+    const ids = props.trackingColumnIds || [];
+    if (ids.length === 0) return props.posts;
+    return props.posts.filter((p) => p.columnId && ids.includes(p.columnId));
+  })();
+  const effectiveProps = { ...props, posts: filteredPosts };
+
+  const itemCount = filteredPosts.length;
 
   // Sync pinned state to localStorage
   useEffect(() => {
@@ -101,7 +112,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
-          <TrackingPanelInline {...props} />
+          <TrackingPanelInline {...effectiveProps} />
         </div>
       </div>
     );
@@ -142,7 +153,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
             </div>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto p-4">
-            <TrackingPanelInline {...props} />
+            <TrackingPanelInline {...effectiveProps} />
           </div>
         </SheetContent>
       </Sheet>
@@ -161,6 +172,8 @@ const TrackingPanelInline = (props: TrackingDrawerProps) => {
         isAdmin={props.isAdmin}
         visibleToClient={props.visibleToClient}
         onToggleVisibility={props.onToggleVisibility}
+        trackingColumnIds={props.trackingColumnIds}
+        onChangeTrackingColumnIds={props.onChangeTrackingColumnIds}
       />
     </div>
   );

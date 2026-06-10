@@ -1,5 +1,7 @@
 import { Post, Tag } from "@/types/post";
-import { Check, Circle, Eye, EyeOff, GripVertical } from "lucide-react";
+import { Check, Circle, Eye, EyeOff, GripVertical, Filter } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -29,6 +31,8 @@ interface TrackingPanelProps {
   isAdmin?: boolean;
   visibleToClient?: boolean;
   onToggleVisibility?: (visible: boolean) => void;
+  trackingColumnIds?: string[];
+  onChangeTrackingColumnIds?: (ids: string[]) => void;
 }
 
 interface ProjectGroup {
@@ -185,6 +189,8 @@ export const TrackingPanel = ({
   isAdmin = false,
   visibleToClient,
   onToggleVisibility,
+  trackingColumnIds,
+  onChangeTrackingColumnIds,
 }: TrackingPanelProps) => {
   const [orderedKeys, setOrderedKeys] = useState<string[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -285,20 +291,70 @@ export const TrackingPanel = ({
         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
           📊 Acompanhamento
         </h3>
-        {isAdmin && onToggleVisibility && (
-          <button
-            onClick={() => onToggleVisibility(!visibleToClient)}
-            className={cn(
-              "rounded-md p-1.5 transition-colors",
-              visibleToClient
-                ? "text-primary hover:bg-primary/10"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            )}
-            title={visibleToClient ? "Visível para o cliente" : "Oculto para o cliente"}
-          >
-            {visibleToClient ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-          </button>
-        )}
+        <div className="flex items-center gap-1">
+          {isAdmin && onChangeTrackingColumnIds && columns.length > 0 && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  className={cn(
+                    "rounded-md p-1.5 transition-colors",
+                    (trackingColumnIds && trackingColumnIds.length > 0)
+                      ? "text-primary hover:bg-primary/10"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                  title="Colunas visíveis para o cliente"
+                >
+                  <Filter className="h-4 w-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-64 p-3">
+                <div className="mb-2 text-xs font-semibold text-foreground">
+                  Colunas visíveis para o cliente
+                </div>
+                <div className="mb-2 text-[11px] text-muted-foreground">
+                  Se nada for selecionado, o cliente verá todas as colunas.
+                </div>
+                <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                  {columns.map((col) => {
+                    const selected = (trackingColumnIds || []).includes(col.id);
+                    return (
+                      <label
+                        key={col.id}
+                        className="flex items-center gap-2 cursor-pointer rounded px-1.5 py-1 hover:bg-muted"
+                      >
+                        <Checkbox
+                          checked={selected}
+                          onCheckedChange={(checked) => {
+                            const current = trackingColumnIds || [];
+                            const next = checked
+                              ? [...current, col.id]
+                              : current.filter((id) => id !== col.id);
+                            onChangeTrackingColumnIds(next);
+                          }}
+                        />
+                        <span className="text-xs text-foreground truncate">{col.name}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+          {isAdmin && onToggleVisibility && (
+            <button
+              onClick={() => onToggleVisibility(!visibleToClient)}
+              className={cn(
+                "rounded-md p-1.5 transition-colors",
+                visibleToClient
+                  ? "text-primary hover:bg-primary/10"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+              title={visibleToClient ? "Visível para o cliente" : "Oculto para o cliente"}
+            >
+              {visibleToClient ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto pr-1">

@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS tracking_column_ids uuid[] NOT NULL DEFAULT '{}'::uuid[];

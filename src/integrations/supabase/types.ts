@@ -1076,6 +1076,7 @@ export type Database = {
           slug: string
           tax_id: string
           tiktok_url: string
+          tracking_column_ids: string[]
           tracking_enabled: boolean
           tracking_visible_to_client: boolean
           trello_board_id: string
@@ -1121,6 +1122,7 @@ export type Database = {
           slug: string
           tax_id?: string
           tiktok_url?: string
+          tracking_column_ids?: string[]
           tracking_enabled?: boolean
           tracking_visible_to_client?: boolean
           trello_board_id?: string
@@ -1166,6 +1168,7 @@ export type Database = {
           slug?: string
           tax_id?: string
           tiktok_url?: string
+          tracking_column_ids?: string[]
           tracking_enabled?: boolean
           tracking_visible_to_client?: boolean
           trello_board_id?: string

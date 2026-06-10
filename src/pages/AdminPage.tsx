@@ -607,6 +607,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [allowClientCreateTags, setAllowClientCreateTags] = useState((clientData as any).allow_client_create_tags ?? false);
   const [trackingEnabled, setTrackingEnabled] = useState(clientData.tracking_enabled ?? false);
   const [trackingVisibleToClient, setTrackingVisibleToClient] = useState(clientData.tracking_visible_to_client ?? false);
+  const [trackingColumnIds, setTrackingColumnIds] = useState<string[]>(((clientData as any).tracking_column_ids as string[]) ?? []);
   const [showUpcomingPosts, setShowUpcomingPosts] = useState((clientData as any).show_upcoming_posts ?? false);
   const [allowClientEditBrandBrain, setAllowClientEditBrandBrain] = useState((clientData as any).allow_client_edit_brand_brain ?? false);
 
@@ -1352,6 +1353,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     onToggleVisibility={async (visible) => {
                       setTrackingVisibleToClient(visible);
                       await supabase.from("clients").update({ tracking_visible_to_client: visible }).eq("id", clientData.id);
+                    }}
+                    trackingColumnIds={trackingColumnIds}
+                    onChangeTrackingColumnIds={async (ids) => {
+                      setTrackingColumnIds(ids);
+                      await supabase.from("clients").update({ tracking_column_ids: ids } as any).eq("id", clientData.id);
                     }}
                   />
                 )}

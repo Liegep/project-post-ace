@@ -437,7 +437,13 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
 
             {clientData.tracking_enabled && clientData.tracking_visible_to_client && (
-              <TrackingDrawer clientId={clientData.id} posts={posts} columns={columns} tags={tags} />
+              <TrackingDrawer
+                clientId={clientData.id}
+                posts={posts}
+                columns={columns}
+                tags={tags}
+                trackingColumnIds={((clientData as any).tracking_column_ids as string[]) ?? []}
+              />
             )}
 
               <div className="flex-1 min-w-0 space-y-8 overflow-x-hidden">
