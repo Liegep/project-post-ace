@@ -297,10 +297,10 @@ export const TrackingPanel = ({
               <PopoverTrigger asChild>
                 <button
                   className={cn(
-                    "rounded-md p-1.5 transition-colors",
+                    "rounded-md p-1.5 border transition-colors",
                     (trackingColumnIds && trackingColumnIds.length > 0)
-                      ? "text-primary hover:bg-primary/10"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      ? "text-primary border-primary/40 bg-primary/10 hover:bg-primary/20"
+                      : "text-foreground border-border bg-background/60 hover:bg-muted"
                   )}
                   title="Colunas visíveis para o cliente"
                 >
