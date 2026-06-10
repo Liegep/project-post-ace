@@ -172,6 +172,8 @@ const TrackingPanelInline = (props: TrackingDrawerProps) => {
         isAdmin={props.isAdmin}
         visibleToClient={props.visibleToClient}
         onToggleVisibility={props.onToggleVisibility}
+        trackingColumnIds={props.trackingColumnIds}
+        onChangeTrackingColumnIds={props.onChangeTrackingColumnIds}
       />
     </div>
   );
