@@ -187,6 +187,8 @@ export const TrackingPanel = ({
   isAdmin = false,
   visibleToClient,
   onToggleVisibility,
+  trackingColumnIds,
+  onChangeTrackingColumnIds,
 }: TrackingPanelProps) => {
   const [orderedKeys, setOrderedKeys] = useState<string[]>([]);
   const [loaded, setLoaded] = useState(false);
