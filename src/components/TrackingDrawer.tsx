@@ -31,7 +31,16 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
     }
   });
 
-  const itemCount = props.posts.length;
+  // For client view, filter posts by selected tracking columns (if any configured)
+  const filteredPosts = (() => {
+    if (props.isAdmin) return props.posts;
+    const ids = props.trackingColumnIds || [];
+    if (ids.length === 0) return props.posts;
+    return props.posts.filter((p) => p.columnId && ids.includes(p.columnId));
+  })();
+  const effectiveProps = { ...props, posts: filteredPosts };
+
+  const itemCount = filteredPosts.length;
 
   // Sync pinned state to localStorage
   useEffect(() => {
