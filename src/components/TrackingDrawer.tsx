@@ -14,6 +14,8 @@ interface TrackingDrawerProps {
   isAdmin?: boolean;
   visibleToClient?: boolean;
   onToggleVisibility?: (visible: boolean) => void;
+  trackingColumnIds?: string[];
+  onChangeTrackingColumnIds?: (ids: string[]) => void;
 }
 
 const PINNED_KEY = "tracking-drawer-pinned";
