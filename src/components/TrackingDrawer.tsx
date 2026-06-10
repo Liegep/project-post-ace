@@ -112,7 +112,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-4">
-          <TrackingPanelInline {...props} />
+          <TrackingPanelInline {...effectiveProps} />
         </div>
       </div>
     );
