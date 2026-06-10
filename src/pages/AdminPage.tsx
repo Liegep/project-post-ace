@@ -1354,6 +1354,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                       setTrackingVisibleToClient(visible);
                       await supabase.from("clients").update({ tracking_visible_to_client: visible }).eq("id", clientData.id);
                     }}
+                    trackingColumnIds={trackingColumnIds}
+                    onChangeTrackingColumnIds={async (ids) => {
+                      setTrackingColumnIds(ids);
+                      await supabase.from("clients").update({ tracking_column_ids: ids } as any).eq("id", clientData.id);
+                    }}
                   />
                 )}
                 
