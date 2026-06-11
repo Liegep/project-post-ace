@@ -217,15 +217,19 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
                   </span>
                 )}
               </SheetTitle>
-              {!isMobile && (
-                <button
-                  onClick={togglePin}
-                  className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                  title="Fixar na tela"
-                >
-                  <Pin className="h-3.5 w-3.5" />
-                </button>
-              )}
+              <div className="flex items-center gap-1">
+                <AdminHeaderControls />
+                {!isMobile && (
+                  <button
+                    onClick={togglePin}
+                    className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Fixar na tela"
+                  >
+                    <Pin className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+
             </div>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto p-4">
