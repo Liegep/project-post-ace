@@ -59,7 +59,79 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
     setPinned((prev) => !prev);
   };
 
+  // Admin controls shown in drawer header (filter + visibility)
+  const AdminHeaderControls = () => {
+    if (!props.isAdmin) return null;
+    return (
+      <>
+        {props.onChangeTrackingColumnIds && (props.columns?.length ?? 0) > 0 && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                className={cn(
+                  "rounded-md p-1.5 border transition-colors",
+                  (props.trackingColumnIds && props.trackingColumnIds.length > 0)
+                    ? "text-primary border-primary/40 bg-primary/10 hover:bg-primary/20"
+                    : "text-foreground border-border bg-background/60 hover:bg-muted"
+                )}
+                title="Colunas visíveis para o cliente"
+              >
+                <Filter className="h-4 w-4" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-64 p-3 z-[60]">
+              <div className="mb-2 text-xs font-semibold text-foreground">
+                Colunas visíveis para o cliente
+              </div>
+              <div className="mb-2 text-[11px] text-muted-foreground">
+                Se nada for selecionado, o cliente verá todas as colunas.
+              </div>
+              <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                {(props.columns || []).map((col) => {
+                  const selected = (props.trackingColumnIds || []).includes(col.id);
+                  return (
+                    <label
+                      key={col.id}
+                      className="flex items-center gap-2 cursor-pointer rounded px-1.5 py-1 hover:bg-muted"
+                    >
+                      <Checkbox
+                        checked={selected}
+                        onCheckedChange={(checked) => {
+                          const current = props.trackingColumnIds || [];
+                          const next = checked
+                            ? [...current, col.id]
+                            : current.filter((id) => id !== col.id);
+                          props.onChangeTrackingColumnIds?.(next);
+                        }}
+                      />
+                      <span className="text-xs text-foreground truncate">{col.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
+        {props.onToggleVisibility && (
+          <button
+            onClick={() => props.onToggleVisibility?.(!props.visibleToClient)}
+            className={cn(
+              "rounded-md p-1.5 transition-colors",
+              props.visibleToClient
+                ? "text-primary hover:bg-primary/10"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            )}
+            title={props.visibleToClient ? "Visível para o cliente" : "Oculto para o cliente"}
+          >
+            {props.visibleToClient ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+          </button>
+        )}
+      </>
+    );
+  };
+
   // Floating trigger button
+
   const TriggerButton = () => (
     <button
       onClick={() => setOpen(true)}
