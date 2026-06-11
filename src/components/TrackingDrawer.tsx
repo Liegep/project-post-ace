@@ -169,6 +169,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
             )}
           </h3>
           <div className="flex items-center gap-1">
+            <AdminHeaderControls />
             <button
               onClick={togglePin}
               className="rounded-md p-1.5 text-primary hover:bg-primary/10 transition-colors"
@@ -184,6 +185,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
               <X className="h-4 w-4" />
             </button>
           </div>
+
         </div>
         <div className="flex-1 overflow-y-auto p-4">
           <TrackingPanelInline {...effectiveProps} />
