@@ -4,7 +4,9 @@ import { TrackingPanel } from "@/components/TrackingPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { BarChart3, Pin, PinOff, X } from "lucide-react";
+import { BarChart3, Pin, PinOff, X, Filter, Eye, EyeOff } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface TrackingDrawerProps {
   clientId: string;
