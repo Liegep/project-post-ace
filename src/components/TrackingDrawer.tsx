@@ -4,7 +4,9 @@ import { TrackingPanel } from "@/components/TrackingPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { BarChart3, Pin, PinOff, X } from "lucide-react";
+import { BarChart3, Pin, PinOff, X, Filter, Eye, EyeOff } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface TrackingDrawerProps {
   clientId: string;
@@ -57,7 +59,79 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
     setPinned((prev) => !prev);
   };
 
+  // Admin controls shown in drawer header (filter + visibility)
+  const AdminHeaderControls = () => {
+    if (!props.isAdmin) return null;
+    return (
+      <>
+        {props.onChangeTrackingColumnIds && (props.columns?.length ?? 0) > 0 && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                className={cn(
+                  "rounded-md p-1.5 border transition-colors",
+                  (props.trackingColumnIds && props.trackingColumnIds.length > 0)
+                    ? "text-primary border-primary/40 bg-primary/10 hover:bg-primary/20"
+                    : "text-foreground border-border bg-background/60 hover:bg-muted"
+                )}
+                title="Colunas visíveis para o cliente"
+              >
+                <Filter className="h-4 w-4" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-64 p-3 z-[60]">
+              <div className="mb-2 text-xs font-semibold text-foreground">
+                Colunas visíveis para o cliente
+              </div>
+              <div className="mb-2 text-[11px] text-muted-foreground">
+                Se nada for selecionado, o cliente verá todas as colunas.
+              </div>
+              <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                {(props.columns || []).map((col) => {
+                  const selected = (props.trackingColumnIds || []).includes(col.id);
+                  return (
+                    <label
+                      key={col.id}
+                      className="flex items-center gap-2 cursor-pointer rounded px-1.5 py-1 hover:bg-muted"
+                    >
+                      <Checkbox
+                        checked={selected}
+                        onCheckedChange={(checked) => {
+                          const current = props.trackingColumnIds || [];
+                          const next = checked
+                            ? [...current, col.id]
+                            : current.filter((id) => id !== col.id);
+                          props.onChangeTrackingColumnIds?.(next);
+                        }}
+                      />
+                      <span className="text-xs text-foreground truncate">{col.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
+        {props.onToggleVisibility && (
+          <button
+            onClick={() => props.onToggleVisibility?.(!props.visibleToClient)}
+            className={cn(
+              "rounded-md p-1.5 transition-colors",
+              props.visibleToClient
+                ? "text-primary hover:bg-primary/10"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            )}
+            title={props.visibleToClient ? "Visível para o cliente" : "Oculto para o cliente"}
+          >
+            {props.visibleToClient ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+          </button>
+        )}
+      </>
+    );
+  };
+
   // Floating trigger button
+
   const TriggerButton = () => (
     <button
       onClick={() => setOpen(true)}
@@ -95,6 +169,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
             )}
           </h3>
           <div className="flex items-center gap-1">
+            <AdminHeaderControls />
             <button
               onClick={togglePin}
               className="rounded-md p-1.5 text-primary hover:bg-primary/10 transition-colors"
@@ -110,6 +185,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
               <X className="h-4 w-4" />
             </button>
           </div>
+
         </div>
         <div className="flex-1 overflow-y-auto p-4">
           <TrackingPanelInline {...effectiveProps} />
@@ -141,15 +217,19 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
                   </span>
                 )}
               </SheetTitle>
-              {!isMobile && (
-                <button
-                  onClick={togglePin}
-                  className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                  title="Fixar na tela"
-                >
-                  <Pin className="h-3.5 w-3.5" />
-                </button>
-              )}
+              <div className="flex items-center gap-1">
+                <AdminHeaderControls />
+                {!isMobile && (
+                  <button
+                    onClick={togglePin}
+                    className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Fixar na tela"
+                  >
+                    <Pin className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+
             </div>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto p-4">
