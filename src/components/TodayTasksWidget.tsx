@@ -34,6 +34,7 @@ export const TodayTasksWidget = () => {
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"today" | "upcoming" | "overdue">("upcoming");
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -304,7 +305,7 @@ export const TodayTasksWidget = () => {
         </div>
       ) : (
         <div className="space-y-2">
-          {filteredTasks.slice(0, 5).map((task) => {
+          {(expanded ? filteredTasks : filteredTasks.slice(0, 5)).map((task) => {
             const urgencyStyle = URGENCY_STYLES[task.urgency];
             const typeConfig = TYPE_CONFIG[task.type];
             const TypeIcon = typeConfig.icon;
@@ -363,11 +364,11 @@ export const TodayTasksWidget = () => {
           })}
           {filteredTasks.length > 5 && (
             <button
-              onClick={() => navigate("/agenda")}
+              onClick={() => setExpanded(v => !v)}
               className="w-full flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
             >
-              <ChevronDown className="h-3.5 w-3.5 text-primary-foreground" />
-              Ver mais {filteredTasks.length - 5} tarefas
+              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
+              {expanded ? "Mostrar menos" : `Ver mais ${filteredTasks.length - 5} tarefas`}
             </button>
           )}
         </div>
