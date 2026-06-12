@@ -135,7 +135,7 @@ export const TodayTasksWidget = () => {
       .in("client_id", clientIds)
       .not("planned_date", "is", null)
       .lte("planned_date", format(weekAhead, "yyyy-MM-dd"))
-      .not("status", "in", '("published","rejected")')
+      .not("status", "in", '("published","rejected","approved")')
       .order("planned_date", { ascending: true });
 
     (briefs || []).forEach((b: any) => {
