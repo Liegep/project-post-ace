@@ -998,7 +998,12 @@ const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDa
             <MonthApt key={apt.id} apt={apt} tags={tags} onToggle={onToggle} onCancel={onCancel} onDelete={onDelete} />
           ))}
           {dayApts.length > 3 && (
-            <div className="text-[10px] text-muted-foreground pl-1">+{dayApts.length - 3} mais</div>
+            <button
+              onClick={(e) => { e.stopPropagation(); onShowMore(day); }}
+              className="w-full text-left text-[10px] font-medium text-primary hover:underline pl-1"
+            >
+              +{dayApts.length - 3} mais
+            </button>
           )}
         </div>
       )}
