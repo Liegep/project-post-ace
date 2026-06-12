@@ -305,7 +305,7 @@ export const TodayTasksWidget = () => {
         </div>
       ) : (
         <div className="space-y-2">
-          {filteredTasks.slice(0, 5).map((task) => {
+          {(expanded ? filteredTasks : filteredTasks.slice(0, 5)).map((task) => {
             const urgencyStyle = URGENCY_STYLES[task.urgency];
             const typeConfig = TYPE_CONFIG[task.type];
             const TypeIcon = typeConfig.icon;
