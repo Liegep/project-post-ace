@@ -936,6 +936,7 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onShowMo
               isCurrentMonth={isCurrentMonth}
               today={today}
               onDayClick={onDayClick}
+              onShowMore={onShowMore}
               onCreateClick={onCreateClick}
               onToggle={onToggle}
               onCancel={onCancel}
