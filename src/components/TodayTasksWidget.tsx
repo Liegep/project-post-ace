@@ -34,6 +34,7 @@ export const TodayTasksWidget = () => {
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"today" | "upcoming" | "overdue">("upcoming");
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
