@@ -294,6 +294,7 @@ const AgendaPage = () => {
               appointmentsByDate={appointmentsByDate}
               tags={tags}
               onDayClick={(d) => openCreateForDate(d)}
+              onShowMore={(d) => { setCurrentDate(d); setViewMode("day"); }}
               onCreateClick={(d) => openCreateForDate(d)}
               onToggle={toggleComplete}
               onCancel={toggleCancelled}
