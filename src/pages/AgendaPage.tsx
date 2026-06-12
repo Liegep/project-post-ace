@@ -951,7 +951,7 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onShowMo
 
 // ── Month Day Cell (droppable) ──────────────────────────────────────────────────
 
-const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDayClick, onCreateClick, onToggle, onCancel, onDelete }: {
+const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDayClick, onShowMore, onCreateClick, onToggle, onCancel, onDelete }: {
   day: Date;
   dateStr: string;
   dayApts: Appointment[];
@@ -959,6 +959,7 @@ const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDa
   isCurrentMonth: boolean;
   today: boolean;
   onDayClick: (date: Date) => void;
+  onShowMore: (date: Date) => void;
   onCreateClick: (date: Date) => void;
   onToggle: (id: string, completed: boolean) => void;
   onCancel: (id: string, cancelled: boolean) => void;
