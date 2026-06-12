@@ -286,26 +286,6 @@ export const TodayTasksWidget = () => {
       {/* Filter tabs */}
       <div className="flex gap-1.5 mb-3">
         <button
-          onClick={() => setFilter("overdue")}
-          className={cn(
-            "rounded-full px-3 py-1 text-xs font-medium transition-colors flex items-center gap-1",
-            filter === "overdue" ? "bg-destructive text-destructive-foreground" : "bg-destructive/10 text-destructive hover:bg-destructive/20"
-          )}
-        >
-          <AlertTriangle className="h-3 w-3" />
-          Atrasadas ({overdueTasks.length})
-        </button>
-        <button
-          onClick={() => setFilter("today")}
-          className={cn(
-            "rounded-full px-3 py-1 text-xs font-medium transition-colors flex items-center gap-1",
-            filter === "today" ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary hover:bg-primary/20"
-          )}
-        >
-          <CalendarClock className="h-3 w-3" />
-          Hoje ({todayTasks.length})
-        </button>
-        <button
           onClick={() => setFilter("upcoming")}
           className={cn(
             "rounded-full px-3 py-1 text-xs font-medium transition-colors flex items-center gap-1",
