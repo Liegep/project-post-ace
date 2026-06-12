@@ -294,6 +294,7 @@ const AgendaPage = () => {
               appointmentsByDate={appointmentsByDate}
               tags={tags}
               onDayClick={(d) => openCreateForDate(d)}
+              onShowMore={(d) => { setCurrentDate(d); setViewMode("day"); }}
               onCreateClick={(d) => openCreateForDate(d)}
               onToggle={toggleComplete}
               onCancel={toggleCancelled}
@@ -892,13 +893,14 @@ interface MonthViewProps {
   appointmentsByDate: Record<string, Appointment[]>;
   tags: AppointmentTag[];
   onDayClick: (date: Date) => void;
+  onShowMore: (date: Date) => void;
   onCreateClick: (date: Date) => void;
   onToggle: (id: string, completed: boolean) => void;
   onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
 }
 
-const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreateClick, onToggle, onCancel, onDelete }: MonthViewProps) => {
+const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onShowMore, onCreateClick, onToggle, onCancel, onDelete }: MonthViewProps) => {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
@@ -934,6 +936,7 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreate
               isCurrentMonth={isCurrentMonth}
               today={today}
               onDayClick={onDayClick}
+              onShowMore={onShowMore}
               onCreateClick={onCreateClick}
               onToggle={onToggle}
               onCancel={onCancel}
@@ -948,7 +951,7 @@ const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreate
 
 // ── Month Day Cell (droppable) ──────────────────────────────────────────────────
 
-const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDayClick, onCreateClick, onToggle, onCancel, onDelete }: {
+const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDayClick, onShowMore, onCreateClick, onToggle, onCancel, onDelete }: {
   day: Date;
   dateStr: string;
   dayApts: Appointment[];
@@ -956,6 +959,7 @@ const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDa
   isCurrentMonth: boolean;
   today: boolean;
   onDayClick: (date: Date) => void;
+  onShowMore: (date: Date) => void;
   onCreateClick: (date: Date) => void;
   onToggle: (id: string, completed: boolean) => void;
   onCancel: (id: string, cancelled: boolean) => void;
@@ -994,7 +998,12 @@ const MonthDayCell = ({ day, dateStr, dayApts, tags, isCurrentMonth, today, onDa
             <MonthApt key={apt.id} apt={apt} tags={tags} onToggle={onToggle} onCancel={onCancel} onDelete={onDelete} />
           ))}
           {dayApts.length > 3 && (
-            <div className="text-[10px] text-muted-foreground pl-1">+{dayApts.length - 3} mais</div>
+            <button
+              onClick={(e) => { e.stopPropagation(); onShowMore(day); }}
+              className="w-full text-left text-[10px] font-medium text-primary hover:underline pl-1"
+            >
+              +{dayApts.length - 3} mais
+            </button>
           )}
         </div>
       )}
