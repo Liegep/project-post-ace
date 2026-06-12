@@ -33,7 +33,7 @@ export const TodayTasksWidget = () => {
   const { userId, isSuperAdmin } = useUserRole();
   const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<"today" | "upcoming" | "overdue">("today");
+  const [filter, setFilter] = useState<"today" | "upcoming" | "overdue">("upcoming");
 
   useEffect(() => {
     if (!userId) return;
