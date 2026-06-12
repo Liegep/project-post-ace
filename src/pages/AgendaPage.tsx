@@ -893,13 +893,14 @@ interface MonthViewProps {
   appointmentsByDate: Record<string, Appointment[]>;
   tags: AppointmentTag[];
   onDayClick: (date: Date) => void;
+  onShowMore: (date: Date) => void;
   onCreateClick: (date: Date) => void;
   onToggle: (id: string, completed: boolean) => void;
   onCancel: (id: string, cancelled: boolean) => void;
   onDelete: (id: string) => void;
 }
 
-const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onCreateClick, onToggle, onCancel, onDelete }: MonthViewProps) => {
+const MonthView = ({ currentDate, appointmentsByDate, tags, onDayClick, onShowMore, onCreateClick, onToggle, onCancel, onDelete }: MonthViewProps) => {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
