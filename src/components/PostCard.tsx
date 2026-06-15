@@ -292,7 +292,7 @@ export const PostCard = memo(
         )}
 
         {/* Content */}
-        {/* Content */}
+
         <div className="p-2.5 space-y-1.5">
           {isAdmin && post.caption && (
             <button
