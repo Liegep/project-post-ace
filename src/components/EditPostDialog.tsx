@@ -210,7 +210,20 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               </div>
 
               <div>
-                <Label htmlFor="edit-caption" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">{t("caption")}</Label>
+                <div className="flex items-center gap-2 mb-1">
+                  <Label htmlFor="edit-caption" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("caption")}</Label>
+                  {caption && (
+                    <button
+                      type="button"
+                      onClick={() => { navigator.clipboard.writeText(caption); toast({ title: "Legenda copiada!" }); }}
+                      className="inline-flex items-center justify-center h-6 w-6 rounded-md bg-white border border-black/10 text-black hover:bg-white/90 shadow-sm"
+                      aria-label="Copiar legenda"
+                      title="Copiar legenda"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
                 <Textarea id="edit-caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("captionPlaceholder")} className="min-h-[350px] text-sm" />
               </div>
 
