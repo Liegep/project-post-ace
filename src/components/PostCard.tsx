@@ -176,24 +176,8 @@ export const PostCard = memo(
           </div>
           {isAdmin && (
             <div className="flex items-center gap-0.5 pt-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-              {post.caption && (
-                <button
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    try {
-                      await navigator.clipboard.writeText(post.caption);
-                      toast.success("Legenda copiada");
-                    } catch {
-                      toast.error("Erro ao copiar");
-                    }
-                  }}
-                  title="Copiar legenda"
-                >
-                  <Copy className="h-3.5 w-3.5" />
-                </button>
-              )}
               {hasMedia && (
+
                 <button
                   className="text-muted-foreground hover:text-primary transition-colors"
                   onClick={async (e) => {
@@ -308,7 +292,28 @@ export const PostCard = memo(
         )}
 
         {/* Content */}
+
         <div className="p-2.5 space-y-1.5">
+          {isAdmin && post.caption && (
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                try {
+                  await navigator.clipboard.writeText(post.caption);
+                  toast.success("Legenda copiada");
+                } catch {
+                  toast.error("Erro ao copiar");
+                }
+              }}
+              className="inline-flex items-center gap-1 rounded-md border border-border bg-background hover:bg-muted px-2 py-1 text-[10px] font-semibold text-foreground transition-colors"
+              title="Copiar legenda"
+            >
+              <Copy className="h-3 w-3" />
+              Copiar legenda
+            </button>
+          )}
+
 
           {/* Tags row */}
           {postTags.length > 0 && (
