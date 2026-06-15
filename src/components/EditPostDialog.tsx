@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { Save, ShieldCheck, ChevronDown, Users } from "lucide-react";
+import { Save, ShieldCheck, ChevronDown, Users, Copy } from "lucide-react";
 import { TagSelector } from "@/components/TagSelector";
 import { SortableMediaGrid, SortableMediaItem } from "@/components/SortableMediaGrid";
 import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
