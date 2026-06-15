@@ -306,10 +306,10 @@ export const PostCard = memo(
                   toast.error("Erro ao copiar");
                 }
               }}
-              className="inline-flex items-center gap-1 rounded-md border border-border bg-background hover:bg-muted px-2 py-1 text-[10px] font-semibold text-foreground transition-colors"
+              className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white hover:bg-white/90 px-2 py-1 text-[10px] font-semibold text-black transition-colors shadow-sm"
               title="Copiar legenda"
             >
-              <Copy className="h-3 w-3" />
+              <Copy className="h-3 w-3 text-black" />
               Copiar legenda
             </button>
           )}
