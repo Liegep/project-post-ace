@@ -292,7 +292,28 @@ export const PostCard = memo(
         )}
 
         {/* Content */}
+        {/* Content */}
         <div className="p-2.5 space-y-1.5">
+          {isAdmin && post.caption && (
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                try {
+                  await navigator.clipboard.writeText(post.caption);
+                  toast.success("Legenda copiada");
+                } catch {
+                  toast.error("Erro ao copiar");
+                }
+              }}
+              className="inline-flex items-center gap-1 rounded-md border border-border bg-background hover:bg-muted px-2 py-1 text-[10px] font-semibold text-foreground transition-colors"
+              title="Copiar legenda"
+            >
+              <Copy className="h-3 w-3" />
+              Copiar legenda
+            </button>
+          )}
+
 
           {/* Tags row */}
           {postTags.length > 0 && (
