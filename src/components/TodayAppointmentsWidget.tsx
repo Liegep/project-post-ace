@@ -106,21 +106,20 @@ export const TodayAppointmentsWidget = () => {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
-    const today = new Date();
 
     if (newRepeat === "none") {
       await supabase.from("appointments").insert({
         user_id: user.id, title: newTitle.trim(), description: newDesc.trim(),
-        appointment_date: format(today, "yyyy-MM-dd"), appointment_time: newTime, category: newCategory, tag_id: newTagId,
+        appointment_date: format(newDate, "yyyy-MM-dd"), appointment_time: newTime, category: newCategory, tag_id: newTagId,
       } as any);
     } else {
-      const endDate = newRepeatEnd || addDays(today, 30);
-      const allDays = eachDayOfInterval({ start: today, end: endDate });
+      const endDate = newRepeatEnd || addDays(newDate, 30);
+      const allDays = eachDayOfInterval({ start: newDate, end: endDate });
       let dates: Date[] = [];
       if (newRepeat === "daily") dates = allDays;
-      else if (newRepeat === "weekly") dates = allDays.filter(d => d.getDay() === today.getDay());
+      else if (newRepeat === "weekly") dates = allDays.filter(d => d.getDay() === newDate.getDay());
       else if (newRepeat === "weekdays") dates = allDays.filter(d => d.getDay() >= 1 && d.getDay() <= 5);
-      if (dates.length === 0) dates = [today];
+      if (dates.length === 0) dates = [newDate];
 
       const rows = dates.map(d => ({
         user_id: user.id, title: newTitle.trim(), description: newDesc.trim(),
@@ -130,7 +129,7 @@ export const TodayAppointmentsWidget = () => {
     }
 
     setNewTitle(""); setNewDesc(""); setNewTime("09:00"); setNewCategory(""); setNewTagId(null);
-    setNewRepeat("none"); setNewRepeatEnd(undefined);
+    setNewDate(new Date()); setNewRepeat("none"); setNewRepeatEnd(undefined);
     setShowQuickAdd(false); setSaving(false);
     await fetchToday();
   };
