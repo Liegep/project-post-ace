@@ -198,6 +198,23 @@ export const TodayAppointmentsWidget = () => {
           <div className="mb-3 rounded-lg border border-border bg-muted/30 p-3 space-y-2">
             <Input placeholder="Título do compromisso" value={newTitle} onChange={e => setNewTitle(e.target.value)} className="h-8 text-sm" autoFocus />
             <div className="flex gap-2 flex-wrap">
+              <Popover open={newDateOpen} onOpenChange={setNewDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 text-sm gap-1 font-normal justify-start">
+                    <CalendarIcon className="h-3.5 w-3.5" />
+                    {format(newDate, "dd/MM/yyyy")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={newDate}
+                    onSelect={(d) => { if (d) { setNewDate(d); setNewDateOpen(false); } }}
+                    initialFocus
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
               <Input type="time" value={newTime} onChange={e => setNewTime(e.target.value)} className="h-8 text-sm w-28" />
               <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="h-8 text-sm rounded-md border border-input bg-background px-2 flex-1 min-w-[100px]">
                 <option value="">Categoria</option>
