@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
-import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink } from "lucide-react";
+import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink, NotebookPen } from "lucide-react";
 import { GradientHeartIcon } from "@/components/GradientHeartIcon";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ClientNotes } from "@/components/ClientNotes";
 import { ClientLinksPanel } from "@/components/ClientLinksPanel";
 import { QuickLinksPanel } from "@/components/QuickLinksPanel";
+import { QuickDraftNotes } from "@/components/QuickDraftNotes";
 
-type Tab = "notes" | "links" | "quick" | null;
+type Tab = "notes" | "drafts" | "links" | "quick" | null;
 
 interface Props {
   clientId: string;
