@@ -196,6 +196,9 @@ export function ClientRightSidebar({ clientId }: Props) {
                 {activeTab === "notes" && (
                   <ClientNotes clientId={clientId} onCountChange={setNotesCount} />
                 )}
+                {activeTab === "drafts" && (
+                  <QuickDraftNotes clientId={clientId} onCountChange={setDraftsCount} />
+                )}
                 {activeTab === "links" && (
                   <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
                 )}
@@ -301,6 +304,9 @@ export function ClientRightSidebar({ clientId }: Props) {
           <div className="flex-1 overflow-y-auto p-4">
             {activeTab === "notes" && (
               <ClientNotes clientId={clientId} onCountChange={setNotesCount} />
+            )}
+            {activeTab === "drafts" && (
+              <QuickDraftNotes clientId={clientId} onCountChange={setDraftsCount} />
             )}
             {activeTab === "links" && (
               <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
