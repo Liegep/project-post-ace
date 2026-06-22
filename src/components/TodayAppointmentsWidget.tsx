@@ -53,6 +53,8 @@ export const TodayAppointmentsWidget = () => {
   const [newTagId, setNewTagId] = useState<string | null>(null);
   const [newDesc, setNewDesc] = useState("");
   const [newRepeat, setNewRepeat] = useState<"none" | "daily" | "weekly" | "weekdays">("none");
+  const [newDate, setNewDate] = useState<Date>(new Date());
+  const [newDateOpen, setNewDateOpen] = useState(false);
   const [newRepeatEnd, setNewRepeatEnd] = useState<Date | undefined>(undefined);
   const [newRepeatEndOpen, setNewRepeatEndOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -104,21 +106,20 @@ export const TodayAppointmentsWidget = () => {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
-    const today = new Date();
 
     if (newRepeat === "none") {
       await supabase.from("appointments").insert({
         user_id: user.id, title: newTitle.trim(), description: newDesc.trim(),
-        appointment_date: format(today, "yyyy-MM-dd"), appointment_time: newTime, category: newCategory, tag_id: newTagId,
+        appointment_date: format(newDate, "yyyy-MM-dd"), appointment_time: newTime, category: newCategory, tag_id: newTagId,
       } as any);
     } else {
-      const endDate = newRepeatEnd || addDays(today, 30);
-      const allDays = eachDayOfInterval({ start: today, end: endDate });
+      const endDate = newRepeatEnd || addDays(newDate, 30);
+      const allDays = eachDayOfInterval({ start: newDate, end: endDate });
       let dates: Date[] = [];
       if (newRepeat === "daily") dates = allDays;
-      else if (newRepeat === "weekly") dates = allDays.filter(d => d.getDay() === today.getDay());
+      else if (newRepeat === "weekly") dates = allDays.filter(d => d.getDay() === newDate.getDay());
       else if (newRepeat === "weekdays") dates = allDays.filter(d => d.getDay() >= 1 && d.getDay() <= 5);
-      if (dates.length === 0) dates = [today];
+      if (dates.length === 0) dates = [newDate];
 
       const rows = dates.map(d => ({
         user_id: user.id, title: newTitle.trim(), description: newDesc.trim(),
@@ -128,7 +129,7 @@ export const TodayAppointmentsWidget = () => {
     }
 
     setNewTitle(""); setNewDesc(""); setNewTime("09:00"); setNewCategory(""); setNewTagId(null);
-    setNewRepeat("none"); setNewRepeatEnd(undefined);
+    setNewDate(new Date()); setNewRepeat("none"); setNewRepeatEnd(undefined);
     setShowQuickAdd(false); setSaving(false);
     await fetchToday();
   };
@@ -197,6 +198,23 @@ export const TodayAppointmentsWidget = () => {
           <div className="mb-3 rounded-lg border border-border bg-muted/30 p-3 space-y-2">
             <Input placeholder="Título do compromisso" value={newTitle} onChange={e => setNewTitle(e.target.value)} className="h-8 text-sm" autoFocus />
             <div className="flex gap-2 flex-wrap">
+              <Popover open={newDateOpen} onOpenChange={setNewDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 text-sm gap-1 font-normal justify-start">
+                    <CalendarIcon className="h-3.5 w-3.5" />
+                    {format(newDate, "dd/MM/yyyy")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={newDate}
+                    onSelect={(d) => { if (d) { setNewDate(d); setNewDateOpen(false); } }}
+                    initialFocus
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
               <Input type="time" value={newTime} onChange={e => setNewTime(e.target.value)} className="h-8 text-sm w-28" />
               <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="h-8 text-sm rounded-md border border-input bg-background px-2 flex-1 min-w-[100px]">
                 <option value="">Categoria</option>
