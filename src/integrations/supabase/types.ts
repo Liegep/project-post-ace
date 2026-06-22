@@ -2462,6 +2462,47 @@ export type Database = {
         }
         Relationships: []
       }
+      quick_notes: {
+        Row: {
+          client_id: string
+          color: string
+          content: string
+          created_at: string
+          id: string
+          position: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          color?: string
+          content?: string
+          created_at?: string
+          id?: string
+          position?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          color?: string
+          content?: string
+          created_at?: string
+          id?: string
+          position?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quick_notes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       social_logs: {
         Row: {
           action: string

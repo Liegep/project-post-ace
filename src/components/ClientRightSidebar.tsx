@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
-import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink } from "lucide-react";
+import { StickyNote, Link as LinkIcon, X, Copy, ExternalLink, NotebookPen } from "lucide-react";
 import { GradientHeartIcon } from "@/components/GradientHeartIcon";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { ClientNotes } from "@/components/ClientNotes";
 import { ClientLinksPanel } from "@/components/ClientLinksPanel";
 import { QuickLinksPanel } from "@/components/QuickLinksPanel";
+import { QuickDraftNotes } from "@/components/QuickDraftNotes";
 
-type Tab = "notes" | "links" | "quick" | null;
+type Tab = "notes" | "drafts" | "links" | "quick" | null;
 
 interface Props {
   clientId: string;
@@ -31,6 +32,7 @@ function useUseSheet() {
 export function ClientRightSidebar({ clientId }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(null);
   const [notesCount, setNotesCount] = useState(0);
+  const [draftsCount, setDraftsCount] = useState(0);
   const [linksCount, setLinksCount] = useState(0);
   const isMobile = useUseSheet();
 
@@ -64,6 +66,16 @@ export function ClientRightSidebar({ clientId }: Props) {
       bgLight: "bg-amber-50 dark:bg-amber-500/10",
     },
     {
+      id: "drafts" as const,
+      label: "Rascunhos",
+      icon: NotebookPen,
+      count: draftsCount,
+      color: "bg-yellow-500",
+      hoverColor: "hover:bg-yellow-400",
+      textColor: "text-yellow-600",
+      bgLight: "bg-yellow-50 dark:bg-yellow-500/10",
+    },
+    {
       id: "links" as const,
       label: "Links",
       icon: LinkIcon,
@@ -87,18 +99,24 @@ export function ClientRightSidebar({ clientId }: Props) {
 
   const headerBg = activeTab === "notes"
     ? "bg-amber-50 dark:bg-amber-500/10"
+    : activeTab === "drafts"
+    ? "bg-yellow-50 dark:bg-yellow-500/10"
     : activeTab === "links"
     ? "bg-blue-50 dark:bg-blue-500/10"
     : "opacity-60 bg-lime-100";
 
   const headerIcon = activeTab === "notes"
     ? <StickyNote className="h-5 w-5 text-amber-500" />
+    : activeTab === "drafts"
+    ? <NotebookPen className="h-5 w-5 text-yellow-600" />
     : activeTab === "links"
     ? <LinkIcon className="h-5 w-5 text-blue-500" />
     : <GradientHeartIcon className="h-5 w-5" />;
 
   const headerTitle = activeTab === "notes"
     ? "Recados"
+    : activeTab === "drafts"
+    ? "Rascunhos"
     : activeTab === "links"
     ? "Links do Cliente"
     : "Links Rápidos";
@@ -177,6 +195,9 @@ export function ClientRightSidebar({ clientId }: Props) {
               <div className="flex-1 overflow-y-auto p-4">
                 {activeTab === "notes" && (
                   <ClientNotes clientId={clientId} onCountChange={setNotesCount} />
+                )}
+                {activeTab === "drafts" && (
+                  <QuickDraftNotes clientId={clientId} onCountChange={setDraftsCount} />
                 )}
                 {activeTab === "links" && (
                   <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
@@ -283,6 +304,9 @@ export function ClientRightSidebar({ clientId }: Props) {
           <div className="flex-1 overflow-y-auto p-4">
             {activeTab === "notes" && (
               <ClientNotes clientId={clientId} onCountChange={setNotesCount} />
+            )}
+            {activeTab === "drafts" && (
+              <QuickDraftNotes clientId={clientId} onCountChange={setDraftsCount} />
             )}
             {activeTab === "links" && (
               <ClientLinksPanel clientId={clientId} onCountChange={setLinksCount} />
