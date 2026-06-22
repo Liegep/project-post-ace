@@ -32,6 +32,7 @@ function useUseSheet() {
 export function ClientRightSidebar({ clientId }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(null);
   const [notesCount, setNotesCount] = useState(0);
+  const [draftsCount, setDraftsCount] = useState(0);
   const [linksCount, setLinksCount] = useState(0);
   const isMobile = useUseSheet();
 
