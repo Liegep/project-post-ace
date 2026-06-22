@@ -66,6 +66,16 @@ export function ClientRightSidebar({ clientId }: Props) {
       bgLight: "bg-amber-50 dark:bg-amber-500/10",
     },
     {
+      id: "drafts" as const,
+      label: "Rascunhos",
+      icon: NotebookPen,
+      count: draftsCount,
+      color: "bg-yellow-500",
+      hoverColor: "hover:bg-yellow-400",
+      textColor: "text-yellow-600",
+      bgLight: "bg-yellow-50 dark:bg-yellow-500/10",
+    },
+    {
       id: "links" as const,
       label: "Links",
       icon: LinkIcon,
@@ -89,18 +99,24 @@ export function ClientRightSidebar({ clientId }: Props) {
 
   const headerBg = activeTab === "notes"
     ? "bg-amber-50 dark:bg-amber-500/10"
+    : activeTab === "drafts"
+    ? "bg-yellow-50 dark:bg-yellow-500/10"
     : activeTab === "links"
     ? "bg-blue-50 dark:bg-blue-500/10"
     : "opacity-60 bg-lime-100";
 
   const headerIcon = activeTab === "notes"
     ? <StickyNote className="h-5 w-5 text-amber-500" />
+    : activeTab === "drafts"
+    ? <NotebookPen className="h-5 w-5 text-yellow-600" />
     : activeTab === "links"
     ? <LinkIcon className="h-5 w-5 text-blue-500" />
     : <GradientHeartIcon className="h-5 w-5" />;
 
   const headerTitle = activeTab === "notes"
     ? "Recados"
+    : activeTab === "drafts"
+    ? "Rascunhos"
     : activeTab === "links"
     ? "Links do Cliente"
     : "Links Rápidos";
