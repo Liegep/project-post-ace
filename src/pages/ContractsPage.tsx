@@ -70,6 +70,15 @@ const ContractsPage = () => {
     setDialogOpen(true);
   };
 
+  const openAsTemplate = (c: Contract) => {
+    setEditing(null);
+    setTitle(c.title);
+    setBody(c.body);
+    setClientId("");
+    setDialogOpen(true);
+    toast({ title: "Modelo carregado", description: "Selecione o cliente para enviar este contrato." });
+  };
+
   const handleSave = async () => {
     if (!title.trim() || !body.trim() || !clientId) {
       toast({ title: "Preencha todos os campos", variant: "destructive" });
