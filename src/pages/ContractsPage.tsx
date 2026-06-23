@@ -216,7 +216,8 @@ const ContractsPage = () => {
           </Card>
         ) : (
           contracts.map((c) => {
-            const st = STATUS_MAP[c.status] || STATUS_MAP.pending;
+            const effectiveStatus = c.accepted_at ? "accepted" : c.status;
+            const st = STATUS_MAP[effectiveStatus] || STATUS_MAP.pending;
             const StIcon = st.icon;
             return (
               <Card key={c.id} className="animate-in fade-in-50 duration-300">
@@ -246,7 +247,10 @@ const ContractsPage = () => {
                 <CardContent>
                   <div className="text-sm text-muted-foreground line-clamp-4 prose prose-sm prose-invert max-w-none [&_strong]:text-foreground [&_b]:text-foreground" dangerouslySetInnerHTML={{ __html: c.body }} />
                   <p className="text-xs text-muted-foreground mt-3">
-                    Criado em {new Date(c.created_at).toLocaleDateString("pt-BR")} · O contrato aparece automaticamente para o cliente no próximo login.
+                    Criado em {new Date(c.created_at).toLocaleDateString("pt-BR")}
+                    {c.accepted_at
+                      ? ` · ✅ Aceito pelo cliente em ${new Date(c.accepted_at).toLocaleString("pt-BR")}`
+                      : " · O contrato aparece automaticamente para o cliente no próximo login."}
                   </p>
                 </CardContent>
               </Card>
