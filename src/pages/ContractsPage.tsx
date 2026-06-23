@@ -288,8 +288,17 @@ const ContractsPage = () => {
               />
             </div>
           </div>
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 flex-wrap">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={saveAsTemplate}
+              disabled={savingTemplate}
+              title="Salvar título e texto como um modelo reutilizável"
+            >
+              <BookmarkPlus className="h-4 w-4" /> {savingTemplate ? "Salvando..." : "Salvar como modelo"}
+            </Button>
             <Button
               variant="outline"
               className="gap-2"
