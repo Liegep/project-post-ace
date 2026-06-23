@@ -161,7 +161,7 @@ const ContractsPage = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-sm text-muted-foreground line-clamp-4 prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: c.body }} />
+                  <div className="text-sm text-muted-foreground line-clamp-4 prose prose-sm prose-invert max-w-none [&_strong]:text-foreground [&_b]:text-foreground" dangerouslySetInnerHTML={{ __html: c.body }} />
                   <p className="text-xs text-muted-foreground mt-3">
                     Criado em {new Date(c.created_at).toLocaleDateString("pt-BR")} · O contrato aparece automaticamente para o cliente no próximo login.
                   </p>
@@ -245,7 +245,7 @@ const ContractsPage = () => {
           </DialogHeader>
           <ScrollArea className="px-8 py-6 max-h-[55vh]">
             <div
-              className="prose prose-sm dark:prose-invert max-w-none font-serif leading-relaxed"
+              className="prose prose-sm prose-invert max-w-none font-serif leading-relaxed [&_strong]:text-foreground [&_b]:text-foreground"
               dangerouslySetInnerHTML={{ __html: previewContract?.body || "" }}
             />
           </ScrollArea>
