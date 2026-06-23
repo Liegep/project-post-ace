@@ -348,7 +348,6 @@ const ContractsPage = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
 
       {/* Chooser: blank vs from template */}
       <Dialog open={chooserOpen} onOpenChange={setChooserOpen}>
