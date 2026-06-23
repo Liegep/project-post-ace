@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, Pencil, FileText, ArrowLeft, CheckCircle2, Clock, XCircle, Eye } from "lucide-react";
+import { Plus, Trash2, Pencil, FileText, ArrowLeft, CheckCircle2, Clock, XCircle, Eye, Copy } from "lucide-react";
 
 interface ClientOption {
   id: string;
@@ -68,6 +68,15 @@ const ContractsPage = () => {
     setBody(c.body);
     setClientId(c.client_id);
     setDialogOpen(true);
+  };
+
+  const openAsTemplate = (c: Contract) => {
+    setEditing(null);
+    setTitle(c.title);
+    setBody(c.body);
+    setClientId("");
+    setDialogOpen(true);
+    toast({ title: "Modelo carregado", description: "Selecione o cliente para enviar este contrato." });
   };
 
   const handleSave = async () => {
@@ -151,6 +160,9 @@ const ContractsPage = () => {
                     </Badge>
                     <Button variant="ghost" size="icon" title="Visualizar como cliente" onClick={() => { setPreviewContract(c); setPreviewOpen(true); }}>
                       <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" title="Usar como modelo para outro cliente" onClick={() => openAsTemplate(c)}>
+                      <Copy className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => openEdit(c)}>
                       <Pencil className="h-4 w-4" />
