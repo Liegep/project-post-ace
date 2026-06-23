@@ -11,6 +11,8 @@ export interface Contract {
   created_at: string;
   updated_at: string;
   client_name?: string;
+  accepted_at?: string | null;
+  accepted_by?: string | null;
 }
 
 export interface ContractAcceptance {
@@ -33,20 +35,36 @@ export function useContracts() {
       .order("created_at", { ascending: false });
 
     if (!error && data) {
-      // Fetch client names
       const clientIds = [...new Set(data.map((c: any) => c.client_id))];
-      const { data: clients } = await supabase
-        .from("clients")
-        .select("id, name")
-        .in("id", clientIds);
+      const contractIds = data.map((c: any) => c.id);
+
+      const [{ data: clients }, { data: acceptances }] = await Promise.all([
+        supabase.from("clients").select("id, name").in("id", clientIds),
+        supabase
+          .from("contract_acceptances")
+          .select("contract_id, user_id, accepted_at")
+          .in("contract_id", contractIds)
+          .order("accepted_at", { ascending: true }),
+      ]);
 
       const clientMap = new Map((clients || []).map((c: any) => [c.id, c.name]));
+      const acceptanceMap = new Map<string, { accepted_at: string; user_id: string }>();
+      (acceptances || []).forEach((a: any) => {
+        if (!acceptanceMap.has(a.contract_id)) {
+          acceptanceMap.set(a.contract_id, { accepted_at: a.accepted_at, user_id: a.user_id });
+        }
+      });
 
       setContracts(
-        data.map((c: any) => ({
-          ...c,
-          client_name: clientMap.get(c.client_id) || "—",
-        }))
+        data.map((c: any) => {
+          const acc = acceptanceMap.get(c.id);
+          return {
+            ...c,
+            client_name: clientMap.get(c.client_id) || "—",
+            accepted_at: acc?.accepted_at ?? null,
+            accepted_by: acc?.user_id ?? null,
+          };
+        })
       );
     }
     setLoading(false);
