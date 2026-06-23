@@ -14,7 +14,14 @@ import { Badge } from "@/components/ui/badge";
 import { RichTextEditor } from "@/components/RichTextEditor";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, Pencil, FileText, ArrowLeft, CheckCircle2, Clock, XCircle, Eye, Copy } from "lucide-react";
+import { Plus, Trash2, Pencil, FileText, ArrowLeft, CheckCircle2, Clock, XCircle, Eye, Copy, BookmarkPlus, LayoutTemplate } from "lucide-react";
+
+interface ContractTemplate {
+  id: string;
+  title: string;
+  body: string;
+  created_at: string;
+}
 
 interface ClientOption {
   id: string;
@@ -42,6 +49,12 @@ const ContractsPage = () => {
   const [clientId, setClientId] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const [chooserOpen, setChooserOpen] = useState(false);
+  const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [templates, setTemplates] = useState<ContractTemplate[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
+  const [savingTemplate, setSavingTemplate] = useState(false);
+
   useEffect(() => {
     if (!roleLoading && !isSuperAdmin) {
       navigate("/admin");
@@ -54,12 +67,70 @@ const ContractsPage = () => {
     });
   }, []);
 
-  const openNew = () => {
+  const openBlankNew = () => {
     setEditing(null);
     setTitle("");
     setBody("");
     setClientId("");
+    setChooserOpen(false);
     setDialogOpen(true);
+  };
+
+  const openNew = () => {
+    setChooserOpen(true);
+  };
+
+  const loadTemplates = async () => {
+    setTemplatesLoading(true);
+    const { data, error } = await (supabase as any)
+      .from("contract_templates")
+      .select("id, title, body, created_at")
+      .order("created_at", { ascending: false });
+    if (!error && data) setTemplates(data as ContractTemplate[]);
+    setTemplatesLoading(false);
+  };
+
+  const openTemplatePicker = async () => {
+    setChooserOpen(false);
+    setTemplatesOpen(true);
+    await loadTemplates();
+  };
+
+  const useTemplate = (t: ContractTemplate) => {
+    setEditing(null);
+    setTitle(t.title);
+    setBody(t.body);
+    setClientId("");
+    setTemplatesOpen(false);
+    setDialogOpen(true);
+  };
+
+  const deleteTemplate = async (id: string) => {
+    if (!confirm("Excluir este modelo?")) return;
+    const { error } = await (supabase as any).from("contract_templates").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir modelo", variant: "destructive" });
+      return;
+    }
+    setTemplates((prev) => prev.filter((t) => t.id !== id));
+    toast({ title: "Modelo excluído" });
+  };
+
+  const saveAsTemplate = async () => {
+    if (!title.trim() || !body.trim()) {
+      toast({ title: "Preencha título e texto para salvar como modelo", variant: "destructive" });
+      return;
+    }
+    setSavingTemplate(true);
+    const { error } = await (supabase as any)
+      .from("contract_templates")
+      .insert({ title, body, created_by: userId });
+    setSavingTemplate(false);
+    if (error) {
+      toast({ title: "Erro ao salvar modelo", variant: "destructive" });
+      return;
+    }
+    toast({ title: "Modelo salvo!", description: "Você poderá reutilizá-lo em novos contratos." });
   };
 
   const openEdit = (c: Contract) => {
@@ -217,8 +288,17 @@ const ContractsPage = () => {
               />
             </div>
           </div>
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 flex-wrap">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={saveAsTemplate}
+              disabled={savingTemplate}
+              title="Salvar título e texto como um modelo reutilizável"
+            >
+              <BookmarkPlus className="h-4 w-4" /> {savingTemplate ? "Salvando..." : "Salvar como modelo"}
+            </Button>
             <Button
               variant="outline"
               className="gap-2"
@@ -266,6 +346,78 @@ const ContractsPage = () => {
               <CheckCircle2 className="h-5 w-5" /> Li e Aceito os Termos
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Chooser: blank vs from template */}
+      <Dialog open={chooserOpen} onOpenChange={setChooserOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Novo Contrato</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-2">
+            <button
+              onClick={openBlankNew}
+              className="group flex flex-col items-center gap-2 rounded-xl border border-border bg-card hover:bg-accent/40 transition-colors p-6 text-center"
+            >
+              <FileText className="h-8 w-8 text-primary" />
+              <span className="font-semibold">Começar do zero</span>
+              <span className="text-xs text-muted-foreground">Escreva um novo contrato em branco</span>
+            </button>
+            <button
+              onClick={openTemplatePicker}
+              className="group flex flex-col items-center gap-2 rounded-xl border border-border bg-card hover:bg-accent/40 transition-colors p-6 text-center"
+            >
+              <LayoutTemplate className="h-8 w-8 text-primary" />
+              <span className="font-semibold">Usar um modelo</span>
+              <span className="text-xs text-muted-foreground">Escolha entre seus modelos salvos</span>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Templates picker */}
+      <Dialog open={templatesOpen} onOpenChange={setTemplatesOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LayoutTemplate className="h-5 w-5 text-primary" /> Modelos de Contrato
+            </DialogTitle>
+          </DialogHeader>
+          {templatesLoading ? (
+            <div className="flex justify-center py-12">
+              <div className="h-6 w-6 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            </div>
+          ) : templates.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <LayoutTemplate className="h-10 w-10 mx-auto mb-3 opacity-50" />
+              <p className="text-sm">Nenhum modelo salvo ainda.</p>
+              <p className="text-xs mt-1">Ao criar um contrato, use "Salvar como modelo" para reutilizá-lo depois.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {templates.map((t) => (
+                <div
+                  key={t.id}
+                  className="flex items-start justify-between gap-3 rounded-lg border border-border bg-card p-4 hover:bg-accent/30 transition-colors"
+                >
+                  <button onClick={() => useTemplate(t)} className="flex-1 text-left">
+                    <div className="font-semibold">{t.title}</div>
+                    <div
+                      className="text-xs text-muted-foreground line-clamp-2 mt-1 prose prose-xs prose-invert max-w-none [&_*]:text-muted-foreground"
+                      dangerouslySetInnerHTML={{ __html: t.body }}
+                    />
+                  </button>
+                  <div className="flex gap-1 shrink-0">
+                    <Button size="sm" variant="outline" onClick={() => useTemplate(t)}>Usar</Button>
+                    <Button size="icon" variant="ghost" onClick={() => deleteTemplate(t.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
