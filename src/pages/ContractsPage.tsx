@@ -49,6 +49,12 @@ const ContractsPage = () => {
   const [clientId, setClientId] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const [chooserOpen, setChooserOpen] = useState(false);
+  const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [templates, setTemplates] = useState<ContractTemplate[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
+  const [savingTemplate, setSavingTemplate] = useState(false);
+
   useEffect(() => {
     if (!roleLoading && !isSuperAdmin) {
       navigate("/admin");
