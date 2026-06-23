@@ -161,6 +161,9 @@ const ContractsPage = () => {
                     <Button variant="ghost" size="icon" title="Visualizar como cliente" onClick={() => { setPreviewContract(c); setPreviewOpen(true); }}>
                       <Eye className="h-4 w-4" />
                     </Button>
+                    <Button variant="ghost" size="icon" title="Usar como modelo para outro cliente" onClick={() => openAsTemplate(c)}>
+                      <Copy className="h-4 w-4" />
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => openEdit(c)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
