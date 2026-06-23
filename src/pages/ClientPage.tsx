@@ -68,22 +68,8 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
     [locale]
   );
 
-  const [userName, setUserName] = useState("");
+  const userName = clientData.name || "";
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.id) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name")
-          .eq("id", session.user.id)
-          .maybeSingle();
-        if (profile?.full_name) setUserName(profile.full_name);
-      }
-    };
-    fetchUser();
-  }, []);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
