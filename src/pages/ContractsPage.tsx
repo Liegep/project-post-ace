@@ -67,12 +67,70 @@ const ContractsPage = () => {
     });
   }, []);
 
-  const openNew = () => {
+  const openBlankNew = () => {
     setEditing(null);
     setTitle("");
     setBody("");
     setClientId("");
+    setChooserOpen(false);
     setDialogOpen(true);
+  };
+
+  const openNew = () => {
+    setChooserOpen(true);
+  };
+
+  const loadTemplates = async () => {
+    setTemplatesLoading(true);
+    const { data, error } = await (supabase as any)
+      .from("contract_templates")
+      .select("id, title, body, created_at")
+      .order("created_at", { ascending: false });
+    if (!error && data) setTemplates(data as ContractTemplate[]);
+    setTemplatesLoading(false);
+  };
+
+  const openTemplatePicker = async () => {
+    setChooserOpen(false);
+    setTemplatesOpen(true);
+    await loadTemplates();
+  };
+
+  const useTemplate = (t: ContractTemplate) => {
+    setEditing(null);
+    setTitle(t.title);
+    setBody(t.body);
+    setClientId("");
+    setTemplatesOpen(false);
+    setDialogOpen(true);
+  };
+
+  const deleteTemplate = async (id: string) => {
+    if (!confirm("Excluir este modelo?")) return;
+    const { error } = await (supabase as any).from("contract_templates").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao excluir modelo", variant: "destructive" });
+      return;
+    }
+    setTemplates((prev) => prev.filter((t) => t.id !== id));
+    toast({ title: "Modelo excluído" });
+  };
+
+  const saveAsTemplate = async () => {
+    if (!title.trim() || !body.trim()) {
+      toast({ title: "Preencha título e texto para salvar como modelo", variant: "destructive" });
+      return;
+    }
+    setSavingTemplate(true);
+    const { error } = await (supabase as any)
+      .from("contract_templates")
+      .insert({ title, body, created_by: userId });
+    setSavingTemplate(false);
+    if (error) {
+      toast({ title: "Erro ao salvar modelo", variant: "destructive" });
+      return;
+    }
+    toast({ title: "Modelo salvo!", description: "Você poderá reutilizá-lo em novos contratos." });
   };
 
   const openEdit = (c: Contract) => {
