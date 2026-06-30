@@ -848,18 +848,23 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, [clientId]);
 
   const unarchivePost = useCallback(async (id: string, columnId?: string | null, clientInitiated?: boolean) => {
-    const post = [...posts, ...posts].find(p => p.id === id); // check active+archived
+    const post = [...posts, ...archivedPosts].find(p => p.id === id); // check active+archived
     // Keep archived_at populated as a "was previously archived" marker so the auto-archive
     // routine on load doesn't immediately re-archive this post when its deadline is in the past.
     const keepArchivedAt = post?.archivedAt ?? new Date();
-    const updates: Partial<Post> = { archived: false, archivedAt: keepArchivedAt, status: ["pronto"] as PostStatus[] };
+    // If the deadline is in the future, restore "agendado" so it reappears in the
+    // client "Próximos Posts" widget and the social calendar as a scheduled card.
+    const now = new Date();
+    const hasFutureDeadline = post?.deadline ? new Date(post.deadline).getTime() >= startOfDay(now).getTime() : false;
+    const nextStatus: PostStatus[] = hasFutureDeadline ? (["agendado"] as PostStatus[]) : (["pronto"] as PostStatus[]);
+    const updates: Partial<Post> = { archived: false, archivedAt: keepArchivedAt, status: nextStatus };
     if (columnId !== undefined) updates.columnId = columnId;
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...updates } : p)));
-    const dbUpdates: Record<string, any> = { archived: false, archived_at: keepArchivedAt instanceof Date ? keepArchivedAt.toISOString() : keepArchivedAt, status: ["pronto"] };
+    const dbUpdates: Record<string, any> = { archived: false, archived_at: keepArchivedAt instanceof Date ? keepArchivedAt.toISOString() : keepArchivedAt, status: nextStatus };
     if (columnId !== undefined) dbUpdates.column_id = columnId;
     if (clientInitiated) dbUpdates.client_unarchived_at = new Date().toISOString();
     await supabase.from("posts").update(dbUpdates as any).eq("id", id);
-  }, [posts, clientId]);
+  }, [posts, archivedPosts, clientId]);
 
 
   const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus[]) => {
