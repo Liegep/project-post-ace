@@ -42,6 +42,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
   const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
   const [targetDate, setTargetDate] = useState<Date | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const { colors: clientColorOverrides, setColor: setClientColor } = useClientColors();
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
