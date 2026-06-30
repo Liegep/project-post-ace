@@ -37,7 +37,47 @@ export interface ClientColor {
   textDark: string;
 }
 
-export function getClientColor(clientId: string | null | undefined): ClientColor {
+function hexToHsl(hex: string): { h: number; s: number; l: number } | null {
+  const m = hex.trim().replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(m)) return null;
+  const r = parseInt(m.slice(0, 2), 16) / 255;
+  const g = parseInt(m.slice(2, 4), 16) / 255;
+  const b = parseInt(m.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h *= 60;
+  }
+  return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+
+function buildColor(h: number, s: number, l: number): ClientColor {
+  return {
+    hsl: `${h} ${s}% ${l}%`,
+    bg: `hsl(${h} ${s}% ${l}% / 0.18)`,
+    bgHover: `hsl(${h} ${s}% ${l}% / 0.30)`,
+    border: `hsl(${h} ${s}% ${l}% / 0.55)`,
+    text: `hsl(${h} ${s}% ${Math.max(l - 15, 20)}%)`,
+    textDark: `hsl(${h} ${s}% ${Math.max(l - 25, 15)}%)`,
+  };
+}
+
+export function getClientColor(clientId: string | null | undefined, override?: string | null): ClientColor {
+  if (override) {
+    const hsl = hexToHsl(override);
+    if (hsl) return buildColor(hsl.h, hsl.s, hsl.l);
+  }
+
   if (!clientId) {
     return {
       hsl: "220 10% 60%",
@@ -51,13 +91,5 @@ export function getClientColor(clientId: string | null | undefined): ClientColor
 
   const idx = hashString(clientId) % PALETTE.length;
   const { h, s, l } = PALETTE[idx];
-
-  return {
-    hsl: `${h} ${s}% ${l}%`,
-    bg: `hsl(${h} ${s}% ${l}% / 0.18)`,
-    bgHover: `hsl(${h} ${s}% ${l}% / 0.30)`,
-    border: `hsl(${h} ${s}% ${l}% / 0.55)`,
-    text: `hsl(${h} ${s}% ${Math.max(l - 15, 20)}%)`,
-    textDark: `hsl(${h} ${s}% ${Math.max(l - 25, 15)}%)`,
-  };
+  return buildColor(h, s, l);
 }
