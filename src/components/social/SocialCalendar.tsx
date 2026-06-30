@@ -221,7 +221,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
-                      value={override || `#${hslToHex(color.hsl)}`}
+                      value={override || color.hex}
                       onChange={(e) => setClientColor(client.id, e.target.value)}
                       className="h-9 w-12 rounded border border-border bg-transparent cursor-pointer"
                       aria-label={`Cor de ${client.name}`}
