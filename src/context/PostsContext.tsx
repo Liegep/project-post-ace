@@ -5,6 +5,8 @@ import { pushToTrello } from "@/lib/trelloPush";
 import { logActivity } from "@/lib/activityLogger";
 import { parsePostDeadline, serializePostDeadline } from "@/lib/postDeadline";
 import { runAutomationsForPost, type AutomationResult } from "@/lib/automationEngine";
+import { syncSocialFromKanban } from "@/lib/socialKanbanSync";
+
 
 export interface CommentAuthorInfo {
   userId: string;
@@ -696,7 +698,21 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
         await triggerAutomations({ postId: id, addedTagIds, removedTagIds });
       }
     }
-  }, [posts, triggerAutomations]);
+
+    // Reflect deadline / tag changes onto matching social_post
+    if (updates.deadline !== undefined || updates.tags !== undefined || updates.title !== undefined) {
+      const current = posts.find((p) => p.id === id);
+      const title = updates.title ?? current?.title ?? "";
+      syncSocialFromKanban({
+        postId: id,
+        clientId,
+        title,
+        deadline: updates.deadline !== undefined ? updates.deadline : current?.deadline ?? null,
+        tags: updates.tags ?? current?.tags,
+      });
+    }
+  }, [posts, triggerAutomations, clientId]);
+
 
   const movePostToColumn = useCallback(async (postId: string, columnId: string | null) => {
     const previousColumnId = posts.find((p) => p.id === postId)?.columnId ?? null;
