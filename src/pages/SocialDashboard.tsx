@@ -60,8 +60,7 @@ export default function SocialDashboard() {
     const { data } = await supabase
       .from("posts")
       .select("id, title, caption, image_url, media_urls, deadline, status, archived, client_id, clients(name)")
-      .not("deadline", "is", null)
-      .eq("archived", false) as any;
+      .not("deadline", "is", null) as any;
 
     if (data) {
       const filtered = data.filter((p: any) => {
