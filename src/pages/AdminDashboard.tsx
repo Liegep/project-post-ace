@@ -13,7 +13,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import UserProfileMenu from "@/components/UserProfileMenu";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
-import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign, Eye, FileSignature, Link2, Palette } from "lucide-react";
+import { Plus, ImagePlus, ExternalLink, Copy, Pencil, Trash2, MessageCircle, Bell, X, RotateCcw, UserPlus, FilePlus, CalendarClock, Users, User, CalendarDays, Lightbulb, Calendar, Instagram, Facebook, Youtube, Linkedin, Twitter, FileText, FileBarChart, Globe, CheckCircle2, Shield, Share2, Lock, Menu, LayoutDashboard, Settings, CalendarHeart, History as HistoryIcon, DollarSign, Eye, FileSignature, Link2, Palette, ChevronDown } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { StorageCleanupButton } from "@/components/StorageCleanupButton";
 import { MobileNav } from "@/components/MobileNav";
@@ -136,6 +136,7 @@ const AdminDashboard = () => {
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [schedulePopoverOpen, setSchedulePopoverOpen] = useState<string | null>(null);
   const [reschedulePopoverOpen, setReschedulePopoverOpen] = useState<string | null>(null);
+  const [scheduledExpanded, setScheduledExpanded] = useState(false);
   const [scheduleDate, setScheduleDate] = useState("");
   const [scheduleTime, setScheduleTime] = useState("09:00");
 
@@ -1410,8 +1411,8 @@ const AdminDashboard = () => {
                 {scheduledNotifs.length}
               </span>
             </div>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {scheduledNotifs.map((fb) => (
+            <div className="space-y-2">
+              {(scheduledExpanded ? scheduledNotifs : scheduledNotifs.slice(0, 5)).map((fb) => (
                 <div
                   key={fb.postId}
                   onClick={() => navigate(`/admin/${fb.clientSlug}`)}
@@ -1479,6 +1480,15 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               ))}
+              {scheduledNotifs.length > 5 && (
+                <button
+                  onClick={() => setScheduledExpanded(v => !v)}
+                  className="w-full flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
+                >
+                  <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", scheduledExpanded && "rotate-180")} />
+                  {scheduledExpanded ? "Mostrar menos" : `Ver mais ${scheduledNotifs.length - 5} posts agendados`}
+                </button>
+              )}
             </div>
           </div>
         )}
