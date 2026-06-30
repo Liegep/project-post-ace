@@ -614,6 +614,107 @@ const AdminDashboard = () => {
     toast({ title: "Post agendado", description: `"${fb.postTitle}" agendado para ${selectedDate} às ${selectedTime}.` });
   };
 
+  const fetchScheduledNotifs = async () => {
+    const allowedIds = await getAllowedClientIds();
+    if (allowedIds.length === 0) { setScheduledNotifs([]); return; }
+
+    const { data: posts } = await supabase
+      .from("posts")
+      .select("id, title, client_id, updated_at, deadline, image_url, media_urls, caption, status, client_label")
+      .eq("archived", false)
+      .in("client_id", allowedIds)
+      .order("deadline", { ascending: true });
+
+    if (!posts || posts.length === 0) { setScheduledNotifs([]); return; }
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const scheduled = posts.filter((p: any) => {
+      const statusList: string[] = Array.isArray(p.status) ? p.status : [];
+      if (!statusList.includes("agendado")) return false;
+      if (statusList.includes("publicado")) return false;
+      if (p.deadline) {
+        const d = new Date(p.deadline);
+        if (!Number.isNaN(d.getTime()) && d < todayStart) return false;
+      }
+      return true;
+    });
+
+    if (scheduled.length === 0) { setScheduledNotifs([]); return; }
+
+    const clientIds = [...new Set(scheduled.map((p: any) => p.client_id).filter(Boolean))];
+    const { data: clientsData } = await supabase
+      .from("clients")
+      .select("id, name, slug, logo_url")
+      .in("id", clientIds);
+
+    const clientMap: Record<string, { name: string; slug: string; logo_url: string }> = {};
+    (clientsData || []).forEach((c: any) => { clientMap[c.id] = { name: c.name, slug: c.slug, logo_url: c.logo_url }; });
+
+    setScheduledNotifs(
+      scheduled.map((p: any) => ({
+        postId: p.id,
+        postTitle: p.title,
+        clientId: p.client_id,
+        clientName: clientMap[p.client_id]?.name || "—",
+        clientSlug: clientMap[p.client_id]?.slug || "",
+        clientLogo: clientMap[p.client_id]?.logo_url || "",
+        label: p.client_label || "pendente",
+        updatedAt: p.updated_at,
+        deadline: p.deadline || null,
+        imageUrl: p.image_url || "",
+        mediaUrls: p.media_urls || [],
+        caption: p.caption || "",
+      }))
+    );
+  };
+
+  const reschedulePost = async (fb: FeedbackNotification, selectedDate: string, selectedTime: string) => {
+    if (!selectedDate || !selectedTime) {
+      toast({ title: "Informe a data e o horário", variant: "destructive" });
+      return;
+    }
+
+    const deadlineISO = new Date(`${selectedDate}T${selectedTime}:00`).toISOString();
+
+    await supabase.from("posts").update({
+      deadline: deadlineISO,
+      status: ["agendado"],
+    } as any).eq("id", fb.postId);
+
+    // Update matching calendar_posts entry, or create one if missing
+    const { data: existing } = await supabase
+      .from("calendar_posts")
+      .select("id")
+      .eq("client_id", fb.clientId)
+      .eq("title", fb.postTitle)
+      .limit(1);
+
+    if (existing && existing.length > 0) {
+      await supabase.from("calendar_posts").update({
+        publish_date: selectedDate,
+        publish_time: selectedTime,
+        status: "scheduled",
+      } as any).eq("id", (existing[0] as any).id);
+    } else {
+      await supabase.from("calendar_posts").insert({
+        client_id: fb.clientId,
+        title: fb.postTitle,
+        caption: fb.caption || "",
+        media_urls: fb.mediaUrls || [],
+        media_type: fb.mediaUrls?.some((u: string) => /\.(mp4|mov|webm)/i.test(u)) ? "video" : "image",
+        publish_date: selectedDate,
+        publish_time: selectedTime,
+        status: "scheduled",
+        created_by: currentUserId,
+      } as any);
+    }
+
+    setReschedulePopoverOpen(null);
+    await fetchScheduledNotifs();
+    toast({ title: "Post reagendado", description: `"${fb.postTitle}" agora em ${selectedDate} às ${selectedTime}.` });
+  };
+
   const dismissUnarchiveNotif = async (postId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     await supabase.from("posts").update({ client_unarchived_at: null } as any).eq("id", postId);
