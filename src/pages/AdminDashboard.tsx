@@ -1411,8 +1411,8 @@ const AdminDashboard = () => {
                 {scheduledNotifs.length}
               </span>
             </div>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {scheduledNotifs.map((fb) => (
+            <div className="space-y-2">
+              {(scheduledExpanded ? scheduledNotifs : scheduledNotifs.slice(0, 5)).map((fb) => (
                 <div
                   key={fb.postId}
                   onClick={() => navigate(`/admin/${fb.clientSlug}`)}
@@ -1480,6 +1480,15 @@ const AdminDashboard = () => {
                   </div>
                 </div>
               ))}
+              {scheduledNotifs.length > 5 && (
+                <button
+                  onClick={() => setScheduledExpanded(v => !v)}
+                  className="w-full flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
+                >
+                  <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", scheduledExpanded && "rotate-180")} />
+                  {scheduledExpanded ? "Mostrar menos" : `Ver mais ${scheduledNotifs.length - 5} posts agendados`}
+                </button>
+              )}
             </div>
           </div>
         )}
