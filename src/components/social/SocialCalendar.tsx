@@ -4,6 +4,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, Facebook, Instagram, FileText, CalendarClock, X } from "lucide-react";
 import type { SocialPost } from "@/hooks/useSocialPosts";
+import { getClientColor } from "@/lib/clientColors";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -11,6 +12,7 @@ export interface ScheduledKanbanPost {
   id: string;
   title: string;
   client_name: string;
+  client_id: string;
   deadline: string;
   preview_url?: string | null;
   preview_text?: string | null;
@@ -201,6 +203,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
               <div className="space-y-1">
                 {dayKanban.slice(0, maxVisible).map((p) => {
                   const isSelected = selectedItem?.type === "kanban" && selectedItem.post.id === p.id;
+                  const color = getClientColor(p.client_id);
 
                   return (
                     <Tooltip key={`kanban-${p.id}`}>
@@ -211,15 +214,18 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                               handleKanbanSelect(p, e);
                             }
                           }}
-                          className={`w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate flex items-center gap-1 transition-colors ${
+                          className={`w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate flex items-center gap-1 transition-colors cursor-pointer ${
+                            isSelected ? "ring-1 ring-primary" : ""
+                          }`}
+                          style={
                             isSelected
-                              ? "bg-primary/15 ring-1 ring-primary text-primary"
-                              : "border border-accent bg-blue-500"
-                          } cursor-pointer`}
+                              ? { background: "hsl(var(--primary) / 0.15)", color: "hsl(var(--primary))" }
+                              : { background: color.bg, borderColor: color.border, color: color.text, borderWidth: 1, borderStyle: "solid" }
+                          }
                         >
-                          <FileText className="h-2.5 w-2.5 text-primary shrink-0" />
-                          <span className="truncate text-primary-foreground font-bold">{p.title}</span>
-                          <span className="shrink-0 text-primary-foreground">· {p.client_name}</span>
+                          <FileText className="h-2.5 w-2.5 shrink-0" style={{ color: isSelected ? undefined : color.text }} />
+                          <span className="truncate font-bold">{p.title}</span>
+                          <span className="shrink-0">· {p.client_name}</span>
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="right" align="start" className="w-56 p-2 space-y-2">
@@ -245,6 +251,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                   const previewUrl = p.media_urls?.[0] || null;
                   const isSelected = selectedItem?.type === "social" && selectedItem.post.id === p.id;
                   const isPublished = p.status === "published";
+                  const color = getClientColor(p.client_id);
 
                   return (
                     <Tooltip key={p.id}>
@@ -259,12 +266,15 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                           }}
                           onDoubleClick={() => onPostClick(p)}
                           className={`w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate transition-colors flex items-center gap-1 ${
-                            isSelected
-                              ? "bg-primary/15 ring-1 ring-primary text-primary"
-                              : isPublished
-                              ? "bg-success/20 text-success border border-success/30 hover:bg-success/30"
-                              : "hover:bg-muted"
+                            isSelected ? "bg-primary/15 ring-1 ring-primary text-primary" : ""
                           }`}
+                          style={
+                            isSelected
+                              ? undefined
+                              : isPublished
+                              ? { background: "hsl(var(--success) / 0.20)", color: "hsl(var(--success))", borderColor: "hsl(var(--success) / 0.30)", borderWidth: 1, borderStyle: "solid" }
+                              : { background: color.bg, color: color.text, borderColor: color.border, borderWidth: 1, borderStyle: "solid" }
+                          }
                         >
                           {p.platform === "instagram" ? (
                             <Instagram className="h-2.5 w-2.5 text-pink-500 shrink-0" />
@@ -273,7 +283,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                           )}
                           <span className="truncate">{p.caption.slice(0, 20) || "Sem legenda"}</span>
                           {(p as any).clients?.name && (
-                            <span className="text-muted-foreground shrink-0">· {(p as any).clients.name}</span>
+                            <span className="shrink-0" style={{ opacity: 0.7 }}>· {(p as any).clients.name}</span>
                           )}
                         </button>
                       </TooltipTrigger>

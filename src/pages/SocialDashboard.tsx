@@ -65,6 +65,7 @@ export default function SocialDashboard() {
         id: p.id,
         title: p.title,
         client_name: p.clients?.name || "—",
+        client_id: p.client_id,
         deadline: p.deadline,
         preview_url: p.image_url || (Array.isArray(p.media_urls) ? p.media_urls[0] : null) || null,
         preview_text: p.caption || null,
