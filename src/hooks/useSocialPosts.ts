@@ -132,9 +132,21 @@ export function useSocialPosts(clientId: string | null) {
         change_note: `Status changed to ${updates.status}`,
       } as any);
     }
+
+    // Reflect changes onto matching kanban card (deadline / status tags)
+    if (!error) {
+      const { data: full } = await supabase
+        .from("social_posts")
+        .select("id, client_id, caption, status, scheduled_at, published_at")
+        .eq("id", id)
+        .single() as any;
+      if (full) await syncKanbanFromSocial(full);
+    }
+
     fetchPosts();
     return { error };
   };
+
 
   const deletePost = async (id: string) => {
     const { error } = await supabase.from("social_posts").delete().eq("id", id);
