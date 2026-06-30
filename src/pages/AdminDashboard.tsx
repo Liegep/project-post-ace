@@ -271,7 +271,6 @@ const AdminDashboard = () => {
       await fetchClientCreatedNotifs();
       await fetchTodayPosts();
       await fetchStatusNotifs();
-      await fetchScheduledNotifs();
     })();
 
     // Realtime: refresh feedbacks when a post becomes actionable for the dashboard.
@@ -610,7 +609,6 @@ const AdminDashboard = () => {
 
     setFeedbacks((prev) => prev.filter((f) => f.postId !== fb.postId));
     setSchedulePopoverOpen(null);
-    await fetchScheduledNotifs();
     toast({ title: "Post agendado", description: `"${fb.postTitle}" agendado para ${selectedDate} às ${selectedTime}.` });
   };
 
