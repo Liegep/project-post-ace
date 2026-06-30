@@ -5,6 +5,8 @@ import { pushToTrello } from "@/lib/trelloPush";
 import { logActivity } from "@/lib/activityLogger";
 import { parsePostDeadline, serializePostDeadline } from "@/lib/postDeadline";
 import { runAutomationsForPost, type AutomationResult } from "@/lib/automationEngine";
+import { syncSocialFromKanban } from "@/lib/socialKanbanSync";
+
 
 export interface CommentAuthorInfo {
   userId: string;
