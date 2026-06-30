@@ -203,6 +203,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
               <div className="space-y-1">
                 {dayKanban.slice(0, maxVisible).map((p) => {
                   const isSelected = selectedItem?.type === "kanban" && selectedItem.post.id === p.id;
+                  const color = getClientColor(p.client_id);
 
                   return (
                     <Tooltip key={`kanban-${p.id}`}>
@@ -213,15 +214,18 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                               handleKanbanSelect(p, e);
                             }
                           }}
-                          className={`w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate flex items-center gap-1 transition-colors ${
+                          className={`w-full text-left rounded px-1 py-0.5 text-[10px] leading-tight truncate flex items-center gap-1 transition-colors cursor-pointer ${
+                            isSelected ? "ring-1 ring-primary" : ""
+                          }`}
+                          style={
                             isSelected
-                              ? "bg-primary/15 ring-1 ring-primary text-primary"
-                              : "border border-accent bg-blue-500"
-                          } cursor-pointer`}
+                              ? { background: "hsl(var(--primary) / 0.15)", color: "hsl(var(--primary))" }
+                              : { background: color.bg, borderColor: color.border, color: color.text, borderWidth: 1, borderStyle: "solid" }
+                          }
                         >
-                          <FileText className="h-2.5 w-2.5 text-primary shrink-0" />
-                          <span className="truncate text-primary-foreground font-bold">{p.title}</span>
-                          <span className="shrink-0 text-primary-foreground">· {p.client_name}</span>
+                          <FileText className="h-2.5 w-2.5 shrink-0" style={{ color: isSelected ? undefined : color.text }} />
+                          <span className="truncate font-bold">{p.title}</span>
+                          <span className="shrink-0">· {p.client_name}</span>
                         </button>
                       </TooltipTrigger>
                       <TooltipContent side="right" align="start" className="w-56 p-2 space-y-2">
