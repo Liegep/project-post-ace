@@ -272,6 +272,7 @@ const AdminDashboard = () => {
       await fetchClientCreatedNotifs();
       await fetchTodayPosts();
       await fetchStatusNotifs();
+      await fetchScheduledNotifs();
     })();
 
     // Realtime: refresh feedbacks when a post becomes actionable for the dashboard.
