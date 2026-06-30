@@ -187,6 +187,32 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
         </div>
       </div>
 
+      {/* Client legend */}
+      {clientsLegend.length > 0 && (
+        <div className="flex flex-wrap gap-2 items-center justify-center">
+          {clientsLegend.map((client) => {
+            const color = getClientColor(client.id);
+            return (
+              <div
+                key={client.id}
+                className="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium"
+                style={{
+                  background: color.bg,
+                  borderColor: color.border,
+                  color: color.text,
+                }}
+              >
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: color.text }}
+                />
+                {client.name}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <div className="grid grid-cols-7 gap-px bg-border rounded-lg">
         {weekDays.map((d) => (
           <div key={d} className="bg-muted px-2 py-2 text-center text-xs font-medium text-muted-foreground">
