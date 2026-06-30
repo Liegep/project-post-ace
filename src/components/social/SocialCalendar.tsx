@@ -72,6 +72,19 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
 
   const canReschedule = !!(onReschedule || onRescheduleKanban);
 
+  const clientsLegend = useMemo<ClientLegend[]>(() => {
+    const map = new Map<string, string>();
+    posts.forEach((p) => {
+      const id = p.client_id;
+      const name = (p as any).clients?.name || "";
+      if (id && name) map.set(id, name);
+    });
+    scheduledPosts.forEach((p) => {
+      if (p.client_id && p.client_name) map.set(p.client_id, p.client_name);
+    });
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [posts, scheduledPosts]);
+
   const handleKanbanSelect = (post: ScheduledKanbanPost, e: React.MouseEvent) => {
     e.stopPropagation();
     if (selectedItem?.type === "kanban" && selectedItem.post.id === post.id) {
