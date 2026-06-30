@@ -280,6 +280,20 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                             Sem imagem
                           </div>
                         )}
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span className="text-muted-foreground">Status:</span>
+                            <span className="font-medium text-foreground">Agendado</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span className="text-muted-foreground">Deadline:</span>
+                            <span className="font-medium text-foreground">{format(new Date(p.deadline), "dd/MM/yyyy")}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span className="text-muted-foreground">Cliente:</span>
+                            <span className="font-medium text-foreground">{p.client_name}</span>
+                          </div>
+                        </div>
                         {p.preview_text && <p className="text-xs text-foreground line-clamp-3">{p.preview_text}</p>}
                         {onRescheduleKanban && (
                           <p className="text-[10px] text-muted-foreground italic">
