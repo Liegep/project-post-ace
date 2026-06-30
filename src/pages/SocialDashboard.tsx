@@ -52,16 +52,26 @@ export default function SocialDashboard() {
     });
   }, []);
 
-  // Fetch kanban posts with "agendado" status that have a deadline
+  // Fetch kanban posts that should appear on the social calendar:
+  // any non-archived, non-published post with a future deadline, OR posts tagged "agendado".
   const fetchScheduledKanban = async () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const { data } = await supabase
       .from("posts")
-      .select("id, title, caption, image_url, media_urls, deadline, client_id, clients(name)")
-      .contains("status", ["agendado"])
-      .not("deadline", "is", null) as any;
-    
+      .select("id, title, caption, image_url, media_urls, deadline, status, archived, client_id, clients(name)")
+      .not("deadline", "is", null)
+      .eq("archived", false) as any;
+
     if (data) {
-      const mapped: ScheduledKanbanPost[] = data.map((p: any) => ({
+      const filtered = data.filter((p: any) => {
+        const status: string[] = Array.isArray(p.status) ? p.status : [];
+        if (status.includes("publicado")) return false;
+        if (status.includes("agendado")) return true;
+        // Include any future-deadline post not yet published
+        return p.deadline && new Date(p.deadline) >= today;
+      });
+      const mapped: ScheduledKanbanPost[] = filtered.map((p: any) => ({
         id: p.id,
         title: p.title,
         client_name: p.clients?.name || "—",
