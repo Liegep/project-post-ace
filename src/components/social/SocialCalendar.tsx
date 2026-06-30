@@ -189,8 +189,8 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
           </Button>
         </div>
       </div>
-
       {/* Client legend */}
+
       {clientsLegend.length > 0 && (
         <div className="flex flex-wrap gap-2 items-center justify-center">
           {clientsLegend.map((client) => {
