@@ -3,6 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, Facebook, Instagram, FileText, CalendarClock, X } from "lucide-react";
+
+interface ClientLegend {
+  id: string;
+  name: string;
+}
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { getClientColor } from "@/lib/clientColors";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from "date-fns";
@@ -66,6 +71,19 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
   const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
   const canReschedule = !!(onReschedule || onRescheduleKanban);
+
+  const clientsLegend = useMemo<ClientLegend[]>(() => {
+    const map = new Map<string, string>();
+    posts.forEach((p) => {
+      const id = p.client_id;
+      const name = (p as any).clients?.name || "";
+      if (id && name) map.set(id, name);
+    });
+    scheduledPosts.forEach((p) => {
+      if (p.client_id && p.client_name) map.set(p.client_id, p.client_name);
+    });
+    return Array.from(map.entries()).map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [posts, scheduledPosts]);
 
   const handleKanbanSelect = (post: ScheduledKanbanPost, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -168,6 +186,32 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
           </Button>
         </div>
       </div>
+
+      {/* Client legend */}
+      {clientsLegend.length > 0 && (
+        <div className="flex flex-wrap gap-2 items-center justify-center">
+          {clientsLegend.map((client) => {
+            const color = getClientColor(client.id);
+            return (
+              <div
+                key={client.id}
+                className="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium"
+                style={{
+                  background: color.bg,
+                  borderColor: color.border,
+                  color: color.text,
+                }}
+              >
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                  style={{ backgroundColor: color.text }}
+                />
+                {client.name}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="grid grid-cols-7 gap-px bg-border rounded-lg">
         {weekDays.map((d) => (
