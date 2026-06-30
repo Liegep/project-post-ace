@@ -611,6 +611,7 @@ const AdminDashboard = () => {
 
     setFeedbacks((prev) => prev.filter((f) => f.postId !== fb.postId));
     setSchedulePopoverOpen(null);
+    await fetchScheduledNotifs();
     toast({ title: "Post agendado", description: `"${fb.postTitle}" agendado para ${selectedDate} às ${selectedTime}.` });
   };
 
