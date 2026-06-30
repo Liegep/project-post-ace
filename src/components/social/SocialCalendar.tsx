@@ -353,6 +353,31 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                             Sem imagem
                           </div>
                         )}
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span className="text-muted-foreground">Status:</span>
+                            <span className="font-medium text-foreground">
+                              {p.status === "draft" && "Rascunho"}
+                              {p.status === "pending_approval" && "Pendente de aprovação"}
+                              {p.status === "approved" && "Aprovado"}
+                              {p.status === "scheduled" && "Agendado"}
+                              {p.status === "publishing" && "Publicando"}
+                              {p.status === "published" && "Publicado"}
+                              {p.status === "error" && "Erro"}
+                              {p.status === "cancelled" && "Cancelado"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span className="text-muted-foreground">Deadline:</span>
+                            <span className="font-medium text-foreground">
+                              {p.scheduled_at ? format(new Date(p.scheduled_at), "dd/MM/yyyy") : format(new Date(p.created_at), "dd/MM/yyyy")}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span className="text-muted-foreground">Cliente:</span>
+                            <span className="font-medium text-foreground">{(p as any).clients?.name || "—"}</span>
+                          </div>
+                        </div>
                         {p.caption && <p className="text-xs text-foreground line-clamp-3">{p.caption}</p>}
                         {onReschedule && (
                           <p className="text-[10px] text-muted-foreground italic">
