@@ -281,7 +281,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
               <div className="space-y-1">
                 {dayKanban.slice(0, maxVisible).map((p) => {
                   const isSelected = selectedItem?.type === "kanban" && selectedItem.post.id === p.id;
-                  const color = getClientColor(p.client_id);
+                  const color = getClientColor(p.client_id, clientColorOverrides[p.client_id] ?? null);
 
                   return (
                     <Tooltip key={`kanban-${p.id}`}>
