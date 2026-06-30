@@ -3,6 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, Facebook, Instagram, FileText, CalendarClock, X } from "lucide-react";
+
+interface ClientLegend {
+  id: string;
+  name: string;
+}
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { getClientColor } from "@/lib/clientColors";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from "date-fns";
