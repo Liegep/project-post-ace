@@ -44,7 +44,19 @@ export const UpcomingPostsWidget = ({ posts, locale = "pt" }: UpcomingPostsWidge
 
   const scheduledPosts = useMemo(() => {
     return posts
-      .filter((p) => p.deadline && Array.isArray(p.status) && p.status.some((s) => s.toLowerCase().includes("agendado")))
+      .filter((p) => {
+        if (!p.deadline) return false;
+        const statuses = Array.isArray(p.status) ? p.status.map((s) => s.toLowerCase()) : [];
+        const tags = Array.isArray((p as any).tags) ? (p as any).tags.map((t: string) => t.toLowerCase()) : [];
+        const isPublished = statuses.includes("publicado") || tags.includes("publicado");
+        if (isPublished) return false;
+        const isAgendado = statuses.some((s) => s.includes("agendado")) || tags.includes("agendado");
+        if (isAgendado) return true;
+        // Fallback: any non-published post with a future deadline counts as upcoming
+        const d = new Date(p.deadline);
+        const today = startOfDay(new Date());
+        return d.getTime() >= today.getTime();
+      })
       .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime());
   }, [posts]);
 
