@@ -848,14 +848,15 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
   }, [clientId]);
 
   const unarchivePost = useCallback(async (id: string, columnId?: string | null, clientInitiated?: boolean) => {
-    const post = [...posts, ...archivedPosts].find(p => p.id === id); // check active+archived
+    const post = posts.find(p => p.id === id);
     // Keep archived_at populated as a "was previously archived" marker so the auto-archive
     // routine on load doesn't immediately re-archive this post when its deadline is in the past.
     const keepArchivedAt = post?.archivedAt ?? new Date();
     // If the deadline is in the future, restore "agendado" so it reappears in the
     // client "Próximos Posts" widget and the social calendar as a scheduled card.
-    const now = new Date();
-    const hasFutureDeadline = post?.deadline ? new Date(post.deadline).getTime() >= startOfDay(now).getTime() : false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const hasFutureDeadline = post?.deadline ? new Date(post.deadline).getTime() >= today.getTime() : false;
     const nextStatus: PostStatus[] = hasFutureDeadline ? (["agendado"] as PostStatus[]) : (["pronto"] as PostStatus[]);
     const updates: Partial<Post> = { archived: false, archivedAt: keepArchivedAt, status: nextStatus };
     if (columnId !== undefined) updates.columnId = columnId;
@@ -864,7 +865,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     if (columnId !== undefined) dbUpdates.column_id = columnId;
     if (clientInitiated) dbUpdates.client_unarchived_at = new Date().toISOString();
     await supabase.from("posts").update(dbUpdates as any).eq("id", id);
-  }, [posts, archivedPosts, clientId]);
+  }, [posts, clientId]);
 
 
   const bulkUpdateStatus = useCallback(async (ids: string[], status: PostStatus[]) => {
