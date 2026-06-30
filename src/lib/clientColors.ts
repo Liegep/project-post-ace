@@ -77,6 +77,7 @@ function hexToHsl(hex: string): { h: number; s: number; l: number } | null {
 function buildColor(h: number, s: number, l: number): ClientColor {
   return {
     hsl: `${h} ${s}% ${l}%`,
+    hex: hslToHex(h, s, l),
     bg: `hsl(${h} ${s}% ${l}% / 0.18)`,
     bgHover: `hsl(${h} ${s}% ${l}% / 0.30)`,
     border: `hsl(${h} ${s}% ${l}% / 0.55)`,
@@ -92,14 +93,7 @@ export function getClientColor(clientId: string | null | undefined, override?: s
   }
 
   if (!clientId) {
-    return {
-      hsl: "220 10% 60%",
-      bg: "hsl(220 10% 60% / 0.18)",
-      bgHover: "hsl(220 10% 60% / 0.28)",
-      border: "hsl(220 10% 60% / 0.50)",
-      text: "hsl(220 10% 40%)",
-      textDark: "hsl(220 10% 30%)",
-    };
+    return buildColor(220, 10, 60);
   }
 
   const idx = hashString(clientId) % PALETTE.length;
