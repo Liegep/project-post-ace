@@ -1054,6 +1054,7 @@ export type Database = {
           billing_recurrence_active: boolean
           billing_start_date: string | null
           billing_type: string
+          calendar_color: string | null
           client_portal_title: string
           client_type: string
           country: string
@@ -1100,6 +1101,7 @@ export type Database = {
           billing_recurrence_active?: boolean
           billing_start_date?: string | null
           billing_type?: string
+          calendar_color?: string | null
           client_portal_title?: string
           client_type?: string
           country?: string
@@ -1146,6 +1148,7 @@ export type Database = {
           billing_recurrence_active?: boolean
           billing_start_date?: string | null
           billing_type?: string
+          calendar_color?: string | null
           client_portal_title?: string
           client_type?: string
           country?: string

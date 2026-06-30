@@ -10,6 +10,8 @@ interface ClientLegend {
 }
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { getClientColor } from "@/lib/clientColors";
+import { useClientColors } from "@/hooks/useClientColors";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -40,6 +42,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
   const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
   const [targetDate, setTargetDate] = useState<Date | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const { colors: clientColorOverrides, setColor: setClientColor } = useClientColors();
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -186,28 +189,59 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
           </Button>
         </div>
       </div>
-
       {/* Client legend */}
+
       {clientsLegend.length > 0 && (
         <div className="flex flex-wrap gap-2 items-center justify-center">
           {clientsLegend.map((client) => {
-            const color = getClientColor(client.id);
+            const override = clientColorOverrides[client.id] ?? null;
+            const color = getClientColor(client.id, override);
             return (
-              <div
-                key={client.id}
-                className="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium"
-                style={{
-                  background: color.bg,
-                  borderColor: color.border,
-                  color: color.text,
-                }}
-              >
-                <span
-                  className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
-                  style={{ backgroundColor: color.text }}
-                />
-                {client.name}
-              </div>
+              <Popover key={client.id}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium hover:opacity-90 transition-opacity cursor-pointer"
+                    style={{
+                      background: color.bg,
+                      borderColor: color.border,
+                      color: color.text,
+                    }}
+                    title="Clique para personalizar a cor"
+                  >
+                    <span
+                      className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: color.text }}
+                    />
+                    {client.name}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-3 space-y-3" align="center">
+                  <div className="text-xs font-medium text-foreground">{client.name}</div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={override || color.hex}
+                      onChange={(e) => setClientColor(client.id, e.target.value)}
+                      className="h-9 w-12 rounded border border-border bg-transparent cursor-pointer"
+                      aria-label={`Cor de ${client.name}`}
+                    />
+                    <div className="flex-1 text-[11px] text-muted-foreground">
+                      Selecione uma cor para este cliente no calendário.
+                    </div>
+                  </div>
+                  {override && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-xs h-7"
+                      onClick={() => setClientColor(client.id, null)}
+                    >
+                      Restaurar cor padrão
+                    </Button>
+                  )}
+                </PopoverContent>
+              </Popover>
             );
           })}
         </div>
@@ -247,7 +281,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
               <div className="space-y-1">
                 {dayKanban.slice(0, maxVisible).map((p) => {
                   const isSelected = selectedItem?.type === "kanban" && selectedItem.post.id === p.id;
-                  const color = getClientColor(p.client_id);
+                  const color = getClientColor(p.client_id, clientColorOverrides[p.client_id] ?? null);
 
                   return (
                     <Tooltip key={`kanban-${p.id}`}>
@@ -309,7 +343,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                   const previewUrl = p.media_urls?.[0] || null;
                   const isSelected = selectedItem?.type === "social" && selectedItem.post.id === p.id;
                   const isPublished = p.status === "published";
-                  const color = getClientColor(p.client_id);
+                  const color = getClientColor(p.client_id, clientColorOverrides[p.client_id] ?? null);
 
                   return (
                     <Tooltip key={p.id}>
