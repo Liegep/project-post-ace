@@ -343,7 +343,7 @@ export function SocialCalendar({ posts, scheduledPosts = [], onPostClick, onResc
                   const previewUrl = p.media_urls?.[0] || null;
                   const isSelected = selectedItem?.type === "social" && selectedItem.post.id === p.id;
                   const isPublished = p.status === "published";
-                  const color = getClientColor(p.client_id);
+                  const color = getClientColor(p.client_id, clientColorOverrides[p.client_id] ?? null);
 
                   return (
                     <Tooltip key={p.id}>
