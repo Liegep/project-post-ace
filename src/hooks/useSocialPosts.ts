@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { syncKanbanFromSocial } from "@/lib/socialKanbanSync";
+
 
 export type SocialPostStatus = "draft" | "pending_approval" | "approved" | "scheduled" | "publishing" | "published" | "error" | "cancelled";
 
