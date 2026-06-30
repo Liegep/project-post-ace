@@ -126,7 +126,7 @@ const AdminDashboard = () => {
   const { role, userId: currentUserId, isSuperAdmin, isAdmin, loading: roleLoading } = useUserRole();
   const [clients, setClients] = useState<Client[]>([]);
   const [feedbacks, setFeedbacks] = useState<FeedbackNotification[]>([]);
-  const [scheduledNotifs, setScheduledNotifs] = useState<FeedbackNotification[]>([]);
+  
   const [unarchiveNotifs, setUnarchiveNotifs] = useState<UnarchiveNotification[]>([]);
   const [clientCreatedNotifs, setClientCreatedNotifs] = useState<ClientCreatedNotification[]>([]);
   const [statusNotifs, setStatusNotifs] = useState<StatusNotification[]>([]);
@@ -135,8 +135,6 @@ const AdminDashboard = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [schedulePopoverOpen, setSchedulePopoverOpen] = useState<string | null>(null);
-  const [reschedulePopoverOpen, setReschedulePopoverOpen] = useState<string | null>(null);
-  const [scheduledExpanded, setScheduledExpanded] = useState(false);
   const [scheduleDate, setScheduleDate] = useState("");
   const [scheduleTime, setScheduleTime] = useState("09:00");
 
