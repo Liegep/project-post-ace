@@ -136,6 +136,7 @@ const AdminDashboard = () => {
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [schedulePopoverOpen, setSchedulePopoverOpen] = useState<string | null>(null);
   const [reschedulePopoverOpen, setReschedulePopoverOpen] = useState<string | null>(null);
+  const [scheduledExpanded, setScheduledExpanded] = useState(false);
   const [scheduleDate, setScheduleDate] = useState("");
   const [scheduleTime, setScheduleTime] = useState("09:00");
 
