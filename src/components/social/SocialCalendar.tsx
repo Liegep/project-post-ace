@@ -10,6 +10,8 @@ interface ClientLegend {
 }
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { getClientColor } from "@/lib/clientColors";
+import { useClientColors } from "@/hooks/useClientColors";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
