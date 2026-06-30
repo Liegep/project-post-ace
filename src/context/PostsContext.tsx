@@ -205,6 +205,44 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     fetchAll();
   }, [clientId]);
 
+  // Realtime: keep posts in sync when admin updates them elsewhere (e.g. reschedule)
+  useEffect(() => {
+    if (!clientId) return;
+    const channel = supabase
+      .channel(`posts-realtime-${clientId}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "posts", filter: `client_id=eq.${clientId}` },
+        (payload: any) => {
+          const row = payload.new;
+          if (!row) return;
+          setPosts((prev) => prev.map((p) => (p.id === row.id ? dbPostToPost(row, p.comments) : p)));
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "posts", filter: `client_id=eq.${clientId}` },
+        (payload: any) => {
+          const row = payload.new;
+          if (!row) return;
+          setPosts((prev) => (prev.some((p) => p.id === row.id) ? prev : [dbPostToPost(row, []), ...prev]));
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "posts", filter: `client_id=eq.${clientId}` },
+        (payload: any) => {
+          const oldRow = payload.old;
+          if (!oldRow) return;
+          setPosts((prev) => prev.filter((p) => p.id !== oldRow.id));
+        }
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [clientId]);
+
   const setPostingPeriod = useCallback(async (period: string) => {
     setPostingPeriodState(period);
     await supabase.from("clients").update({ posting_period: period } as any).eq("id", clientId);
