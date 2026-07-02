@@ -512,7 +512,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               </div>
           </>
         ) : (
-          <div>
+          <div className="h-[calc(100vh-600px)] min-h-[300px] overflow-hidden">
             {archivedPosts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="mb-4 rounded-full bg-muted p-6">
@@ -521,14 +521,14 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <h2 className="text-xl font-semibold text-foreground">Nenhum post arquivado</h2>
               </div>
             ) : (
-              <div className="flex gap-4 overflow-x-auto pb-4">
+              <div className="flex gap-4 overflow-x-auto pb-4 h-full">
                 {archivedMonths.map((month) => (
-                  <div key={month} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
+                  <div key={month} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4 flex flex-col h-full">
                     <div className="mb-4 flex items-center gap-2">
                       <span className="text-sm font-semibold text-foreground capitalize">{month}</span>
                       <span className="text-xs text-muted-foreground">({groupedArchived[month].length})</span>
                     </div>
-                    <div className="space-y-3">
+                    <div className="space-y-3 overflow-y-auto flex-1 min-h-0">
                       {groupedArchived[month].map((post) => (
                         <div key={post.id} className="relative">
                           <PostCard post={post} isAdmin={false} onEdit={() => setDetailPost(post)} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
