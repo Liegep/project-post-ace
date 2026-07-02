@@ -1383,16 +1383,18 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
             )}
           </>
         ) : activeTab === "archived" ? (
-          <ArchivedView
-            archivedPosts={archivedPosts}
-            columns={columns}
-            unarchivePost={unarchivePost}
-            deletePost={deletePost}
-            selectionMode={selectionMode}
-            selectedPostIds={selectedPostIds}
-            onToggleSelect={toggleSelect}
-            t={t}
-          />
+          <div className="h-[calc(100vh-200px)] overflow-hidden">
+            <ArchivedView
+              archivedPosts={archivedPosts}
+              columns={columns}
+              unarchivePost={unarchivePost}
+              deletePost={deletePost}
+              selectionMode={selectionMode}
+              selectedPostIds={selectedPostIds}
+              onToggleSelect={toggleSelect}
+              t={t}
+            />
+          </div>
         ) : activeTab === "texts" ? (
           <div className="mx-auto max-w-4xl">
             <TextContentsPanel clientId={clientData.id} clientName={clientData.name} isAdmin />
