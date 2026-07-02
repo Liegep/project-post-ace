@@ -479,14 +479,14 @@ const ArchivedView = ({ archivedPosts, columns, unarchivePost, deletePost, selec
   }
 
   return (
-    <div className="flex gap-4 overflow-x-auto pb-4">
+    <div className="flex gap-4 overflow-x-auto pb-4 h-full">
       {months.map((month) => (
-        <div key={month} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
+        <div key={month} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4 flex flex-col h-full">
           <div className="mb-4 flex items-center gap-2">
             <span className="text-sm font-semibold text-foreground capitalize">{month}</span>
             <span className="text-xs text-muted-foreground">({grouped[month].length})</span>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-3 overflow-y-auto flex-1 min-h-0">
             {grouped[month].map((post) => {
               const isSelected = selectedPostIds?.has(post.id);
               return (
