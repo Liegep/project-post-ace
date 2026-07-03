@@ -92,7 +92,9 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
     const ms = startOfMonth(filterMonth);
     const me = endOfMonth(filterMonth);
     return pending.filter((b) => {
-      const d = b.planned_date ? new Date(b.planned_date) : new Date(b.created_at);
+      // Pautas sem data planejada aparecem sempre — não estão presas a um mês
+      if (!b.planned_date) return true;
+      const d = new Date(b.planned_date);
       return d >= ms && d <= me;
     });
   }, [briefs, filterMonth]);
