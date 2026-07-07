@@ -236,8 +236,8 @@ export const PostCard = memo(
         {/* Thumbnail 4:5 */}
         {hasMedia && (
           <div
-            className="relative w-full overflow-hidden cursor-zoom-in"
-            style={{ aspectRatio: "4/5" }}
+            className="relative w-full overflow-hidden cursor-zoom-in bg-black/20"
+            style={{ aspectRatio: mediaAspect ? `${mediaAspect}` : "4/5" }}
             onClick={(e) => {
               if (!isExternalLink(thumbUrl)) {
                 e.stopPropagation();
@@ -254,9 +254,26 @@ export const PostCard = memo(
                 );
               const isVideo = thumbUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
               return isVideo ? (
-                <video src={thumbUrl} className="h-full w-full object-cover" muted />
+                <video
+                  src={thumbUrl}
+                  className="h-full w-full object-contain"
+                  muted
+                  onLoadedMetadata={(e) => {
+                    const v = e.currentTarget;
+                    if (v.videoWidth && v.videoHeight) setMediaAspect(v.videoWidth / v.videoHeight);
+                  }}
+                />
               ) : (
-                <img src={thumbUrl} alt={post.title} className="h-full w-full object-cover" loading="lazy" />
+                <img
+                  src={thumbUrl}
+                  alt={post.title}
+                  className="h-full w-full object-contain"
+                  loading="lazy"
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    if (img.naturalWidth && img.naturalHeight) setMediaAspect(img.naturalWidth / img.naturalHeight);
+                  }}
+                />
               );
             })()}
 
