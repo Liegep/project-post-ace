@@ -288,7 +288,10 @@ const KanbanBoard = ({
             const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
             return (
               <SortableColumn key={col.id} col={col}>
-                <div className="mb-4 flex items-center justify-between gap-2 shrink-0 z-10 rounded-lg bg-black backdrop-blur-sm border border-white/10 px-3 py-2 shadow-sm">
+                <div
+                  className="mb-4 flex items-center justify-between gap-2 shrink-0 z-10 rounded-lg bg-black backdrop-blur-sm border border-white/10 px-3 py-2 shadow-sm border-l-4"
+                  style={col.color ? { borderLeftColor: col.color, backgroundColor: col.color + "26" } : { borderLeftColor: "transparent" }}
+                >
                   {editingColumnId === col.id ? (
                     <Input
                       ref={editColumnInputRef}
@@ -302,8 +305,11 @@ const KanbanBoard = ({
                       className="h-7 text-sm font-semibold"
                     />
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-white">{col.name}</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      {col.color && (
+                        <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: col.color }} />
+                      )}
+                      <span className="text-sm font-semibold text-white truncate">{col.name}</span>
                       <span className="text-xs text-white/60">({columnPosts.length})</span>
                     </div>
                   )}
