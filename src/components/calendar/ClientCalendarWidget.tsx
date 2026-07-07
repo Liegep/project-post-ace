@@ -166,6 +166,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const selectedDayPosts = selectedDay ? postsByDate[selectedDay] || [] : [];
 
   const getPostColor = (post: UnifiedPost) => {
+    if (post.color) return "";
     if (post.source === "kanban") {
       return post.status === "archived"
         ? "bg-zinc-200 border-l-zinc-400"
@@ -181,6 +182,14 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
     }
   };
 
+  const getPostStyle = (post: UnifiedPost): React.CSSProperties | undefined => {
+    if (!post.color) return undefined;
+    return {
+      backgroundColor: post.color + "22",
+      borderLeftColor: post.color,
+    };
+  };
+
   const getStatusLabel = (post: UnifiedPost) => {
     if (post.source === "kanban") return post.status === "archived" ? "Arquivado" : "Kanban";
     return STATUS_CONFIG[post.status as keyof typeof STATUS_CONFIG]?.label || post.status;
@@ -189,6 +198,26 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const getStatusDot = (post: UnifiedPost) => {
     if (post.source === "kanban") return post.status === "archived" ? "bg-zinc-400" : "bg-orange-500";
     return STATUS_CONFIG[post.status as keyof typeof STATUS_CONFIG]?.dotClass || "bg-gray-400";
+  };
+
+  const changePostColor = async (post: UnifiedPost, color: string | null) => {
+    if (post.source === "calendar" && post.calendarPost) {
+      await updatePost(post.calendarPost.id, { event_color: color } as any);
+    } else if (post.source === "kanban" && post.kanbanPost) {
+      await updateKanbanColor(post.kanbanPost.id, color);
+    }
+  };
+
+  const addLegendEntry = () => {
+    const usedColors = new Set(legend.map((l) => l.color));
+    const nextColor = PRESET_COLORS.find((c) => !usedColors.has(c)) || PRESET_COLORS[0];
+    setLegend([...legend, { color: nextColor, label: "Nova categoria" }]);
+  };
+  const updateLegendEntry = (idx: number, patch: Partial<LegendEntry>) => {
+    setLegend(legend.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
+  };
+  const removeLegendEntry = (idx: number) => {
+    setLegend(legend.filter((_, i) => i !== idx));
   };
 
   return (
