@@ -290,7 +290,7 @@ const KanbanBoard = ({
               <SortableColumn key={col.id} col={col}>
                 <div
                   className="mb-4 flex items-center justify-between gap-2 shrink-0 z-10 rounded-lg bg-black backdrop-blur-sm border border-white/10 px-3 py-2 shadow-sm border-l-4"
-                  style={col.color ? { borderLeftColor: col.color, backgroundColor: col.color + "26" } : { borderLeftColor: "transparent" }}
+                  style={col.color ? { borderLeftColor: col.color } : { borderLeftColor: "transparent" }}
                 >
                   {editingColumnId === col.id ? (
                     <Input
