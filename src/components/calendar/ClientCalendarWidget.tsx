@@ -309,13 +309,14 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                 {kanbanColumns.map((col) => (
                   <span
                     key={col.id}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] text-zinc-800"
+                    className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-medium"
+                    style={{ backgroundColor: "#ffffff", color: "#18181b", borderColor: "#d4d4d8" }}
                   >
                     <span
-                      className="h-2.5 w-2.5 rounded-full border border-zinc-300"
+                      className="h-2.5 w-2.5 rounded-full border border-zinc-400 shrink-0"
                       style={{ backgroundColor: col.color || "#a1a1aa" }}
                     />
-                    {col.name}
+                    <span style={{ color: "#18181b" }}>{col.name}</span>
                   </span>
                 ))}
               </div>
@@ -415,12 +416,17 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                             <span className="truncate font-semibold">{post.title}</span>
                           </div>
                           {post.columnName && (
-                            <div className="flex items-center gap-1 mt-0.5 rounded bg-white/85 px-1 py-[1px] w-fit max-w-full">
+                            <div
+                              className="flex items-center gap-1 mt-0.5 rounded px-1 py-[1px] w-fit max-w-full"
+                              style={{ backgroundColor: "#ffffff" }}
+                            >
                               <span
                                 className="h-1.5 w-1.5 rounded-full shrink-0 border border-zinc-400"
                                 style={{ backgroundColor: post.columnColor || "#a1a1aa" }}
                               />
-                              <span className="text-[9px] text-zinc-900 font-medium truncate">{post.columnName}</span>
+                              <span className="text-[9px] font-semibold truncate" style={{ color: "#18181b" }}>
+                                {post.columnName}
+                              </span>
                             </div>
                           )}
                         </button>
