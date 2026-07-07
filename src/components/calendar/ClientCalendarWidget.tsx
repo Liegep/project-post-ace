@@ -401,7 +401,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                   </span>
                 </div>
                 <div className="space-y-0.5">
-                  {dayPosts.slice(0, 3).map((post) => (
+                  {dayPosts.map((post) => (
                     <Popover key={post.id}>
                       <PopoverTrigger asChild>
                         <button
@@ -495,9 +495,6 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                       </PopoverContent>
                     </Popover>
                   ))}
-                  {dayPosts.length > 3 && (
-                    <span className="text-[10px] text-zinc-500 pl-1">+{dayPosts.length - 3}</span>
-                  )}
                 </div>
               </div>
             );
