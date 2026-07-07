@@ -208,11 +208,33 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
     }
   };
 
+  // Compute readable text color (black/white) for a given hex background
+  // using WCAG relative luminance.
+  const getReadableTextColor = (hex?: string | null): string => {
+    if (!hex) return "#0a0a0a";
+    const h = hex.replace("#", "");
+    const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h.slice(0, 6);
+    const r = parseInt(full.slice(0, 2), 16);
+    const g = parseInt(full.slice(2, 4), 16);
+    const b = parseInt(full.slice(4, 6), 16);
+    if ([r, g, b].some((v) => Number.isNaN(v))) return "#0a0a0a";
+    const toLin = (c: number) => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const L = 0.2126 * toLin(r) + 0.7152 * toLin(g) + 0.0722 * toLin(b);
+    // Contrast ratio vs white and black; pick the one with higher contrast
+    const contrastWhite = 1.05 / (L + 0.05);
+    const contrastBlack = (L + 0.05) / 0.05;
+    return contrastWhite > contrastBlack ? "#ffffff" : "#0a0a0a";
+  };
+
   const getPostStyle = (post: UnifiedPost): React.CSSProperties | undefined => {
     if (!post.color) return undefined;
     return {
-      backgroundColor: post.color + "22",
+      backgroundColor: post.color,
       borderLeftColor: post.color,
+      color: getReadableTextColor(post.color),
     };
   };
 
@@ -389,8 +411,8 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                         >
                           <div className="flex items-center gap-1 truncate">
                             {post.source === "kanban" && <Kanban className="inline h-2.5 w-2.5 shrink-0" />}
-                            {post.time && <span className="font-bold text-black">{post.time.slice(0, 5)}</span>}
-                            <span className="truncate text-black font-semibold">{post.title}</span>
+                            {post.time && <span className="font-bold">{post.time.slice(0, 5)}</span>}
+                            <span className="truncate font-semibold">{post.title}</span>
                           </div>
                           {post.columnName && (
                             <div className="flex items-center gap-1 mt-0.5 rounded bg-white/85 px-1 py-[1px] w-fit max-w-full">
