@@ -38,6 +38,7 @@ interface UnifiedPost {
   media_urls: string[];
   source: "calendar" | "kanban";
   status: string;
+  color?: string | null;
   calendarPost?: CalendarPost;
   kanbanPost?: KanbanPost;
 }
