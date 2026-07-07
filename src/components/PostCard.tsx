@@ -77,12 +77,41 @@ export const PostCard = memo(
     showInlineDetails,
     allowEditCaption,
   }: PostCardProps) => {
-    const { tags, columns, updateClientLabel, addComment, updatePost, addPost, updatePostStatus, clientId } = usePosts();
+    const { tags, columns, updateClientLabel, addComment, updatePost, addPost, updatePostStatus, uploadMedia, clientId } = usePosts();
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [mediaAspect, setMediaAspect] = useState<number | null>(null);
     const [mediaError, setMediaError] = useState(false);
+    const [reuploading, setReuploading] = useState(false);
+    const reuploadInputRef = useRef<HTMLInputElement | null>(null);
+
+    const handleReupload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      if (!file) return;
+      try {
+        setReuploading(true);
+        const url = await uploadMedia(file);
+        const nextMediaUrls = post.mediaUrls.length > 0
+          ? [url, ...post.mediaUrls.slice(1)]
+          : [url];
+        const isVideo = file.type.startsWith("video/");
+        await updatePost(post.id, {
+          mediaUrls: nextMediaUrls,
+          imageUrl: url,
+          mediaType: isVideo ? "video" : "image",
+        } as any);
+        setMediaError(false);
+        setMediaAspect(null);
+        toast.success("Mídia reenviada");
+      } catch (err) {
+        console.error(err);
+        toast.error("Erro ao reenviar mídia");
+      } finally {
+        setReuploading(false);
+      }
+    };
     const [captionDrawerOpen, setCaptionDrawerOpen] = useState(false);
     const [editingCaption, setEditingCaption] = useState(false);
     const [draftCaption, setDraftCaption] = useState(post.caption);
