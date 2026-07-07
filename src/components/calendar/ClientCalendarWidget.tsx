@@ -526,6 +526,15 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                             </div>
                           </div>
                           <p className="font-medium text-sm truncate text-zinc-900">{post.title}</p>
+                          {post.columnName && (
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <span
+                                className="h-2 w-2 rounded-full shrink-0"
+                                style={{ backgroundColor: post.columnColor || "#a1a1aa" }}
+                              />
+                              <span className="text-[11px] text-zinc-600">Coluna: {post.columnName}</span>
+                            </div>
+                          )}
                           {post.caption && <p className="text-xs text-zinc-500 line-clamp-2 mt-1">{post.caption}</p>}
                         </div>
                         {post.media_urls?.[0] && (
