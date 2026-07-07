@@ -313,6 +313,47 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
         </div>
 
 
+        {/* Label Filters */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-zinc-700 mr-1">Filtrar por etiqueta:</span>
+          {FILTER_OPTIONS.map((opt) => {
+            const active = activeFilters.has(opt.key);
+            return (
+              <button
+                key={opt.key}
+                onClick={() => {
+                  setActiveFilters((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(opt.key)) next.delete(opt.key);
+                    else next.add(opt.key);
+                    return next;
+                  });
+                }}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+                  active
+                    ? "border-transparent text-white"
+                    : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
+                }`}
+                style={active ? { backgroundColor: opt.color, borderColor: opt.color } : {}}
+              >
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: active ? "#ffffff" : opt.color }}
+                />
+                {opt.label}
+              </button>
+            );
+          })}
+          {activeFilters.size > 0 && (
+            <button
+              onClick={() => setActiveFilters(new Set())}
+              className="text-[11px] text-zinc-500 hover:text-zinc-800 underline ml-1"
+            >
+              Limpar filtros
+            </button>
+          )}
+        </div>
+
         {/* Legend */}
         <div className="rounded-lg border border-zinc-200 bg-white p-3 space-y-3">
           {/* Kanban columns auto legend */}
