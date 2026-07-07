@@ -129,17 +129,20 @@ function SortableProjectGroup({
       <div className="space-y-1 pl-5">
         {group.posts.map((post) => {
           const finished = isPostFinished(post, tags);
+          const postTags = post.tags
+            .map((id) => tags.find((t) => t.id === id))
+            .filter(Boolean) as Tag[];
           return (
             <div
               key={post.id}
               className={cn(
-                "flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors",
+                "flex items-start gap-2 rounded-lg px-2 py-1.5 transition-colors",
                 finished ? "opacity-50" : "hover:bg-muted/50"
               )}
             >
               <div
                 className={cn(
-                  "flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors",
+                  "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors",
                   finished
                     ? "border-success bg-success"
                     : "border-muted-foreground/40 bg-transparent"
@@ -158,11 +161,28 @@ function SortableProjectGroup({
                 >
                   {post.title}
                 </span>
+                {postTags.length > 0 && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {postTags.map((t) => (
+                      <span
+                        key={t.id}
+                        className="inline-flex items-center rounded px-1.5 py-0.5 text-[9px] font-bold uppercase leading-tight tracking-wide"
+                        style={{
+                          backgroundColor: t.color,
+                          color: getContrastText(t.color),
+                        }}
+                        title={t.name}
+                      >
+                        {t.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               {!finished && (
                 <Circle
                   className={cn(
-                    "h-2 w-2 shrink-0 fill-current",
+                    "mt-1 h-2 w-2 shrink-0 fill-current",
                     post.status.includes("em_desenvolvimento")
                       ? "text-warning"
                       : post.status.includes("alteracao_solicitada")
