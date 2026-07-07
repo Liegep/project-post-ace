@@ -357,43 +357,83 @@ const KanbanBoard = ({
                     >
                       {col.visibleToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                     </button>
-                    <button
-                      onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
-                      className="rounded p-1 transition-colors"
-                      style={{ color: mutedColor }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = hoverBg)}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                      title={t("addPost")}
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                    </button>
-                    <div className="flex items-center" title="Cor da coluna">
-                      <EventColorPicker
-                        value={col.color}
-                        onChange={(c) => setColumnColor(col.id, c)}
-                        compact
-                        align="end"
-                        triggerClassName={isLight ? "!bg-white/60 !border-black/10 !text-zinc-900 hover:!bg-white" : "!bg-transparent !border-white/20 !text-white hover:!bg-white/10"}
-                      />
-                    </div>
-                    <button
-                      onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}
-                      className="rounded p-1 transition-colors"
-                      style={{ color: mutedColor }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = hoverBg)}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteColumn(col.id)}
-                      className="rounded p-1 transition-colors"
-                      style={{ color: mutedColor }}
-                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(239,68,68,0.2)"; e.currentTarget.style.color = "#f87171"; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = mutedColor; }}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    <span className="text-xs shrink-0" style={{ color: mutedColor }}>({columnPosts.length})</span>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          className="rounded p-1 transition-colors"
+                          style={{ color: mutedColor }}
+                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = hoverBg)}
+                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                        >
+                          <MoreVertical className="h-3.5 w-3.5" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          {t("addPost")}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}>
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger>
+                            <Paintbrush className="h-4 w-4 mr-2" />
+                            {t("color")}
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuSubContent className="w-56 p-2" sideOffset={6}>
+                            <div className="grid grid-cols-6 gap-1.5">
+                              {PRESET_COLORS.map((c) => (
+                                <button
+                                  key={c}
+                                  type="button"
+                                  onClick={() => setColumnColor(col.id, c)}
+                                  className="h-6 w-6 rounded-full border-2 transition-transform hover:scale-110"
+                                  style={{
+                                    backgroundColor: c,
+                                    borderColor: col.color === c ? (isLight ? "#111" : "#fff") : "transparent",
+                                    boxShadow: col.color === c ? "0 0 0 1px " + (isLight ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.3)") : "none",
+                                  }}
+                                  title={c}
+                                />
+                              ))}
+                            </div>
+                            <div className="mt-2 flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={col.color || "#3b82f6"}
+                                onChange={(e) => setColumnColor(col.id, e.target.value)}
+                                className="h-7 w-10 p-0.5 cursor-pointer rounded border"
+                                style={{ borderColor: isLight ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)" }}
+                              />
+                              {col.color && (
+                                <button
+                                  type="button"
+                                  onClick={() => setColumnColor(col.id, null)}
+                                  className="text-xs px-2 py-1 rounded border transition-colors"
+                                  style={{
+                                    color: mutedColor,
+                                    borderColor: isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)",
+                                  }}
+                                >
+                                  Remover cor
+                                </button>
+                              )}
+                            </div>
+                          </DropdownMenuSubContent>
+                        </DropdownMenuSub>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteColumn(col.id)}
+                          className="text-red-500 focus:text-red-500 focus:bg-red-500/10"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          {t("deleteAction")}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
                 <SortableContext items={columnPosts.map((p) => p.id)} strategy={verticalListSortingStrategy}>
