@@ -13,6 +13,7 @@ export interface CalendarPost {
   publish_date: string;
   publish_time: string;
   status: CalendarPostStatus;
+  event_color?: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
