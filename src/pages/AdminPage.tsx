@@ -302,10 +302,11 @@ const KanbanBoard = ({
             return (
               <SortableColumn key={col.id} col={col}>
                 <div
-                  className="mb-4 flex items-center justify-between gap-2 shrink-0 z-10 rounded-lg backdrop-blur-sm border px-3 py-2 shadow-sm"
+                  className="mb-4 flex items-center justify-between gap-2 shrink-0 z-10 rounded-lg backdrop-blur-sm border border-l-4 px-3 py-2 shadow-sm"
                   style={{
                     backgroundColor: headerBg,
                     borderColor: isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)",
+                    borderLeftColor: col.color || (isLight ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.5)"),
                     color: textColor,
                   }}
                 >
