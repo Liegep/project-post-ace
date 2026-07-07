@@ -276,48 +276,73 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
 
 
         {/* Legend */}
-        <div className="rounded-lg border border-zinc-200 bg-white p-3">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-900">
-              <Palette className="h-3.5 w-3.5" /> Legenda de cores
-            </div>
-            <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={addLegendEntry}>
-              <Plus className="mr-1 h-3 w-3" /> Adicionar
-            </Button>
-          </div>
-          {legend.length === 0 ? (
-            <p className="text-[11px] text-zinc-500">
-              Crie categorias com cor e rótulo para identificar seus eventos (ex.: "Reels", "Story", "Campanha").
-            </p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {legend.map((entry, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 pl-1 pr-1 py-0.5"
-                >
-                  <EventColorPicker
-                    value={entry.color}
-                    onChange={(c) => updateLegendEntry(idx, { color: c || "#3b82f6" })}
-                    compact
-                  />
-                  <Input
-                    value={entry.label}
-                    onChange={(e) => updateLegendEntry(idx, { label: e.target.value })}
-                    className="h-6 w-32 text-[11px] px-1.5 border-0 bg-transparent focus-visible:ring-1"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeLegendEntry(idx)}
-                    className="text-zinc-400 hover:text-destructive p-0.5"
-                    title="Remover"
+        <div className="rounded-lg border border-zinc-200 bg-white p-3 space-y-3">
+          {/* Kanban columns auto legend */}
+          {kanbanColumns.length > 0 && (
+            <div>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-900 mb-2">
+                <Kanban className="h-3.5 w-3.5" /> Colunas do Kanban
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {kanbanColumns.map((col) => (
+                  <span
+                    key={col.id}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] text-zinc-800"
                   >
-                    <Trash2 className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
+                    <span
+                      className="h-2.5 w-2.5 rounded-full border border-zinc-300"
+                      style={{ backgroundColor: col.color || "#a1a1aa" }}
+                    />
+                    {col.name}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-900">
+                <Palette className="h-3.5 w-3.5" /> Legenda de cores
+              </div>
+              <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={addLegendEntry}>
+                <Plus className="mr-1 h-3 w-3" /> Adicionar
+              </Button>
+            </div>
+            {legend.length === 0 ? (
+              <p className="text-[11px] text-zinc-500">
+                Crie categorias com cor e rótulo para identificar seus eventos (ex.: "Reels", "Story", "Campanha"). Ao mudar a cor de um evento clicando nele, a cor é adicionada aqui automaticamente.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {legend.map((entry, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 pl-1 pr-1 py-0.5"
+                  >
+                    <EventColorPicker
+                      value={entry.color}
+                      onChange={(c) => updateLegendEntry(idx, { color: c || "#3b82f6" })}
+                      compact
+                    />
+                    <Input
+                      value={entry.label}
+                      onChange={(e) => updateLegendEntry(idx, { label: e.target.value })}
+                      className="h-6 w-32 text-[11px] px-1.5 border-0 bg-transparent focus-visible:ring-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeLegendEntry(idx)}
+                      className="text-zinc-400 hover:text-destructive p-0.5"
+                      title="Remover"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Calendar grid */}
