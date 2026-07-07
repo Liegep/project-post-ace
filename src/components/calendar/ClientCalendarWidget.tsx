@@ -384,6 +384,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                       onClick={() => {
                         if (isCalendar && post.calendarPost) openEdit(post.calendarPost);
                       }}
+                      style={getPostStyle(post)}
                       className={`rounded-lg border-l-4 p-3 ${isCalendar ? "cursor-pointer hover:shadow-md" : ""} transition-shadow ${getPostColor(post)}`}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -400,6 +401,14 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                             <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${getStatusDot(post)} text-white font-medium`}>
                               {getStatusLabel(post)}
                             </span>
+                            <div className="ml-auto" onClick={(e) => e.stopPropagation()}>
+                              <EventColorPicker
+                                value={post.color}
+                                onChange={(c) => changePostColor(post, c)}
+                                align="end"
+                                compact
+                              />
+                            </div>
                           </div>
                           <p className="font-medium text-sm truncate text-zinc-900">{post.title}</p>
                           {post.caption && <p className="text-xs text-zinc-500 line-clamp-2 mt-1">{post.caption}</p>}
