@@ -585,7 +585,7 @@ export const PostCard = memo(
 
           <ContextMenuSeparator />
 
-          <ContextMenuItem onSelect={handleDuplicate}>
+          <ContextMenuItem onSelect={handleDuplicateClick}>
             <Copy className="h-4 w-4 mr-2" />
             Copiar card
           </ContextMenuItem>
