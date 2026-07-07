@@ -110,6 +110,7 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
       status,
       media_urls: mediaUrls,
       media_type: mediaType,
+      event_color: eventColor,
     };
     if (post) (data as any).id = post.id;
     const { error } = await onSave(data);
