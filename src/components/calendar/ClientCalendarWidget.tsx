@@ -34,6 +34,7 @@ interface KanbanPost {
 
 interface KanbanColumn {
   id: string;
+  name: string;
   color?: string | null;
 }
 
@@ -47,6 +48,8 @@ interface UnifiedPost {
   source: "calendar" | "kanban";
   status: string;
   color?: string | null;
+  columnName?: string | null;
+  columnColor?: string | null;
   calendarPost?: CalendarPost;
   kanbanPost?: KanbanPost;
 }
