@@ -118,9 +118,11 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
       });
     });
 
+    const colorByCol = new Map(kanbanColumns.map((c) => [c.id, c.color || null]));
     kanbanPosts.forEach((p) => {
       if (!p.deadline) return;
       const deadlineDate = p.deadline.slice(0, 10); // "yyyy-MM-dd"
+      const fallback = p.column_id ? colorByCol.get(p.column_id) ?? null : null;
       list.push({
         id: p.id,
         title: p.title,
@@ -129,13 +131,13 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
         media_urls: p.media_urls || [],
         source: "kanban",
         status: p.archived ? "archived" : "kanban",
-        color: p.event_color ?? null,
+        color: p.event_color ?? fallback,
         kanbanPost: p,
       });
     });
 
     return list;
-  }, [clientCalendarPosts, kanbanPosts]);
+  }, [clientCalendarPosts, kanbanPosts, kanbanColumns]);
 
   const postsByDate = useMemo(() => {
     const map: Record<string, UnifiedPost[]> = {};
