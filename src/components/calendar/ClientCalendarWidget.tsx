@@ -123,11 +123,12 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
       });
     });
 
-    const colorByCol = new Map(kanbanColumns.map((c) => [c.id, c.color || null]));
+    const colByCol = new Map(kanbanColumns.map((c) => [c.id, c]));
     kanbanPosts.forEach((p) => {
       if (!p.deadline) return;
       const deadlineDate = p.deadline.slice(0, 10); // "yyyy-MM-dd"
-      const fallback = p.column_id ? colorByCol.get(p.column_id) ?? null : null;
+      const col = p.column_id ? colByCol.get(p.column_id) : undefined;
+      const fallback = col?.color || null;
       list.push({
         id: p.id,
         title: p.title,
@@ -137,6 +138,8 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
         source: "kanban",
         status: p.archived ? "archived" : "kanban",
         color: p.event_color ?? fallback,
+        columnName: col?.name || null,
+        columnColor: col?.color || null,
         kanbanPost: p,
       });
     });
