@@ -38,6 +38,7 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
   const [mediaType, setMediaType] = useState("image");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [eventColor, setEventColor] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("clients").select("id, name").order("name").then(({ data }) => {
