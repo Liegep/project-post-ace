@@ -12,12 +12,12 @@ export function useCalendarLegend(clientId: string) {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from("clients")
+    const { data } = await (supabase
+      .from("clients") as any)
       .select("calendar_legend")
       .eq("id", clientId)
       .maybeSingle();
-    const raw = (data as any)?.calendar_legend;
+    const raw = data?.calendar_legend;
     setLegend(Array.isArray(raw) ? (raw as LegendEntry[]) : []);
     setLoading(false);
   }, [clientId]);
