@@ -165,7 +165,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
 
   const postsByDate = useMemo(() => {
     const map: Record<string, UnifiedPost[]> = {};
-    unifiedPosts.forEach((p) => {
+    filteredUnifiedPosts.forEach((p) => {
       if (!map[p.date]) map[p.date] = [];
       map[p.date].push(p);
     });
@@ -174,7 +174,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
       arr.sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"))
     );
     return map;
-  }, [unifiedPosts]);
+  }, [filteredUnifiedPosts]);
 
   const handleSave = async (data: Partial<CalendarPost>) => {
     if ((data as any).id) {
