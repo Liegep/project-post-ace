@@ -190,6 +190,12 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
             </Select>
           </div>
           <div>
+            <Label className="text-white/80">Cor do evento</Label>
+            <div className="mt-1">
+              <EventColorPicker value={eventColor} onChange={setEventColor} />
+            </div>
+          </div>
+          <div>
             <Label className="text-white/80">Mídia</Label>
             <div className="flex flex-wrap gap-2 mt-1">
               {mediaUrls.map((url, i) => (
