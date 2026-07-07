@@ -328,6 +328,15 @@ const KanbanBoard = ({
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
+                    <div className="flex items-center" title="Cor da coluna">
+                      <EventColorPicker
+                        value={col.color}
+                        onChange={(c) => setColumnColor(col.id, c)}
+                        compact
+                        align="end"
+                        triggerClassName="!bg-transparent !border-white/20 !text-white hover:!bg-white/10"
+                      />
+                    </div>
                     <button
                       onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}
                       className="rounded p-1 text-white/70 hover:bg-white/10 hover:text-white"
