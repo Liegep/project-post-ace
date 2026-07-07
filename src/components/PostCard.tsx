@@ -256,7 +256,7 @@ export const PostCard = memo(
               return isVideo ? (
                 <video
                   src={thumbUrl}
-                  className="h-full w-full object-contain"
+                  className="h-full w-full object-cover"
                   muted
                   onLoadedMetadata={(e) => {
                     const v = e.currentTarget;
