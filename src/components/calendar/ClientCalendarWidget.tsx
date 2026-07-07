@@ -379,36 +379,93 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                 </div>
                 <div className="space-y-0.5">
                   {dayPosts.slice(0, 3).map((post) => (
-                    <Tooltip key={post.id}>
-                      <TooltipTrigger asChild>
+                    <Popover key={post.id}>
+                      <PopoverTrigger asChild>
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (post.source === "calendar" && post.calendarPost) {
-                              openEdit(post.calendarPost);
-                            }
-                          }}
+                          onClick={(e) => e.stopPropagation()}
                           style={getPostStyle(post)}
-                          className={`w-full text-left rounded px-1.5 py-0.5 text-[10px] leading-tight truncate border-l-2 hover:opacity-80 transition-opacity ${getPostColor(post)}`}
+                          className={`w-full text-left rounded px-1.5 py-0.5 text-[10px] leading-tight border-l-2 hover:opacity-80 transition-opacity ${getPostColor(post)}`}
+                          title={post.title}
                         >
-                          {post.source === "kanban" && <Kanban className="inline h-2.5 w-2.5 mr-0.5" />}
-                          {post.time && <span className="font-bold text-black">{post.time.slice(0, 5)} </span>}
-                          <span className="truncate text-black font-semibold">{post.title}</span>
+                          <div className="flex items-center gap-1 truncate">
+                            {post.source === "kanban" && <Kanban className="inline h-2.5 w-2.5 shrink-0" />}
+                            {post.time && <span className="font-bold text-black">{post.time.slice(0, 5)}</span>}
+                            <span className="truncate text-black font-semibold">{post.title}</span>
+                          </div>
+                          {post.columnName && (
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <span
+                                className="h-1.5 w-1.5 rounded-full shrink-0"
+                                style={{ backgroundColor: post.columnColor || "#a1a1aa" }}
+                              />
+                              <span className="text-[9px] text-zinc-700 truncate">{post.columnName}</span>
+                            </div>
+                          )}
                         </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-[220px] p-2 z-[9999]" style={{ backgroundColor: 'white', color: '#18181b', border: '1px solid #e4e4e7' }}>
-                        <p className="font-semibold text-xs" style={{ color: '#18181b' }}>{post.title}</p>
-                        <p className="text-[11px] mt-0.5" style={{ color: '#71717a' }}>
-                          {getStatusLabel(post)}{post.time ? ` • ${post.time.slice(0, 5)}` : ""}
-                        </p>
-                        {post.caption && (
-                          <p className="text-[11px] line-clamp-2 mt-1" style={{ color: '#3f3f46' }}>{post.caption}</p>
-                        )}
-                        {post.media_urls?.[0] && (
-                          <img src={post.media_urls[0]} alt="" className="h-12 w-full rounded object-cover mt-1.5" />
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        align="start"
+                        className="w-64 p-3 z-[9999]"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="space-y-2">
+                          <div>
+                            <p className="font-semibold text-xs text-zinc-900 line-clamp-2">{post.title}</p>
+                            <p className="text-[11px] text-zinc-500 mt-0.5">
+                              {getStatusLabel(post)}{post.time ? ` • ${post.time.slice(0, 5)}` : ""}
+                            </p>
+                            {post.columnName && (
+                              <div className="flex items-center gap-1.5 mt-1">
+                                <span
+                                  className="h-2.5 w-2.5 rounded-full border border-zinc-300"
+                                  style={{ backgroundColor: post.columnColor || "#a1a1aa" }}
+                                />
+                                <span className="text-[11px] text-zinc-700">{post.columnName}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="border-t border-zinc-200 pt-2">
+                            <div className="text-[11px] font-semibold text-zinc-800 mb-1.5">Cor do evento</div>
+                            <div className="grid grid-cols-6 gap-1.5">
+                              {PRESET_COLORS.map((c) => (
+                                <button
+                                  key={c}
+                                  type="button"
+                                  onClick={() => changePostColor(post, c)}
+                                  className={cn(
+                                    "h-6 w-6 rounded-full border-2 transition-transform hover:scale-110",
+                                    post.color === c ? "border-zinc-900 ring-2 ring-zinc-900/20" : "border-white shadow"
+                                  )}
+                                  style={{ backgroundColor: c }}
+                                />
+                              ))}
+                            </div>
+                            {post.color && (
+                              <button
+                                type="button"
+                                onClick={() => changePostColor(post, null)}
+                                className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-md border border-zinc-200 bg-white px-2 py-1 text-[11px] text-zinc-600 hover:bg-zinc-50"
+                              >
+                                Remover cor
+                              </button>
+                            )}
+                            <p className="text-[10px] text-zinc-500 mt-2">
+                              A cor escolhida é adicionada à legenda automaticamente.
+                            </p>
+                          </div>
+                          {post.source === "calendar" && post.calendarPost && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full h-7 text-[11px]"
+                              onClick={() => openEdit(post.calendarPost!)}
+                            >
+                              <Pencil className="mr-1 h-3 w-3" /> Editar evento
+                            </Button>
+                          )}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   ))}
                   {dayPosts.length > 3 && (
                     <span className="text-[10px] text-zinc-500 pl-1">+{dayPosts.length - 3}</span>
