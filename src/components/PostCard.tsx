@@ -82,6 +82,7 @@ export const PostCard = memo(
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [mediaAspect, setMediaAspect] = useState<number | null>(null);
+    const [mediaError, setMediaError] = useState(false);
     const [captionDrawerOpen, setCaptionDrawerOpen] = useState(false);
     const [editingCaption, setEditingCaption] = useState(false);
     const [draftCaption, setDraftCaption] = useState(post.caption);
