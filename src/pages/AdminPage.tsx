@@ -182,7 +182,7 @@ const KanbanBoard = ({
   updatePost,
   setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
   newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
-  toggleColumnVisibility,
+  toggleColumnVisibility, setColumnColor,
   selectionMode, selectedPostIds, onToggleSelect,
   reorderColumns,
 }: KanbanBoardProps) => {
