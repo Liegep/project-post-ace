@@ -83,7 +83,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const fetchColumns = async () => {
     const { data } = await (supabase
       .from("columns") as any)
-      .select("id, color")
+      .select("id, name, color")
       .eq("client_id", clientId);
     setKanbanColumns((data as KanbanColumn[]) || []);
   };
