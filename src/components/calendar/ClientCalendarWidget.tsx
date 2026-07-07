@@ -27,6 +27,12 @@ interface KanbanPost {
   status: string[];
   archived: boolean;
   event_color?: string | null;
+  column_id?: string | null;
+}
+
+interface KanbanColumn {
+  id: string;
+  color?: string | null;
 }
 
 interface UnifiedPost {
@@ -57,19 +63,29 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const [editingPost, setEditingPost] = useState<CalendarPost | null>(null);
   const [defaultDate, setDefaultDate] = useState("");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [kanbanColumns, setKanbanColumns] = useState<KanbanColumn[]>([]);
 
   // Fetch kanban posts with deadlines for this client
   const fetchKanbanPosts = async () => {
     const { data } = await (supabase
       .from("posts") as any)
-      .select("id, title, caption, deadline, media_urls, tags, status, archived, event_color")
+      .select("id, title, caption, deadline, media_urls, tags, status, archived, event_color, column_id")
       .eq("client_id", clientId)
       .not("deadline", "is", null);
     setKanbanPosts((data as KanbanPost[]) || []);
   };
 
+  const fetchColumns = async () => {
+    const { data } = await (supabase
+      .from("columns") as any)
+      .select("id, color")
+      .eq("client_id", clientId);
+    setKanbanColumns((data as KanbanColumn[]) || []);
+  };
+
   useEffect(() => {
     fetchKanbanPosts();
+    fetchColumns();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId]);
 
@@ -102,9 +118,11 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
       });
     });
 
+    const colorByCol = new Map(kanbanColumns.map((c) => [c.id, c.color || null]));
     kanbanPosts.forEach((p) => {
       if (!p.deadline) return;
       const deadlineDate = p.deadline.slice(0, 10); // "yyyy-MM-dd"
+      const fallback = p.column_id ? colorByCol.get(p.column_id) ?? null : null;
       list.push({
         id: p.id,
         title: p.title,
@@ -113,13 +131,13 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
         media_urls: p.media_urls || [],
         source: "kanban",
         status: p.archived ? "archived" : "kanban",
-        color: p.event_color ?? null,
+        color: p.event_color ?? fallback,
         kanbanPost: p,
       });
     });
 
     return list;
-  }, [clientCalendarPosts, kanbanPosts]);
+  }, [clientCalendarPosts, kanbanPosts, kanbanColumns]);
 
   const postsByDate = useMemo(() => {
     const map: Record<string, UnifiedPost[]> = {};
