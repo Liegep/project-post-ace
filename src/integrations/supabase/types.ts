@@ -1191,6 +1191,7 @@ export type Database = {
       columns: {
         Row: {
           client_id: string
+          color: string | null
           created_at: string
           id: string
           name: string
@@ -1200,6 +1201,7 @@ export type Database = {
         }
         Insert: {
           client_id: string
+          color?: string | null
           created_at?: string
           id?: string
           name: string
@@ -1209,6 +1211,7 @@ export type Database = {
         }
         Update: {
           client_id?: string
+          color?: string | null
           created_at?: string
           id?: string
           name?: string

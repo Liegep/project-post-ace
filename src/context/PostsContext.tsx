@@ -45,6 +45,7 @@ interface PostsContextType {
   deleteColumn: (id: string) => void;
   reorderColumns: (columns: Column[]) => void;
   toggleColumnVisibility: (id: string, visible: boolean) => void;
+  setColumnColor: (id: string, color: string | null) => void;
   movePostToColumn: (postId: string, columnId: string | null) => void;
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   unarchivePost: (id: string, columnId?: string | null, clientInitiated?: boolean) => void;
@@ -201,7 +202,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       setTags([...dbTags.map((t: any) => ({ id: t.id, name: t.name, color: t.color })), ...missingDefaultTags]);
       
-      setColumns((columnsRes.data || []).map((c: any) => ({ id: c.id, clientId: c.client_id, name: c.name, position: c.position, visibleToClient: c.visible_to_client ?? false })));
+      setColumns((columnsRes.data || []).map((c: any) => ({ id: c.id, clientId: c.client_id, name: c.name, position: c.position, visibleToClient: c.visible_to_client ?? false, color: c.color ?? null })));
       setLoading(false);
     };
     fetchAll();
@@ -785,6 +786,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("columns").update({ name } as any).eq("id", id);
   }, []);
 
+  const setColumnColor = useCallback(async (id: string, color: string | null) => {
+    setColumns((prev) => prev.map((c) => (c.id === id ? { ...c, color } : c)));
+    await (supabase.from("columns") as any).update({ color }).eq("id", id);
+  }, []);
+
   const deleteColumn = useCallback(async (id: string) => {
     // Move posts from this column to unassigned
     setPosts((prev) => prev.map((p) => (p.id && p.columnId === id ? { ...p, columnId: null } : p)));
@@ -932,7 +938,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     <PostsContext.Provider value={{
       clientId, posts: activePosts, archivedPosts, tags, columns, postingPeriod, companyLogo, commentAuthors, setPostingPeriod, setCompanyLogo,
       addPost, updatePostStatus, updateClientLabel, addComment, deleteComment, updateComment, deletePost, updatePost,
-      addTag, updateTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns, toggleColumnVisibility,
+      addTag, updateTag, deleteTag, uploadMedia, addColumn, renameColumn, deleteColumn, reorderColumns, toggleColumnVisibility, setColumnColor,
       movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, loading,
     }}>
       {children}

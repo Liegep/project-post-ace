@@ -26,6 +26,7 @@ import { ClientRightSidebar } from "@/components/ClientRightSidebar";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
+import { EventColorPicker } from "@/components/calendar/EventColorPicker";
 import ClientAccessPanel from "@/components/ClientAccessPanel";
 import { HybridAccessConfig } from "@/components/HybridAccessConfig";
 import { ClientCalendarWidget } from "@/components/calendar/ClientCalendarWidget";
@@ -123,7 +124,7 @@ interface ClientData {
 
 interface KanbanBoardProps {
   posts: Post[];
-  columns: { id: string; name: string; position: number; visibleToClient: boolean }[];
+  columns: { id: string; name: string; position: number; visibleToClient: boolean; color?: string | null }[];
   unassignedPosts: Post[];
   editingColumnId: string | null;
   editingColumnName: string;
@@ -148,10 +149,11 @@ interface KanbanBoardProps {
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   t: (key: any) => string;
   toggleColumnVisibility: (id: string, visible: boolean) => void;
+  setColumnColor: (id: string, color: string | null) => void;
   selectionMode?: boolean;
   selectedPostIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
-  reorderColumns: (columns: { id: string; name: string; position: number; visibleToClient: boolean }[]) => void;
+  reorderColumns: (columns: { id: string; name: string; position: number; visibleToClient: boolean; color?: string | null }[]) => void;
 }
 
 const SortableColumn = ({ col, children }: { col: { id: string }; children: React.ReactNode }) => {
@@ -181,7 +183,7 @@ const KanbanBoard = ({
   updatePost,
   setCreateOpen, addingColumn, setAddingColumn, newColumnName, setNewColumnName,
   newColumnInputRef, handleAddColumn, movePostToColumn, reorderPostsInColumn, t,
-  toggleColumnVisibility,
+  toggleColumnVisibility, setColumnColor,
   selectionMode, selectedPostIds, onToggleSelect,
   reorderColumns,
 }: KanbanBoardProps) => {
@@ -286,7 +288,10 @@ const KanbanBoard = ({
             const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
             return (
               <SortableColumn key={col.id} col={col}>
-                <div className="mb-4 flex items-center justify-between gap-2 shrink-0 z-10 rounded-lg bg-black backdrop-blur-sm border border-white/10 px-3 py-2 shadow-sm">
+                <div
+                  className="mb-4 flex items-center justify-between gap-2 shrink-0 z-10 rounded-lg bg-black backdrop-blur-sm border border-white/10 px-3 py-2 shadow-sm border-l-4"
+                  style={col.color ? { borderLeftColor: col.color, backgroundColor: col.color + "26" } : { borderLeftColor: "transparent" }}
+                >
                   {editingColumnId === col.id ? (
                     <Input
                       ref={editColumnInputRef}
@@ -300,8 +305,11 @@ const KanbanBoard = ({
                       className="h-7 text-sm font-semibold"
                     />
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-white">{col.name}</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      {col.color && (
+                        <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: col.color }} />
+                      )}
+                      <span className="text-sm font-semibold text-white truncate">{col.name}</span>
                       <span className="text-xs text-white/60">({columnPosts.length})</span>
                     </div>
                   )}
@@ -320,6 +328,15 @@ const KanbanBoard = ({
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
+                    <div className="flex items-center" title="Cor da coluna">
+                      <EventColorPicker
+                        value={col.color}
+                        onChange={(c) => setColumnColor(col.id, c)}
+                        compact
+                        align="end"
+                        triggerClassName="!bg-transparent !border-white/20 !text-white hover:!bg-white/10"
+                      />
+                    </div>
                     <button
                       onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}
                       className="rounded p-1 text-white/70 hover:bg-white/10 hover:text-white"
@@ -557,7 +574,7 @@ const ArchivedView = ({ archivedPosts, columns, unarchivePost, deletePost, selec
 const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const {
     posts, archivedPosts, columns, tags, updatePostStatus, deletePost, updatePost, postingPeriod, setPostingPeriod,
-    companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn, toggleColumnVisibility,
+    companyLogo, setCompanyLogo, uploadMedia, addColumn, renameColumn, deleteColumn, toggleColumnVisibility, setColumnColor,
     movePostToColumn, reorderPostsInColumn, unarchivePost, bulkUpdateStatus, bulkDeletePosts, bulkMoveToColumn, reorderColumns,
     clientId: ctxClientId,
   } = usePosts();
@@ -1336,6 +1353,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     reorderPostsInColumn={reorderPostsInColumn}
                     t={t}
                     toggleColumnVisibility={toggleColumnVisibility}
+                    setColumnColor={setColumnColor}
                     selectionMode={selectionMode}
                     selectedPostIds={selectedPostIds}
                     onToggleSelect={toggleSelect}

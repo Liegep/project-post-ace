@@ -13,6 +13,7 @@ export interface Column {
   name: string;
   position: number;
   visibleToClient: boolean;
+  color?: string | null;
 }
 
 export interface Comment {

@@ -1,0 +1,1 @@
+ALTER TABLE public.columns ADD COLUMN IF NOT EXISTS color text;
