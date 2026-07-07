@@ -9,6 +9,7 @@ import { CalendarPost, CalendarPostStatus, STATUS_CONFIG } from "@/hooks/useCale
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { ImagePlus, Trash2, X } from "lucide-react";
+import { EventColorPicker } from "@/components/calendar/EventColorPicker";
 
 interface Client {
   id: string;
