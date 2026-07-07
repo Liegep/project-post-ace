@@ -148,10 +148,11 @@ interface KanbanBoardProps {
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   t: (key: any) => string;
   toggleColumnVisibility: (id: string, visible: boolean) => void;
+  setColumnColor: (id: string, color: string | null) => void;
   selectionMode?: boolean;
   selectedPostIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
-  reorderColumns: (columns: { id: string; name: string; position: number; visibleToClient: boolean }[]) => void;
+  reorderColumns: (columns: { id: string; name: string; position: number; visibleToClient: boolean; color?: string | null }[]) => void;
 }
 
 const SortableColumn = ({ col, children }: { col: { id: string }; children: React.ReactNode }) => {
