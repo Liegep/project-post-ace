@@ -785,6 +785,11 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
     await supabase.from("columns").update({ name } as any).eq("id", id);
   }, []);
 
+  const setColumnColor = useCallback(async (id: string, color: string | null) => {
+    setColumns((prev) => prev.map((c) => (c.id === id ? { ...c, color } : c)));
+    await (supabase.from("columns") as any).update({ color }).eq("id", id);
+  }, []);
+
   const deleteColumn = useCallback(async (id: string) => {
     // Move posts from this column to unassigned
     setPosts((prev) => prev.map((p) => (p.id && p.columnId === id ? { ...p, columnId: null } : p)));
