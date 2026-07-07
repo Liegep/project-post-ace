@@ -5,10 +5,12 @@ import { CalendarPostDialog } from "@/components/calendar/CalendarPostDialog";
 import { EventColorPicker, PRESET_COLORS } from "@/components/calendar/EventColorPicker";
 import { useCalendarLegend, LegendEntry } from "@/hooks/useCalendarLegend";
 import { toast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, Plus, Check, Clock, Kanban, Palette, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Check, Clock, Kanban, Palette, Trash2, Pencil } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 import {
   format, startOfMonth, endOfMonth, eachDayOfInterval, getDay,
   addMonths, subMonths, isToday,
