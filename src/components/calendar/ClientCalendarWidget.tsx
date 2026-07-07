@@ -27,6 +27,12 @@ interface KanbanPost {
   status: string[];
   archived: boolean;
   event_color?: string | null;
+  column_id?: string | null;
+}
+
+interface KanbanColumn {
+  id: string;
+  color?: string | null;
 }
 
 interface UnifiedPost {
