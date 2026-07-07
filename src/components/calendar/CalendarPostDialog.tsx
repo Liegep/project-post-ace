@@ -56,6 +56,7 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
       setStatus(post.status);
       setMediaUrls(post.media_urls || []);
       setMediaType(post.media_type || "image");
+      setEventColor(post.event_color ?? null);
     } else {
       setTitle("");
       setCaption("");
@@ -65,6 +66,7 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
       setStatus("draft");
       setMediaUrls([]);
       setMediaType("image");
+      setEventColor(null);
     }
   }, [post, defaultDate, open]);
 
