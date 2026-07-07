@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { Post, PostStatus, ClientLabel, STATUS_CONFIG, LABEL_CONFIG, TAG_TRANSLATION_KEYS } from "@/types/post";
 import { usePosts } from "@/context/PostsContext";
 import { useI18n } from "@/i18n/I18nContext";
@@ -77,12 +77,41 @@ export const PostCard = memo(
     showInlineDetails,
     allowEditCaption,
   }: PostCardProps) => {
-    const { tags, columns, updateClientLabel, addComment, updatePost, addPost, updatePostStatus, clientId } = usePosts();
+    const { tags, columns, updateClientLabel, addComment, updatePost, addPost, updatePostStatus, uploadMedia, clientId } = usePosts();
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [mediaAspect, setMediaAspect] = useState<number | null>(null);
     const [mediaError, setMediaError] = useState(false);
+    const [reuploading, setReuploading] = useState(false);
+    const reuploadInputRef = useRef<HTMLInputElement | null>(null);
+
+    const handleReupload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      if (!file) return;
+      try {
+        setReuploading(true);
+        const url = await uploadMedia(file);
+        const nextMediaUrls = post.mediaUrls.length > 0
+          ? [url, ...post.mediaUrls.slice(1)]
+          : [url];
+        const isVideo = file.type.startsWith("video/");
+        await updatePost(post.id, {
+          mediaUrls: nextMediaUrls,
+          imageUrl: url,
+          mediaType: isVideo ? "video" : "image",
+        } as any);
+        setMediaError(false);
+        setMediaAspect(null);
+        toast.success("Mídia reenviada");
+      } catch (err) {
+        console.error(err);
+        toast.error("Erro ao reenviar mídia");
+      } finally {
+        setReuploading(false);
+      }
+    };
     const [captionDrawerOpen, setCaptionDrawerOpen] = useState(false);
     const [editingCaption, setEditingCaption] = useState(false);
     const [draftCaption, setDraftCaption] = useState(post.caption);
@@ -255,9 +284,29 @@ export const PostCard = memo(
                 );
               if (mediaError)
                 return (
-                  <div className="h-full w-full bg-muted flex flex-col items-center justify-center gap-1 text-muted-foreground">
+                  <div className="h-full w-full bg-muted flex flex-col items-center justify-center gap-2 text-muted-foreground p-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-60"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                    <span className="text-[9px] font-medium opacity-70">mídia indisponível</span>
+                    <span className="text-[10px] font-medium opacity-70">mídia indisponível</span>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        disabled={reuploading}
+                        onClick={(e) => { e.stopPropagation(); reuploadInputRef.current?.click(); }}
+                        className="inline-flex items-center gap-1 rounded-md bg-primary/90 hover:bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-1 shadow-sm disabled:opacity-60"
+                      >
+                        {reuploading ? (
+                          <>
+                            <span className="h-3 w-3 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                            Enviando…
+                          </>
+                        ) : (
+                          <>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            Reenviar
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                 );
               const isVideo = thumbUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
@@ -286,6 +335,16 @@ export const PostCard = memo(
                 />
               );
             })()}
+
+            <input
+              ref={reuploadInputRef}
+              type="file"
+              accept="image/*,video/*"
+              className="hidden"
+              onChange={handleReupload}
+              onClick={(e) => e.stopPropagation()}
+            />
+
 
             {/* Media count badge */}
             {allMedia.length > 1 && (
