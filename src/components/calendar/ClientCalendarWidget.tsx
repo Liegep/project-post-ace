@@ -411,8 +411,8 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                         >
                           <div className="flex items-center gap-1 truncate">
                             {post.source === "kanban" && <Kanban className="inline h-2.5 w-2.5 shrink-0" />}
-                            {post.time && <span className="font-bold text-black">{post.time.slice(0, 5)}</span>}
-                            <span className="truncate text-black font-semibold">{post.title}</span>
+                            {post.time && <span className="font-bold">{post.time.slice(0, 5)}</span>}
+                            <span className="truncate font-semibold">{post.title}</span>
                           </div>
                           {post.columnName && (
                             <div className="flex items-center gap-1 mt-0.5 rounded bg-white/85 px-1 py-[1px] w-fit max-w-full">
