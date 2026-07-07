@@ -201,7 +201,7 @@ export const PostsProvider: React.FC<PostsProviderProps> = ({ clientId, clientLo
 
       setTags([...dbTags.map((t: any) => ({ id: t.id, name: t.name, color: t.color })), ...missingDefaultTags]);
       
-      setColumns((columnsRes.data || []).map((c: any) => ({ id: c.id, clientId: c.client_id, name: c.name, position: c.position, visibleToClient: c.visible_to_client ?? false })));
+      setColumns((columnsRes.data || []).map((c: any) => ({ id: c.id, clientId: c.client_id, name: c.name, position: c.position, visibleToClient: c.visible_to_client ?? false, color: c.color ?? null })));
       setLoading(false);
     };
     fetchAll();
