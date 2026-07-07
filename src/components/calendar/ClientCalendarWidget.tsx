@@ -75,7 +75,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const fetchKanbanPosts = async () => {
     const { data } = await (supabase
       .from("posts") as any)
-      .select("id, title, caption, deadline, media_urls, tags, status, archived, event_color, column_id")
+      .select("id, title, caption, deadline, media_urls, tags, status, archived, event_color, column_id, client_label")
       .eq("client_id", clientId)
       .not("deadline", "is", null);
     setKanbanPosts((data as KanbanPost[]) || []);
