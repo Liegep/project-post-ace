@@ -26,7 +26,7 @@ import { ClientRightSidebar } from "@/components/ClientRightSidebar";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
-import { EventColorPicker, PRESET_COLORS } from "@/components/calendar/EventColorPicker";
+import { PRESET_COLORS } from "@/components/calendar/EventColorPicker";
 import {
   DropdownMenu,
   DropdownMenuContent,
