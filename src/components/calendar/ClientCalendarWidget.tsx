@@ -5,10 +5,12 @@ import { CalendarPostDialog } from "@/components/calendar/CalendarPostDialog";
 import { EventColorPicker, PRESET_COLORS } from "@/components/calendar/EventColorPicker";
 import { useCalendarLegend, LegendEntry } from "@/hooks/useCalendarLegend";
 import { toast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, Plus, Check, Clock, Kanban, Palette, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Check, Clock, Kanban, Palette, Trash2, Pencil } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 import {
   format, startOfMonth, endOfMonth, eachDayOfInterval, getDay,
   addMonths, subMonths, isToday,
@@ -32,6 +34,7 @@ interface KanbanPost {
 
 interface KanbanColumn {
   id: string;
+  name: string;
   color?: string | null;
 }
 
@@ -45,6 +48,8 @@ interface UnifiedPost {
   source: "calendar" | "kanban";
   status: string;
   color?: string | null;
+  columnName?: string | null;
+  columnColor?: string | null;
   calendarPost?: CalendarPost;
   kanbanPost?: KanbanPost;
 }
@@ -78,7 +83,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const fetchColumns = async () => {
     const { data } = await (supabase
       .from("columns") as any)
-      .select("id, color")
+      .select("id, name, color")
       .eq("client_id", clientId);
     setKanbanColumns((data as KanbanColumn[]) || []);
   };
@@ -118,11 +123,12 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
       });
     });
 
-    const colorByCol = new Map(kanbanColumns.map((c) => [c.id, c.color || null]));
+    const colByCol = new Map(kanbanColumns.map((c) => [c.id, c]));
     kanbanPosts.forEach((p) => {
       if (!p.deadline) return;
       const deadlineDate = p.deadline.slice(0, 10); // "yyyy-MM-dd"
-      const fallback = p.column_id ? colorByCol.get(p.column_id) ?? null : null;
+      const col = p.column_id ? colByCol.get(p.column_id) : undefined;
+      const fallback = col?.color || null;
       list.push({
         id: p.id,
         title: p.title,
@@ -132,6 +138,8 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
         source: "kanban",
         status: p.archived ? "archived" : "kanban",
         color: p.event_color ?? fallback,
+        columnName: col?.name || null,
+        columnColor: col?.color || null,
         kanbanPost: p,
       });
     });
@@ -218,12 +226,19 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
     return STATUS_CONFIG[post.status as keyof typeof STATUS_CONFIG]?.dotClass || "bg-gray-400";
   };
 
+  const ensureLegendColor = (color: string | null, suggestedLabel?: string | null) => {
+    if (!color) return;
+    if (legend.some((l) => l.color.toLowerCase() === color.toLowerCase())) return;
+    setLegend([...legend, { color, label: suggestedLabel || "Nova categoria" }]);
+  };
+
   const changePostColor = async (post: UnifiedPost, color: string | null) => {
     if (post.source === "calendar" && post.calendarPost) {
       await updatePost(post.calendarPost.id, { event_color: color } as any);
     } else if (post.source === "kanban" && post.kanbanPost) {
       await updateKanbanColor(post.kanbanPost.id, color);
     }
+    ensureLegendColor(color, post.columnName);
   };
 
   const addLegendEntry = () => {
@@ -261,48 +276,73 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
 
 
         {/* Legend */}
-        <div className="rounded-lg border border-zinc-200 bg-white p-3">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-900">
-              <Palette className="h-3.5 w-3.5" /> Legenda de cores
-            </div>
-            <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={addLegendEntry}>
-              <Plus className="mr-1 h-3 w-3" /> Adicionar
-            </Button>
-          </div>
-          {legend.length === 0 ? (
-            <p className="text-[11px] text-zinc-500">
-              Crie categorias com cor e rótulo para identificar seus eventos (ex.: "Reels", "Story", "Campanha").
-            </p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {legend.map((entry, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 pl-1 pr-1 py-0.5"
-                >
-                  <EventColorPicker
-                    value={entry.color}
-                    onChange={(c) => updateLegendEntry(idx, { color: c || "#3b82f6" })}
-                    compact
-                  />
-                  <Input
-                    value={entry.label}
-                    onChange={(e) => updateLegendEntry(idx, { label: e.target.value })}
-                    className="h-6 w-32 text-[11px] px-1.5 border-0 bg-transparent focus-visible:ring-1"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeLegendEntry(idx)}
-                    className="text-zinc-400 hover:text-destructive p-0.5"
-                    title="Remover"
+        <div className="rounded-lg border border-zinc-200 bg-white p-3 space-y-3">
+          {/* Kanban columns auto legend */}
+          {kanbanColumns.length > 0 && (
+            <div>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-900 mb-2">
+                <Kanban className="h-3.5 w-3.5" /> Colunas do Kanban
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {kanbanColumns.map((col) => (
+                  <span
+                    key={col.id}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] text-zinc-800"
                   >
-                    <Trash2 className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
+                    <span
+                      className="h-2.5 w-2.5 rounded-full border border-zinc-300"
+                      style={{ backgroundColor: col.color || "#a1a1aa" }}
+                    />
+                    {col.name}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-900">
+                <Palette className="h-3.5 w-3.5" /> Legenda de cores
+              </div>
+              <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={addLegendEntry}>
+                <Plus className="mr-1 h-3 w-3" /> Adicionar
+              </Button>
+            </div>
+            {legend.length === 0 ? (
+              <p className="text-[11px] text-zinc-500">
+                Crie categorias com cor e rótulo para identificar seus eventos (ex.: "Reels", "Story", "Campanha"). Ao mudar a cor de um evento clicando nele, a cor é adicionada aqui automaticamente.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {legend.map((entry, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 pl-1 pr-1 py-0.5"
+                  >
+                    <EventColorPicker
+                      value={entry.color}
+                      onChange={(c) => updateLegendEntry(idx, { color: c || "#3b82f6" })}
+                      compact
+                    />
+                    <Input
+                      value={entry.label}
+                      onChange={(e) => updateLegendEntry(idx, { label: e.target.value })}
+                      className="h-6 w-32 text-[11px] px-1.5 border-0 bg-transparent focus-visible:ring-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeLegendEntry(idx)}
+                      className="text-zinc-400 hover:text-destructive p-0.5"
+                      title="Remover"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Calendar grid */}
@@ -339,36 +379,93 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                 </div>
                 <div className="space-y-0.5">
                   {dayPosts.slice(0, 3).map((post) => (
-                    <Tooltip key={post.id}>
-                      <TooltipTrigger asChild>
+                    <Popover key={post.id}>
+                      <PopoverTrigger asChild>
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (post.source === "calendar" && post.calendarPost) {
-                              openEdit(post.calendarPost);
-                            }
-                          }}
+                          onClick={(e) => e.stopPropagation()}
                           style={getPostStyle(post)}
-                          className={`w-full text-left rounded px-1.5 py-0.5 text-[10px] leading-tight truncate border-l-2 hover:opacity-80 transition-opacity ${getPostColor(post)}`}
+                          className={`w-full text-left rounded px-1.5 py-0.5 text-[10px] leading-tight border-l-2 hover:opacity-80 transition-opacity ${getPostColor(post)}`}
+                          title={post.title}
                         >
-                          {post.source === "kanban" && <Kanban className="inline h-2.5 w-2.5 mr-0.5" />}
-                          {post.time && <span className="font-bold text-black">{post.time.slice(0, 5)} </span>}
-                          <span className="truncate text-black font-semibold">{post.title}</span>
+                          <div className="flex items-center gap-1 truncate">
+                            {post.source === "kanban" && <Kanban className="inline h-2.5 w-2.5 shrink-0" />}
+                            {post.time && <span className="font-bold text-black">{post.time.slice(0, 5)}</span>}
+                            <span className="truncate text-black font-semibold">{post.title}</span>
+                          </div>
+                          {post.columnName && (
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <span
+                                className="h-1.5 w-1.5 rounded-full shrink-0"
+                                style={{ backgroundColor: post.columnColor || "#a1a1aa" }}
+                              />
+                              <span className="text-[9px] text-zinc-700 truncate">{post.columnName}</span>
+                            </div>
+                          )}
                         </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="max-w-[220px] p-2 z-[9999]" style={{ backgroundColor: 'white', color: '#18181b', border: '1px solid #e4e4e7' }}>
-                        <p className="font-semibold text-xs" style={{ color: '#18181b' }}>{post.title}</p>
-                        <p className="text-[11px] mt-0.5" style={{ color: '#71717a' }}>
-                          {getStatusLabel(post)}{post.time ? ` • ${post.time.slice(0, 5)}` : ""}
-                        </p>
-                        {post.caption && (
-                          <p className="text-[11px] line-clamp-2 mt-1" style={{ color: '#3f3f46' }}>{post.caption}</p>
-                        )}
-                        {post.media_urls?.[0] && (
-                          <img src={post.media_urls[0]} alt="" className="h-12 w-full rounded object-cover mt-1.5" />
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        align="start"
+                        className="w-64 p-3 z-[9999]"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="space-y-2">
+                          <div>
+                            <p className="font-semibold text-xs text-zinc-900 line-clamp-2">{post.title}</p>
+                            <p className="text-[11px] text-zinc-500 mt-0.5">
+                              {getStatusLabel(post)}{post.time ? ` • ${post.time.slice(0, 5)}` : ""}
+                            </p>
+                            {post.columnName && (
+                              <div className="flex items-center gap-1.5 mt-1">
+                                <span
+                                  className="h-2.5 w-2.5 rounded-full border border-zinc-300"
+                                  style={{ backgroundColor: post.columnColor || "#a1a1aa" }}
+                                />
+                                <span className="text-[11px] text-zinc-700">{post.columnName}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="border-t border-zinc-200 pt-2">
+                            <div className="text-[11px] font-semibold text-zinc-800 mb-1.5">Cor do evento</div>
+                            <div className="grid grid-cols-6 gap-1.5">
+                              {PRESET_COLORS.map((c) => (
+                                <button
+                                  key={c}
+                                  type="button"
+                                  onClick={() => changePostColor(post, c)}
+                                  className={cn(
+                                    "h-6 w-6 rounded-full border-2 transition-transform hover:scale-110",
+                                    post.color === c ? "border-zinc-900 ring-2 ring-zinc-900/20" : "border-white shadow"
+                                  )}
+                                  style={{ backgroundColor: c }}
+                                />
+                              ))}
+                            </div>
+                            {post.color && (
+                              <button
+                                type="button"
+                                onClick={() => changePostColor(post, null)}
+                                className="mt-2 w-full inline-flex items-center justify-center gap-1 rounded-md border border-zinc-200 bg-white px-2 py-1 text-[11px] text-zinc-600 hover:bg-zinc-50"
+                              >
+                                Remover cor
+                              </button>
+                            )}
+                            <p className="text-[10px] text-zinc-500 mt-2">
+                              A cor escolhida é adicionada à legenda automaticamente.
+                            </p>
+                          </div>
+                          {post.source === "calendar" && post.calendarPost && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="w-full h-7 text-[11px]"
+                              onClick={() => openEdit(post.calendarPost!)}
+                            >
+                              <Pencil className="mr-1 h-3 w-3" /> Editar evento
+                            </Button>
+                          )}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   ))}
                   {dayPosts.length > 3 && (
                     <span className="text-[10px] text-zinc-500 pl-1">+{dayPosts.length - 3}</span>
@@ -429,6 +526,15 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                             </div>
                           </div>
                           <p className="font-medium text-sm truncate text-zinc-900">{post.title}</p>
+                          {post.columnName && (
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <span
+                                className="h-2 w-2 rounded-full shrink-0"
+                                style={{ backgroundColor: post.columnColor || "#a1a1aa" }}
+                              />
+                              <span className="text-[11px] text-zinc-600">Coluna: {post.columnName}</span>
+                            </div>
+                          )}
                           {post.caption && <p className="text-xs text-zinc-500 line-clamp-2 mt-1">{post.caption}</p>}
                         </div>
                         {post.media_urls?.[0] && (
