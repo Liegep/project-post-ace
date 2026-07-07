@@ -416,12 +416,17 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                             <span className="truncate font-semibold">{post.title}</span>
                           </div>
                           {post.columnName && (
-                            <div className="flex items-center gap-1 mt-0.5 rounded bg-white/85 px-1 py-[1px] w-fit max-w-full">
+                            <div
+                              className="flex items-center gap-1 mt-0.5 rounded px-1 py-[1px] w-fit max-w-full"
+                              style={{ backgroundColor: "#ffffff" }}
+                            >
                               <span
                                 className="h-1.5 w-1.5 rounded-full shrink-0 border border-zinc-400"
                                 style={{ backgroundColor: post.columnColor || "#a1a1aa" }}
                               />
-                              <span className="text-[9px] text-zinc-900 font-medium truncate">{post.columnName}</span>
+                              <span className="text-[9px] font-semibold truncate" style={{ color: "#18181b" }}>
+                                {post.columnName}
+                              </span>
                             </div>
                           )}
                         </button>
