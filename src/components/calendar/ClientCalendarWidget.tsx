@@ -226,12 +226,19 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
     return STATUS_CONFIG[post.status as keyof typeof STATUS_CONFIG]?.dotClass || "bg-gray-400";
   };
 
+  const ensureLegendColor = (color: string | null, suggestedLabel?: string | null) => {
+    if (!color) return;
+    if (legend.some((l) => l.color.toLowerCase() === color.toLowerCase())) return;
+    setLegend([...legend, { color, label: suggestedLabel || "Nova categoria" }]);
+  };
+
   const changePostColor = async (post: UnifiedPost, color: string | null) => {
     if (post.source === "calendar" && post.calendarPost) {
       await updatePost(post.calendarPost.id, { event_color: color } as any);
     } else if (post.source === "kanban" && post.kanbanPost) {
       await updateKanbanColor(post.kanbanPost.id, color);
     }
+    ensureLegendColor(color, post.columnName);
   };
 
   const addLegendEntry = () => {
