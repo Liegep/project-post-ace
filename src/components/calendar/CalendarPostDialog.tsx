@@ -9,6 +9,7 @@ import { CalendarPost, CalendarPostStatus, STATUS_CONFIG } from "@/hooks/useCale
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { ImagePlus, Trash2, X } from "lucide-react";
+import { EventColorPicker } from "@/components/calendar/EventColorPicker";
 
 interface Client {
   id: string;
@@ -37,6 +38,7 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
   const [mediaType, setMediaType] = useState("image");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [eventColor, setEventColor] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.from("clients").select("id, name").order("name").then(({ data }) => {
@@ -54,6 +56,7 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
       setStatus(post.status);
       setMediaUrls(post.media_urls || []);
       setMediaType(post.media_type || "image");
+      setEventColor(post.event_color ?? null);
     } else {
       setTitle("");
       setCaption("");
@@ -63,6 +66,7 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
       setStatus("draft");
       setMediaUrls([]);
       setMediaType("image");
+      setEventColor(null);
     }
   }, [post, defaultDate, open]);
 
@@ -106,6 +110,7 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
       status,
       media_urls: mediaUrls,
       media_type: mediaType,
+      event_color: eventColor,
     };
     if (post) (data as any).id = post.id;
     const { error } = await onSave(data);
@@ -183,6 +188,12 @@ export function CalendarPostDialog({ open, onOpenChange, post, onSave, onDelete,
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <Label className="text-white/80">Cor do evento</Label>
+            <div className="mt-1">
+              <EventColorPicker value={eventColor} onChange={setEventColor} />
+            </div>
           </div>
           <div>
             <Label className="text-white/80">Mídia</Label>

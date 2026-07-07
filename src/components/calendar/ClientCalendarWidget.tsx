@@ -2,9 +2,12 @@ import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useCalendarPosts, CalendarPost, STATUS_CONFIG } from "@/hooks/useCalendarPosts";
 import { CalendarPostDialog } from "@/components/calendar/CalendarPostDialog";
+import { EventColorPicker, PRESET_COLORS } from "@/components/calendar/EventColorPicker";
+import { useCalendarLegend, LegendEntry } from "@/hooks/useCalendarLegend";
 import { toast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, Plus, Check, Clock, Kanban } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Check, Clock, Kanban, Palette, Trash2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import {
   format, startOfMonth, endOfMonth, eachDayOfInterval, getDay,
@@ -23,6 +26,7 @@ interface KanbanPost {
   tags: string[];
   status: string[];
   archived: boolean;
+  event_color?: string | null;
 }
 
 interface UnifiedPost {
@@ -34,6 +38,7 @@ interface UnifiedPost {
   media_urls: string[];
   source: "calendar" | "kanban";
   status: string;
+  color?: string | null;
   calendarPost?: CalendarPost;
   kanbanPost?: KanbanPost;
 }
@@ -45,6 +50,7 @@ interface Props {
 
 export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const { posts: calendarPosts, createPost, updatePost, deletePost } = useCalendarPosts();
+  const { legend, setLegend } = useCalendarLegend(clientId);
   const [kanbanPosts, setKanbanPosts] = useState<KanbanPost[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -53,17 +59,24 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   // Fetch kanban posts with deadlines for this client
+  const fetchKanbanPosts = async () => {
+    const { data } = await (supabase
+      .from("posts") as any)
+      .select("id, title, caption, deadline, media_urls, tags, status, archived, event_color")
+      .eq("client_id", clientId)
+      .not("deadline", "is", null);
+    setKanbanPosts((data as KanbanPost[]) || []);
+  };
+
   useEffect(() => {
-    const fetchKanbanPosts = async () => {
-      const { data } = await supabase
-        .from("posts")
-        .select("id, title, caption, deadline, media_urls, tags, status, archived")
-        .eq("client_id", clientId)
-        .not("deadline", "is", null);
-      setKanbanPosts((data as KanbanPost[]) || []);
-    };
     fetchKanbanPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId]);
+
+  const updateKanbanColor = async (id: string, color: string | null) => {
+    setKanbanPosts((prev) => prev.map((p) => (p.id === id ? { ...p, event_color: color } : p)));
+    await (supabase.from("posts") as any).update({ event_color: color }).eq("id", id);
+  };
 
   const clientCalendarPosts = useMemo(
     () => calendarPosts.filter((p) => p.client_id === clientId),
@@ -84,6 +97,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
         media_urls: p.media_urls,
         source: "calendar",
         status: p.status,
+        color: p.event_color ?? null,
         calendarPost: p,
       });
     });
@@ -99,6 +113,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
         media_urls: p.media_urls || [],
         source: "kanban",
         status: p.archived ? "archived" : "kanban",
+        color: p.event_color ?? null,
         kanbanPost: p,
       });
     });
@@ -151,6 +166,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const selectedDayPosts = selectedDay ? postsByDate[selectedDay] || [] : [];
 
   const getPostColor = (post: UnifiedPost) => {
+    if (post.color) return "";
     if (post.source === "kanban") {
       return post.status === "archived"
         ? "bg-zinc-200 border-l-zinc-400"
@@ -166,6 +182,14 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
     }
   };
 
+  const getPostStyle = (post: UnifiedPost): React.CSSProperties | undefined => {
+    if (!post.color) return undefined;
+    return {
+      backgroundColor: post.color + "22",
+      borderLeftColor: post.color,
+    };
+  };
+
   const getStatusLabel = (post: UnifiedPost) => {
     if (post.source === "kanban") return post.status === "archived" ? "Arquivado" : "Kanban";
     return STATUS_CONFIG[post.status as keyof typeof STATUS_CONFIG]?.label || post.status;
@@ -174,6 +198,26 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const getStatusDot = (post: UnifiedPost) => {
     if (post.source === "kanban") return post.status === "archived" ? "bg-zinc-400" : "bg-orange-500";
     return STATUS_CONFIG[post.status as keyof typeof STATUS_CONFIG]?.dotClass || "bg-gray-400";
+  };
+
+  const changePostColor = async (post: UnifiedPost, color: string | null) => {
+    if (post.source === "calendar" && post.calendarPost) {
+      await updatePost(post.calendarPost.id, { event_color: color } as any);
+    } else if (post.source === "kanban" && post.kanbanPost) {
+      await updateKanbanColor(post.kanbanPost.id, color);
+    }
+  };
+
+  const addLegendEntry = () => {
+    const usedColors = new Set(legend.map((l) => l.color));
+    const nextColor = PRESET_COLORS.find((c) => !usedColors.has(c)) || PRESET_COLORS[0];
+    setLegend([...legend, { color: nextColor, label: "Nova categoria" }]);
+  };
+  const updateLegendEntry = (idx: number, patch: Partial<LegendEntry>) => {
+    setLegend(legend.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
+  };
+  const removeLegendEntry = (idx: number) => {
+    setLegend(legend.filter((_, i) => i !== idx));
   };
 
   return (
@@ -195,6 +239,52 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
           <Button size="sm" onClick={() => openCreate()}>
             <Plus className="mr-1.5 h-4 w-4" /> Novo Post
           </Button>
+        </div>
+
+
+        {/* Legend */}
+        <div className="rounded-lg border border-zinc-200 bg-white p-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-900">
+              <Palette className="h-3.5 w-3.5" /> Legenda de cores
+            </div>
+            <Button size="sm" variant="outline" className="h-7 text-[11px]" onClick={addLegendEntry}>
+              <Plus className="mr-1 h-3 w-3" /> Adicionar
+            </Button>
+          </div>
+          {legend.length === 0 ? (
+            <p className="text-[11px] text-zinc-500">
+              Crie categorias com cor e rótulo para identificar seus eventos (ex.: "Reels", "Story", "Campanha").
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {legend.map((entry, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 pl-1 pr-1 py-0.5"
+                >
+                  <EventColorPicker
+                    value={entry.color}
+                    onChange={(c) => updateLegendEntry(idx, { color: c || "#3b82f6" })}
+                    compact
+                  />
+                  <Input
+                    value={entry.label}
+                    onChange={(e) => updateLegendEntry(idx, { label: e.target.value })}
+                    className="h-6 w-32 text-[11px] px-1.5 border-0 bg-transparent focus-visible:ring-1"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeLegendEntry(idx)}
+                    className="text-zinc-400 hover:text-destructive p-0.5"
+                    title="Remover"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Calendar grid */}
@@ -240,6 +330,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                               openEdit(post.calendarPost);
                             }
                           }}
+                          style={getPostStyle(post)}
                           className={`w-full text-left rounded px-1.5 py-0.5 text-[10px] leading-tight truncate border-l-2 hover:opacity-80 transition-opacity ${getPostColor(post)}`}
                         >
                           {post.source === "kanban" && <Kanban className="inline h-2.5 w-2.5 mr-0.5" />}
@@ -293,6 +384,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                       onClick={() => {
                         if (isCalendar && post.calendarPost) openEdit(post.calendarPost);
                       }}
+                      style={getPostStyle(post)}
                       className={`rounded-lg border-l-4 p-3 ${isCalendar ? "cursor-pointer hover:shadow-md" : ""} transition-shadow ${getPostColor(post)}`}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -309,6 +401,14 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                             <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${getStatusDot(post)} text-white font-medium`}>
                               {getStatusLabel(post)}
                             </span>
+                            <div className="ml-auto" onClick={(e) => e.stopPropagation()}>
+                              <EventColorPicker
+                                value={post.color}
+                                onChange={(c) => changePostColor(post, c)}
+                                align="end"
+                                compact
+                              />
+                            </div>
                           </div>
                           <p className="font-medium text-sm truncate text-zinc-900">{post.title}</p>
                           {post.caption && <p className="text-xs text-zinc-500 line-clamp-2 mt-1">{post.caption}</p>}

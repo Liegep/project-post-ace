@@ -838,6 +838,7 @@ export type Database = {
           client_id: string
           created_at: string
           created_by: string | null
+          event_color: string | null
           id: string
           media_type: string
           media_urls: string[]
@@ -852,6 +853,7 @@ export type Database = {
           client_id: string
           created_at?: string
           created_by?: string | null
+          event_color?: string | null
           id?: string
           media_type?: string
           media_urls?: string[]
@@ -866,6 +868,7 @@ export type Database = {
           client_id?: string
           created_at?: string
           created_by?: string | null
+          event_color?: string | null
           id?: string
           media_type?: string
           media_urls?: string[]
@@ -1055,6 +1058,7 @@ export type Database = {
           billing_start_date: string | null
           billing_type: string
           calendar_color: string | null
+          calendar_legend: Json
           client_portal_title: string
           client_type: string
           country: string
@@ -1102,6 +1106,7 @@ export type Database = {
           billing_start_date?: string | null
           billing_type?: string
           calendar_color?: string | null
+          calendar_legend?: Json
           client_portal_title?: string
           client_type?: string
           country?: string
@@ -1149,6 +1154,7 @@ export type Database = {
           billing_start_date?: string | null
           billing_type?: string
           calendar_color?: string | null
+          calendar_legend?: Json
           client_portal_title?: string
           client_type?: string
           country?: string
@@ -2247,6 +2253,7 @@ export type Database = {
           content_pillar_id: string | null
           created_at: string
           deadline: string | null
+          event_color: string | null
           id: string
           image_url: string
           is_pauta: boolean
@@ -2274,6 +2281,7 @@ export type Database = {
           content_pillar_id?: string | null
           created_at?: string
           deadline?: string | null
+          event_color?: string | null
           id?: string
           image_url: string
           is_pauta?: boolean
@@ -2301,6 +2309,7 @@ export type Database = {
           content_pillar_id?: string | null
           created_at?: string
           deadline?: string | null
+          event_color?: string | null
           id?: string
           image_url?: string
           is_pauta?: boolean
