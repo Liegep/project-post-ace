@@ -149,6 +149,20 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
     return list;
   }, [clientCalendarPosts, kanbanPosts, kanbanColumns]);
 
+  const FILTER_OPTIONS: { key: string; label: string; color: string }[] = [
+    { key: "aprovado", label: "Aprovado", color: "#22c55e" },
+    { key: "alteracao_solicitada", label: "Alteração Solicitada", color: "#ef4444" },
+    { key: "leia_comentario", label: "Leia Comentário", color: "#f59e0b" },
+  ];
+
+  const filteredUnifiedPosts = useMemo(() => {
+    if (activeFilters.size === 0) return unifiedPosts;
+    return unifiedPosts.filter((p) => {
+      if (p.source !== "kanban") return false;
+      return activeFilters.has(p.kanbanPost?.client_label || "");
+    });
+  }, [unifiedPosts, activeFilters]);
+
   const postsByDate = useMemo(() => {
     const map: Record<string, UnifiedPost[]> = {};
     unifiedPosts.forEach((p) => {
