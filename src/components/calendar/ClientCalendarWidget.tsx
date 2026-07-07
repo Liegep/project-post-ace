@@ -70,6 +70,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const [defaultDate, setDefaultDate] = useState("");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [kanbanColumns, setKanbanColumns] = useState<KanbanColumn[]>([]);
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
 
   // Fetch kanban posts with deadlines for this client
   const fetchKanbanPosts = async () => {
