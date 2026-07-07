@@ -309,13 +309,14 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                 {kanbanColumns.map((col) => (
                   <span
                     key={col.id}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] text-zinc-800"
+                    className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] font-medium"
+                    style={{ backgroundColor: "#ffffff", color: "#18181b", borderColor: "#d4d4d8" }}
                   >
                     <span
-                      className="h-2.5 w-2.5 rounded-full border border-zinc-300"
+                      className="h-2.5 w-2.5 rounded-full border border-zinc-400 shrink-0"
                       style={{ backgroundColor: col.color || "#a1a1aa" }}
                     />
-                    {col.name}
+                    <span style={{ color: "#18181b" }}>{col.name}</span>
                   </span>
                 ))}
               </div>
