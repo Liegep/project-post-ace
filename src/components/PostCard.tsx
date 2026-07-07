@@ -82,6 +82,7 @@ export const PostCard = memo(
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [mediaAspect, setMediaAspect] = useState<number | null>(null);
+    const [mediaError, setMediaError] = useState(false);
     const [captionDrawerOpen, setCaptionDrawerOpen] = useState(false);
     const [editingCaption, setEditingCaption] = useState(false);
     const [draftCaption, setDraftCaption] = useState(post.caption);
@@ -252,6 +253,13 @@ export const PostCard = memo(
                     <Play className="h-6 w-6 text-muted-foreground" />
                   </div>
                 );
+              if (mediaError)
+                return (
+                  <div className="h-full w-full bg-muted flex flex-col items-center justify-center gap-1 text-muted-foreground">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-60"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    <span className="text-[9px] font-medium opacity-70">mídia indisponível</span>
+                  </div>
+                );
               const isVideo = thumbUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
               return isVideo ? (
                 <video
@@ -262,6 +270,7 @@ export const PostCard = memo(
                     const v = e.currentTarget;
                     if (v.videoWidth && v.videoHeight) setMediaAspect(v.videoWidth / v.videoHeight);
                   }}
+                  onError={() => setMediaError(true)}
                 />
               ) : (
                 <img
@@ -273,6 +282,7 @@ export const PostCard = memo(
                     const img = e.currentTarget;
                     if (img.naturalWidth && img.naturalHeight) setMediaAspect(img.naturalWidth / img.naturalHeight);
                   }}
+                  onError={() => setMediaError(true)}
                 />
               );
             })()}
