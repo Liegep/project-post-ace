@@ -267,7 +267,7 @@ export const PostCard = memo(
                 <img
                   src={thumbUrl}
                   alt={post.title}
-                  className="h-full w-full object-contain"
+                  className="h-full w-full object-cover"
                   loading="lazy"
                   onLoad={(e) => {
                     const img = e.currentTarget;
