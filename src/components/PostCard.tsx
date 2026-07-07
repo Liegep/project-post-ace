@@ -236,7 +236,7 @@ export const PostCard = memo(
         {/* Thumbnail 4:5 */}
         {hasMedia && (
           <div
-            className="relative w-full overflow-hidden cursor-zoom-in bg-black/20"
+            className="relative w-full overflow-hidden cursor-zoom-in"
             style={{ aspectRatio: mediaAspect ? `${mediaAspect}` : "4/5" }}
             onClick={(e) => {
               if (!isExternalLink(thumbUrl)) {
