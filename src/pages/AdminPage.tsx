@@ -324,7 +324,7 @@ const KanbanBoard = ({
                     <Input
                       ref={editColumnInputRef}
                       value={editingColumnName}
-                      onChange={(e) => from setEditingColumnName(e.target.value)}
+                      onChange={(e) => setEditingColumnName(e.target.value)}
                       onBlur={() => handleRenameColumn(col.id)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleRenameColumn(col.id);
