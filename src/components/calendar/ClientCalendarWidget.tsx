@@ -63,19 +63,29 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const [editingPost, setEditingPost] = useState<CalendarPost | null>(null);
   const [defaultDate, setDefaultDate] = useState("");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [kanbanColumns, setKanbanColumns] = useState<KanbanColumn[]>([]);
 
   // Fetch kanban posts with deadlines for this client
   const fetchKanbanPosts = async () => {
     const { data } = await (supabase
       .from("posts") as any)
-      .select("id, title, caption, deadline, media_urls, tags, status, archived, event_color")
+      .select("id, title, caption, deadline, media_urls, tags, status, archived, event_color, column_id")
       .eq("client_id", clientId)
       .not("deadline", "is", null);
     setKanbanPosts((data as KanbanPost[]) || []);
   };
 
+  const fetchColumns = async () => {
+    const { data } = await (supabase
+      .from("columns") as any)
+      .select("id, color")
+      .eq("client_id", clientId);
+    setKanbanColumns((data as KanbanColumn[]) || []);
+  };
+
   useEffect(() => {
     fetchKanbanPosts();
+    fetchColumns();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId]);
 
