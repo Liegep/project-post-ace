@@ -323,6 +323,14 @@ const KanbanBoard = ({
                     />
                   ) : (
                     <div className="flex items-center gap-2 min-w-0">
+                      <span
+                        className="h-2.5 w-2.5 rounded-full shrink-0 ring-1"
+                        style={{
+                          backgroundColor: col.color || "transparent",
+                          borderColor: isLight ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.4)",
+                          boxShadow: isLight ? "inset 0 0 0 1px rgba(0,0,0,0.15)" : "inset 0 0 0 1px rgba(255,255,255,0.35)",
+                        }}
+                      />
                       <span className="text-sm font-semibold truncate" style={{ color: textColor }}>{col.name}</span>
                       <span className="text-xs" style={{ color: mutedColor }}>({columnPosts.length})</span>
                     </div>
