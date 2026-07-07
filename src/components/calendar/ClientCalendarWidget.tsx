@@ -30,6 +30,7 @@ interface KanbanPost {
   archived: boolean;
   event_color?: string | null;
   column_id?: string | null;
+  client_label?: string | null;
 }
 
 interface KanbanColumn {
