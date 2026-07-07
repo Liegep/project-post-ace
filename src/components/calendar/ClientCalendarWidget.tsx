@@ -2,9 +2,12 @@ import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useCalendarPosts, CalendarPost, STATUS_CONFIG } from "@/hooks/useCalendarPosts";
 import { CalendarPostDialog } from "@/components/calendar/CalendarPostDialog";
+import { EventColorPicker, PRESET_COLORS } from "@/components/calendar/EventColorPicker";
+import { useCalendarLegend, LegendEntry } from "@/hooks/useCalendarLegend";
 import { toast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, Plus, Check, Clock, Kanban } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Check, Clock, Kanban, Palette, Trash2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import {
   format, startOfMonth, endOfMonth, eachDayOfInterval, getDay,
@@ -23,6 +26,7 @@ interface KanbanPost {
   tags: string[];
   status: string[];
   archived: boolean;
+  event_color?: string | null;
 }
 
 interface UnifiedPost {
