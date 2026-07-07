@@ -336,6 +336,16 @@ export const PostCard = memo(
               );
             })()}
 
+            <input
+              ref={reuploadInputRef}
+              type="file"
+              accept="image/*,video/*"
+              className="hidden"
+              onChange={handleReupload}
+              onClick={(e) => e.stopPropagation()}
+            />
+
+
             {/* Media count badge */}
             {allMedia.length > 1 && (
               <div className="absolute top-1.5 right-1.5 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
