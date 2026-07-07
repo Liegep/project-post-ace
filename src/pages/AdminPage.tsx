@@ -324,13 +324,13 @@ const KanbanBoard = ({
                     <Input
                       ref={editColumnInputRef}
                       value={editingColumnName}
-                      onChange={(e) => setEditingColumnName(e.target.value)}
+                      onChange={(e) => from setEditingColumnName(e.target.value)}
                       onBlur={() => handleRenameColumn(col.id)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter") handleRenameColumn(col.id);
                         if (e.key === "Escape") setEditingColumnId(null);
                       }}
-                      className="h-7 text-sm font-semibold"
+                      className="h-7 text-sm font-semibold bg-white/90 text-black"
                     />
                   ) : (
                     <div className="flex items-center gap-2 min-w-0">
