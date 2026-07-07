@@ -26,6 +26,7 @@ import { ClientRightSidebar } from "@/components/ClientRightSidebar";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
+import { EventColorPicker } from "@/components/calendar/EventColorPicker";
 import ClientAccessPanel from "@/components/ClientAccessPanel";
 import { HybridAccessConfig } from "@/components/HybridAccessConfig";
 import { ClientCalendarWidget } from "@/components/calendar/ClientCalendarWidget";
