@@ -123,7 +123,7 @@ interface ClientData {
 
 interface KanbanBoardProps {
   posts: Post[];
-  columns: { id: string; name: string; position: number; visibleToClient: boolean }[];
+  columns: { id: string; name: string; position: number; visibleToClient: boolean; color?: string | null }[];
   unassignedPosts: Post[];
   editingColumnId: string | null;
   editingColumnName: string;
