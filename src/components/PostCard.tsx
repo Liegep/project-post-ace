@@ -284,9 +284,29 @@ export const PostCard = memo(
                 );
               if (mediaError)
                 return (
-                  <div className="h-full w-full bg-muted flex flex-col items-center justify-center gap-1 text-muted-foreground">
+                  <div className="h-full w-full bg-muted flex flex-col items-center justify-center gap-2 text-muted-foreground p-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-60"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                    <span className="text-[9px] font-medium opacity-70">mídia indisponível</span>
+                    <span className="text-[10px] font-medium opacity-70">mídia indisponível</span>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        disabled={reuploading}
+                        onClick={(e) => { e.stopPropagation(); reuploadInputRef.current?.click(); }}
+                        className="inline-flex items-center gap-1 rounded-md bg-primary/90 hover:bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-1 shadow-sm disabled:opacity-60"
+                      >
+                        {reuploading ? (
+                          <>
+                            <span className="h-3 w-3 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                            Enviando…
+                          </>
+                        ) : (
+                          <>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            Reenviar
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                 );
               const isVideo = thumbUrl?.match(/\.(mp4|webm|mov|avi)/i) || post.mediaType === "video";
