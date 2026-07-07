@@ -1337,6 +1337,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     reorderPostsInColumn={reorderPostsInColumn}
                     t={t}
                     toggleColumnVisibility={toggleColumnVisibility}
+                    setColumnColor={setColumnColor}
                     selectionMode={selectionMode}
                     selectedPostIds={selectedPostIds}
                     onToggleSelect={toggleSelect}
