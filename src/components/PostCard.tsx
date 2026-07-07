@@ -122,7 +122,12 @@ export const PostCard = memo(
       updatePost(post.id, { tags: next });
     };
 
-    const handleDuplicate = async () => {
+    const handleDuplicateClick = () => {
+      setTargetColumnId(post.columnId);
+      setCopyDialogOpen(true);
+    };
+
+    const handleConfirmCopy = async () => {
       const ok = await addPost({
         title: `${post.title} (cópia)`,
         imageUrl: post.imageUrl,
@@ -131,10 +136,11 @@ export const PostCard = memo(
         caption: post.caption,
         status: post.status,
         tags: post.tags,
-        columnId: post.columnId,
+        columnId: targetColumnId,
         deadline: post.deadline ?? undefined,
       } as any);
-      toast[ok ? "success" : "error"](ok ? "Card duplicado" : "Erro ao duplicar");
+      toast[ok ? "success" : "error"](ok ? "Card copiado" : "Erro ao copiar");
+      setCopyDialogOpen(false);
     };
 
     const isPauta = (post as any).isPauta === true;
