@@ -77,7 +77,7 @@ export const PostCard = memo(
     showInlineDetails,
     allowEditCaption,
   }: PostCardProps) => {
-    const { tags, updateClientLabel, addComment, updatePost, addPost, updatePostStatus, clientId } = usePosts();
+    const { tags, columns, updateClientLabel, addComment, updatePost, addPost, updatePostStatus, clientId } = usePosts();
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -86,6 +86,8 @@ export const PostCard = memo(
     const [draftCaption, setDraftCaption] = useState(post.caption);
     const [savingCaption, setSavingCaption] = useState(false);
     const [sendDialogOpen, setSendDialogOpen] = useState(false);
+    const [copyDialogOpen, setCopyDialogOpen] = useState(false);
+    const [targetColumnId, setTargetColumnId] = useState<string | null>(post.columnId);
 
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
