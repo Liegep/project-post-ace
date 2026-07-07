@@ -286,11 +286,28 @@ const KanbanBoard = ({
         <SortableContext items={columnSortIds} strategy={horizontalListSortingStrategy}>
           {columns.map((col) => {
             const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
+            const headerBg = col.color || "#000000";
+            const luminance = (() => {
+              const m = headerBg.replace("#", "");
+              if (!/^[0-9a-fA-F]{6}$/.test(m)) return 0;
+              const r = parseInt(m.slice(0, 2), 16);
+              const g = parseInt(m.slice(2, 4), 16);
+              const b = parseInt(m.slice(4, 6), 16);
+              return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            })();
+            const isLight = luminance > 0.6;
+            const textColor = isLight ? "#111827" : "#ffffff";
+            const mutedColor = isLight ? "rgba(17,24,39,0.65)" : "rgba(255,255,255,0.65)";
+            const hoverBg = isLight ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.12)";
             return (
               <SortableColumn key={col.id} col={col}>
                 <div
-                  className="mb-4 flex items-center justify-between gap-2 shrink-0 z-10 rounded-lg bg-black backdrop-blur-sm border border-white/10 px-3 py-2 shadow-sm border-l-4"
-                  style={col.color ? { borderLeftColor: col.color } : { borderLeftColor: "transparent" }}
+                  className="mb-4 flex items-center justify-between gap-2 shrink-0 z-10 rounded-lg backdrop-blur-sm border px-3 py-2 shadow-sm"
+                  style={{
+                    backgroundColor: headerBg,
+                    borderColor: isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)",
+                    color: textColor,
+                  }}
                 >
                   {editingColumnId === col.id ? (
                     <Input
@@ -306,24 +323,27 @@ const KanbanBoard = ({
                     />
                   ) : (
                     <div className="flex items-center gap-2 min-w-0">
-                      {col.color && (
-                        <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: col.color }} />
-                      )}
-                      <span className="text-sm font-semibold text-white truncate">{col.name}</span>
-                      <span className="text-xs text-white/60">({columnPosts.length})</span>
+                      <span className="text-sm font-semibold truncate" style={{ color: textColor }}>{col.name}</span>
+                      <span className="text-xs" style={{ color: mutedColor }}>({columnPosts.length})</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => toggleColumnVisibility(col.id, !col.visibleToClient)}
-                      className={`rounded p-1 transition-colors ${col.visibleToClient ? "text-white hover:bg-white/10" : "text-white/50 hover:bg-white/10 hover:text-white"}`}
+                      className="rounded p-1 transition-colors"
+                      style={{ color: col.visibleToClient ? textColor : mutedColor }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = hoverBg)}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                       title={col.visibleToClient ? t("visibleToClient") : t("hiddenFromClient")}
                     >
                       {col.visibleToClient ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                     </button>
                     <button
                       onClick={() => { setCreateInColumnId(col.id); setCreateOpen(true); }}
-                      className="rounded p-1 text-white/70 hover:bg-white/10 hover:text-white"
+                      className="rounded p-1 transition-colors"
+                      style={{ color: mutedColor }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = hoverBg)}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                       title={t("addPost")}
                     >
                       <Plus className="h-3.5 w-3.5" />
@@ -334,18 +354,24 @@ const KanbanBoard = ({
                         onChange={(c) => setColumnColor(col.id, c)}
                         compact
                         align="end"
-                        triggerClassName="!bg-transparent !border-white/20 !text-white hover:!bg-white/10"
+                        triggerClassName={isLight ? "!bg-white/60 !border-black/10 !text-zinc-900 hover:!bg-white" : "!bg-transparent !border-white/20 !text-white hover:!bg-white/10"}
                       />
                     </div>
                     <button
                       onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}
-                      className="rounded p-1 text-white/70 hover:bg-white/10 hover:text-white"
+                      className="rounded p-1 transition-colors"
+                      style={{ color: mutedColor }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = hoverBg)}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                     >
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteColumn(col.id)}
-                      className="rounded p-1 text-white/70 hover:bg-red-500/20 hover:text-red-400"
+                      className="rounded p-1 transition-colors"
+                      style={{ color: mutedColor }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "rgba(239,68,68,0.2)"; e.currentTarget.style.color = "#f87171"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; e.currentTarget.style.color = mutedColor; }}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
