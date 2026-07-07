@@ -50,6 +50,7 @@ interface Props {
 
 export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const { posts: calendarPosts, createPost, updatePost, deletePost } = useCalendarPosts();
+  const { legend, setLegend } = useCalendarLegend(clientId);
   const [kanbanPosts, setKanbanPosts] = useState<KanbanPost[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -58,17 +59,24 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   // Fetch kanban posts with deadlines for this client
+  const fetchKanbanPosts = async () => {
+    const { data } = await (supabase
+      .from("posts") as any)
+      .select("id, title, caption, deadline, media_urls, tags, status, archived, event_color")
+      .eq("client_id", clientId)
+      .not("deadline", "is", null);
+    setKanbanPosts((data as KanbanPost[]) || []);
+  };
+
   useEffect(() => {
-    const fetchKanbanPosts = async () => {
-      const { data } = await supabase
-        .from("posts")
-        .select("id, title, caption, deadline, media_urls, tags, status, archived")
-        .eq("client_id", clientId)
-        .not("deadline", "is", null);
-      setKanbanPosts((data as KanbanPost[]) || []);
-    };
     fetchKanbanPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientId]);
+
+  const updateKanbanColor = async (id: string, color: string | null) => {
+    setKanbanPosts((prev) => prev.map((p) => (p.id === id ? { ...p, event_color: color } : p)));
+    await (supabase.from("posts") as any).update({ event_color: color }).eq("id", id);
+  };
 
   const clientCalendarPosts = useMemo(
     () => calendarPosts.filter((p) => p.client_id === clientId),
