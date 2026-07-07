@@ -330,6 +330,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
                               openEdit(post.calendarPost);
                             }
                           }}
+                          style={getPostStyle(post)}
                           className={`w-full text-left rounded px-1.5 py-0.5 text-[10px] leading-tight truncate border-l-2 hover:opacity-80 transition-opacity ${getPostColor(post)}`}
                         >
                           {post.source === "kanban" && <Kanban className="inline h-2.5 w-2.5 mr-0.5" />}
