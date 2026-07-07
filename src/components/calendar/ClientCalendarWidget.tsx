@@ -97,6 +97,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
         media_urls: p.media_urls,
         source: "calendar",
         status: p.status,
+        color: p.event_color ?? null,
         calendarPost: p,
       });
     });
@@ -112,6 +113,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
         media_urls: p.media_urls || [],
         source: "kanban",
         status: p.archived ? "archived" : "kanban",
+        color: p.event_color ?? null,
         kanbanPost: p,
       });
     });
