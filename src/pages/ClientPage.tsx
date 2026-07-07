@@ -359,23 +359,6 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
         {/* Reports list moved into the unified Novidades widget above */}
 
-        {clientData.show_upcoming_posts && (
-          <div className="mb-6">
-            <UpcomingPostsWidget
-              posts={[
-                ...posts,
-                ...archivedPosts.filter((p) => {
-                  if (!p.deadline) return false;
-                  const d = new Date(p.deadline);
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  return d.getTime() >= today.getTime();
-                }),
-              ]}
-              locale={clientData.locale}
-            />
-          </div>
-        )}
 
         {clientData.show_archived_to_client && (
           <div className="mb-6 flex items-center justify-center">
