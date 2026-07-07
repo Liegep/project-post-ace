@@ -30,6 +30,7 @@ interface KanbanPost {
   archived: boolean;
   event_color?: string | null;
   column_id?: string | null;
+  client_label?: string | null;
 }
 
 interface KanbanColumn {
@@ -69,12 +70,13 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
   const [defaultDate, setDefaultDate] = useState("");
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [kanbanColumns, setKanbanColumns] = useState<KanbanColumn[]>([]);
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
 
   // Fetch kanban posts with deadlines for this client
   const fetchKanbanPosts = async () => {
     const { data } = await (supabase
       .from("posts") as any)
-      .select("id, title, caption, deadline, media_urls, tags, status, archived, event_color, column_id")
+      .select("id, title, caption, deadline, media_urls, tags, status, archived, event_color, column_id, client_label")
       .eq("client_id", clientId)
       .not("deadline", "is", null);
     setKanbanPosts((data as KanbanPost[]) || []);
@@ -147,9 +149,23 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
     return list;
   }, [clientCalendarPosts, kanbanPosts, kanbanColumns]);
 
+  const FILTER_OPTIONS: { key: string; label: string; color: string }[] = [
+    { key: "aprovado", label: "Aprovado", color: "#22c55e" },
+    { key: "alteracao_solicitada", label: "Alteração Solicitada", color: "#ef4444" },
+    { key: "leia_comentario", label: "Leia Comentário", color: "#f59e0b" },
+  ];
+
+  const filteredUnifiedPosts = useMemo(() => {
+    if (activeFilters.size === 0) return unifiedPosts;
+    return unifiedPosts.filter((p) => {
+      if (p.source !== "kanban") return false;
+      return activeFilters.has(p.kanbanPost?.client_label || "");
+    });
+  }, [unifiedPosts, activeFilters]);
+
   const postsByDate = useMemo(() => {
     const map: Record<string, UnifiedPost[]> = {};
-    unifiedPosts.forEach((p) => {
+    filteredUnifiedPosts.forEach((p) => {
       if (!map[p.date]) map[p.date] = [];
       map[p.date].push(p);
     });
@@ -158,7 +174,7 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
       arr.sort((a, b) => (a.time || "23:59").localeCompare(b.time || "23:59"))
     );
     return map;
-  }, [unifiedPosts]);
+  }, [filteredUnifiedPosts]);
 
   const handleSave = async (data: Partial<CalendarPost>) => {
     if ((data as any).id) {
@@ -296,6 +312,47 @@ export function ClientCalendarWidget({ clientId, clientName }: Props) {
           </Button>
         </div>
 
+
+        {/* Label Filters */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-zinc-700 mr-1">Filtrar por etiqueta:</span>
+          {FILTER_OPTIONS.map((opt) => {
+            const active = activeFilters.has(opt.key);
+            return (
+              <button
+                key={opt.key}
+                onClick={() => {
+                  setActiveFilters((prev) => {
+                    const next = new Set(prev);
+                    if (next.has(opt.key)) next.delete(opt.key);
+                    else next.add(opt.key);
+                    return next;
+                  });
+                }}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+                  active
+                    ? "border-transparent text-white"
+                    : "border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50"
+                }`}
+                style={active ? { backgroundColor: opt.color, borderColor: opt.color } : {}}
+              >
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: active ? "#ffffff" : opt.color }}
+                />
+                {opt.label}
+              </button>
+            );
+          })}
+          {activeFilters.size > 0 && (
+            <button
+              onClick={() => setActiveFilters(new Set())}
+              className="text-[11px] text-zinc-500 hover:text-zinc-800 underline ml-1"
+            >
+              Limpar filtros
+            </button>
+          )}
+        </div>
 
         {/* Legend */}
         <div className="rounded-lg border border-zinc-200 bg-white p-3 space-y-3">
