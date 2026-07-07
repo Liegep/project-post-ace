@@ -45,6 +45,7 @@ interface PostsContextType {
   deleteColumn: (id: string) => void;
   reorderColumns: (columns: Column[]) => void;
   toggleColumnVisibility: (id: string, visible: boolean) => void;
+  setColumnColor: (id: string, color: string | null) => void;
   movePostToColumn: (postId: string, columnId: string | null) => void;
   reorderPostsInColumn: (columnId: string | null, orderedPostIds: string[]) => void;
   unarchivePost: (id: string, columnId?: string | null, clientInitiated?: boolean) => void;
