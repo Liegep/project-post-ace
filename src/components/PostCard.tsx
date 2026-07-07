@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -76,7 +77,7 @@ export const PostCard = memo(
     showInlineDetails,
     allowEditCaption,
   }: PostCardProps) => {
-    const { tags, updateClientLabel, addComment, updatePost, addPost, updatePostStatus, clientId } = usePosts();
+    const { tags, columns, updateClientLabel, addComment, updatePost, addPost, updatePostStatus, clientId } = usePosts();
     const { t } = useI18n();
     const [commentText, setCommentText] = useState("");
     const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -85,6 +86,8 @@ export const PostCard = memo(
     const [draftCaption, setDraftCaption] = useState(post.caption);
     const [savingCaption, setSavingCaption] = useState(false);
     const [sendDialogOpen, setSendDialogOpen] = useState(false);
+    const [copyDialogOpen, setCopyDialogOpen] = useState(false);
+    const [targetColumnId, setTargetColumnId] = useState<string | null>(post.columnId);
 
     const allMedia = post.mediaUrls.length > 0 ? post.mediaUrls : post.imageUrl ? [post.imageUrl] : [];
     const hasMedia = allMedia.length > 0;
@@ -119,7 +122,12 @@ export const PostCard = memo(
       updatePost(post.id, { tags: next });
     };
 
-    const handleDuplicate = async () => {
+    const handleDuplicateClick = () => {
+      setTargetColumnId(post.columnId);
+      setCopyDialogOpen(true);
+    };
+
+    const handleConfirmCopy = async () => {
       const ok = await addPost({
         title: `${post.title} (cópia)`,
         imageUrl: post.imageUrl,
@@ -128,10 +136,11 @@ export const PostCard = memo(
         caption: post.caption,
         status: post.status,
         tags: post.tags,
-        columnId: post.columnId,
+        columnId: targetColumnId,
         deadline: post.deadline ?? undefined,
       } as any);
-      toast[ok ? "success" : "error"](ok ? "Card duplicado" : "Erro ao duplicar");
+      toast[ok ? "success" : "error"](ok ? "Card copiado" : "Erro ao copiar");
+      setCopyDialogOpen(false);
     };
 
     const isPauta = (post as any).isPauta === true;
@@ -576,7 +585,7 @@ export const PostCard = memo(
 
           <ContextMenuSeparator />
 
-          <ContextMenuItem onSelect={handleDuplicate}>
+          <ContextMenuItem onSelect={handleDuplicateClick}>
             <Copy className="h-4 w-4 mr-2" />
             Copiar card
           </ContextMenuItem>
@@ -609,6 +618,43 @@ export const PostCard = memo(
           post={post}
           currentClientId={clientId}
         />
+
+        <Dialog open={copyDialogOpen} onOpenChange={setCopyDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Copiar card</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <p className="text-sm text-muted-foreground">
+                Para qual coluna deseja copiar <strong>&ldquo;{post.title}&rdquo;</strong>?
+              </p>
+              <Select
+                value={targetColumnId ?? "__unassigned__"}
+                onValueChange={(v) => setTargetColumnId(v === "__unassigned__" ? null : v)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione uma coluna" />
+                </SelectTrigger>
+                <SelectContent>
+                  {columns.map((col) => (
+                    <SelectItem key={col.id} value={col.id}>
+                      {col.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="flex justify-end gap-2">
+                <Button variant="ghost" onClick={() => setCopyDialogOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button onClick={handleConfirmCopy}>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copiar
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </ContextMenu>
     );
   },
