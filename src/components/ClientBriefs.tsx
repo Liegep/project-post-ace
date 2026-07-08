@@ -251,12 +251,12 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
               )}
               <div className="p-4 flex flex-col gap-2 flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-amber-900/70">{CONTENT_LABELS[brief.content_type] || brief.content_type}</span>
+                  <span className="text-xs font-medium text-amber-900">{CONTENT_LABELS[brief.content_type] || brief.content_type}</span>
                   <Badge variant="secondary" className={cn("text-[10px]", sc.color)}>{sc.label}</Badge>
                 </div>
                 <h3 className="font-semibold text-sm line-clamp-2 text-amber-950">{brief.title}</h3>
                 {brief.planned_date && (
-                  <span className="text-[11px] text-amber-900/70 flex items-center gap-1">
+                  <span className="text-[11px] text-amber-900 flex items-center gap-1">
                     <CalendarIcon className="h-3 w-3" />
                     {new Date(brief.planned_date + "T00:00:00").toLocaleDateString("pt-BR")}
                   </span>
