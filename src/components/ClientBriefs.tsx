@@ -303,7 +303,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
               <div className="space-y-4 mt-4">
                 {detailBrief.media_urls && detailBrief.media_urls.length > 0 && (
                   <div>
-                    <Label className="text-xs text-amber-900/70 mb-1.5 block">Imagens de referência</Label>
+                    <Label className="text-xs font-medium text-amber-900 mb-1.5 block">Imagens de referência</Label>
                     <div className="grid grid-cols-2 gap-2">
                       {detailBrief.media_urls.map((url, idx) => {
                         const isVideo = /\.(mp4|webm|mov|ogg)(\?|$)/i.test(url);
