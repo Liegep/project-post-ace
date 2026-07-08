@@ -162,6 +162,37 @@
     color: white;
   }
 
+  /* Notebook/brief scope: cream paper, dark amber text — overrides glass-modal */
+  .glass-modal.brief-notebook-modal,
+  .brief-notebook {
+    background: #fffaf0 !important;
+    background-image:
+      repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(217, 119, 6, 0.18) 27px, rgba(217, 119, 6, 0.18) 28px) !important;
+    color: hsl(30 40% 15%) !important;
+  }
+  .glass-modal.brief-notebook-modal h1,
+  .glass-modal.brief-notebook-modal h2,
+  .glass-modal.brief-notebook-modal h3,
+  .glass-modal.brief-notebook-modal h4,
+  .glass-modal.brief-notebook-modal p,
+  .glass-modal.brief-notebook-modal span,
+  .glass-modal.brief-notebook-modal label,
+  .glass-modal.brief-notebook-modal div,
+  .brief-notebook h1,
+  .brief-notebook h2,
+  .brief-notebook h3,
+  .brief-notebook h4,
+  .brief-notebook p,
+  .brief-notebook span,
+  .brief-notebook label,
+  .brief-notebook div {
+    color: inherit;
+  }
+  .glass-modal.brief-notebook-modal .text-muted-foreground,
+  .brief-notebook .text-muted-foreground {
+    color: hsl(30 30% 35%) !important;
+  }
+
   /* Glass modal typography */
   .glass-modal h1,
   .glass-modal h2,
