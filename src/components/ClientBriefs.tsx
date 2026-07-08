@@ -13,8 +13,6 @@ import { CalendarIcon, Check, X, MessageCircle, FileText, Send, Lightbulb, Penci
 // Padrão "papel pautado" para reforçar que é um rascunho/ideia
 const NOTEBOOK_BG: React.CSSProperties = {
   backgroundColor: "#fffaf0",
-  backgroundImage:
-    "repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(217, 119, 6, 0.18) 27px, rgba(217, 119, 6, 0.18) 28px)",
 };
 
 type BriefStatus = "draft" | "internal" | "pending_approval" | "approved" | "rejected" | "published";
