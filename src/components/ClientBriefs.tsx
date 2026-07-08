@@ -356,20 +356,20 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
                 )}
 
                 {/* Comments */}
-                <div className="space-y-3 pt-2 border-t">
-                  <h4 className="text-sm font-semibold flex items-center gap-1.5">
+                <div className="space-y-3 pt-2 border-t border-amber-300">
+                  <h4 className="text-sm font-semibold flex items-center gap-1.5 text-amber-950">
                     <MessageCircle className="h-4 w-4" /> Comentários
                   </h4>
-                  {comments.length === 0 && <p className="text-xs text-muted-foreground">Nenhum comentário.</p>}
+                  {comments.length === 0 && <p className="text-xs text-amber-900">Nenhum comentário.</p>}
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {comments.map((c) => (
-                      <div key={c.id} className={cn("rounded-lg p-2.5 text-sm", c.author_role === "client" ? "bg-blue-500/10 border border-blue-500/20" : "bg-muted/50")}>
+                      <div key={c.id} className={cn("rounded-lg p-2.5 text-sm border", c.author_role === "client" ? "bg-white text-black border-blue-400" : "bg-white text-black border-amber-300")}>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-xs">{c.author_name}</span>
-                          <Badge variant="secondary" className="text-[9px] h-4">
+                          <span className="font-semibold text-xs">{c.author_name}</span>
+                          <Badge variant="secondary" className="text-[9px] h-4 bg-amber-500/20 text-amber-900">
                             {c.author_role === "client" ? "Cliente" : "Equipe"}
                           </Badge>
-                          <span className="text-[10px] text-muted-foreground ml-auto">
+                          <span className="text-[10px] text-neutral-600 ml-auto">
                             {new Date(c.created_at).toLocaleDateString("pt-BR")}
                           </span>
                         </div>
@@ -378,8 +378,8 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
                     ))}
                   </div>
                   <div className="flex gap-2">
-                    <Textarea value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="Deixe seu feedback..." rows={2} className="flex-1" />
-                    <Button size="sm" onClick={addComment} disabled={!newComment.trim()} className="self-end gap-1">
+                    <Textarea value={newComment} onChange={(e) => setNewComment(e.target.value)} placeholder="Deixe seu feedback..." rows={2} className="flex-1 bg-white text-black placeholder:text-neutral-500 border-amber-300" />
+                    <Button size="sm" onClick={addComment} disabled={!newComment.trim()} className="self-end gap-1 bg-amber-600 hover:bg-amber-700 text-white">
                       <Send className="h-3 w-3" /> Enviar
                     </Button>
                   </div>
