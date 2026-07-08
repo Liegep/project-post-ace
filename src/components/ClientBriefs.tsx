@@ -281,14 +281,14 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
 
       {/* Detail Dialog */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto p-0 border-2 border-dashed border-amber-400/70">
+        <DialogContent className="brief-notebook-modal max-w-lg max-h-[85vh] overflow-y-auto p-0 border-2 border-dashed border-amber-400/70 text-amber-950">
           {detailBrief && (
             <>
               <div className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 text-xs font-bold uppercase tracking-widest">
                 <PencilLine className="h-4 w-4" />
                 Pauta para Aprovação
               </div>
-              <div style={NOTEBOOK_BG} className="p-6">
+              <div className="p-6">
               <DialogHeader>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-amber-900/70">{CONTENT_LABELS[detailBrief.content_type]}</span>
