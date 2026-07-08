@@ -289,13 +289,13 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
               <div className="p-6">
               <DialogHeader>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-amber-900/70">{CONTENT_LABELS[detailBrief.content_type]}</span>
+                  <span className="text-xs font-medium text-amber-900">{CONTENT_LABELS[detailBrief.content_type]}</span>
                   <Badge variant="secondary" className={cn("text-xs", STATUS_LABELS[detailBrief.status]?.color)}>
                     {STATUS_LABELS[detailBrief.status]?.label}
                   </Badge>
                 </div>
                 <DialogTitle className="text-amber-950">{detailBrief.title}</DialogTitle>
-                <p className="text-[11px] text-amber-800/80 italic mt-1">
+                <p className="text-[11px] text-amber-900 italic mt-1">
                   Esta é uma ideia em discussão. O post final será criado após sua aprovação.
                 </p>
               </DialogHeader>
