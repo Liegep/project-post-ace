@@ -321,7 +321,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
                   </div>
                 )}
                 {detailBrief.planned_date && (
-                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1.5 text-sm text-amber-900">
                     <CalendarIcon className="h-4 w-4" />
                     Data prevista: {new Date(detailBrief.planned_date + "T00:00:00").toLocaleDateString("pt-BR")}
                   </div>
@@ -329,15 +329,15 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
 
                 {detailBrief.description && (
                   <div>
-                    <Label className="text-xs text-muted-foreground">Descrição</Label>
-                    <p className="text-sm mt-1 whitespace-pre-wrap">{detailBrief.description}</p>
+                    <Label className="text-xs font-medium text-amber-900">Descrição</Label>
+                    <p className="text-sm mt-1 whitespace-pre-wrap text-amber-950">{detailBrief.description}</p>
                   </div>
                 )}
 
                 {detailBrief.caption && (
                   <div>
-                    <Label className="text-xs text-muted-foreground">Legenda</Label>
-                    <p className="text-sm mt-1 whitespace-pre-wrap bg-muted/50 rounded-lg p-3">{detailBrief.caption}</p>
+                    <Label className="text-xs font-medium text-amber-900">Legenda</Label>
+                    <p className="text-sm mt-1 whitespace-pre-wrap bg-white text-black border border-amber-300 rounded-lg p-3">{detailBrief.caption}</p>
                   </div>
                 )}
 
