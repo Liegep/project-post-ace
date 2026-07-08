@@ -166,8 +166,7 @@
   .glass-modal.brief-notebook-modal,
   .brief-notebook {
     background: #fffaf0 !important;
-    background-image:
-      repeating-linear-gradient(to bottom, transparent 0, transparent 27px, rgba(217, 119, 6, 0.18) 27px, rgba(217, 119, 6, 0.18) 28px) !important;
+    background-image: none !important;
     color: hsl(30 40% 15%) !important;
   }
   .glass-modal.brief-notebook-modal h1,
