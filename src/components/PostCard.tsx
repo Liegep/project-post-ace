@@ -76,6 +76,7 @@ export const PostCard = memo(
     onToggleSelect,
     showInlineDetails,
     allowEditCaption,
+    allowClientDownload,
   }: PostCardProps) => {
     const { tags, columns, updateClientLabel, addComment, updatePost, addPost, updatePostStatus, uploadMedia, clientId } = usePosts();
     const { t } = useI18n();
