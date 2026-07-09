@@ -85,6 +85,8 @@ export const PostCard = memo(
     const [mediaAspect, setMediaAspect] = useState<number | null>(null);
     const [mediaError, setMediaError] = useState(false);
     const [reuploading, setReuploading] = useState(false);
+    const [downloading, setDownloading] = useState(false);
+    const [downloadProgress, setDownloadProgress] = useState(0); // 0..1
     const reuploadInputRef = useRef<HTMLInputElement | null>(null);
 
     const handleReupload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -334,27 +336,78 @@ export const PostCard = memo(
             {!isAdmin && allowClientDownload && !isExternalLink(thumbUrl) && !mediaError && (
               <button
                 type="button"
+                disabled={downloading}
                 onClick={async (e) => {
                   e.stopPropagation();
+                  if (downloading) return;
                   const { downloadMediaUrl } = await import("@/lib/downloadMedia");
-                  if (allMedia.length > 1) {
-                    // Baixa slide a slide, com pequeno intervalo para o browser
+                  setDownloading(true);
+                  setDownloadProgress(0);
+                  const isMulti = allMedia.length > 1;
+                  const toastId = toast.loading(
+                    isMulti ? `Baixando 1 de ${allMedia.length}…` : "Baixando mídia…",
+                  );
+                  let ok = 0;
+                  let failed = 0;
+                  try {
                     for (let i = 0; i < allMedia.length; i++) {
                       const url = allMedia[i];
-                      if (isExternalLink(url)) continue;
-                      await downloadMediaUrl(url, post.title, i);
-                      await new Promise((r) => setTimeout(r, 350));
+                      if (!url || isExternalLink(url)) { failed++; continue; }
+                      if (isMulti) {
+                        toast.loading(`Baixando ${i + 1} de ${allMedia.length}…`, { id: toastId });
+                      }
+                      try {
+                        await downloadMediaUrl(url, post.title, isMulti ? i : undefined, (frac) => {
+                          const overall = (i + frac) / allMedia.length;
+                          setDownloadProgress(overall);
+                        });
+                        ok++;
+                        setDownloadProgress((i + 1) / allMedia.length);
+                      } catch {
+                        failed++;
+                      }
+                      if (isMulti && i < allMedia.length - 1) {
+                        await new Promise((r) => setTimeout(r, 300));
+                      }
                     }
-                    toast.success(`${allMedia.length} arquivos baixados`);
-                  } else {
-                    await downloadMediaUrl(allMedia[0], post.title);
+                    if (failed === 0) {
+                      toast.success(
+                        isMulti ? `${ok} arquivos baixados` : "Download concluído",
+                        { id: toastId },
+                      );
+                    } else if (ok === 0) {
+                      toast.error("Não foi possível baixar. Abrimos em nova aba.", { id: toastId });
+                    } else {
+                      toast.warning(`${ok} baixados, ${failed} falharam`, { id: toastId });
+                    }
+                  } finally {
+                    setDownloading(false);
+                    setDownloadProgress(0);
                   }
                 }}
                 title={allMedia.length > 1 ? "Baixar todas as mídias" : "Baixar mídia"}
-                className="absolute top-1.5 left-1.5 z-10 inline-flex items-center gap-1 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur px-2 py-1 text-[10px] font-semibold text-white shadow-md transition-colors"
+                className="absolute top-1.5 left-1.5 z-10 inline-flex items-center gap-1 overflow-hidden rounded-full bg-black/70 hover:bg-black/85 backdrop-blur px-2 py-1 text-[10px] font-semibold text-white shadow-md transition-colors disabled:cursor-not-allowed"
               >
-                <Download className="h-3 w-3" />
-                {allMedia.length > 1 ? `${allMedia.length}` : "Baixar"}
+                {/* progress fill */}
+                {downloading && (
+                  <span
+                    aria-hidden
+                    className="absolute inset-y-0 left-0 bg-primary/70 transition-[width] duration-200"
+                    style={{ width: `${Math.max(6, Math.round(downloadProgress * 100))}%` }}
+                  />
+                )}
+                <span className="relative inline-flex items-center gap-1">
+                  {downloading ? (
+                    <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : (
+                    <Download className="h-3 w-3" />
+                  )}
+                  {downloading
+                    ? `${Math.round(downloadProgress * 100)}%`
+                    : allMedia.length > 1
+                      ? `${allMedia.length}`
+                      : "Baixar"}
+                </span>
               </button>
             )}
 
