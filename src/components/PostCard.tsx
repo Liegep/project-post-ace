@@ -85,6 +85,8 @@ export const PostCard = memo(
     const [mediaAspect, setMediaAspect] = useState<number | null>(null);
     const [mediaError, setMediaError] = useState(false);
     const [reuploading, setReuploading] = useState(false);
+    const [downloading, setDownloading] = useState(false);
+    const [downloadProgress, setDownloadProgress] = useState(0); // 0..1
     const reuploadInputRef = useRef<HTMLInputElement | null>(null);
 
     const handleReupload = async (e: React.ChangeEvent<HTMLInputElement>) => {
