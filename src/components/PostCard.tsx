@@ -330,6 +330,34 @@ export const PostCard = memo(
             />
 
 
+            {/* Client-side download button (top-left) */}
+            {!isAdmin && allowClientDownload && !isExternalLink(thumbUrl) && !mediaError && (
+              <button
+                type="button"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  const { downloadMediaUrl } = await import("@/lib/downloadMedia");
+                  if (allMedia.length > 1) {
+                    // Baixa slide a slide, com pequeno intervalo para o browser
+                    for (let i = 0; i < allMedia.length; i++) {
+                      const url = allMedia[i];
+                      if (isExternalLink(url)) continue;
+                      await downloadMediaUrl(url, post.title, i);
+                      await new Promise((r) => setTimeout(r, 350));
+                    }
+                    toast.success(`${allMedia.length} arquivos baixados`);
+                  } else {
+                    await downloadMediaUrl(allMedia[0], post.title);
+                  }
+                }}
+                title={allMedia.length > 1 ? "Baixar todas as mídias" : "Baixar mídia"}
+                className="absolute top-1.5 left-1.5 z-10 inline-flex items-center gap-1 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur px-2 py-1 text-[10px] font-semibold text-white shadow-md transition-colors"
+              >
+                <Download className="h-3 w-3" />
+                {allMedia.length > 1 ? `${allMedia.length}` : "Baixar"}
+              </button>
+            )}
+
             {/* Media count badge */}
             {allMedia.length > 1 && (
               <div className="absolute top-1.5 right-1.5 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
