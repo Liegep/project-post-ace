@@ -217,11 +217,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => navigate(`/client/${clientData.slug}/brand-brain`)}>
                 <Sparkles className="mr-2 h-4 w-4" />
-                Brand Brain
+                {t("brandBrain")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setPasswordOpen(true)}>
                 <KeyRound className="mr-2 h-4 w-4" />
-                Alterar senha
+                {t("changePassword")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={async () => {
@@ -231,7 +231,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 className="text-destructive focus:text-destructive"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                Sair
+                {t("signOut")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -239,27 +239,27 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Alterar senha</DialogTitle>
+                <DialogTitle>{t("changePassword")}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-2">
                 <div className="space-y-2">
-                  <Label htmlFor="new-password">Nova senha</Label>
+                  <Label htmlFor="new-password">{t("newPassword")}</Label>
                   <Input
                     id="new-password"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder={t("minChars")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirmar nova senha</Label>
+                  <Label htmlFor="confirm-password">{t("confirmNewPassword")}</Label>
                   <Input
                     id="confirm-password"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Repita a nova senha"
+                    placeholder={t("repeatPassword")}
                   />
                 </div>
                 <Button
@@ -267,7 +267,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                   disabled={savingPassword}
                   className="w-full"
                 >
-                  {savingPassword ? "Salvando..." : "Alterar senha"}
+                  {savingPassword ? t("saving") : t("saveNewPassword")}
                 </Button>
               </div>
             </DialogContent>
