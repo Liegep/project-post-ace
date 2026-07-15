@@ -399,7 +399,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                   className="bg-accent text-accent-foreground hover:bg-accent/90"
                 >
                   <Plus className="mr-1.5 h-4 w-4" />
-                  Criar post
+                  {t("createPost")}
                 </Button>
               </div>
             )}
