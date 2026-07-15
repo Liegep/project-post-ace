@@ -309,6 +309,7 @@ export function ClientInvoicesPanel({
   canViewAttachments = true,
   canDownloadAttachments = true,
   filterMonth,
+  locale,
 }: {
   clientId: string;
   unseenIds?: Set<string>;
@@ -316,7 +317,16 @@ export function ClientInvoicesPanel({
   canViewAttachments?: boolean;
   canDownloadAttachments?: boolean;
   filterMonth?: Date;
+  locale?: string;
 }) {
+  const CI_T: Record<string, { invoices: string; loading: string; history: string; older: string; total: string; details: string }> = {
+    pt: { invoices: "Faturas", loading: "Carregando faturas...", history: "Ver histórico", older: "Faturas anteriores", total: "fatura(s) no total", details: "Detalhes da fatura" },
+    en: { invoices: "Invoices", loading: "Loading invoices...", history: "View history", older: "Previous invoices", total: "invoice(s) total", details: "Invoice details" },
+    it: { invoices: "Fatture", loading: "Caricamento fatture...", history: "Vedi cronologia", older: "Fatture precedenti", total: "fattura/e in totale", details: "Dettagli fattura" },
+    es: { invoices: "Facturas", loading: "Cargando facturas...", history: "Ver historial", older: "Facturas anteriores", total: "factura(s) en total", details: "Detalles de la factura" },
+    sv: { invoices: "Fakturor", loading: "Laddar fakturor...", history: "Visa historik", older: "Tidigare fakturor", total: "faktura/or totalt", details: "Fakturadetaljer" },
+  };
+  const ci = CI_T[(locale as string) in CI_T ? (locale as string) : "pt"];
   const { invoices, loading } = useInvoices(clientId);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
