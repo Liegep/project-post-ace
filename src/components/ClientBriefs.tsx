@@ -274,7 +274,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBrief
         }
       }
 
-      toast({ title: "Pauta aprovada!" });
+      toast({ title: tt.briefApproved });
       setDetailBrief((prev) => prev ? { ...prev, status: "approved" } : null);
       loadBriefs();
     }
