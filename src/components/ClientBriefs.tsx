@@ -401,7 +401,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBrief
             <>
               <div className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 text-xs font-bold uppercase tracking-widest">
                 <PencilLine className="h-4 w-4" />
-                Pauta para Aprovação
+                {tt.briefForApproval}
               </div>
               <div className="p-6">
               <DialogHeader>
