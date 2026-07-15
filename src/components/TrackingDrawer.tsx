@@ -32,6 +32,7 @@ const TD_T: Record<string, { tracking: string; visibleColumns: string; visibleCo
 const PINNED_KEY = "tracking-drawer-pinned";
 
 export const TrackingDrawer = (props: TrackingDrawerProps) => {
+  const td = TD_T[(props.locale as string) in TD_T ? (props.locale as string) : "pt"];
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
   const [pinned, setPinned] = useState(() => {
