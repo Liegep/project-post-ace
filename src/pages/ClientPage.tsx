@@ -638,19 +638,22 @@ const ClientPage = () => {
   }
 
   if (notFound || !clientData) {
+    const fallbackLocale = (clientData?.locale || "pt") as Locale;
+    const tt = (key: keyof typeof translations.pt) => translations[fallbackLocale]?.[key] || translations.pt[key];
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-        <h1 className="text-2xl font-bold text-foreground">Cliente não encontrado</h1>
-        <p className="mt-2 text-muted-foreground">Verifique o link e tente novamente.</p>
+        <h1 className="text-2xl font-bold text-foreground">{tt("clientNotFound")}</h1>
+        <p className="mt-2 text-muted-foreground">{tt("clientNotFoundDesc")}</p>
       </div>
     );
   }
 
 
   const clientLocale = (clientData.locale || "pt") as Locale;
+  const tOuter = (key: keyof typeof translations.pt) => translations[clientLocale]?.[key] || translations.pt[key];
 
   return (
-    <ErrorBoundary fallbackTitle="Erro ao carregar página do cliente">
+    <ErrorBoundary fallbackTitle={tOuter("errorLoadingClientPage")}>
       {isClient && <ContractGateModal />}
       <I18nProvider key={clientLocale} forceLocale={clientLocale}>
         <PostsProvider clientId={clientData.id} clientLogo={clientData.logo_url} clientPostingPeriod={clientData.posting_period}>
