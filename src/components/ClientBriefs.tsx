@@ -283,7 +283,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBrief
   const handleReject = async (briefId: string) => {
     const { error } = await supabase.from("content_briefs").update({ status: "rejected" } as any).eq("id", briefId);
     if (!error) {
-      toast({ title: "Pauta reprovada" });
+      toast({ title: tt.briefRejected });
       setDetailBrief((prev) => prev ? { ...prev, status: "rejected" } : null);
       loadBriefs();
     }
