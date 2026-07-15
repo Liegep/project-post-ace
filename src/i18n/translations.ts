@@ -276,6 +276,15 @@ type TranslationKeys = {
   approvalSuccessApproved: string;
   approvalSuccessChange: string;
   approvalActionError: string;
+  // Client page extras
+  currentMonth: string;
+  loadMore: string;
+  loadMoreRemaining: string;
+  brandBrain: string;
+  clientNotFound: string;
+  clientNotFoundDesc: string;
+  errorDisplayingPost: string;
+  errorLoadingClientPage: string;
 };
 
 const pt: TranslationKeys = {
