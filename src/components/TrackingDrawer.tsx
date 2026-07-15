@@ -18,7 +18,16 @@ interface TrackingDrawerProps {
   onToggleVisibility?: (visible: boolean) => void;
   trackingColumnIds?: string[];
   onChangeTrackingColumnIds?: (ids: string[]) => void;
+  locale?: string;
 }
+
+const TD_T: Record<string, { tracking: string; visibleColumns: string; visibleColumnsHelp: string; visibleToClient: string; hiddenFromClient: string; pin: string; unpin: string; close: string }> = {
+  pt: { tracking: "Acompanhamento", visibleColumns: "Colunas visíveis para o cliente", visibleColumnsHelp: "Se nada for selecionado, o cliente verá todas as colunas.", visibleToClient: "Visível para o cliente", hiddenFromClient: "Oculto para o cliente", pin: "Fixar na tela", unpin: "Desafixar", close: "Fechar" },
+  en: { tracking: "Tracking", visibleColumns: "Columns visible to client", visibleColumnsHelp: "If nothing is selected, the client will see all columns.", visibleToClient: "Visible to client", hiddenFromClient: "Hidden from client", pin: "Pin to screen", unpin: "Unpin", close: "Close" },
+  it: { tracking: "Monitoraggio", visibleColumns: "Colonne visibili al cliente", visibleColumnsHelp: "Se nulla è selezionato, il cliente vedrà tutte le colonne.", visibleToClient: "Visibile al cliente", hiddenFromClient: "Nascosto al cliente", pin: "Fissa allo schermo", unpin: "Sblocca", close: "Chiudi" },
+  es: { tracking: "Seguimiento", visibleColumns: "Columnas visibles para el cliente", visibleColumnsHelp: "Si nada está seleccionado, el cliente verá todas las columnas.", visibleToClient: "Visible para el cliente", hiddenFromClient: "Oculto para el cliente", pin: "Fijar en pantalla", unpin: "Desfijar", close: "Cerrar" },
+  sv: { tracking: "Uppföljning", visibleColumns: "Kolumner synliga för klienten", visibleColumnsHelp: "Om inget är valt ser klienten alla kolumner.", visibleToClient: "Synlig för klient", hiddenFromClient: "Dold för klient", pin: "Fäst på skärmen", unpin: "Lossa", close: "Stäng" },
+};
 
 const PINNED_KEY = "tracking-drawer-pinned";
 
