@@ -41,25 +41,142 @@ interface BriefComment {
   created_at: string;
 }
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending_approval: { label: "Aguardando Aprovação", color: "bg-amber-500/15 text-amber-600" },
-  approved: { label: "Aprovado", color: "bg-emerald-500/15 text-emerald-600" },
-  rejected: { label: "Reprovado", color: "bg-red-500/15 text-red-600" },
-  published: { label: "Publicado", color: "bg-purple-500/15 text-purple-600" },
-};
+type LocaleKey = "pt" | "en" | "it" | "es" | "sv";
 
-const CONTENT_LABELS: Record<string, string> = {
-  post: "Post", reels: "Reels", story: "Story", carousel: "Carrossel",
-  article: "Artigo", video: "Vídeo", other: "Outro",
+const T: Record<LocaleKey, {
+  statusPendingApproval: string;
+  statusApproved: string;
+  statusRejected: string;
+  statusPublished: string;
+  contentPost: string; contentReels: string; contentStory: string; contentCarousel: string;
+  contentArticle: string; contentVideo: string; contentOther: string;
+  loading: string;
+  briefsForApproval: string;
+  pending: string;
+  bannerTitle: string;
+  bannerDesc: string;
+  briefForApproval: string;
+  reference: string;
+  approve: string; reject: string;
+  briefApproved: string; briefRejected: string;
+  disclaimer: string;
+  referenceImages: string;
+  plannedDate: string;
+  description: string;
+  captionLabel: string;
+  comments: string;
+  noComments: string;
+  clientRole: string; teamRole: string;
+  leaveFeedback: string; send: string;
+  commentSent: string;
+}> = {
+  pt: {
+    statusPendingApproval: "Aguardando Aprovação", statusApproved: "Aprovado", statusRejected: "Reprovado", statusPublished: "Publicado",
+    contentPost: "Post", contentReels: "Reels", contentStory: "Story", contentCarousel: "Carrossel",
+    contentArticle: "Artigo", contentVideo: "Vídeo", contentOther: "Outro",
+    loading: "Carregando pautas...", briefsForApproval: "Pautas para Aprovar", pending: "pendentes",
+    bannerTitle: "Estas são ideias de conteúdo aguardando sua aprovação.",
+    bannerDesc: "Ainda não são os posts finais — depois de aprovadas, nossa equipe irá produzir as artes e legendas.",
+    briefForApproval: "Pauta para Aprovação", reference: "Referência",
+    approve: "Aprovar", reject: "Reprovar",
+    briefApproved: "Pauta aprovada!", briefRejected: "Pauta reprovada",
+    disclaimer: "Esta é uma ideia em discussão. O post final será criado após sua aprovação.",
+    referenceImages: "Imagens de referência", plannedDate: "Data prevista",
+    description: "Descrição", captionLabel: "Legenda",
+    comments: "Comentários", noComments: "Nenhum comentário.",
+    clientRole: "Cliente", teamRole: "Equipe",
+    leaveFeedback: "Deixe seu feedback...", send: "Enviar", commentSent: "Comentário enviado!",
+  },
+  en: {
+    statusPendingApproval: "Awaiting Approval", statusApproved: "Approved", statusRejected: "Rejected", statusPublished: "Published",
+    contentPost: "Post", contentReels: "Reels", contentStory: "Story", contentCarousel: "Carousel",
+    contentArticle: "Article", contentVideo: "Video", contentOther: "Other",
+    loading: "Loading briefs...", briefsForApproval: "Briefs for Approval", pending: "pending",
+    bannerTitle: "These are content ideas awaiting your approval.",
+    bannerDesc: "They are not the final posts — once approved, our team will produce the artwork and captions.",
+    briefForApproval: "Brief for Approval", reference: "Reference",
+    approve: "Approve", reject: "Reject",
+    briefApproved: "Brief approved!", briefRejected: "Brief rejected",
+    disclaimer: "This is an idea under discussion. The final post will be created after your approval.",
+    referenceImages: "Reference images", plannedDate: "Planned date",
+    description: "Description", captionLabel: "Caption",
+    comments: "Comments", noComments: "No comments.",
+    clientRole: "Client", teamRole: "Team",
+    leaveFeedback: "Leave your feedback...", send: "Send", commentSent: "Comment sent!",
+  },
+  it: {
+    statusPendingApproval: "In attesa di approvazione", statusApproved: "Approvato", statusRejected: "Rifiutato", statusPublished: "Pubblicato",
+    contentPost: "Post", contentReels: "Reels", contentStory: "Story", contentCarousel: "Carosello",
+    contentArticle: "Articolo", contentVideo: "Video", contentOther: "Altro",
+    loading: "Caricamento brief...", briefsForApproval: "Brief da approvare", pending: "in attesa",
+    bannerTitle: "Queste sono idee di contenuto in attesa della tua approvazione.",
+    bannerDesc: "Non sono ancora i post finali — una volta approvate, il nostro team produrrà grafiche e didascalie.",
+    briefForApproval: "Brief da approvare", reference: "Riferimento",
+    approve: "Approva", reject: "Rifiuta",
+    briefApproved: "Brief approvato!", briefRejected: "Brief rifiutato",
+    disclaimer: "Questa è un'idea in discussione. Il post finale sarà creato dopo la tua approvazione.",
+    referenceImages: "Immagini di riferimento", plannedDate: "Data prevista",
+    description: "Descrizione", captionLabel: "Didascalia",
+    comments: "Commenti", noComments: "Nessun commento.",
+    clientRole: "Cliente", teamRole: "Team",
+    leaveFeedback: "Lascia il tuo feedback...", send: "Invia", commentSent: "Commento inviato!",
+  },
+  es: {
+    statusPendingApproval: "Esperando aprobación", statusApproved: "Aprobado", statusRejected: "Rechazado", statusPublished: "Publicado",
+    contentPost: "Post", contentReels: "Reels", contentStory: "Historia", contentCarousel: "Carrusel",
+    contentArticle: "Artículo", contentVideo: "Video", contentOther: "Otro",
+    loading: "Cargando briefs...", briefsForApproval: "Briefs para Aprobar", pending: "pendientes",
+    bannerTitle: "Estas son ideas de contenido esperando tu aprobación.",
+    bannerDesc: "Aún no son las publicaciones finales — después de aprobadas, nuestro equipo producirá las artes y textos.",
+    briefForApproval: "Brief para Aprobación", reference: "Referencia",
+    approve: "Aprobar", reject: "Rechazar",
+    briefApproved: "¡Brief aprobado!", briefRejected: "Brief rechazado",
+    disclaimer: "Esta es una idea en discusión. La publicación final se creará tras tu aprobación.",
+    referenceImages: "Imágenes de referencia", plannedDate: "Fecha prevista",
+    description: "Descripción", captionLabel: "Texto",
+    comments: "Comentarios", noComments: "Sin comentarios.",
+    clientRole: "Cliente", teamRole: "Equipo",
+    leaveFeedback: "Deja tu feedback...", send: "Enviar", commentSent: "¡Comentario enviado!",
+  },
+  sv: {
+    statusPendingApproval: "Väntar på godkännande", statusApproved: "Godkänd", statusRejected: "Avvisad", statusPublished: "Publicerad",
+    contentPost: "Inlägg", contentReels: "Reels", contentStory: "Story", contentCarousel: "Karusell",
+    contentArticle: "Artikel", contentVideo: "Video", contentOther: "Annat",
+    loading: "Laddar utkast...", briefsForApproval: "Utkast att godkänna", pending: "väntande",
+    bannerTitle: "Detta är innehållsidéer som väntar på ditt godkännande.",
+    bannerDesc: "De är inte de slutliga inläggen — när de är godkända producerar vårt team grafik och texter.",
+    briefForApproval: "Utkast att godkänna", reference: "Referens",
+    approve: "Godkänn", reject: "Avvisa",
+    briefApproved: "Utkast godkänt!", briefRejected: "Utkast avvisat",
+    disclaimer: "Detta är en idé under diskussion. Det slutliga inlägget skapas efter ditt godkännande.",
+    referenceImages: "Referensbilder", plannedDate: "Planerat datum",
+    description: "Beskrivning", captionLabel: "Bildtext",
+    comments: "Kommentarer", noComments: "Inga kommentarer.",
+    clientRole: "Klient", teamRole: "Team",
+    leaveFeedback: "Lämna din feedback...", send: "Skicka", commentSent: "Kommentar skickad!",
+  },
 };
 
 interface ClientBriefsProps {
   clientId: string;
   clientName: string;
   filterMonth?: Date;
+  locale?: string;
 }
 
-const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) => {
+const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBriefsProps) => {
+  const lk: LocaleKey = ((locale as LocaleKey) in T ? (locale as LocaleKey) : "pt");
+  const tt = T[lk];
+  const STATUS_LABELS: Record<string, { label: string; color: string }> = {
+    pending_approval: { label: tt.statusPendingApproval, color: "bg-amber-500/15 text-amber-600" },
+    approved: { label: tt.statusApproved, color: "bg-emerald-500/15 text-emerald-600" },
+    rejected: { label: tt.statusRejected, color: "bg-red-500/15 text-red-600" },
+    published: { label: tt.statusPublished, color: "bg-purple-500/15 text-purple-600" },
+  };
+  const CONTENT_LABELS: Record<string, string> = {
+    post: tt.contentPost, reels: tt.contentReels, story: tt.contentStory, carousel: tt.contentCarousel,
+    article: tt.contentArticle, video: tt.contentVideo, other: tt.contentOther,
+  };
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [loading, setLoading] = useState(true);
   const [detailBrief, setDetailBrief] = useState<Brief | null>(null);
