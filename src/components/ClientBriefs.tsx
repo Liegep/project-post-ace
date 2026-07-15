@@ -302,7 +302,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBrief
       setNewComment("");
       const { data } = await supabase.from("brief_comments").select("*").eq("brief_id", detailBrief.id).order("created_at", { ascending: true });
       if (data) setComments(data as BriefComment[]);
-      toast({ title: "Comentário enviado!" });
+      toast({ title: tt.commentSent });
     }
   };
 
