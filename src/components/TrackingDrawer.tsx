@@ -22,7 +22,7 @@ interface TrackingDrawerProps {
 }
 
 const TD_T: Record<string, { tracking: string; visibleColumns: string; visibleColumnsHelp: string; visibleToClient: string; hiddenFromClient: string; pin: string; unpin: string; close: string }> = {
-  pt: { tracking: "Acompanhamento", visibleColumns: "Colunas visíveis para o cliente", visibleColumnsHelp: "{td.visibleColumnsHelp}", visibleToClient: "Visível para o cliente", hiddenFromClient: "Oculto para o cliente", pin: "Fixar na tela", unpin: "Desafixar", close: "Fechar" },
+  pt: { tracking: "Acompanhamento", visibleColumns: "Colunas visíveis para o cliente", visibleColumnsHelp: "Se nada for selecionado, o cliente verá todas as colunas.", visibleToClient: "Visível para o cliente", hiddenFromClient: "Oculto para o cliente", pin: "Fixar na tela", unpin: "Desafixar", close: "Fechar" },
   en: { tracking: "Tracking", visibleColumns: "Columns visible to client", visibleColumnsHelp: "If nothing is selected, the client will see all columns.", visibleToClient: "Visible to client", hiddenFromClient: "Hidden from client", pin: "Pin to screen", unpin: "Unpin", close: "Close" },
   it: { tracking: "Monitoraggio", visibleColumns: "Colonne visibili al cliente", visibleColumnsHelp: "Se nulla è selezionato, il cliente vedrà tutte le colonne.", visibleToClient: "Visibile al cliente", hiddenFromClient: "Nascosto al cliente", pin: "Fissa allo schermo", unpin: "Sblocca", close: "Chiudi" },
   es: { tracking: "Seguimiento", visibleColumns: "Columnas visibles para el cliente", visibleColumnsHelp: "Si nada está seleccionado, el cliente verá todas las columnas.", visibleToClient: "Visible para el cliente", hiddenFromClient: "Oculto para el cliente", pin: "Fijar en pantalla", unpin: "Desfijar", close: "Cerrar" },
