@@ -413,7 +413,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBrief
                 </div>
                 <DialogTitle className="text-amber-950">{detailBrief.title}</DialogTitle>
                 <p className="text-[11px] text-amber-900 italic mt-1">
-                  Esta é uma ideia em discussão. O post final será criado após sua aprovação.
+                  {tt.disclaimer}
                 </p>
               </DialogHeader>
 
