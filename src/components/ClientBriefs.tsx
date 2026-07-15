@@ -347,7 +347,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBrief
             >
               <div className="flex items-center gap-2 bg-amber-500 text-white px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest">
                 <PencilLine className="h-3.5 w-3.5" />
-                Pauta para Aprovação
+                {tt.briefForApproval}
               </div>
               {brief.media_urls && brief.media_urls.length > 0 && (
                 <div className="relative w-full bg-black/5 border-b-2 border-dashed border-amber-300/60" style={{ aspectRatio: "4/5" }}>
