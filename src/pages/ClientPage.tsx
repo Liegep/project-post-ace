@@ -375,7 +375,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "archived" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
               >
                 <Archive className="mr-1.5 inline h-4 w-4" />
-                Arquivados
+                {t("archived")}
                 {archivedPosts.length > 0 && (
                   <span className="ml-1.5 rounded-full bg-muted-foreground/20 px-1.5 py-0.5 text-[10px] font-semibold">
                     {archivedPosts.length}
