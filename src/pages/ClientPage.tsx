@@ -325,7 +325,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
         {/* Client Briefs for Approval */}
         <div className="mb-8">
-          <ClientBriefs clientId={clientData.id} clientName={clientData.name} filterMonth={selectedMonth} />
+          <ClientBriefs clientId={clientData.id} clientName={clientData.name} filterMonth={selectedMonth} locale={clientData.locale} />
         </div>
 
         {/* Design Briefs */}
@@ -340,7 +340,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
         {/* Text Contents for Approval */}
         <div className="mb-8">
-          <TextContentsPanel clientId={clientData.id} clientName={clientData.name} />
+          <TextContentsPanel clientId={clientData.id} clientName={clientData.name} locale={clientData.locale} />
         </div>
 
         {/* Client Invoices - permission-controlled */}
@@ -353,6 +353,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               canViewAttachments={billingPerm.can_view_attachments}
               canDownloadAttachments={billingPerm.can_download_attachments}
               filterMonth={selectedMonth}
+              locale={clientData.locale}
             />
           </div>
         )}
