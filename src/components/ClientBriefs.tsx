@@ -320,9 +320,9 @@ const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBrief
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <FileText className="h-5 w-5 text-amber-600" />
-        <h2 className="text-lg font-bold">Pautas para Aprovar</h2>
+        <h2 className="text-lg font-bold">{tt.briefsForApproval}</h2>
         <Badge variant="secondary" className="ml-1 bg-amber-500/15 text-amber-700">
-          {filteredBriefs.filter((b) => b.status === "pending_approval").length} pendentes
+          {filteredBriefs.filter((b) => b.status === "pending_approval").length} {tt.pending}
         </Badge>
       </div>
 
@@ -330,8 +330,8 @@ const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBrief
       <div className="flex gap-3 rounded-xl border-2 border-dashed border-amber-400/60 bg-amber-50 p-3 text-sm text-amber-900">
         <Lightbulb className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
         <p>
-          <strong>Estas são ideias de conteúdo aguardando sua aprovação.</strong>{" "}
-          Ainda não são os posts finais — depois de aprovadas, nossa equipe irá produzir as artes e legendas.
+          <strong>{tt.bannerTitle}</strong>{" "}
+          {tt.bannerDesc}
         </p>
       </div>
 
