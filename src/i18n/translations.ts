@@ -276,6 +276,15 @@ type TranslationKeys = {
   approvalSuccessApproved: string;
   approvalSuccessChange: string;
   approvalActionError: string;
+  // Client page extras
+  currentMonth: string;
+  loadMore: string;
+  loadMoreRemaining: string;
+  brandBrain: string;
+  clientNotFound: string;
+  clientNotFoundDesc: string;
+  errorDisplayingPost: string;
+  errorLoadingClientPage: string;
 };
 
 const pt: TranslationKeys = {
@@ -510,6 +519,14 @@ const pt: TranslationKeys = {
   approvalSuccessApproved: "Post aprovado!",
   approvalSuccessChange: "Ajuste solicitado!",
   approvalActionError: "Erro ao processar ação.",
+  currentMonth: "Mês atual",
+  loadMore: "Carregar mais",
+  loadMoreRemaining: "restantes",
+  brandBrain: "Brand Brain",
+  clientNotFound: "Cliente não encontrado",
+  clientNotFoundDesc: "Verifique o link e tente novamente.",
+  errorDisplayingPost: "Erro ao exibir post",
+  errorLoadingClientPage: "Erro ao carregar página do cliente",
 };
 
 const en: TranslationKeys = {
@@ -742,6 +759,14 @@ const en: TranslationKeys = {
   approvalSuccessApproved: "Post approved!",
   approvalSuccessChange: "Change requested!",
   approvalActionError: "Error processing action.",
+  currentMonth: "Current month",
+  loadMore: "Load more",
+  loadMoreRemaining: "remaining",
+  brandBrain: "Brand Brain",
+  clientNotFound: "Client not found",
+  clientNotFoundDesc: "Check the link and try again.",
+  errorDisplayingPost: "Error displaying post",
+  errorLoadingClientPage: "Error loading client page",
 };
 
 const it: TranslationKeys = {
@@ -974,6 +999,14 @@ const it: TranslationKeys = {
   approvalSuccessApproved: "Post approvato!",
   approvalSuccessChange: "Modifica richiesta!",
   approvalActionError: "Errore nell'elaborazione dell'azione.",
+  currentMonth: "Mese corrente",
+  loadMore: "Carica altro",
+  loadMoreRemaining: "rimanenti",
+  brandBrain: "Brand Brain",
+  clientNotFound: "Cliente non trovato",
+  clientNotFoundDesc: "Controlla il link e riprova.",
+  errorDisplayingPost: "Errore nel mostrare il post",
+  errorLoadingClientPage: "Errore nel caricare la pagina del cliente",
 };
 
 const es: TranslationKeys = {
@@ -1206,6 +1239,14 @@ const es: TranslationKeys = {
   approvalSuccessApproved: "¡Post aprobado!",
   approvalSuccessChange: "¡Cambio solicitado!",
   approvalActionError: "Error al procesar la acción.",
+  currentMonth: "Mes actual",
+  loadMore: "Cargar más",
+  loadMoreRemaining: "restantes",
+  brandBrain: "Brand Brain",
+  clientNotFound: "Cliente no encontrado",
+  clientNotFoundDesc: "Verifica el enlace e inténtalo de nuevo.",
+  errorDisplayingPost: "Error al mostrar la publicación",
+  errorLoadingClientPage: "Error al cargar la página del cliente",
 };
 
 const sv: TranslationKeys = {
@@ -1438,6 +1479,14 @@ const sv: TranslationKeys = {
   approvalSuccessApproved: "Inlägg godkänt!",
   approvalSuccessChange: "Ändring begärd!",
   approvalActionError: "Fel vid bearbetning av åtgärd.",
+  currentMonth: "Aktuell månad",
+  loadMore: "Ladda fler",
+  loadMoreRemaining: "kvar",
+  brandBrain: "Brand Brain",
+  clientNotFound: "Klient hittades inte",
+  clientNotFoundDesc: "Kontrollera länken och försök igen.",
+  errorDisplayingPost: "Fel vid visning av inlägg",
+  errorLoadingClientPage: "Fel vid laddning av klientsidan",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };

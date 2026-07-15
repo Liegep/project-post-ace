@@ -41,25 +41,142 @@ interface BriefComment {
   created_at: string;
 }
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  pending_approval: { label: "Aguardando Aprovação", color: "bg-amber-500/15 text-amber-600" },
-  approved: { label: "Aprovado", color: "bg-emerald-500/15 text-emerald-600" },
-  rejected: { label: "Reprovado", color: "bg-red-500/15 text-red-600" },
-  published: { label: "Publicado", color: "bg-purple-500/15 text-purple-600" },
-};
+type LocaleKey = "pt" | "en" | "it" | "es" | "sv";
 
-const CONTENT_LABELS: Record<string, string> = {
-  post: "Post", reels: "Reels", story: "Story", carousel: "Carrossel",
-  article: "Artigo", video: "Vídeo", other: "Outro",
+const T: Record<LocaleKey, {
+  statusPendingApproval: string;
+  statusApproved: string;
+  statusRejected: string;
+  statusPublished: string;
+  contentPost: string; contentReels: string; contentStory: string; contentCarousel: string;
+  contentArticle: string; contentVideo: string; contentOther: string;
+  loading: string;
+  briefsForApproval: string;
+  pending: string;
+  bannerTitle: string;
+  bannerDesc: string;
+  briefForApproval: string;
+  reference: string;
+  approve: string; reject: string;
+  briefApproved: string; briefRejected: string;
+  disclaimer: string;
+  referenceImages: string;
+  plannedDate: string;
+  description: string;
+  captionLabel: string;
+  comments: string;
+  noComments: string;
+  clientRole: string; teamRole: string;
+  leaveFeedback: string; send: string;
+  commentSent: string;
+}> = {
+  pt: {
+    statusPendingApproval: "Aguardando Aprovação", statusApproved: "Aprovado", statusRejected: "Reprovado", statusPublished: "Publicado",
+    contentPost: "Post", contentReels: "Reels", contentStory: "Story", contentCarousel: "Carrossel",
+    contentArticle: "Artigo", contentVideo: "Vídeo", contentOther: "Outro",
+    loading: "Carregando pautas...", briefsForApproval: "Pautas para Aprovar", pending: "pendentes",
+    bannerTitle: "Estas são ideias de conteúdo aguardando sua aprovação.",
+    bannerDesc: "Ainda não são os posts finais — depois de aprovadas, nossa equipe irá produzir as artes e legendas.",
+    briefForApproval: "Pauta para Aprovação", reference: "Referência",
+    approve: "Aprovar", reject: "Reprovar",
+    briefApproved: "Pauta aprovada!", briefRejected: "Pauta reprovada",
+    disclaimer: "Esta é uma ideia em discussão. O post final será criado após sua aprovação.",
+    referenceImages: "Imagens de referência", plannedDate: "Data prevista",
+    description: "Descrição", captionLabel: "Legenda",
+    comments: "Comentários", noComments: "Nenhum comentário.",
+    clientRole: "Cliente", teamRole: "Equipe",
+    leaveFeedback: "Deixe seu feedback...", send: "Enviar", commentSent: "Comentário enviado!",
+  },
+  en: {
+    statusPendingApproval: "Awaiting Approval", statusApproved: "Approved", statusRejected: "Rejected", statusPublished: "Published",
+    contentPost: "Post", contentReels: "Reels", contentStory: "Story", contentCarousel: "Carousel",
+    contentArticle: "Article", contentVideo: "Video", contentOther: "Other",
+    loading: "Loading briefs...", briefsForApproval: "Briefs for Approval", pending: "pending",
+    bannerTitle: "These are content ideas awaiting your approval.",
+    bannerDesc: "They are not the final posts — once approved, our team will produce the artwork and captions.",
+    briefForApproval: "Brief for Approval", reference: "Reference",
+    approve: "Approve", reject: "Reject",
+    briefApproved: "Brief approved!", briefRejected: "Brief rejected",
+    disclaimer: "This is an idea under discussion. The final post will be created after your approval.",
+    referenceImages: "Reference images", plannedDate: "Planned date",
+    description: "Description", captionLabel: "Caption",
+    comments: "Comments", noComments: "No comments.",
+    clientRole: "Client", teamRole: "Team",
+    leaveFeedback: "Leave your feedback...", send: "Send", commentSent: "Comment sent!",
+  },
+  it: {
+    statusPendingApproval: "In attesa di approvazione", statusApproved: "Approvato", statusRejected: "Rifiutato", statusPublished: "Pubblicato",
+    contentPost: "Post", contentReels: "Reels", contentStory: "Story", contentCarousel: "Carosello",
+    contentArticle: "Articolo", contentVideo: "Video", contentOther: "Altro",
+    loading: "Caricamento brief...", briefsForApproval: "Brief da approvare", pending: "in attesa",
+    bannerTitle: "Queste sono idee di contenuto in attesa della tua approvazione.",
+    bannerDesc: "Non sono ancora i post finali — una volta approvate, il nostro team produrrà grafiche e didascalie.",
+    briefForApproval: "Brief da approvare", reference: "Riferimento",
+    approve: "Approva", reject: "Rifiuta",
+    briefApproved: "Brief approvato!", briefRejected: "Brief rifiutato",
+    disclaimer: "Questa è un'idea in discussione. Il post finale sarà creato dopo la tua approvazione.",
+    referenceImages: "Immagini di riferimento", plannedDate: "Data prevista",
+    description: "Descrizione", captionLabel: "Didascalia",
+    comments: "Commenti", noComments: "Nessun commento.",
+    clientRole: "Cliente", teamRole: "Team",
+    leaveFeedback: "Lascia il tuo feedback...", send: "Invia", commentSent: "Commento inviato!",
+  },
+  es: {
+    statusPendingApproval: "Esperando aprobación", statusApproved: "Aprobado", statusRejected: "Rechazado", statusPublished: "Publicado",
+    contentPost: "Post", contentReels: "Reels", contentStory: "Historia", contentCarousel: "Carrusel",
+    contentArticle: "Artículo", contentVideo: "Video", contentOther: "Otro",
+    loading: "Cargando briefs...", briefsForApproval: "Briefs para Aprobar", pending: "pendientes",
+    bannerTitle: "Estas son ideas de contenido esperando tu aprobación.",
+    bannerDesc: "Aún no son las publicaciones finales — después de aprobadas, nuestro equipo producirá las artes y textos.",
+    briefForApproval: "Brief para Aprobación", reference: "Referencia",
+    approve: "Aprobar", reject: "Rechazar",
+    briefApproved: "¡Brief aprobado!", briefRejected: "Brief rechazado",
+    disclaimer: "Esta es una idea en discusión. La publicación final se creará tras tu aprobación.",
+    referenceImages: "Imágenes de referencia", plannedDate: "Fecha prevista",
+    description: "Descripción", captionLabel: "Texto",
+    comments: "Comentarios", noComments: "Sin comentarios.",
+    clientRole: "Cliente", teamRole: "Equipo",
+    leaveFeedback: "Deja tu feedback...", send: "Enviar", commentSent: "¡Comentario enviado!",
+  },
+  sv: {
+    statusPendingApproval: "Väntar på godkännande", statusApproved: "Godkänd", statusRejected: "Avvisad", statusPublished: "Publicerad",
+    contentPost: "Inlägg", contentReels: "Reels", contentStory: "Story", contentCarousel: "Karusell",
+    contentArticle: "Artikel", contentVideo: "Video", contentOther: "Annat",
+    loading: "Laddar utkast...", briefsForApproval: "Utkast att godkänna", pending: "väntande",
+    bannerTitle: "Detta är innehållsidéer som väntar på ditt godkännande.",
+    bannerDesc: "De är inte de slutliga inläggen — när de är godkända producerar vårt team grafik och texter.",
+    briefForApproval: "Utkast att godkänna", reference: "Referens",
+    approve: "Godkänn", reject: "Avvisa",
+    briefApproved: "Utkast godkänt!", briefRejected: "Utkast avvisat",
+    disclaimer: "Detta är en idé under diskussion. Det slutliga inlägget skapas efter ditt godkännande.",
+    referenceImages: "Referensbilder", plannedDate: "Planerat datum",
+    description: "Beskrivning", captionLabel: "Bildtext",
+    comments: "Kommentarer", noComments: "Inga kommentarer.",
+    clientRole: "Klient", teamRole: "Team",
+    leaveFeedback: "Lämna din feedback...", send: "Skicka", commentSent: "Kommentar skickad!",
+  },
 };
 
 interface ClientBriefsProps {
   clientId: string;
   clientName: string;
   filterMonth?: Date;
+  locale?: string;
 }
 
-const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) => {
+const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBriefsProps) => {
+  const lk: LocaleKey = ((locale as LocaleKey) in T ? (locale as LocaleKey) : "pt");
+  const tt = T[lk];
+  const STATUS_LABELS: Record<string, { label: string; color: string }> = {
+    pending_approval: { label: tt.statusPendingApproval, color: "bg-amber-500/15 text-amber-600" },
+    approved: { label: tt.statusApproved, color: "bg-emerald-500/15 text-emerald-600" },
+    rejected: { label: tt.statusRejected, color: "bg-red-500/15 text-red-600" },
+    published: { label: tt.statusPublished, color: "bg-purple-500/15 text-purple-600" },
+  };
+  const CONTENT_LABELS: Record<string, string> = {
+    post: tt.contentPost, reels: tt.contentReels, story: tt.contentStory, carousel: tt.contentCarousel,
+    article: tt.contentArticle, video: tt.contentVideo, other: tt.contentOther,
+  };
   const [briefs, setBriefs] = useState<Brief[]>([]);
   const [loading, setLoading] = useState(true);
   const [detailBrief, setDetailBrief] = useState<Brief | null>(null);
@@ -157,7 +274,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
         }
       }
 
-      toast({ title: "Pauta aprovada!" });
+      toast({ title: tt.briefApproved });
       setDetailBrief((prev) => prev ? { ...prev, status: "approved" } : null);
       loadBriefs();
     }
@@ -166,7 +283,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
   const handleReject = async (briefId: string) => {
     const { error } = await supabase.from("content_briefs").update({ status: "rejected" } as any).eq("id", briefId);
     if (!error) {
-      toast({ title: "Pauta reprovada" });
+      toast({ title: tt.briefRejected });
       setDetailBrief((prev) => prev ? { ...prev, status: "rejected" } : null);
       loadBriefs();
     }
@@ -185,7 +302,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
       setNewComment("");
       const { data } = await supabase.from("brief_comments").select("*").eq("brief_id", detailBrief.id).order("created_at", { ascending: true });
       if (data) setComments(data as BriefComment[]);
-      toast({ title: "Comentário enviado!" });
+      toast({ title: tt.commentSent });
     }
   };
 
@@ -196,16 +313,16 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
     return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
   });
 
-  if (loading) return <div className="text-center py-8 text-muted-foreground text-sm">Carregando pautas...</div>;
+  if (loading) return <div className="text-center py-8 text-muted-foreground text-sm">{tt.loading}</div>;
   if (filteredBriefs.length === 0) return null;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <FileText className="h-5 w-5 text-amber-600" />
-        <h2 className="text-lg font-bold">Pautas para Aprovar</h2>
+        <h2 className="text-lg font-bold">{tt.briefsForApproval}</h2>
         <Badge variant="secondary" className="ml-1 bg-amber-500/15 text-amber-700">
-          {filteredBriefs.filter((b) => b.status === "pending_approval").length} pendentes
+          {filteredBriefs.filter((b) => b.status === "pending_approval").length} {tt.pending}
         </Badge>
       </div>
 
@@ -213,8 +330,8 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
       <div className="flex gap-3 rounded-xl border-2 border-dashed border-amber-400/60 bg-amber-50 p-3 text-sm text-amber-900">
         <Lightbulb className="h-5 w-5 shrink-0 text-amber-600 mt-0.5" />
         <p>
-          <strong>Estas são ideias de conteúdo aguardando sua aprovação.</strong>{" "}
-          Ainda não são os posts finais — depois de aprovadas, nossa equipe irá produzir as artes e legendas.
+          <strong>{tt.bannerTitle}</strong>{" "}
+          {tt.bannerDesc}
         </p>
       </div>
 
@@ -230,7 +347,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
             >
               <div className="flex items-center gap-2 bg-amber-500 text-white px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest">
                 <PencilLine className="h-3.5 w-3.5" />
-                Pauta para Aprovação
+                {tt.briefForApproval}
               </div>
               {brief.media_urls && brief.media_urls.length > 0 && (
                 <div className="relative w-full bg-black/5 border-b-2 border-dashed border-amber-300/60" style={{ aspectRatio: "4/5" }}>
@@ -245,7 +362,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
                     </span>
                   )}
                   <span className="absolute bottom-2 left-2 bg-amber-500/95 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
-                    Referência
+                    {tt.reference}
                   </span>
                 </div>
               )}
@@ -264,10 +381,10 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
                 {brief.status === "pending_approval" && (
                   <div className="flex gap-2 mt-auto pt-2 border-t border-amber-300/60">
                     <Button size="sm" className="flex-1 gap-1 text-xs bg-emerald-500 hover:bg-emerald-600" onClick={(e) => { e.stopPropagation(); handleApprove(brief.id); }}>
-                      <Check className="h-3 w-3" /> Aprovar
+                      <Check className="h-3 w-3" /> {tt.approve}
                     </Button>
                     <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs text-red-500 hover:text-red-600 bg-white" onClick={(e) => { e.stopPropagation(); handleReject(brief.id); }}>
-                      <X className="h-3 w-3" /> Reprovar
+                      <X className="h-3 w-3" /> {tt.reject}
                     </Button>
                   </div>
                 )}
@@ -284,7 +401,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
             <>
               <div className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 text-xs font-bold uppercase tracking-widest">
                 <PencilLine className="h-4 w-4" />
-                Pauta para Aprovação
+                {tt.briefForApproval}
               </div>
               <div className="p-6">
               <DialogHeader>
@@ -296,7 +413,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth }: ClientBriefsProps) 
                 </div>
                 <DialogTitle className="text-amber-950">{detailBrief.title}</DialogTitle>
                 <p className="text-[11px] text-amber-900 italic mt-1">
-                  Esta é uma ideia em discussão. O post final será criado após sua aprovação.
+                  {tt.disclaimer}
                 </p>
               </DialogHeader>
 

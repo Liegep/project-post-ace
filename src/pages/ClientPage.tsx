@@ -129,20 +129,20 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
   const handleChangePassword = async () => {
     if (newPassword.length < 6) {
-      toast.error("A nova senha deve ter pelo menos 6 caracteres");
+      toast.error(t("passwordMinError"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error("As senhas não coincidem");
+      toast.error(t("passwordMismatch"));
       return;
     }
     setSavingPassword(true);
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     setSavingPassword(false);
     if (error) {
-      toast.error("Erro ao alterar senha: " + error.message);
+      toast.error(t("passwordUpdateError") + ": " + error.message);
     } else {
-      toast.success("Senha alterada com sucesso!");
+      toast.success(t("passwordUpdated"));
       setPasswordOpen(false);
       setCurrentPassword("");
       setNewPassword("");
@@ -217,11 +217,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => navigate(`/client/${clientData.slug}/brand-brain`)}>
                 <Sparkles className="mr-2 h-4 w-4" />
-                Brand Brain
+                {t("brandBrain")}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setPasswordOpen(true)}>
                 <KeyRound className="mr-2 h-4 w-4" />
-                Alterar senha
+                {t("changePassword")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={async () => {
@@ -231,7 +231,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 className="text-destructive focus:text-destructive"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                Sair
+                {t("signOut")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -239,27 +239,27 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
           <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Alterar senha</DialogTitle>
+                <DialogTitle>{t("changePassword")}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-2">
                 <div className="space-y-2">
-                  <Label htmlFor="new-password">Nova senha</Label>
+                  <Label htmlFor="new-password">{t("newPassword")}</Label>
                   <Input
                     id="new-password"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Mínimo 6 caracteres"
+                    placeholder={t("minChars")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirmar nova senha</Label>
+                  <Label htmlFor="confirm-password">{t("confirmNewPassword")}</Label>
                   <Input
                     id="confirm-password"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Repita a nova senha"
+                    placeholder={t("repeatPassword")}
                   />
                 </div>
                 <Button
@@ -267,7 +267,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                   disabled={savingPassword}
                   className="w-full"
                 >
-                  {savingPassword ? "Salvando..." : "Alterar senha"}
+                  {savingPassword ? t("saving") : t("saveNewPassword")}
                 </Button>
               </div>
             </DialogContent>
@@ -315,7 +315,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               className="text-xs ml-1"
               onClick={() => setSelectedMonth(new Date())}
             >
-              Mês atual
+              {t("currentMonth")}
             </Button>
           )}
         </div>
@@ -325,7 +325,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
         {/* Client Briefs for Approval */}
         <div className="mb-8">
-          <ClientBriefs clientId={clientData.id} clientName={clientData.name} filterMonth={selectedMonth} />
+          <ClientBriefs clientId={clientData.id} clientName={clientData.name} filterMonth={selectedMonth} locale={clientData.locale} />
         </div>
 
         {/* Design Briefs */}
@@ -340,7 +340,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
         {/* Text Contents for Approval */}
         <div className="mb-8">
-          <TextContentsPanel clientId={clientData.id} clientName={clientData.name} />
+          <TextContentsPanel clientId={clientData.id} clientName={clientData.name} locale={clientData.locale} />
         </div>
 
         {/* Client Invoices - permission-controlled */}
@@ -353,6 +353,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               canViewAttachments={billingPerm.can_view_attachments}
               canDownloadAttachments={billingPerm.can_download_attachments}
               filterMonth={selectedMonth}
+              locale={clientData.locale}
             />
           </div>
         )}
@@ -375,7 +376,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "archived" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
               >
                 <Archive className="mr-1.5 inline h-4 w-4" />
-                Arquivados
+                {t("archived")}
                 {archivedPosts.length > 0 && (
                   <span className="ml-1.5 rounded-full bg-muted-foreground/20 px-1.5 py-0.5 text-[10px] font-semibold">
                     {archivedPosts.length}
@@ -399,7 +400,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                   className="bg-accent text-accent-foreground hover:bg-accent/90"
                 >
                   <Plus className="mr-1.5 h-4 w-4" />
-                  Criar post
+                  {t("createPost")}
                 </Button>
               </div>
             )}
@@ -412,6 +413,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 columns={columns}
                 tags={tags}
                 trackingColumnIds={((clientData as any).tracking_column_ids as string[]) ?? []}
+                locale={clientData.locale}
               />
             )}
 
@@ -436,7 +438,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                               </div>
                               <div className="space-y-4">
                                 {sortByDate(colPosts).map((post) => (
-                                  <ErrorBoundary key={post.id} fallbackTitle="Erro ao exibir post">
+                                   <ErrorBoundary key={post.id} fallbackTitle={t("errorDisplayingPost")}>
                                     <PostCard post={post} isAdmin={false} onEdit={() => setDetailPost(post)} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
                                   </ErrorBoundary>
                                 ))}
@@ -452,10 +454,10 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                     <div className="flex flex-col lg:flex-row gap-6">
                       {entradaPosts.length > 0 && (
                         <div className="w-full lg:w-80 shrink-0">
-                          <h3 className="mb-3 text-lg font-semibold text-muted-foreground">Entrada</h3>
+                          <h3 className="mb-3 text-lg font-semibold text-muted-foreground">{t("statusEntry")}</h3>
                           <div className="space-y-4 rounded-xl bg-muted/30 p-4">
                             {sortByDate(entradaPosts).map((post) => (
-                              <ErrorBoundary key={post.id} fallbackTitle="Erro ao exibir post">
+                              <ErrorBoundary key={post.id} fallbackTitle={t("errorDisplayingPost")}>
                                 <PostCard post={post} isAdmin={false} onEdit={() => setDetailPost(post)} hideFeedback allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
                               </ErrorBoundary>
                             ))}
@@ -468,7 +470,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                           <>
                             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                               {sortByDate(readyPosts).slice(0, visibleCount).map((post) => (
-                                <ErrorBoundary key={post.id} fallbackTitle="Erro ao exibir post">
+                                <ErrorBoundary key={post.id} fallbackTitle={t("errorDisplayingPost")}>
                                   <PostCard post={post} isAdmin={false} onEdit={() => setDetailPost(post)} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} showInlineDetails={visibleColumnPosts.length === 0} />
                                 </ErrorBoundary>
                               ))}
@@ -480,7 +482,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                                   onClick={() => setVisibleCount((prev) => prev + POSTS_PER_PAGE)}
                                   className="px-8"
                                 >
-                                  Carregar mais ({readyPosts.length - visibleCount} restantes)
+                                  {t("loadMore")} ({readyPosts.length - visibleCount} {t("loadMoreRemaining")})
                                 </Button>
                               </div>
                             )}
@@ -501,7 +503,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <div className="mb-4 rounded-full bg-muted p-6">
                   <Archive className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h2 className="text-xl font-semibold text-foreground">Nenhum post arquivado</h2>
+                <h2 className="text-xl font-semibold text-foreground">{t("noArchivedPosts")}</h2>
               </div>
             ) : (
               <div className="flex gap-4 overflow-x-auto pb-4 h-full">
@@ -520,11 +522,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <Button variant="outline" size="sm" className="w-full text-xs">
-                                    <RotateCcw className="mr-1.5 h-3 w-3" /> Restaurar
+                                    <RotateCcw className="mr-1.5 h-3 w-3" /> {t("restore")}
                                   </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-48 p-2" align="start">
-                                  <p className="text-xs font-medium text-muted-foreground mb-2">Mover para coluna:</p>
+                                  <p className="text-xs font-medium text-muted-foreground mb-2">{t("moveToColumn")}:</p>
                                   <div className="space-y-1">
                                     {columns.map((col) => (
                                       <button
@@ -638,19 +640,22 @@ const ClientPage = () => {
   }
 
   if (notFound || !clientData) {
+    const fallbackLocale = (clientData?.locale || "pt") as Locale;
+    const tt = (key: keyof typeof translations.pt) => translations[fallbackLocale]?.[key] || translations.pt[key];
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background">
-        <h1 className="text-2xl font-bold text-foreground">Cliente não encontrado</h1>
-        <p className="mt-2 text-muted-foreground">Verifique o link e tente novamente.</p>
+        <h1 className="text-2xl font-bold text-foreground">{tt("clientNotFound")}</h1>
+        <p className="mt-2 text-muted-foreground">{tt("clientNotFoundDesc")}</p>
       </div>
     );
   }
 
 
   const clientLocale = (clientData.locale || "pt") as Locale;
+  const tOuter = (key: keyof typeof translations.pt) => translations[clientLocale]?.[key] || translations.pt[key];
 
   return (
-    <ErrorBoundary fallbackTitle="Erro ao carregar página do cliente">
+    <ErrorBoundary fallbackTitle={tOuter("errorLoadingClientPage")}>
       {isClient && <ContractGateModal />}
       <I18nProvider key={clientLocale} forceLocale={clientLocale}>
         <PostsProvider clientId={clientData.id} clientLogo={clientData.logo_url} clientPostingPeriod={clientData.posting_period}>

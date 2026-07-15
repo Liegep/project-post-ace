@@ -85,16 +85,16 @@ export function StorageCleanupButton() {
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Confirmar limpeza de armazenamento</AlertDialogTitle>
-            <AlertDialogDescription className="text-white/90">
-              Foram encontrados <strong className="text-white">{orphanCount}</strong> arquivos órfãos ocupando aproximadamente{" "}
-              <strong className="text-white">{formatBytes(totalBytes)}</strong>. Esses arquivos não estão vinculados a nenhum post, pauta,
+            <AlertDialogTitle>Confirmar limpeza de armazenamento</AlertDialogTitle>
+            <AlertDialogDescription>
+              Foram encontrados <strong className="text-foreground">{orphanCount}</strong> arquivos órfãos ocupando aproximadamente{" "}
+              <strong className="text-foreground">{formatBytes(totalBytes)}</strong>. Esses arquivos não estão vinculados a nenhum post, pauta,
               calendário ou fatura. Deseja excluir permanentemente?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting} className="text-white">Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} disabled={deleting} className="text-white">
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} disabled={deleting}>
               {deleting ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
               Excluir {orphanCount} arquivos
             </AlertDialogAction>
