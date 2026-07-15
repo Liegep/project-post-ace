@@ -480,7 +480,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                                   onClick={() => setVisibleCount((prev) => prev + POSTS_PER_PAGE)}
                                   className="px-8"
                                 >
-                                  Carregar mais ({readyPosts.length - visibleCount} restantes)
+                                  {t("loadMore")} ({readyPosts.length - visibleCount} {t("loadMoreRemaining")})
                                 </Button>
                               </div>
                             )}
