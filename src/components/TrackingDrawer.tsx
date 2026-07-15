@@ -22,7 +22,7 @@ interface TrackingDrawerProps {
 }
 
 const TD_T: Record<string, { tracking: string; visibleColumns: string; visibleColumnsHelp: string; visibleToClient: string; hiddenFromClient: string; pin: string; unpin: string; close: string }> = {
-  pt: { tracking: "Acompanhamento", visibleColumns: "Colunas visíveis para o cliente", visibleColumnsHelp: "Se nada for selecionado, o cliente verá todas as colunas.", visibleToClient: "Visível para o cliente", hiddenFromClient: "Oculto para o cliente", pin: "Fixar na tela", unpin: "Desafixar", close: "Fechar" },
+  pt: { tracking: "Acompanhamento", visibleColumns: "Colunas visíveis para o cliente", visibleColumnsHelp: "{td.visibleColumnsHelp}", visibleToClient: "Visível para o cliente", hiddenFromClient: "Oculto para o cliente", pin: "Fixar na tela", unpin: "Desafixar", close: "Fechar" },
   en: { tracking: "Tracking", visibleColumns: "Columns visible to client", visibleColumnsHelp: "If nothing is selected, the client will see all columns.", visibleToClient: "Visible to client", hiddenFromClient: "Hidden from client", pin: "Pin to screen", unpin: "Unpin", close: "Close" },
   it: { tracking: "Monitoraggio", visibleColumns: "Colonne visibili al cliente", visibleColumnsHelp: "Se nulla è selezionato, il cliente vedrà tutte le colonne.", visibleToClient: "Visibile al cliente", hiddenFromClient: "Nascosto al cliente", pin: "Fissa allo schermo", unpin: "Sblocca", close: "Chiudi" },
   es: { tracking: "Seguimiento", visibleColumns: "Columnas visibles para el cliente", visibleColumnsHelp: "Si nada está seleccionado, el cliente verá todas las columnas.", visibleToClient: "Visible para el cliente", hiddenFromClient: "Oculto para el cliente", pin: "Fijar en pantalla", unpin: "Desfijar", close: "Cerrar" },
@@ -84,7 +84,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
                     ? "text-primary border-primary/40 bg-primary/10 hover:bg-primary/20"
                     : "text-foreground border-border bg-background/60 hover:bg-muted"
                 )}
-                title="Colunas visíveis para o cliente"
+                title={td.visibleColumns}
               >
                 <Filter className="h-4 w-4" />
               </button>
@@ -94,7 +94,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
                 Colunas visíveis para o cliente
               </div>
               <div className="mb-2 text-[11px] text-muted-foreground">
-                Se nada for selecionado, o cliente verá todas as colunas.
+                {td.visibleColumnsHelp}
               </div>
               <div className="space-y-1.5 max-h-60 overflow-y-auto">
                 {(props.columns || []).map((col) => {
@@ -131,7 +131,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
                 ? "text-primary hover:bg-primary/10"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             )}
-            title={props.visibleToClient ? "Visível para o cliente" : "Oculto para o cliente"}
+            title={props.visibleToClient ? td.visibleToClient : td.hiddenFromClient}
           >
             {props.visibleToClient ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
           </button>
@@ -150,7 +150,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
         "bg-card border rounded-l-xl px-3 py-3 hover:px-4 hover:shadow-xl group",
         "right-0 top-1/3",
       )}
-      title="Acompanhamento"
+      title={td.tracking}
     >
       <BarChart3 className="h-4 w-4 text-primary" />
       <span className="text-xs font-semibold text-foreground hidden sm:inline">
@@ -183,14 +183,14 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
             <button
               onClick={togglePin}
               className="rounded-md p-1.5 text-primary hover:bg-primary/10 transition-colors"
-              title="Desafixar"
+              title={td.unpin}
             >
               <PinOff className="h-3.5 w-3.5" />
             </button>
             <button
               onClick={() => { setPinned(false); setOpen(false); }}
               className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-              title="Fechar"
+              title={td.close}
             >
               <X className="h-4 w-4" />
             </button>
@@ -233,7 +233,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
                   <button
                     onClick={togglePin}
                     className="rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                    title="Fixar na tela"
+                    title={td.pin}
                   >
                     <Pin className="h-3.5 w-3.5" />
                   </button>
