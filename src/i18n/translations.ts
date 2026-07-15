@@ -999,6 +999,14 @@ const it: TranslationKeys = {
   approvalSuccessApproved: "Post approvato!",
   approvalSuccessChange: "Modifica richiesta!",
   approvalActionError: "Errore nell'elaborazione dell'azione.",
+  currentMonth: "Mese corrente",
+  loadMore: "Carica altro",
+  loadMoreRemaining: "rimanenti",
+  brandBrain: "Brand Brain",
+  clientNotFound: "Cliente non trovato",
+  clientNotFoundDesc: "Controlla il link e riprova.",
+  errorDisplayingPost: "Errore nel mostrare il post",
+  errorLoadingClientPage: "Errore nel caricare la pagina del cliente",
 };
 
 const es: TranslationKeys = {
