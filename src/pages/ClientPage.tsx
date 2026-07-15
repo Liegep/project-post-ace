@@ -129,20 +129,20 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
 
   const handleChangePassword = async () => {
     if (newPassword.length < 6) {
-      toast.error("A nova senha deve ter pelo menos 6 caracteres");
+      toast.error(t("passwordMinError"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error("As senhas não coincidem");
+      toast.error(t("passwordMismatch"));
       return;
     }
     setSavingPassword(true);
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     setSavingPassword(false);
     if (error) {
-      toast.error("Erro ao alterar senha: " + error.message);
+      toast.error(t("passwordUpdateError") + ": " + error.message);
     } else {
-      toast.success("Senha alterada com sucesso!");
+      toast.success(t("passwordUpdated"));
       setPasswordOpen(false);
       setCurrentPassword("");
       setNewPassword("");
