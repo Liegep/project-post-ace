@@ -91,7 +91,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
             </PopoverTrigger>
             <PopoverContent align="end" className="w-64 p-3 z-[60]">
               <div className="mb-2 text-xs font-semibold text-foreground">
-                Colunas visíveis para o cliente
+                {td.visibleColumns}
               </div>
               <div className="mb-2 text-[11px] text-muted-foreground">
                 {td.visibleColumnsHelp}
@@ -154,7 +154,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
     >
       <BarChart3 className="h-4 w-4 text-primary" />
       <span className="text-xs font-semibold text-foreground hidden sm:inline">
-        Acompanhamento
+        {td.tracking}
       </span>
       {itemCount > 0 && (
         <span className="absolute -top-2 -left-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground shadow">
@@ -171,7 +171,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
         <div className="flex items-center justify-between border-b px-4 py-3">
           <h3 className="flex items-center gap-2 text-sm font-bold text-foreground">
             <BarChart3 className="h-4 w-4 text-primary" />
-            Acompanhamento
+            {td.tracking}
             {itemCount > 0 && (
               <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
                 {itemCount}
@@ -220,7 +220,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
             <div className="flex items-center justify-between">
               <SheetTitle className="flex items-center gap-2 text-sm font-bold">
                 <BarChart3 className="h-4 w-4 text-primary" />
-                Acompanhamento
+                {td.tracking}
                 {itemCount > 0 && (
                   <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
                     {itemCount}
