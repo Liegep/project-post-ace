@@ -12,9 +12,25 @@ interface Props {
   clientId: string;
   clientName?: string;
   isAdmin?: boolean;
+  locale?: string;
 }
 
-export function TextContentsPanel({ clientId, clientName, isAdmin }: Props) {
+type LocaleKey = "pt" | "en" | "it" | "es" | "sv";
+const TC_T: Record<LocaleKey, {
+  title: string; new: string; empty: string; contentApproved: string; contentRejected: string;
+  createdSuccess: string; createError: string; updated: string; deleted: string; deleteConfirm: string;
+  commentSent: string;
+}> = {
+  pt: { title: "Conteúdos Textuais", new: "Novo", empty: "Nenhum conteúdo textual para aprovação", contentApproved: "Conteúdo aprovado!", contentRejected: "Conteúdo reprovado", createdSuccess: "Conteúdo criado com sucesso!", createError: "Erro ao criar conteúdo", updated: "Conteúdo atualizado!", deleted: "Conteúdo excluído", deleteConfirm: "Excluir este conteúdo?", commentSent: "Comentário enviado!" },
+  en: { title: "Text Contents", new: "New", empty: "No text content for approval", contentApproved: "Content approved!", contentRejected: "Content rejected", createdSuccess: "Content created!", createError: "Error creating content", updated: "Content updated!", deleted: "Content deleted", deleteConfirm: "Delete this content?", commentSent: "Comment sent!" },
+  it: { title: "Contenuti Testuali", new: "Nuovo", empty: "Nessun contenuto testuale da approvare", contentApproved: "Contenuto approvato!", contentRejected: "Contenuto rifiutato", createdSuccess: "Contenuto creato!", createError: "Errore nella creazione", updated: "Contenuto aggiornato!", deleted: "Contenuto eliminato", deleteConfirm: "Eliminare questo contenuto?", commentSent: "Commento inviato!" },
+  es: { title: "Contenidos de Texto", new: "Nuevo", empty: "Sin contenido de texto para aprobar", contentApproved: "¡Contenido aprobado!", contentRejected: "Contenido rechazado", createdSuccess: "¡Contenido creado!", createError: "Error al crear contenido", updated: "¡Contenido actualizado!", deleted: "Contenido eliminado", deleteConfirm: "¿Eliminar este contenido?", commentSent: "¡Comentario enviado!" },
+  sv: { title: "Textinnehåll", new: "Nytt", empty: "Inget textinnehåll för godkännande", contentApproved: "Innehåll godkänt!", contentRejected: "Innehåll avvisat", createdSuccess: "Innehåll skapat!", createError: "Fel vid skapande", updated: "Innehåll uppdaterat!", deleted: "Innehåll borttaget", deleteConfirm: "Ta bort detta innehåll?", commentSent: "Kommentar skickad!" },
+};
+
+export function TextContentsPanel({ clientId, clientName, isAdmin, locale }: Props) {
+  const lk: LocaleKey = ((locale as LocaleKey) in TC_T ? (locale as LocaleKey) : "pt");
+  const tt = TC_T[lk];
   const { contents, loading, create, update, remove } = useTextContents(clientId);
   const [createOpen, setCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<TextContent | null>(null);
