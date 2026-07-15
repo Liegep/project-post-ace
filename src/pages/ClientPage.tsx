@@ -413,6 +413,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 columns={columns}
                 tags={tags}
                 trackingColumnIds={((clientData as any).tracking_column_ids as string[]) ?? []}
+                locale={clientData.locale}
               />
             )}
 
