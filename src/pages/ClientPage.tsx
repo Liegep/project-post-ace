@@ -315,7 +315,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               className="text-xs ml-1"
               onClick={() => setSelectedMonth(new Date())}
             >
-              Mês atual
+              {t("currentMonth")}
             </Button>
           )}
         </div>
