@@ -519,6 +519,14 @@ const pt: TranslationKeys = {
   approvalSuccessApproved: "Post aprovado!",
   approvalSuccessChange: "Ajuste solicitado!",
   approvalActionError: "Erro ao processar ação.",
+  currentMonth: "Mês atual",
+  loadMore: "Carregar mais",
+  loadMoreRemaining: "restantes",
+  brandBrain: "Brand Brain",
+  clientNotFound: "Cliente não encontrado",
+  clientNotFoundDesc: "Verifique o link e tente novamente.",
+  errorDisplayingPost: "Erro ao exibir post",
+  errorLoadingClientPage: "Erro ao carregar página do cliente",
 };
 
 const en: TranslationKeys = {
