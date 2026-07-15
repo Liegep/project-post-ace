@@ -520,11 +520,11 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <Button variant="outline" size="sm" className="w-full text-xs">
-                                    <RotateCcw className="mr-1.5 h-3 w-3" /> Restaurar
+                                    <RotateCcw className="mr-1.5 h-3 w-3" /> {t("restore")}
                                   </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-48 p-2" align="start">
-                                  <p className="text-xs font-medium text-muted-foreground mb-2">Mover para coluna:</p>
+                                  <p className="text-xs font-medium text-muted-foreground mb-2">{t("moveToColumn")}:</p>
                                   <div className="space-y-1">
                                     {columns.map((col) => (
                                       <button
