@@ -1479,6 +1479,14 @@ const sv: TranslationKeys = {
   approvalSuccessApproved: "Inlägg godkänt!",
   approvalSuccessChange: "Ändring begärd!",
   approvalActionError: "Fel vid bearbetning av åtgärd.",
+  currentMonth: "Aktuell månad",
+  loadMore: "Ladda fler",
+  loadMoreRemaining: "kvar",
+  brandBrain: "Brand Brain",
+  clientNotFound: "Klient hittades inte",
+  clientNotFoundDesc: "Kontrollera länken och försök igen.",
+  errorDisplayingPost: "Fel vid visning av inlägg",
+  errorLoadingClientPage: "Fel vid laddning av klientsidan",
 };
 
 export const translations: Record<Locale, TranslationKeys> = { pt, en, it, es, sv };
