@@ -313,7 +313,7 @@ const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBrief
     return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
   });
 
-  if (loading) return <div className="text-center py-8 text-muted-foreground text-sm">Carregando pautas...</div>;
+  if (loading) return <div className="text-center py-8 text-muted-foreground text-sm">{tt.loading}</div>;
   if (filteredBriefs.length === 0) return null;
 
   return (
