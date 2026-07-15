@@ -381,10 +381,10 @@ const ClientBriefs = ({ clientId, clientName, filterMonth, locale }: ClientBrief
                 {brief.status === "pending_approval" && (
                   <div className="flex gap-2 mt-auto pt-2 border-t border-amber-300/60">
                     <Button size="sm" className="flex-1 gap-1 text-xs bg-emerald-500 hover:bg-emerald-600" onClick={(e) => { e.stopPropagation(); handleApprove(brief.id); }}>
-                      <Check className="h-3 w-3" /> Aprovar
+                      <Check className="h-3 w-3" /> {tt.approve}
                     </Button>
                     <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs text-red-500 hover:text-red-600 bg-white" onClick={(e) => { e.stopPropagation(); handleReject(brief.id); }}>
-                      <X className="h-3 w-3" /> Reprovar
+                      <X className="h-3 w-3" /> {tt.reject}
                     </Button>
                   </div>
                 )}
