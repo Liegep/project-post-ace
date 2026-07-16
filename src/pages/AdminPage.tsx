@@ -164,6 +164,7 @@ interface KanbanBoardProps {
   selectedPostIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
   reorderColumns: (columns: { id: string; name: string; position: number; visibleToClient: boolean; color?: string | null }[]) => void;
+  clientId: string;
 }
 
 const SortableColumn = ({ col, children }: { col: { id: string }; children: React.ReactNode }) => {
