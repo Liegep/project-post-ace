@@ -197,6 +197,7 @@ const KanbanBoard = ({
   toggleColumnVisibility, setColumnColor,
   selectionMode, selectedPostIds, onToggleSelect,
   reorderColumns,
+  clientId,
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
