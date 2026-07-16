@@ -204,6 +204,7 @@ const KanbanBoard = ({
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
+  const [invoiceColumnTarget, setInvoiceColumnTarget] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } })
