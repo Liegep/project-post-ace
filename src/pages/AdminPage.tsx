@@ -554,6 +554,21 @@ const KanbanBoard = ({
         )}
       </DragOverlay>
     </DndContext>
+    <InvoiceColumnDialog
+      open={!!invoiceColumnTarget}
+      onOpenChange={(o) => { if (!o) setInvoiceColumnTarget(null); }}
+      columnName={invoiceColumnTarget || ""}
+      currency={billingCurrency}
+      onConfirm={async ({ name, quantity, unit_price, description }) => {
+        try {
+          const res = await invoiceColumnAuto(clientId, name, { quantity, unit_price, description });
+          toast({ title: "Adicionado à fatura", description: `"${name}" enviado para "${res.invoiceTitle}".` });
+        } catch (err: any) {
+          toast({ title: "Erro ao faturar", description: err.message, variant: "destructive" });
+        }
+      }}
+    />
+    </>
   );
 };
 
