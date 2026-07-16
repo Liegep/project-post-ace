@@ -200,6 +200,7 @@ const KanbanBoard = ({
   selectionMode, selectedPostIds, onToggleSelect,
   reorderColumns,
   clientId,
+  billingCurrency,
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
