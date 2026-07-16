@@ -380,6 +380,19 @@ const KanbanBoard = ({
                           <Pencil className="h-4 w-4 mr-2" />
                           Editar
                         </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={async () => {
+                            try {
+                              const res = await invoiceColumnAuto(clientId, col.name);
+                              toast({ title: "Adicionado à fatura", description: `"${col.name}" enviado para "${res.invoiceTitle}".` });
+                            } catch (err: any) {
+                              toast({ title: "Erro ao faturar", description: err.message, variant: "destructive" });
+                            }
+                          }}
+                        >
+                          <Receipt className="h-4 w-4 mr-2" />
+                          Faturar
+                        </DropdownMenuItem>
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger>
                             <Paintbrush className="h-4 w-4 mr-2" />
