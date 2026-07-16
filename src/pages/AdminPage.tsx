@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings, History, Download, CalendarClock, FileText, Search, Sparkles, MoreVertical, Paintbrush, Receipt } from "lucide-react";
 import { invoiceColumnAuto } from "@/hooks/useInvoices";
+import { InvoiceColumnDialog } from "@/components/billing/InvoiceColumnDialog";
 import { ClientRightSidebar } from "@/components/ClientRightSidebar";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
