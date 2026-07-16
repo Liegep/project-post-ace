@@ -21,7 +21,8 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { useI18n } from "@/i18n/I18nContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings, History, Download, CalendarClock, FileText, Search, Sparkles, MoreVertical, Paintbrush } from "lucide-react";
+import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings, History, Download, CalendarClock, FileText, Search, Sparkles, MoreVertical, Paintbrush, Receipt } from "lucide-react";
+import { invoiceColumnAuto } from "@/hooks/useInvoices";
 import { ClientRightSidebar } from "@/components/ClientRightSidebar";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -164,6 +165,7 @@ interface KanbanBoardProps {
   selectedPostIds?: Set<string>;
   onToggleSelect?: (id: string) => void;
   reorderColumns: (columns: { id: string; name: string; position: number; visibleToClient: boolean; color?: string | null }[]) => void;
+  clientId: string;
 }
 
 const SortableColumn = ({ col, children }: { col: { id: string }; children: React.ReactNode }) => {
@@ -196,6 +198,7 @@ const KanbanBoard = ({
   toggleColumnVisibility, setColumnColor,
   selectionMode, selectedPostIds, onToggleSelect,
   reorderColumns,
+  clientId,
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
@@ -376,6 +379,19 @@ const KanbanBoard = ({
                         <DropdownMenuItem onClick={() => { setEditingColumnId(col.id); setEditingColumnName(col.name); }}>
                           <Pencil className="h-4 w-4 mr-2" />
                           Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={async () => {
+                            try {
+                              const res = await invoiceColumnAuto(clientId, col.name);
+                              toast({ title: "Adicionado à fatura", description: `"${col.name}" enviado para "${res.invoiceTitle}".` });
+                            } catch (err: any) {
+                              toast({ title: "Erro ao faturar", description: err.message, variant: "destructive" });
+                            }
+                          }}
+                        >
+                          <Receipt className="h-4 w-4 mr-2" />
+                          Faturar
                         </DropdownMenuItem>
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger>
@@ -1442,6 +1458,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     selectedPostIds={selectedPostIds}
                     onToggleSelect={toggleSelect}
                     reorderColumns={reorderColumns}
+                    clientId={clientData.id}
                   />
                 </div>
                 {trackingEnabled && (

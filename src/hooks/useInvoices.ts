@@ -274,3 +274,55 @@ export async function invoicePostAuto(clientId: string, post: {
 
   return { invoiceId, invoiceTitle };
 }
+
+// Auto-create or find open invoice for a client and add a plain item (e.g. column name)
+export async function invoiceColumnAuto(clientId: string, columnName: string) {
+  // Find open invoice for this client
+  const { data: openInvoices } = await supabase
+    .from("invoices")
+    .select("id, title")
+    .eq("client_id", clientId)
+    .eq("status", "open")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  let invoiceId: string;
+  let invoiceTitle: string;
+
+  if (openInvoices && openInvoices.length > 0) {
+    invoiceId = (openInvoices[0] as any).id;
+    invoiceTitle = (openInvoices[0] as any).title;
+  } else {
+    const now = new Date();
+    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const title = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const dueDate = new Date(now.getFullYear(), now.getMonth() + 1, 10);
+
+    const { data: inv, error } = await supabase.from("invoices").insert({
+      client_id: clientId,
+      title,
+      period_start: firstDay.toISOString().split("T")[0],
+      period_end: lastDay.toISOString().split("T")[0],
+      issue_date: now.toISOString().split("T")[0],
+      due_date: dueDate.toISOString().split("T")[0],
+    } as any).select().single();
+    if (error) throw error;
+    invoiceId = (inv as any).id;
+    invoiceTitle = title;
+  }
+
+  await createInvoiceItem({
+    invoice_id: invoiceId,
+    post_id: null,
+    name: columnName,
+    category: "post",
+    service_date: new Date().toISOString().split("T")[0],
+    quantity: 1,
+    unit_price: 0,
+    total_price: 0,
+  });
+
+  return { invoiceId, invoiceTitle };
+}
