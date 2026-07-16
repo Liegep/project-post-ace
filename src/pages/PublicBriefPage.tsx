@@ -49,32 +49,12 @@ export default function PublicBriefPage() {
 
     (async () => {
       setLoading(true);
-      const { data: tokenData, error: tokenErr } = await supabase
-        .from("design_brief_tokens")
-        .select("brief_id, active, expires_at")
-        .eq("token", token)
-        .maybeSingle();
+      const { data, error: briefErr } = await supabase
+        .rpc("get_public_brief_by_token", { p_token: token } as any);
 
-      if (tokenErr || !tokenData) {
-        setError("Link inválido ou expirado.");
-        setLoading(false);
-        return;
-      }
-
-      if (!tokenData.active || (tokenData.expires_at && new Date(tokenData.expires_at) < new Date())) {
-        setError("Este link expirou.");
-        setLoading(false);
-        return;
-      }
-
-      const { data: briefData, error: briefErr } = await supabase
-        .from("design_briefs")
-        .select("id, title, category, answers, locale, respondent_name, respondent_email, submitted_at, created_at, updated_at")
-        .eq("id", tokenData.brief_id)
-        .maybeSingle();
-
+      const briefData = Array.isArray(data) ? data[0] : data;
       if (briefErr || !briefData) {
-        setError("Brief não encontrado.");
+        setError("Link inválido ou expirado.");
         setLoading(false);
         return;
       }
@@ -186,19 +166,28 @@ export default function PublicBriefPage() {
     }
 
     setSaving(true);
-    const { error } = await supabase
-      .from("design_briefs")
-      .update({
-        answers: answers as any,
-        respondent_name: respondentName.trim(),
-        respondent_email: respondentEmail.trim(),
-        submitted_at: new Date().toISOString(),
-      })
-      .eq("id", brief.id);
+    const { data, error } = await supabase.rpc("submit_public_brief_by_token", {
+      p_token: token!,
+      p_answers: answers as any,
+      p_respondent_name: respondentName.trim(),
+      p_respondent_email: respondentEmail.trim(),
+    } as any);
 
-    if (error) {
+    if (error || !data) {
       toast({ title: "Erro ao enviar", description: error.message, variant: "destructive" });
     } else {
+      const updatedBrief = Array.isArray(data) ? data[0] : data;
+      if (updatedBrief) {
+        setBrief({
+          ...updatedBrief,
+          answers: (typeof updatedBrief.answers === "object" && updatedBrief.answers)
+            ? updatedBrief.answers as Record<string, any>
+            : {},
+          respondent_name: (updatedBrief as any).respondent_name || "",
+          respondent_email: (updatedBrief as any).respondent_email || "",
+          submitted_at: (updatedBrief as any).submitted_at || null,
+        });
+      }
       setSubmitted(true);
       toast({ title: "Brief enviado com sucesso!" });
     }
