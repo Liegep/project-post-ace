@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, LayoutGrid, List, Pencil, ImagePlus, ArrowLeft, Trash2, GripVertical, Archive, RotateCcw, CheckSquare, X, Eye, EyeOff, ClipboardList, StickyNote, LinkIcon, ExternalLink, UserPlus, Settings, History, Download, CalendarClock, FileText, Search, Sparkles, MoreVertical, Paintbrush, Receipt } from "lucide-react";
 import { invoiceColumnAuto } from "@/hooks/useInvoices";
+import { InvoiceColumnDialog } from "@/components/billing/InvoiceColumnDialog";
 import { ClientRightSidebar } from "@/components/ClientRightSidebar";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -166,6 +167,7 @@ interface KanbanBoardProps {
   onToggleSelect?: (id: string) => void;
   reorderColumns: (columns: { id: string; name: string; position: number; visibleToClient: boolean; color?: string | null }[]) => void;
   clientId: string;
+  billingCurrency?: string;
 }
 
 const SortableColumn = ({ col, children }: { col: { id: string }; children: React.ReactNode }) => {
@@ -199,9 +201,11 @@ const KanbanBoard = ({
   selectionMode, selectedPostIds, onToggleSelect,
   reorderColumns,
   clientId,
+  billingCurrency,
 }: KanbanBoardProps) => {
   const [activePost, setActivePost] = useState<Post | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
+  const [invoiceColumnTarget, setInvoiceColumnTarget] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } })
@@ -294,6 +298,7 @@ const KanbanBoard = ({
   const columnSortIds = columns.map((c) => `col-${c.id}`);
 
   return (
+    <>
     <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <KanbanScrollWrapper fillHeight>
         <SortableContext items={columnSortIds} strategy={horizontalListSortingStrategy}>
@@ -381,14 +386,7 @@ const KanbanBoard = ({
                           Editar
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={async () => {
-                            try {
-                              const res = await invoiceColumnAuto(clientId, col.name);
-                              toast({ title: "Adicionado à fatura", description: `"${col.name}" enviado para "${res.invoiceTitle}".` });
-                            } catch (err: any) {
-                              toast({ title: "Erro ao faturar", description: err.message, variant: "destructive" });
-                            }
-                          }}
+                          onClick={() => setInvoiceColumnTarget(col.name)}
                         >
                           <Receipt className="h-4 w-4 mr-2" />
                           Faturar
@@ -556,6 +554,21 @@ const KanbanBoard = ({
         )}
       </DragOverlay>
     </DndContext>
+    <InvoiceColumnDialog
+      open={!!invoiceColumnTarget}
+      onOpenChange={(o) => { if (!o) setInvoiceColumnTarget(null); }}
+      columnName={invoiceColumnTarget || ""}
+      currency={billingCurrency}
+      onConfirm={async ({ name, quantity, unit_price, description }) => {
+        try {
+          const res = await invoiceColumnAuto(clientId, name, { quantity, unit_price, description });
+          toast({ title: "Adicionado à fatura", description: `"${name}" enviado para "${res.invoiceTitle}".` });
+        } catch (err: any) {
+          toast({ title: "Erro ao faturar", description: err.message, variant: "destructive" });
+        }
+      }}
+    />
+    </>
   );
 };
 
@@ -1459,6 +1472,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     onToggleSelect={toggleSelect}
                     reorderColumns={reorderColumns}
                     clientId={clientData.id}
+                    billingCurrency={(clientData as any).billing_currency}
                   />
                 </div>
                 {trackingEnabled && (
