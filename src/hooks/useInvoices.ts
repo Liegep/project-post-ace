@@ -276,7 +276,11 @@ export async function invoicePostAuto(clientId: string, post: {
 }
 
 // Auto-create or find open invoice for a client and add a plain item (e.g. column name)
-export async function invoiceColumnAuto(clientId: string, columnName: string) {
+export async function invoiceColumnAuto(
+  clientId: string,
+  columnName: string,
+  opts?: { quantity?: number; unit_price?: number; description?: string }
+) {
   // Find open invoice for this client
   const { data: openInvoices } = await supabase
     .from("invoices")
@@ -313,15 +317,20 @@ export async function invoiceColumnAuto(clientId: string, columnName: string) {
     invoiceTitle = title;
   }
 
+  const quantity = opts?.quantity ?? 1;
+  const unit_price = opts?.unit_price ?? 0;
+  const total_price = Number((quantity * unit_price).toFixed(2));
+
   await createInvoiceItem({
     invoice_id: invoiceId,
     post_id: null,
     name: columnName,
+    description: opts?.description || "",
     category: "post",
     service_date: new Date().toISOString().split("T")[0],
-    quantity: 1,
-    unit_price: 0,
-    total_price: 0,
+    quantity,
+    unit_price,
+    total_price,
   });
 
   return { invoiceId, invoiceTitle };
