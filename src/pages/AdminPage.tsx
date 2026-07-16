@@ -1472,6 +1472,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                     onToggleSelect={toggleSelect}
                     reorderColumns={reorderColumns}
                     clientId={clientData.id}
+                    billingCurrency={(clientData as any).billing_currency}
                   />
                 </div>
                 {trackingEnabled && (
