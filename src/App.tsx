@@ -53,6 +53,7 @@ const App = () => (
               <Route path="/brief/:token" element={<PublicBriefPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/accept-invite" element={<AcceptInvitePage />} />
+              <Route path="/select-client" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador", "client"]}><SelectClientPage /></AuthGuard>} />
               <Route path="/" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminDashboard /></AuthGuard>} />
               <Route path="/admin" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminDashboard /></AuthGuard>} />
               <Route path="/admin/:slug" element={<AuthGuard allowedRoles={["super_admin", "admin", "colaborador"]}><AdminPage /></AuthGuard>} />
