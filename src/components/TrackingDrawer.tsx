@@ -101,6 +101,9 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
     setPinned((prev) => !prev);
   };
 
+  const pinnedScroll = useScrollPersistence(props.clientId, effectivePinned);
+  const sheetScroll = useScrollPersistence(props.clientId, open && !effectivePinned);
+
   // Admin controls shown in drawer header (filter + visibility)
   const AdminHeaderControls = () => {
     if (!props.isAdmin) return null;
