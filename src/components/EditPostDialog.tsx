@@ -35,6 +35,7 @@ const STATUS_KEYS: Record<PostStatus, string> = {
   entrada: "statusEntry",
   em_desenvolvimento: "statusInDevelopment",
   escrevendo_legenda: "statusWritingCaption",
+  design_pronto: "statusDesignReady",
   pronto: "statusReady",
   finalizado: "statusFinalized",
   alteracao_solicitada: "statusChangeRequested",
