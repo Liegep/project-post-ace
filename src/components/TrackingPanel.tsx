@@ -38,13 +38,19 @@ interface TrackingPanelProps {
   embedded?: boolean;
 }
 
-const LEGEND_T: Record<string, { title: string; done: string; inProgress: string; ready: string; changes: string; pending: string }> = {
-  pt: { title: "Legenda", done: "Finalizado", inProgress: "Em desenvolvimento", ready: "Pronto", changes: "Alteração solicitada", pending: "Aguardando" },
-  en: { title: "Legend", done: "Finished", inProgress: "In progress", ready: "Ready", changes: "Changes requested", pending: "Pending" },
-  it: { title: "Legenda", done: "Finalizzato", inProgress: "In corso", ready: "Pronto", changes: "Modifiche richieste", pending: "In attesa" },
-  es: { title: "Leyenda", done: "Finalizado", inProgress: "En desarrollo", ready: "Listo", changes: "Cambios solicitados", pending: "Pendiente" },
-  sv: { title: "Förklaring", done: "Klar", inProgress: "Pågår", ready: "Redo", changes: "Ändringar begärda", pending: "Väntar" },
+const LEGEND_T: Record<string, { title: string; done: string; inProgress: string; ready: string; changes: string; pending: string; writingCaption: string; designReady: string }> = {
+  pt: { title: "Legenda", done: "Finalizado", inProgress: "Em desenvolvimento", ready: "Pronto", changes: "Alteração solicitada", pending: "Aguardando", writingCaption: "Escrevendo legenda", designReady: "Design pronto" },
+  en: { title: "Legend", done: "Finished", inProgress: "In progress", ready: "Ready", changes: "Changes requested", pending: "Pending", writingCaption: "Writing caption", designReady: "Design ready" },
+  it: { title: "Legenda", done: "Finalizzato", inProgress: "In corso", ready: "Pronto", changes: "Modifiche richieste", pending: "In attesa", writingCaption: "Scrivendo didascalia", designReady: "Design pronto" },
+  es: { title: "Leyenda", done: "Finalizado", inProgress: "En desarrollo", ready: "Listo", changes: "Cambios solicitados", pending: "Pendiente", writingCaption: "Escribiendo leyenda", designReady: "Diseño listo" },
+  sv: { title: "Förklaring", done: "Klar", inProgress: "Pågår", ready: "Redo", changes: "Ändringar begärda", pending: "Väntar", writingCaption: "Skriver bildtext", designReady: "Design klar" },
 };
+
+function hasTagNamed(post: Post, tags: Tag[], names: string[]): boolean {
+  const lowered = names.map((n) => n.toLowerCase());
+  const matchIds = tags.filter((t) => lowered.includes(t.name.toLowerCase())).map((t) => t.id);
+  return post.tags.some((id) => matchIds.includes(id));
+}
 
 interface ProjectGroup {
   projectTitle: string;
