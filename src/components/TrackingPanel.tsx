@@ -217,20 +217,37 @@ function SortableProjectGroup({
                 const isInProgress = post.status.includes("em_desenvolvimento");
                 const isChanges = post.status.includes("alteracao_solicitada");
                 const isReady = post.status.includes("pronto");
-                const label = isInProgress ? lt.inProgress : isChanges ? lt.changes : isReady ? lt.ready : lt.pending;
+                const isWritingCaption = hasTagNamed(post, tags, ["escrevendo legenda", "writing caption", "escribiendo leyenda", "scrivendo didascalia", "skriver bildtext"]);
+                const isDesignReady = hasTagNamed(post, tags, ["design pronto", "design ready", "diseño listo", "design klar"]);
+                const label = isDesignReady
+                  ? lt.designReady
+                  : isWritingCaption
+                  ? lt.writingCaption
+                  : isInProgress
+                  ? lt.inProgress
+                  : isChanges
+                  ? lt.changes
+                  : isReady
+                  ? lt.ready
+                  : lt.pending;
+                const colorClass = isDesignReady
+                  ? "text-emerald-500"
+                  : isWritingCaption
+                  ? "text-violet-500"
+                  : isInProgress
+                  ? "text-warning"
+                  : isChanges
+                  ? "text-destructive"
+                  : isReady
+                  ? "text-primary"
+                  : "text-muted-foreground/40";
                 return (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Circle
                         className={cn(
                           "mt-1 h-2 w-2 shrink-0 fill-current cursor-help",
-                          isInProgress
-                            ? "text-warning"
-                            : isChanges
-                            ? "text-destructive"
-                            : isReady
-                            ? "text-primary"
-                            : "text-muted-foreground/40"
+                          colorClass
                         )}
                       />
                     </TooltipTrigger>
