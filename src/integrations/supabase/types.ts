@@ -3282,37 +3282,6 @@ export type Database = {
           name: string
         }[]
       }
-      get_public_brief_by_token: {
-        Args: { p_token: string }
-        Returns: {
-          additional_notes: string
-          answers: Json
-          brand_name: string
-          category: string
-          client_id: string | null
-          created_at: string
-          id: string
-          locale: string
-          objectives: string
-          preferred_colors: string
-          references_links: string
-          respondent_email: string
-          respondent_name: string
-          status: string
-          style_preferences: string
-          submitted_at: string | null
-          target_audience: string
-          title: string
-          updated_at: string
-          user_id: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "design_briefs"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
       get_proposal_by_token: {
         Args: { p_token: string }
         Returns: {
@@ -3345,6 +3314,37 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "proposals"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      get_public_brief_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          additional_notes: string
+          answers: Json
+          brand_name: string
+          category: string
+          client_id: string | null
+          created_at: string
+          id: string
+          locale: string
+          objectives: string
+          preferred_colors: string
+          references_links: string
+          respondent_email: string
+          respondent_name: string
+          status: string
+          style_preferences: string
+          submitted_at: string | null
+          target_audience: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "design_briefs"
           isOneToOne: true
           isSetofReturn: false
         }
