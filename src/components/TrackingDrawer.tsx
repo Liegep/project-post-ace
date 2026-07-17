@@ -253,7 +253,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
 
 const TrackingPanelInline = (props: TrackingDrawerProps) => {
   return (
-    <div className="[&>div]:w-full [&>div]:border-0 [&>div]:bg-transparent [&>div]:p-0 [&>div]:shadow-none [&>div>div:first-child]:hidden">
+    <div className="[&>div>div:first-child]:hidden">
       <TrackingPanel
         clientId={props.clientId}
         posts={props.posts}
@@ -264,6 +264,8 @@ const TrackingPanelInline = (props: TrackingDrawerProps) => {
         onToggleVisibility={props.onToggleVisibility}
         trackingColumnIds={props.trackingColumnIds}
         onChangeTrackingColumnIds={props.onChangeTrackingColumnIds}
+        locale={props.locale}
+        embedded
       />
     </div>
   );
