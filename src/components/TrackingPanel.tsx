@@ -231,7 +231,10 @@ export const TrackingPanel = ({
   onToggleVisibility,
   trackingColumnIds,
   onChangeTrackingColumnIds,
+  locale,
+  embedded = false,
 }: TrackingPanelProps) => {
+  const lt = LEGEND_T[(locale as string) in LEGEND_T ? (locale as string) : "pt"];
   const [orderedKeys, setOrderedKeys] = useState<string[]>([]);
   const [loaded, setLoaded] = useState(false);
   const savedOrderRef = useRef<string[]>([]);
