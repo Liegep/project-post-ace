@@ -380,6 +380,7 @@ export const TrackingPanel = ({
   );
 
   return (
+    <TooltipProvider delayDuration={150}>
     <div className={cn(
       "shrink-0",
       embedded
@@ -471,6 +472,7 @@ export const TrackingPanel = ({
                   group={group}
                   columns={columns}
                   tags={tags}
+                  lt={lt}
                 />
               ))}
             </SortableContext>
@@ -482,5 +484,6 @@ export const TrackingPanel = ({
         )}
       </div>
     </div>
+    </TooltipProvider>
   );
 };
