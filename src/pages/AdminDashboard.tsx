@@ -29,12 +29,8 @@ import { TodayTasksWidget } from "@/components/TodayTasksWidget";
 import { NotificationBell } from "@/components/NotificationBell";
 import { QuickLinksPanel } from "@/components/QuickLinksPanel";
 
-const CLIENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
-  standard: { label: "Padrão", color: "bg-muted text-muted-foreground" },
-  premium: { label: "Premium", color: "bg-amber-500/15 text-amber-600" },
-  partner: { label: "Parceiro", color: "bg-emerald-500/15 text-emerald-600" },
-  vip: { label: "VIP", color: "bg-purple-500/15 text-purple-600" },
-};
+
+
 
 interface Client {
   id: string;
