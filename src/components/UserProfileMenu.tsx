@@ -45,6 +45,7 @@ const UserProfileMenu = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const [profileSaving, setProfileSaving] = useState(false);
+  const [assignmentCount, setAssignmentCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
