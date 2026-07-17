@@ -188,6 +188,12 @@ const UserProfileMenu = () => {
             <CalendarDays className="mr-2 h-4 w-4" />
             Agenda
           </DropdownMenuItem>
+          {assignmentCount > 1 && (
+            <DropdownMenuItem onClick={() => navigate("/select-client")}>
+              <Users className="mr-2 h-4 w-4" />
+              {t("switchAccount")}
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <Globe className="mr-2 h-4 w-4" />
