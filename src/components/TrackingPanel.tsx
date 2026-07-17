@@ -347,34 +347,35 @@ export const TrackingPanel = ({
     });
   };
 
+  const legendItems = [
+    { key: "done", label: lt.done, node: (
+      <span className="flex h-3 w-3 shrink-0 items-center justify-center rounded border-2 border-success bg-success">
+        <Check className="h-2 w-2 text-success-foreground" />
+      </span>
+    ) },
+    { key: "inProgress", label: lt.inProgress, node: <Circle className="h-2 w-2 shrink-0 fill-current text-warning" /> },
+    { key: "ready", label: lt.ready, node: <Circle className="h-2 w-2 shrink-0 fill-current text-primary" /> },
+    { key: "changes", label: lt.changes, node: <Circle className="h-2 w-2 shrink-0 fill-current text-destructive" /> },
+    { key: "pending", label: lt.pending, node: <Circle className="h-2 w-2 shrink-0 fill-current text-muted-foreground/40" /> },
+  ];
+
   const Legend = () => (
     <div className="mb-3 rounded-lg border border-border/60 bg-muted/30 p-2">
       <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
         {lt.title}
       </div>
       <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] text-foreground">
-        <div className="flex items-center gap-1.5">
-          <span className="flex h-3 w-3 shrink-0 items-center justify-center rounded border-2 border-success bg-success">
-            <Check className="h-2 w-2 text-success-foreground" />
-          </span>
-          <span>{lt.done}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Circle className="h-2 w-2 shrink-0 fill-current text-warning" />
-          <span>{lt.inProgress}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Circle className="h-2 w-2 shrink-0 fill-current text-primary" />
-          <span>{lt.ready}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Circle className="h-2 w-2 shrink-0 fill-current text-destructive" />
-          <span>{lt.changes}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Circle className="h-2 w-2 shrink-0 fill-current text-muted-foreground/40" />
-          <span>{lt.pending}</span>
-        </div>
+        {legendItems.map((item) => (
+          <Tooltip key={item.key}>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5 cursor-help">
+                {item.node}
+                <span>{item.label}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="top">{item.label}</TooltipContent>
+          </Tooltip>
+        ))}
       </div>
     </div>
   );
