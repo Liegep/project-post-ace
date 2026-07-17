@@ -30,6 +30,38 @@ const TD_T: Record<string, { tracking: string; visibleColumns: string; visibleCo
 };
 
 const PINNED_KEY = "tracking-drawer-pinned";
+const SCROLL_KEY_PREFIX = "tracking-drawer-scroll:";
+
+function useScrollPersistence(clientId: string, active: boolean) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const key = SCROLL_KEY_PREFIX + clientId;
+
+  // Restore after mount / when becoming active
+  useEffect(() => {
+    if (!active) return;
+    const el = ref.current;
+    if (!el) return;
+    try {
+      const saved = parseInt(localStorage.getItem(key) || "0", 10);
+      if (!Number.isNaN(saved) && saved > 0) {
+        // Wait a tick so children render before scrolling
+        requestAnimationFrame(() => {
+          if (ref.current) ref.current.scrollTop = saved;
+        });
+      }
+    } catch {}
+  }, [active, key]);
+
+  const onScroll = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    try {
+      localStorage.setItem(key, String(el.scrollTop));
+    } catch {}
+  }, [key]);
+
+  return { ref, onScroll };
+}
 
 export const TrackingDrawer = (props: TrackingDrawerProps) => {
   const td = TD_T[(props.locale as string) in TD_T ? (props.locale as string) : "pt"];
