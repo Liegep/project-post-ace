@@ -377,6 +377,8 @@ export const TrackingPanel = ({
       </span>
     ) },
     { key: "inProgress", label: lt.inProgress, node: <Circle className="h-2 w-2 shrink-0 fill-current text-warning" /> },
+    { key: "designReady", label: lt.designReady, node: <Circle className="h-2 w-2 shrink-0 fill-current text-emerald-500" /> },
+    { key: "writingCaption", label: lt.writingCaption, node: <Circle className="h-2 w-2 shrink-0 fill-current text-violet-500" /> },
     { key: "ready", label: lt.ready, node: <Circle className="h-2 w-2 shrink-0 fill-current text-primary" /> },
     { key: "changes", label: lt.changes, node: <Circle className="h-2 w-2 shrink-0 fill-current text-destructive" /> },
     { key: "pending", label: lt.pending, node: <Circle className="h-2 w-2 shrink-0 fill-current text-muted-foreground/40" /> },
