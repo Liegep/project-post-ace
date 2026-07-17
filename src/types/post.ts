@@ -70,6 +70,7 @@ export const STATUS_CONFIG: Record<PostStatus, { label: string; color: string }>
   entrada: { label: "Entrada", color: "bg-violet-600 text-white" },
   em_desenvolvimento: { label: "Em Desenvolvimento", color: "bg-info text-info-foreground" },
   escrevendo_legenda: { label: "Escrevendo Legenda", color: "bg-warning text-warning-foreground" },
+  design_pronto: { label: "Design Pronto", color: "bg-emerald-500 text-white" },
   pronto: { label: "Enviar para Cliente", color: "bg-success text-success-foreground" },
   finalizado: { label: "Finalizado", color: "bg-primary text-primary-foreground" },
   alteracao_solicitada: { label: "Alteração Solicitada", color: "bg-violet-600 text-white" },
