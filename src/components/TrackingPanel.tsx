@@ -33,7 +33,17 @@ interface TrackingPanelProps {
   onToggleVisibility?: (visible: boolean) => void;
   trackingColumnIds?: string[];
   onChangeTrackingColumnIds?: (ids: string[]) => void;
+  locale?: string;
+  embedded?: boolean;
 }
+
+const LEGEND_T: Record<string, { title: string; done: string; inProgress: string; ready: string; changes: string; pending: string }> = {
+  pt: { title: "Legenda", done: "Finalizado", inProgress: "Em desenvolvimento", ready: "Pronto", changes: "Alteração solicitada", pending: "Aguardando" },
+  en: { title: "Legend", done: "Finished", inProgress: "In progress", ready: "Ready", changes: "Changes requested", pending: "Pending" },
+  it: { title: "Legenda", done: "Finalizzato", inProgress: "In corso", ready: "Pronto", changes: "Modifiche richieste", pending: "In attesa" },
+  es: { title: "Leyenda", done: "Finalizado", inProgress: "En desarrollo", ready: "Listo", changes: "Cambios solicitados", pending: "Pendiente" },
+  sv: { title: "Förklaring", done: "Klar", inProgress: "Pågår", ready: "Redo", changes: "Ändringar begärda", pending: "Väntar" },
+};
 
 interface ProjectGroup {
   projectTitle: string;
