@@ -38,13 +38,19 @@ interface TrackingPanelProps {
   embedded?: boolean;
 }
 
-const LEGEND_T: Record<string, { title: string; done: string; inProgress: string; ready: string; changes: string; pending: string }> = {
-  pt: { title: "Legenda", done: "Finalizado", inProgress: "Em desenvolvimento", ready: "Pronto", changes: "Alteração solicitada", pending: "Aguardando" },
-  en: { title: "Legend", done: "Finished", inProgress: "In progress", ready: "Ready", changes: "Changes requested", pending: "Pending" },
-  it: { title: "Legenda", done: "Finalizzato", inProgress: "In corso", ready: "Pronto", changes: "Modifiche richieste", pending: "In attesa" },
-  es: { title: "Leyenda", done: "Finalizado", inProgress: "En desarrollo", ready: "Listo", changes: "Cambios solicitados", pending: "Pendiente" },
-  sv: { title: "Förklaring", done: "Klar", inProgress: "Pågår", ready: "Redo", changes: "Ändringar begärda", pending: "Väntar" },
+const LEGEND_T: Record<string, { title: string; done: string; inProgress: string; ready: string; changes: string; pending: string; writingCaption: string; designReady: string }> = {
+  pt: { title: "Legenda", done: "Finalizado", inProgress: "Em desenvolvimento", ready: "Pronto", changes: "Alteração solicitada", pending: "Aguardando", writingCaption: "Escrevendo legenda", designReady: "Design pronto" },
+  en: { title: "Legend", done: "Finished", inProgress: "In progress", ready: "Ready", changes: "Changes requested", pending: "Pending", writingCaption: "Writing caption", designReady: "Design ready" },
+  it: { title: "Legenda", done: "Finalizzato", inProgress: "In corso", ready: "Pronto", changes: "Modifiche richieste", pending: "In attesa", writingCaption: "Scrivendo didascalia", designReady: "Design pronto" },
+  es: { title: "Leyenda", done: "Finalizado", inProgress: "En desarrollo", ready: "Listo", changes: "Cambios solicitados", pending: "Pendiente", writingCaption: "Escribiendo leyenda", designReady: "Diseño listo" },
+  sv: { title: "Förklaring", done: "Klar", inProgress: "Pågår", ready: "Redo", changes: "Ändringar begärda", pending: "Väntar", writingCaption: "Skriver bildtext", designReady: "Design klar" },
 };
+
+function hasTagNamed(post: Post, tags: Tag[], names: string[]): boolean {
+  const lowered = names.map((n) => n.toLowerCase());
+  const matchIds = tags.filter((t) => lowered.includes(t.name.toLowerCase())).map((t) => t.id);
+  return post.tags.some((id) => matchIds.includes(id));
+}
 
 interface ProjectGroup {
   projectTitle: string;
@@ -86,7 +92,7 @@ function SortableProjectGroup({
   group: ProjectGroup;
   columns: { id: string; name: string }[];
   tags: Tag[];
-  lt: { title: string; done: string; inProgress: string; ready: string; changes: string; pending: string };
+  lt: { title: string; done: string; inProgress: string; ready: string; changes: string; pending: string; writingCaption: string; designReady: string };
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: group.projectTitle,
@@ -211,20 +217,37 @@ function SortableProjectGroup({
                 const isInProgress = post.status.includes("em_desenvolvimento");
                 const isChanges = post.status.includes("alteracao_solicitada");
                 const isReady = post.status.includes("pronto");
-                const label = isInProgress ? lt.inProgress : isChanges ? lt.changes : isReady ? lt.ready : lt.pending;
+                const isWritingCaption = hasTagNamed(post, tags, ["escrevendo legenda", "writing caption", "escribiendo leyenda", "scrivendo didascalia", "skriver bildtext"]);
+                const isDesignReady = hasTagNamed(post, tags, ["design pronto", "design ready", "diseño listo", "design klar"]);
+                const label = isDesignReady
+                  ? lt.designReady
+                  : isWritingCaption
+                  ? lt.writingCaption
+                  : isInProgress
+                  ? lt.inProgress
+                  : isChanges
+                  ? lt.changes
+                  : isReady
+                  ? lt.ready
+                  : lt.pending;
+                const colorClass = isDesignReady
+                  ? "text-emerald-500"
+                  : isWritingCaption
+                  ? "text-violet-500"
+                  : isInProgress
+                  ? "text-warning"
+                  : isChanges
+                  ? "text-destructive"
+                  : isReady
+                  ? "text-primary"
+                  : "text-muted-foreground/40";
                 return (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Circle
                         className={cn(
                           "mt-1 h-2 w-2 shrink-0 fill-current cursor-help",
-                          isInProgress
-                            ? "text-warning"
-                            : isChanges
-                            ? "text-destructive"
-                            : isReady
-                            ? "text-primary"
-                            : "text-muted-foreground/40"
+                          colorClass
                         )}
                       />
                     </TooltipTrigger>
@@ -354,6 +377,8 @@ export const TrackingPanel = ({
       </span>
     ) },
     { key: "inProgress", label: lt.inProgress, node: <Circle className="h-2 w-2 shrink-0 fill-current text-warning" /> },
+    { key: "designReady", label: lt.designReady, node: <Circle className="h-2 w-2 shrink-0 fill-current text-emerald-500" /> },
+    { key: "writingCaption", label: lt.writingCaption, node: <Circle className="h-2 w-2 shrink-0 fill-current text-violet-500" /> },
     { key: "ready", label: lt.ready, node: <Circle className="h-2 w-2 shrink-0 fill-current text-primary" /> },
     { key: "changes", label: lt.changes, node: <Circle className="h-2 w-2 shrink-0 fill-current text-destructive" /> },
     { key: "pending", label: lt.pending, node: <Circle className="h-2 w-2 shrink-0 fill-current text-muted-foreground/40" /> },
