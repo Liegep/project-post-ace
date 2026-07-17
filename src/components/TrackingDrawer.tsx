@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Post, Tag } from "@/types/post";
 import { TrackingPanel } from "@/components/TrackingPanel";
 import { useIsMobile } from "@/hooks/use-mobile";
