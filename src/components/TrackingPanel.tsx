@@ -163,16 +163,21 @@ function SortableProjectGroup({
                 finished ? "opacity-50" : "hover:bg-muted/50"
               )}
             >
-              <div
-                className={cn(
-                  "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors",
-                  finished
-                    ? "border-success bg-success"
-                    : "border-muted-foreground/40 bg-transparent"
-                )}
-              >
-                {finished && <Check className="h-2.5 w-2.5 text-success-foreground" />}
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={cn(
+                      "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors cursor-help",
+                      finished
+                        ? "border-success bg-success"
+                        : "border-muted-foreground/40 bg-transparent"
+                    )}
+                  >
+                    {finished && <Check className="h-2.5 w-2.5 text-success-foreground" />}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top">{finished ? lt.done : lt.pending}</TooltipContent>
+              </Tooltip>
               <div className="flex-1 min-w-0">
                 <span
                   className={cn(
@@ -202,20 +207,31 @@ function SortableProjectGroup({
                   </div>
                 )}
               </div>
-              {!finished && (
-                <Circle
-                  className={cn(
-                    "mt-1 h-2 w-2 shrink-0 fill-current",
-                    post.status.includes("em_desenvolvimento")
-                      ? "text-warning"
-                      : post.status.includes("alteracao_solicitada")
-                      ? "text-destructive"
-                      : post.status.includes("pronto")
-                      ? "text-primary"
-                      : "text-muted-foreground/40"
-                  )}
-                />
-              )}
+              {!finished && (() => {
+                const isInProgress = post.status.includes("em_desenvolvimento");
+                const isChanges = post.status.includes("alteracao_solicitada");
+                const isReady = post.status.includes("pronto");
+                const label = isInProgress ? lt.inProgress : isChanges ? lt.changes : isReady ? lt.ready : lt.pending;
+                return (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Circle
+                        className={cn(
+                          "mt-1 h-2 w-2 shrink-0 fill-current cursor-help",
+                          isInProgress
+                            ? "text-warning"
+                            : isChanges
+                            ? "text-destructive"
+                            : isReady
+                            ? "text-primary"
+                            : "text-muted-foreground/40"
+                        )}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent side="top">{label}</TooltipContent>
+                  </Tooltip>
+                );
+              })()}
             </div>
           );
         })}
