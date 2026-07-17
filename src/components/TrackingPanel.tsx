@@ -2,6 +2,7 @@ import { Post, Tag } from "@/types/post";
 import { Check, Circle, Eye, EyeOff, GripVertical, Filter } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -80,10 +81,12 @@ function SortableProjectGroup({
   group,
   columns,
   tags,
+  lt,
 }: {
   group: ProjectGroup;
   columns: { id: string; name: string }[];
   tags: Tag[];
+  lt: { title: string; done: string; inProgress: string; ready: string; changes: string; pending: string };
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: group.projectTitle,
@@ -160,16 +163,21 @@ function SortableProjectGroup({
                 finished ? "opacity-50" : "hover:bg-muted/50"
               )}
             >
-              <div
-                className={cn(
-                  "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors",
-                  finished
-                    ? "border-success bg-success"
-                    : "border-muted-foreground/40 bg-transparent"
-                )}
-              >
-                {finished && <Check className="h-2.5 w-2.5 text-success-foreground" />}
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={cn(
+                      "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors cursor-help",
+                      finished
+                        ? "border-success bg-success"
+                        : "border-muted-foreground/40 bg-transparent"
+                    )}
+                  >
+                    {finished && <Check className="h-2.5 w-2.5 text-success-foreground" />}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top">{finished ? lt.done : lt.pending}</TooltipContent>
+              </Tooltip>
               <div className="flex-1 min-w-0">
                 <span
                   className={cn(
@@ -199,20 +207,31 @@ function SortableProjectGroup({
                   </div>
                 )}
               </div>
-              {!finished && (
-                <Circle
-                  className={cn(
-                    "mt-1 h-2 w-2 shrink-0 fill-current",
-                    post.status.includes("em_desenvolvimento")
-                      ? "text-warning"
-                      : post.status.includes("alteracao_solicitada")
-                      ? "text-destructive"
-                      : post.status.includes("pronto")
-                      ? "text-primary"
-                      : "text-muted-foreground/40"
-                  )}
-                />
-              )}
+              {!finished && (() => {
+                const isInProgress = post.status.includes("em_desenvolvimento");
+                const isChanges = post.status.includes("alteracao_solicitada");
+                const isReady = post.status.includes("pronto");
+                const label = isInProgress ? lt.inProgress : isChanges ? lt.changes : isReady ? lt.ready : lt.pending;
+                return (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Circle
+                        className={cn(
+                          "mt-1 h-2 w-2 shrink-0 fill-current cursor-help",
+                          isInProgress
+                            ? "text-warning"
+                            : isChanges
+                            ? "text-destructive"
+                            : isReady
+                            ? "text-primary"
+                            : "text-muted-foreground/40"
+                        )}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent side="top">{label}</TooltipContent>
+                  </Tooltip>
+                );
+              })()}
             </div>
           );
         })}
@@ -328,39 +347,41 @@ export const TrackingPanel = ({
     });
   };
 
+  const legendItems = [
+    { key: "done", label: lt.done, node: (
+      <span className="flex h-3 w-3 shrink-0 items-center justify-center rounded border-2 border-success bg-success">
+        <Check className="h-2 w-2 text-success-foreground" />
+      </span>
+    ) },
+    { key: "inProgress", label: lt.inProgress, node: <Circle className="h-2 w-2 shrink-0 fill-current text-warning" /> },
+    { key: "ready", label: lt.ready, node: <Circle className="h-2 w-2 shrink-0 fill-current text-primary" /> },
+    { key: "changes", label: lt.changes, node: <Circle className="h-2 w-2 shrink-0 fill-current text-destructive" /> },
+    { key: "pending", label: lt.pending, node: <Circle className="h-2 w-2 shrink-0 fill-current text-muted-foreground/40" /> },
+  ];
+
   const Legend = () => (
     <div className="mb-3 rounded-lg border border-border/60 bg-muted/30 p-2">
       <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
         {lt.title}
       </div>
       <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] text-foreground">
-        <div className="flex items-center gap-1.5">
-          <span className="flex h-3 w-3 shrink-0 items-center justify-center rounded border-2 border-success bg-success">
-            <Check className="h-2 w-2 text-success-foreground" />
-          </span>
-          <span>{lt.done}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Circle className="h-2 w-2 shrink-0 fill-current text-warning" />
-          <span>{lt.inProgress}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Circle className="h-2 w-2 shrink-0 fill-current text-primary" />
-          <span>{lt.ready}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Circle className="h-2 w-2 shrink-0 fill-current text-destructive" />
-          <span>{lt.changes}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Circle className="h-2 w-2 shrink-0 fill-current text-muted-foreground/40" />
-          <span>{lt.pending}</span>
-        </div>
+        {legendItems.map((item) => (
+          <Tooltip key={item.key}>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5 cursor-help">
+                {item.node}
+                <span>{item.label}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="top">{item.label}</TooltipContent>
+          </Tooltip>
+        ))}
       </div>
     </div>
   );
 
   return (
+    <TooltipProvider delayDuration={150}>
     <div className={cn(
       "shrink-0",
       embedded
@@ -452,6 +473,7 @@ export const TrackingPanel = ({
                   group={group}
                   columns={columns}
                   tags={tags}
+                  lt={lt}
                 />
               ))}
             </SortableContext>
@@ -463,5 +485,6 @@ export const TrackingPanel = ({
         )}
       </div>
     </div>
+    </TooltipProvider>
   );
 };
