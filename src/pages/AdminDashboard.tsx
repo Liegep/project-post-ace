@@ -1450,15 +1450,7 @@ const AdminDashboard = () => {
                 >
                   {/* Top badges row */}
                   <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                    {/* Client type badge */}
-                    {(() => {
-                      const typeConfig = CLIENT_TYPE_CONFIG[client.client_type] || CLIENT_TYPE_CONFIG.standard;
-                      return (
-                        <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold", typeConfig.color)}>
-                          {typeConfig.label}
-                        </span>
-                      );
-                    })()}
+                    {/* Client type badge removed */}
                     {client.owner_id === currentUserId && (
                       <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-amber-600" title="Você é o dono">
                         <Shield className="h-2.5 w-2.5" />
