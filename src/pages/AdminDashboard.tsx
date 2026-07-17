@@ -723,14 +723,18 @@ const AdminDashboard = () => {
     setClientType(client.client_type || "standard");
     setClientPassword("");
 
+    // Reset first so stale values from a previous edit never leak in.
+    setExistingClientUser(null);
+    setClientEmail("");
+
     // Load existing client user
     const { data: assignments } = await supabase
       .from("user_client_assignments")
       .select("user_id")
       .eq("client_id", client.id);
 
+    let foundClientUser: ClientUser | null = null;
     if (assignments && assignments.length > 0) {
-      // Check if any assigned user has client role
       for (const a of assignments) {
         const { data: hasClientRole } = await supabase.rpc("has_role" as any, {
           _user_id: a.user_id,
@@ -742,18 +746,15 @@ const AdminDashboard = () => {
             .select("email")
             .eq("id", a.user_id)
             .single();
-          setExistingClientUser({ userId: a.user_id, email: profile?.email || "" });
-          setClientEmail(profile?.email || "");
+          foundClientUser = { userId: a.user_id, email: profile?.email || "" };
           break;
         }
       }
-      if (!existingClientUser) {
-        setExistingClientUser(null);
-        setClientEmail("");
-      }
-    } else {
-      setExistingClientUser(null);
-      setClientEmail("");
+    }
+
+    if (foundClientUser) {
+      setExistingClientUser(foundClientUser);
+      setClientEmail(foundClientUser.email);
     }
 
     setDialogOpen(true);
