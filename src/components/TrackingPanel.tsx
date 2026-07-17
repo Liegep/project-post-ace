@@ -214,11 +214,11 @@ function SortableProjectGroup({
                 )}
               </div>
               {!finished && (() => {
+                const isWritingCaption = post.status.includes("escrevendo_legenda" as any);
+                const isDesignReady = post.status.includes("pronto");
                 const isInProgress = post.status.includes("em_desenvolvimento");
                 const isChanges = post.status.includes("alteracao_solicitada");
-                const isReady = post.status.includes("pronto");
-                const isWritingCaption = hasTagNamed(post, tags, ["escrevendo legenda", "writing caption", "escribiendo leyenda", "scrivendo didascalia", "skriver bildtext"]);
-                const isDesignReady = hasTagNamed(post, tags, ["design pronto", "design ready", "diseño listo", "design klar"]);
+                const isReady = false;
                 const label = isDesignReady
                   ? lt.designReady
                   : isWritingCaption
