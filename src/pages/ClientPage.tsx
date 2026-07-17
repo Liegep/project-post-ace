@@ -229,6 +229,12 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <Sparkles className="mr-2 h-4 w-4" />
                 {t("brandBrain")}
               </DropdownMenuItem>
+              {assignmentCount > 1 && (
+                <DropdownMenuItem onClick={() => navigate("/select-client")}>
+                  <ArrowRight className="mr-2 h-4 w-4" />
+                  {t("switchAccount")}
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => setPasswordOpen(true)}>
                 <KeyRound className="mr-2 h-4 w-4" />
                 {t("changePassword")}
