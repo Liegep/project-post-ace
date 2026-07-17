@@ -1657,21 +1657,6 @@ const AdminDashboard = () => {
               </Select>
             </div>
 
-            <div>
-              <Label>Tipo de Cliente</Label>
-              <Select value={clientType} onValueChange={setClientType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(CLIENT_TYPE_CONFIG).map(([key, config]) => (
-                    <SelectItem key={key} value={key}>
-                      {config.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
 
             <div>
               <Label>{t("logo")}</Label>
