@@ -26,6 +26,7 @@ type TranslationKeys = {
   statusInDevelopment: string;
   statusWritingCaption: string;
   statusReady: string;
+  statusDesignReady: string;
   statusFinalized: string;
   statusChangeRequested: string;
   statusScheduled: string;
