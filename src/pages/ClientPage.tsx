@@ -89,6 +89,16 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [savingPassword, setSavingPassword] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
+  const [assignmentCount, setAssignmentCount] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const { data } = await supabase.from("user_client_assignments").select("client_id").eq("user_id", session.user.id);
+      setAssignmentCount((data || []).length);
+    })();
+  }, []);
 
   const isCurrentMonth = isSameMonth(selectedMonth, new Date());
   const monthStart = startOfMonth(selectedMonth);
@@ -219,6 +229,12 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <Sparkles className="mr-2 h-4 w-4" />
                 {t("brandBrain")}
               </DropdownMenuItem>
+              {assignmentCount > 1 && (
+                <DropdownMenuItem onClick={() => navigate("/select-client")}>
+                  <ArrowRight className="mr-2 h-4 w-4" />
+                  {t("switchAccount")}
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => setPasswordOpen(true)}>
                 <KeyRound className="mr-2 h-4 w-4" />
                 {t("changePassword")}
