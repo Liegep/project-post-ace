@@ -265,8 +265,30 @@ export const PostCard = memo(
             {(() => {
               if (isExternalLink(thumbUrl))
                 return (
-                  <div className="h-full w-full bg-muted flex items-center justify-center">
-                    <Play className="h-6 w-6 text-muted-foreground" />
+                  <div
+                    className="relative h-full w-full flex flex-col items-center justify-center gap-3 p-4 bg-gradient-to-br from-slate-100 via-slate-200 to-slate-300 dark:from-slate-800 dark:via-slate-900 dark:to-slate-950"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--accent)) 100%), radial-gradient(circle at 20% 20%, rgba(255,255,255,0.15) 0, transparent 40%)",
+                    }}
+                  >
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-background/90 shadow-lg ring-1 ring-border backdrop-blur">
+                      <Play className="h-6 w-6 translate-x-[1px] fill-foreground text-foreground" />
+                    </div>
+                    <span className="text-[11px] font-medium text-foreground/70">
+                      Sem preview disponível
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (thumbUrl) window.open(thumbUrl, "_blank", "noopener,noreferrer");
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                    >
+                      <Play className="h-3.5 w-3.5 fill-current" />
+                      Assistir
+                    </button>
                   </div>
                 );
               if (mediaError)
