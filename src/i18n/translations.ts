@@ -147,6 +147,7 @@ type TranslationKeys = {
   inviteError: string;
   social: string;
   signOut: string;
+  switchAccount: string;
   confirmDeleteClient: string;
   // Admin Page (Kanban)
   noColumn: string;
@@ -402,6 +403,7 @@ const pt: TranslationKeys = {
   inviteError: "Erro ao enviar convite",
   social: "Social",
   signOut: "Sair",
+  switchAccount: "Trocar de conta",
   confirmDeleteClient: "Tem certeza que deseja excluir este cliente?",
   // Admin Page
   noColumn: "Sem coluna",
@@ -643,6 +645,7 @@ const en: TranslationKeys = {
   inviteError: "Error sending invite",
   social: "Social",
   signOut: "Sign out",
+  switchAccount: "Switch account",
   confirmDeleteClient: "Are you sure you want to delete this client?",
   noColumn: "No column",
   columnLabel: "Column",
@@ -883,6 +886,7 @@ const it: TranslationKeys = {
   inviteError: "Errore nell'invio dell'invito",
   social: "Social",
   signOut: "Esci",
+  switchAccount: "Cambia account",
   confirmDeleteClient: "Sei sicuro di voler eliminare questo cliente?",
   noColumn: "Senza colonna",
   columnLabel: "Colonna",
@@ -1123,6 +1127,7 @@ const es: TranslationKeys = {
   inviteError: "Error al enviar invitación",
   social: "Social",
   signOut: "Salir",
+  switchAccount: "Cambiar cuenta",
   confirmDeleteClient: "¿Estás seguro de que quieres eliminar este cliente?",
   noColumn: "Sin columna",
   columnLabel: "Columna",
@@ -1363,6 +1368,7 @@ const sv: TranslationKeys = {
   inviteError: "Fel vid skickande av inbjudan",
   social: "Social",
   signOut: "Logga ut",
+  switchAccount: "Byt konto",
   confirmDeleteClient: "Är du säker på att du vill ta bort denna klient?",
   noColumn: "Ingen kolumn",
   columnLabel: "Kolumn",

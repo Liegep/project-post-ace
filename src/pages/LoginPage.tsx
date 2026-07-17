@@ -93,10 +93,14 @@ const LoginPage = () => {
         const { data: assignments } = await supabase
           .from("user_client_assignments")
           .select("client_id")
-          .eq("user_id", userId)
-          .limit(1);
+          .eq("user_id", userId);
 
-        if (assignments && assignments.length > 0) {
+        if (assignments && assignments.length > 1) {
+          navigate("/select-client", { replace: true });
+          return;
+        }
+
+        if (assignments && assignments.length === 1) {
           const { data: clientData } = await supabase
             .from("clients")
             .select("slug")

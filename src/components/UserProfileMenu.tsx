@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
-import { User, KeyRound, LogOut, Camera, CalendarDays, Shield, Globe } from "lucide-react";
+import { User, KeyRound, LogOut, Camera, CalendarDays, Shield, Globe, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 
@@ -45,13 +45,19 @@ const UserProfileMenu = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const [profileSaving, setProfileSaving] = useState(false);
+  const [assignmentCount, setAssignmentCount] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user);
         fetchProfile(session.user.id);
+        const { data: assigns } = await supabase
+          .from("user_client_assignments")
+          .select("client_id")
+          .eq("user_id", session.user.id);
+        setAssignmentCount(assigns?.length || 0);
       }
     });
   }, []);
@@ -182,6 +188,12 @@ const UserProfileMenu = () => {
             <CalendarDays className="mr-2 h-4 w-4" />
             Agenda
           </DropdownMenuItem>
+          {assignmentCount > 1 && (
+            <DropdownMenuItem onClick={() => navigate("/select-client")}>
+              <Users className="mr-2 h-4 w-4" />
+              {t("switchAccount")}
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>
               <Globe className="mr-2 h-4 w-4" />
