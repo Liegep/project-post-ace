@@ -49,10 +49,15 @@ const UserProfileMenu = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         setUser(session.user);
         fetchProfile(session.user.id);
+        const { data: assigns } = await supabase
+          .from("user_client_assignments")
+          .select("client_id")
+          .eq("user_id", session.user.id);
+        setAssignmentCount(assigns?.length || 0);
       }
     });
   }, []);
