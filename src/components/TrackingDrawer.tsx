@@ -277,7 +277,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
 
             </div>
           </SheetHeader>
-          <div className="flex-1 overflow-y-auto p-4">
+          <div ref={sheetScroll.ref} onScroll={sheetScroll.onScroll} className="flex-1 overflow-y-auto p-4">
             <TrackingPanelInline {...effectiveProps} />
           </div>
         </SheetContent>
