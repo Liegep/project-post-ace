@@ -215,7 +215,7 @@ function SortableProjectGroup({
               </div>
               {!finished && (() => {
                 const isWritingCaption = post.status.includes("escrevendo_legenda" as any);
-                const isDesignReady = post.status.includes("pronto");
+                const isDesignReady = post.status.includes("design_pronto" as any) || post.status.includes("pronto");
                 const isInProgress = post.status.includes("em_desenvolvimento");
                 const isChanges = post.status.includes("alteracao_solicitada");
                 const isReady = false;
