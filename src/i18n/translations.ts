@@ -147,6 +147,7 @@ type TranslationKeys = {
   inviteError: string;
   social: string;
   signOut: string;
+  switchAccount: string;
   confirmDeleteClient: string;
   // Admin Page (Kanban)
   noColumn: string;
