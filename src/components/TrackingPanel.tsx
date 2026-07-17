@@ -328,8 +328,45 @@ export const TrackingPanel = ({
     });
   };
 
+  const Legend = () => (
+    <div className="mb-3 rounded-lg border border-border/60 bg-muted/30 p-2">
+      <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+        {lt.title}
+      </div>
+      <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] text-foreground">
+        <div className="flex items-center gap-1.5">
+          <span className="flex h-3 w-3 shrink-0 items-center justify-center rounded border-2 border-success bg-success">
+            <Check className="h-2 w-2 text-success-foreground" />
+          </span>
+          <span>{lt.done}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Circle className="h-2 w-2 shrink-0 fill-current text-warning" />
+          <span>{lt.inProgress}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Circle className="h-2 w-2 shrink-0 fill-current text-primary" />
+          <span>{lt.ready}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Circle className="h-2 w-2 shrink-0 fill-current text-destructive" />
+          <span>{lt.changes}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Circle className="h-2 w-2 shrink-0 fill-current text-muted-foreground/40" />
+          <span>{lt.pending}</span>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="w-80 shrink-0 rounded-xl border bg-gradient-to-b from-card to-card/80 p-4 shadow-sm">
+    <div className={cn(
+      "shrink-0",
+      embedded
+        ? "w-full"
+        : "w-80 rounded-xl border bg-gradient-to-b from-card to-card/80 p-4 shadow-sm"
+    )}>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
           📊 Acompanhamento
@@ -400,7 +437,12 @@ export const TrackingPanel = ({
         </div>
       </div>
 
-      <div className="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto pr-1">
+      <Legend />
+
+      <div className={cn(
+        "space-y-3",
+        embedded ? "" : "max-h-[calc(100vh-250px)] overflow-y-auto pr-1"
+      )}>
         {orderedGroups.length > 0 ? (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={orderedKeys} strategy={verticalListSortingStrategy}>
