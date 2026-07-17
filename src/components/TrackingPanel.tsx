@@ -92,7 +92,7 @@ function SortableProjectGroup({
   group: ProjectGroup;
   columns: { id: string; name: string }[];
   tags: Tag[];
-  lt: { title: string; done: string; inProgress: string; ready: string; changes: string; pending: string };
+  lt: { title: string; done: string; inProgress: string; ready: string; changes: string; pending: string; writingCaption: string; designReady: string };
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: group.projectTitle,
