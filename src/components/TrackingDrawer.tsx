@@ -232,7 +232,7 @@ export const TrackingDrawer = (props: TrackingDrawerProps) => {
           </div>
 
         </div>
-        <div className="flex-1 overflow-y-auto p-4">
+        <div ref={pinnedScroll.ref} onScroll={pinnedScroll.onScroll} className="flex-1 overflow-y-auto p-4">
           <TrackingPanelInline {...effectiveProps} />
         </div>
       </div>
