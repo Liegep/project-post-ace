@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
-import { User, KeyRound, LogOut, Camera, CalendarDays, Shield, Globe } from "lucide-react";
+import { User, KeyRound, LogOut, Camera, CalendarDays, Shield, Globe, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Locale, LOCALE_LABELS, LOCALE_FLAGS } from "@/i18n/translations";
 
