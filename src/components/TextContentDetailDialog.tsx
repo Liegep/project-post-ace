@@ -18,9 +18,12 @@ import {
 import {
   FileText, BookOpen, Type, PenTool, FileCheck,
   Calendar, Check, X, Send, MessageCircle, Download,
+  FileType, LayoutGrid,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { exportTextContentToPdf, exportTextContentToWord } from "@/lib/textContentExport";
+import { SendTextToColumnDialog } from "@/components/SendTextToColumnDialog";
 
 const TYPE_ICONS: Record<string, React.ElementType> = {
   blog: BookOpen, artigo: FileText, texto: Type, copy: PenTool, documento: FileCheck,
