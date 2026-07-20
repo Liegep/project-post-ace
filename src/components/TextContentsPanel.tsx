@@ -106,10 +106,11 @@ export function TextContentsPanel({ clientId, clientName, isAdmin, locale }: Pro
     if (!error) toast({ title: "Comentário enviado!" });
   };
 
-  // Filter for client view: hide approved/published
+  // Client view: only show items sent for approval (pending_approval) or with change requests (rejected).
+  // Drafts and internal contents stay hidden from the client.
   const visibleContents = isAdmin
     ? contents
-    : contents.filter((c) => c.status !== "approved" && c.status !== "published");
+    : contents.filter((c) => c.status === "pending_approval" || c.status === "rejected");
 
   // Hide entire widget for clients when no contents
   if (!isAdmin && !loading && visibleContents.length === 0) {
