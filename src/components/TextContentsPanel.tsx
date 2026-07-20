@@ -217,6 +217,7 @@ export function TextContentsPanel({ clientId, clientName, isAdmin, locale }: Pro
         isAdmin={isAdmin}
         clientName={clientName}
         onStatusChange={handleStatusChange}
+        onEdit={(c) => { setDetailItem(null); setEditItem(c); }}
       />
     </div>
   );
