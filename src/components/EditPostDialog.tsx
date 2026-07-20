@@ -225,7 +225,9 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                     </button>
                   )}
                 </div>
-                <Textarea id="edit-caption" value={caption} onChange={(e) => setCaption(e.target.value)} placeholder={t("captionPlaceholder")} className="min-h-[350px] text-sm" />
+                <div className="rounded-md border border-input bg-white overflow-hidden">
+                  <RichTextEditor content={caption} onChange={setCaption} placeholder={t("captionPlaceholder")} />
+                </div>
               </div>
 
               <div>
