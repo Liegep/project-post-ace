@@ -265,6 +265,38 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
             >
               <Eye className="mr-2 h-4 w-4" /> Pré-visualizar
             </Button>
+            <Button
+              variant="outline"
+              onClick={async () => {
+                try {
+                  await exportTextContentToPdf({
+                    id: "preview", client_id: "", content_type: contentType,
+                    title: title || "conteudo", subtitle, body, status,
+                    planned_date: plannedDate || null, observations,
+                    pdf_url: pdfUrl, pdf_name: pdfName,
+                    created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+                  } as any);
+                } catch (e: any) {
+                  toast({ title: "Erro ao gerar PDF", description: e?.message, variant: "destructive" });
+                }
+              }}
+              className="bg-white text-black border border-black/10 hover:bg-white/90"
+            >
+              <Download className="mr-2 h-4 w-4" /> Baixar PDF
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => exportTextContentToWord({
+                id: "preview", client_id: "", content_type: contentType,
+                title: title || "conteudo", subtitle, body, status,
+                planned_date: plannedDate || null, observations,
+                pdf_url: pdfUrl, pdf_name: pdfName,
+                created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+              } as any)}
+              className="bg-white text-black border border-black/10 hover:bg-white/90"
+            >
+              <FileType className="mr-2 h-4 w-4" /> Baixar Word
+            </Button>
             <Button onClick={handleSave} disabled={saving} className="bg-accent text-accent-foreground hover:bg-accent/90">
               {saving ? "Salvando..." : mode === "edit" ? "Salvar" : "Salvar rascunho"}
             </Button>
