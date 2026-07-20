@@ -10,7 +10,8 @@ import { toast } from "@/hooks/use-toast";
 import { TextContentType, TextContentStatus, CONTENT_TYPE_LABELS, TEXT_STATUS_LABELS } from "@/hooks/useTextContents";
 import { supabase } from "@/integrations/supabase/client";
 import { extractPdfAsHtml, renderPdfAsImagesHtml } from "@/lib/pdfExtract";
-import { FileUp, FileText, X, Loader2, Image as ImageIcon, Eye, Send } from "lucide-react";
+import { FileUp, FileText, X, Loader2, Image as ImageIcon, Eye, Send, Download, FileType } from "lucide-react";
+import { exportTextContentToPdf, exportTextContentToWord } from "@/lib/textContentExport";
 
 interface Props {
   open: boolean;
