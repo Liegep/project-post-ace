@@ -11,6 +11,7 @@ import { useActivityLogs } from "@/hooks/useActivityLogs";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useI18n } from "@/i18n/I18nContext";
 import { LinkedText } from "@/components/LinkedText";
+import { RichCaption } from "@/components/RichCaption";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { toast } from "sonner";
 import { getContrastColor } from "@/lib/utils";
@@ -182,7 +183,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
             <div className="relative rounded-xl p-4 sm:p-5 bg-white text-black shadow-sm border border-white/20">
               <div className="flex items-center justify-between mb-2 gap-2">
                 <p className="text-[11px] uppercase tracking-wider font-semibold text-black/50">
-                  {t("fullCaption")}
+                  {post.artType === "text" ? "Texto" : t("fullCaption")}
                 </p>
                 <button
                   type="button"
@@ -203,8 +204,8 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
                   {copied ? "Copiado" : "Copiar"}
                 </button>
               </div>
-              <div className="text-[18px] sm:text-[19px] leading-[1.6] whitespace-pre-wrap font-medium">
-                <LinkedText text={post.caption} />
+              <div className="text-[16px] sm:text-[17px] leading-[1.7] font-medium">
+                <RichCaption text={post.caption} />
               </div>
             </div>
           )}

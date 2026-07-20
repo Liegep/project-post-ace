@@ -12,6 +12,7 @@ import { LazyImage, LazyVideo } from "@/components/LazyImage";
 import { ExternalLinkCard, isExternalLink } from "@/components/ExternalLinkCard";
 import { MediaLightbox } from "@/components/MediaLightbox";
 import { LinkedText } from "@/components/LinkedText";
+import { RichCaption } from "@/components/RichCaption";
 import { ApprovalLinkButton } from "@/components/ApprovalLinkButton";
 import { InternalApprovalDialog } from "@/components/InternalApprovalDialog";
 import { TagSelector, TagDisplay } from "@/components/TagSelector";
@@ -267,7 +268,7 @@ export function PostCardDialog({
 
               {/* CORPO: Legenda/Descrição PRIMEIRO */}
               <div>
-                <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">Legenda</h4>
+                <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">{post.artType === "text" ? "Texto" : "Legenda"}</h4>
                 {(isAdmin || allowEditCaption) && isEditingCaption ? (
                   <div className="space-y-2">
                     <Textarea value={editedCaption} onChange={(e) => setEditedCaption(e.target.value)} className="min-h-[120px] text-sm bg-white text-black border-zinc-200 focus-visible:ring-zinc-400 placeholder:text-zinc-400" />
@@ -278,7 +279,7 @@ export function PostCardDialog({
                   </div>
                 ) : (
                   <div
-                    className={`text-sm whitespace-pre-wrap leading-relaxed max-h-[200px] overflow-y-auto rounded-lg p-3 bg-white/95 backdrop-blur-md border border-zinc-200 text-black ${(isAdmin || allowEditCaption) ? "cursor-text hover:border-zinc-400 group relative" : ""}`}
+                    className={`text-sm leading-relaxed max-h-[400px] overflow-y-auto rounded-lg p-4 bg-white/95 backdrop-blur-md border border-zinc-200 text-black ${(isAdmin || allowEditCaption) ? "cursor-text hover:border-zinc-400 group relative" : ""}`}
                     onClick={() => (isAdmin || allowEditCaption) && setIsEditingCaption(true)}
                   >
                     {(isAdmin || allowEditCaption) && (
@@ -286,7 +287,7 @@ export function PostCardDialog({
                         <Pencil className="h-3.5 w-3.5 text-zinc-600" />
                       </div>
                     )}
-                    {post.caption ? <LinkedText text={post.caption} /> : <span className="text-zinc-500 italic">Sem legenda</span>}
+                    {post.caption ? <RichCaption text={post.caption} /> : <span className="text-zinc-500 italic">Sem legenda</span>}
                   </div>
                 )}
               </div>

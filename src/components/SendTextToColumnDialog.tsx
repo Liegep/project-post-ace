@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import type { TextContent } from "@/hooks/useTextContents";
+import { CONTENT_TYPE_LABELS, type TextContent } from "@/hooks/useTextContents";
 
 interface Column {
   id: string;
@@ -53,8 +53,11 @@ export function SendTextToColumnDialog({ open, onOpenChange, content, clientId }
         .maybeSingle();
       const nextPosition = ((maxPosRow as any)?.position ?? -1) + 1;
 
+      const typeLabel = CONTENT_TYPE_LABELS[content.content_type] || "Texto";
+      const titleWithType = `[${typeLabel}] ${content.title}`;
+
       const { error } = await supabase.from("posts").insert({
-        title: content.title,
+        title: titleWithType,
         image_url: "",
         media_type: "image",
         media_urls: [],
