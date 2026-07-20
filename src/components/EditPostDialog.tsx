@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/RichTextEditor";
+import { RichCaption } from "@/components/RichCaption";
 import { CommentContent } from "@/components/CommentContent";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Smile, Send as SendIcon, Pencil, Trash2 as CommentTrash, Check, X, ExternalLink as ExternalLinkIcon } from "lucide-react";
@@ -228,6 +229,14 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                 <div className="rounded-md border border-input bg-white overflow-hidden">
                   <RichTextEditor content={caption} onChange={setCaption} placeholder={t("captionPlaceholder")} />
                 </div>
+                {caption && (
+                  <div className="mt-3">
+                    <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-1">Prévia (como aparece no card)</div>
+                    <div className="rounded-lg border border-zinc-200 bg-white/95 p-4 max-h-[280px] overflow-y-auto shadow-sm">
+                      <RichCaption text={caption} />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
