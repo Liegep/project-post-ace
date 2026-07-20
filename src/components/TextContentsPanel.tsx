@@ -5,7 +5,7 @@ import { TextContentCard } from "@/components/TextContentCard";
 import { TextContentDetailDialog } from "@/components/TextContentDetailDialog";
 import { CreateTextContentDialog } from "@/components/CreateTextContentDialog";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Trash2 } from "lucide-react";
+import { Plus, FileText, Trash2, Pencil } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface Props {
@@ -168,19 +168,21 @@ export function TextContentsPanel({ clientId, clientName, isAdmin, locale }: Pro
                 onComment={handleCardComment}
               />
               {isAdmin && (
-                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                <div className="absolute top-3 right-3 flex gap-1 z-10">
                   <Button
                     size="icon"
-                    variant="ghost"
-                    className="h-7 w-7"
+                    variant="secondary"
+                    className="h-7 w-7 shadow-sm bg-background/90 hover:bg-background border"
+                    title="Editar conteúdo"
                     onClick={(e) => { e.stopPropagation(); setEditItem(content); }}
                   >
-                    <FileText className="h-3.5 w-3.5" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
                   <Button
                     size="icon"
-                    variant="ghost"
-                    className="h-7 w-7 text-destructive hover:text-destructive"
+                    variant="secondary"
+                    className="h-7 w-7 shadow-sm bg-background/90 hover:bg-destructive hover:text-destructive-foreground border text-destructive"
+                    title="Excluir conteúdo"
                     onClick={(e) => { e.stopPropagation(); handleDelete(content.id); }}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
