@@ -10,7 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { TextContentType, TextContentStatus, CONTENT_TYPE_LABELS, TEXT_STATUS_LABELS } from "@/hooks/useTextContents";
 import { supabase } from "@/integrations/supabase/client";
 import { extractPdfAsHtml, renderPdfAsImagesHtml } from "@/lib/pdfExtract";
-import { FileUp, FileText, X, Loader2, Image as ImageIcon, Eye } from "lucide-react";
+import { FileUp, FileText, X, Loader2, Image as ImageIcon, Eye, Send } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -102,18 +102,19 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
     }
   };
 
-  const handleSave = async () => {
+  const performSave = async (overrideStatus?: TextContentStatus) => {
     if (!title.trim()) {
       toast({ title: "Título obrigatório", variant: "destructive" });
       return;
     }
     setSaving(true);
+    const finalStatus = overrideStatus ?? status;
     const ok = await onSave({
       content_type: contentType,
       title: title.trim(),
       subtitle: subtitle.trim(),
       body,
-      status,
+      status: finalStatus,
       planned_date: plannedDate || null,
       observations: observations.trim(),
       pdf_url: pdfUrl,
@@ -121,6 +122,7 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
     });
     setSaving(false);
     if (ok) {
+      if (overrideStatus) setStatus(overrideStatus);
       if (mode === "create") {
         setTitle(""); setSubtitle(""); setBody(""); setObservations(""); setPlannedDate("");
         setContentType("texto"); setStatus("draft");
@@ -129,6 +131,9 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
       onOpenChange(false);
     }
   };
+
+  const handleSave = () => performSave();
+  const handleSendToClient = () => performSave("pending_approval");
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -251,7 +256,7 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/15 mt-2">
+          <div className="flex flex-wrap justify-end gap-2 pt-2 border-t border-white/15 mt-2">
             <Button onClick={() => onOpenChange(false)} className="bg-white text-black border border-black/10 hover:bg-white/90">Cancelar</Button>
             <Button
               onClick={() => setPreviewOpen(true)}
@@ -260,7 +265,16 @@ export function CreateTextContentDialog({ open, onOpenChange, onSave, initial, m
               <Eye className="mr-2 h-4 w-4" /> Pré-visualizar
             </Button>
             <Button onClick={handleSave} disabled={saving} className="bg-accent text-accent-foreground hover:bg-accent/90">
-              {saving ? "Salvando..." : mode === "edit" ? "Salvar" : "Criar Conteúdo"}
+              {saving ? "Salvando..." : mode === "edit" ? "Salvar" : "Salvar rascunho"}
+            </Button>
+            <Button
+              onClick={handleSendToClient}
+              disabled={saving}
+              className="bg-success text-success-foreground hover:bg-success/90"
+              title="Salva e envia o conteúdo para aprovação do cliente"
+            >
+              <Send className="mr-2 h-4 w-4" />
+              {saving ? "Enviando..." : "Enviar para cliente"}
             </Button>
           </div>
         </div>
