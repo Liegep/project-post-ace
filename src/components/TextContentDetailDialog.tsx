@@ -18,9 +18,12 @@ import {
 import {
   FileText, BookOpen, Type, PenTool, FileCheck,
   Calendar, Check, X, Send, MessageCircle, Download,
+  FileType, LayoutGrid,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { exportTextContentToPdf, exportTextContentToWord } from "@/lib/textContentExport";
+import { SendTextToColumnDialog } from "@/components/SendTextToColumnDialog";
 
 const TYPE_ICONS: Record<string, React.ElementType> = {
   blog: BookOpen, artigo: FileText, texto: Type, copy: PenTool, documento: FileCheck,
@@ -40,6 +43,8 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
   const [comments, setComments] = useState<TextContentComment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [sending, setSending] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const [sendColumnOpen, setSendColumnOpen] = useState(false);
 
   useEffect(() => {
     if (content && open) loadComments(content.id);
@@ -118,6 +123,39 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
           <p className="text-lg text-muted-foreground leading-relaxed">
             {content.subtitle}
           </p>
+        )}
+
+        {/* Export & send actions */}
+        {isAdmin && (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setSendColumnOpen(true)}
+            >
+              <LayoutGrid className="mr-2 h-3.5 w-3.5" /> Enviar ao Kanban
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={exportingPdf}
+              onClick={async () => {
+                setExportingPdf(true);
+                try { await exportTextContentToPdf(content); }
+                catch (e: any) { toast({ title: "Erro ao gerar PDF", description: e?.message, variant: "destructive" }); }
+                finally { setExportingPdf(false); }
+              }}
+            >
+              <Download className="mr-2 h-3.5 w-3.5" /> {exportingPdf ? "Gerando…" : "Baixar PDF"}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => exportTextContentToWord(content)}
+            >
+              <FileType className="mr-2 h-3.5 w-3.5" /> Baixar Word
+            </Button>
+          </div>
         )}
       </div>
 
@@ -234,6 +272,13 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
           </Button>
         </div>
       )}
+
+      <SendTextToColumnDialog
+        open={sendColumnOpen}
+        onOpenChange={setSendColumnOpen}
+        content={content}
+        clientId={content.client_id}
+      />
     </div>
   );
 
