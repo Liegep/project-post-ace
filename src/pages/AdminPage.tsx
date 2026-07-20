@@ -1297,6 +1297,11 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${activeTab === "texts" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"}`}
             >
               <FileText className="mr-1.5 inline h-4 w-4" /> Textos
+              {textContents.length > 0 && (
+                <span className="ml-1.5 rounded-full bg-primary/20 text-primary px-1.5 py-0.5 text-[10px] font-semibold">
+                  {textContents.length}
+                </span>
+              )}
             </button>
             <button
               onClick={() => setCalendarOpen(true)}
