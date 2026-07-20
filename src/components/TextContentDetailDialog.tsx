@@ -43,6 +43,8 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
   const [comments, setComments] = useState<TextContentComment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [sending, setSending] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const [sendColumnOpen, setSendColumnOpen] = useState(false);
 
   useEffect(() => {
     if (content && open) loadComments(content.id);
