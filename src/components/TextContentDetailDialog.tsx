@@ -272,6 +272,13 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
           </Button>
         </div>
       )}
+
+      <SendTextToColumnDialog
+        open={sendColumnOpen}
+        onOpenChange={setSendColumnOpen}
+        content={content}
+        clientId={content.client_id}
+      />
     </div>
   );
 
