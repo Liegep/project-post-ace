@@ -18,7 +18,7 @@ import {
 import {
   FileText, BookOpen, Type, PenTool, FileCheck,
   Calendar, Check, X, Send, MessageCircle, Download,
-  FileType, LayoutGrid,
+  FileType, LayoutGrid, Pencil,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -36,9 +36,10 @@ interface Props {
   isAdmin?: boolean;
   clientName?: string;
   onStatusChange?: (id: string, status: string) => void;
+  onEdit?: (content: TextContent) => void;
 }
 
-export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, clientName, onStatusChange }: Props) {
+export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, clientName, onStatusChange, onEdit }: Props) {
   const isMobile = useIsMobile();
   const [comments, setComments] = useState<TextContentComment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -128,6 +129,22 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
         {/* Export & send actions */}
         {isAdmin && (
           <div className="mt-4 flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              onClick={() => onEdit?.(content)}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Pencil className="mr-2 h-3.5 w-3.5" /> Editar
+            </Button>
+            {content.status !== "pending_approval" && content.status !== "approved" && (
+              <Button
+                size="sm"
+                onClick={() => onStatusChange?.(content.id, "pending_approval")}
+                className="bg-success text-success-foreground hover:bg-success/90"
+              >
+                <Send className="mr-2 h-3.5 w-3.5" /> Enviar para cliente
+              </Button>
+            )}
             <Button
               size="sm"
               variant="outline"
