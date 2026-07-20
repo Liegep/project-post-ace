@@ -133,7 +133,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
               variant="outline"
               onClick={() => setSendColumnOpen(true)}
             >
-              <LayoutGrid className="mr-2 h-3.5 w-3.5" /> Enviar ao Kanban
+              <LayoutGrid className="mr-2 h-3.5 w-3.5" /> Enviar a coluna
             </Button>
             <Button
               size="sm"

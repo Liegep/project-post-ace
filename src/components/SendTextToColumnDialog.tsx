@@ -81,7 +81,7 @@ export function SendTextToColumnDialog({ open, onOpenChange, content, clientId }
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Enviar para o Kanban</DialogTitle>
+          <DialogTitle>Enviar a coluna</DialogTitle>
           <DialogDescription>Escolha em qual coluna criar o card deste texto.</DialogDescription>
         </DialogHeader>
         <div className="max-h-[50vh] overflow-y-auto space-y-2">
