@@ -733,6 +733,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [selectedPostIds, setSelectedPostIds] = useState<Set<string>>(new Set());
   const [showArchivedToClient, setShowArchivedToClient] = useState(clientData.show_archived_to_client);
   const [allowClientEditCaption, setAllowClientEditCaption] = useState((clientData as any).allow_client_edit_caption ?? false);
+  const { contents: textContents } = useTextContents(clientData.id);
   const [allowClientCreatePost, setAllowClientCreatePost] = useState((clientData as any).allow_client_create_post ?? false);
   const [allowClientDownload, setAllowClientDownload] = useState((clientData as any).allow_client_download ?? false);
   const [allowClientCreateTags, setAllowClientCreateTags] = useState((clientData as any).allow_client_create_tags ?? false);
