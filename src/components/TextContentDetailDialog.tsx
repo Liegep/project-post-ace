@@ -124,6 +124,39 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
             {content.subtitle}
           </p>
         )}
+
+        {/* Export & send actions */}
+        {isAdmin && (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setSendColumnOpen(true)}
+            >
+              <LayoutGrid className="mr-2 h-3.5 w-3.5" /> Enviar ao Kanban
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={exportingPdf}
+              onClick={async () => {
+                setExportingPdf(true);
+                try { await exportTextContentToPdf(content); }
+                catch (e: any) { toast({ title: "Erro ao gerar PDF", description: e?.message, variant: "destructive" }); }
+                finally { setExportingPdf(false); }
+              }}
+            >
+              <Download className="mr-2 h-3.5 w-3.5" /> {exportingPdf ? "Gerando…" : "Baixar PDF"}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => exportTextContentToWord(content)}
+            >
+              <FileType className="mr-2 h-3.5 w-3.5" /> Baixar Word
+            </Button>
+          </div>
+        )}
       </div>
 
       <Separator />
