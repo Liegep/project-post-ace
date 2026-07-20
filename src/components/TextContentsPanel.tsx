@@ -135,11 +135,6 @@ export function TextContentsPanel({ clientId, clientName, isAdmin, locale }: Pro
             <FileText className="h-4 w-4 text-primary" />
           </div>
           <h2 className="font-semibold text-foreground">Conteúdos Textuais</h2>
-          {visibleContents.length > 0 && (
-            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
-              {visibleContents.length}
-            </span>
-          )}
         </div>
         {isAdmin && (
           <Button size="sm" onClick={() => setCreateOpen(true)} className="bg-accent text-accent-foreground hover:bg-accent/90">
