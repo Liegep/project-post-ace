@@ -26,6 +26,7 @@ import { invoiceColumnAuto } from "@/hooks/useInvoices";
 import { InvoiceColumnDialog } from "@/components/billing/InvoiceColumnDialog";
 import { ClientRightSidebar } from "@/components/ClientRightSidebar";
 import { TextContentsPanel } from "@/components/TextContentsPanel";
+import { useTextContents } from "@/hooks/useTextContents";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { TrackingDrawer } from "@/components/TrackingDrawer";
 import { PRESET_COLORS } from "@/components/calendar/EventColorPicker";
