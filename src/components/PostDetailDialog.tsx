@@ -15,6 +15,7 @@ import { RichCaption } from "@/components/RichCaption";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { toast } from "sonner";
 import { getContrastColor } from "@/lib/utils";
+import { htmlToPlainText } from "@/lib/htmlToPlain";
 
 const RESET_LABEL: Record<string, string> = {
   pt: "Resetar para Pendente",

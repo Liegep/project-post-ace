@@ -30,6 +30,7 @@ import { BrandBrainSidePanel } from "@/components/BrandBrainSidePanel";
 import { useBrandBrain } from "@/hooks/useBrandBrain";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Sparkles } from "lucide-react";
+import { htmlToPlainText } from "@/lib/htmlToPlain";
 
 const STATUS_KEYS: Record<PostStatus, string> = {
   entrada: "statusEntry",
