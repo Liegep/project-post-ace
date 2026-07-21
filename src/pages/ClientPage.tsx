@@ -339,6 +339,12 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
         {/* News Widget - unseen invoices & reports */}
         <ClientNewsWidget clientId={clientData.id} showInvoices={clientData.show_invoices_to_client && !!billingPerm?.can_view_invoices} locale={clientData.locale} />
 
+        {/* Upcoming Posts */}
+        <div className="mb-8">
+          <UpcomingPostsWidget posts={posts} locale={locale} />
+        </div>
+
+
         {/* Client Briefs for Approval */}
         <div className="mb-8">
           <ClientBriefs clientId={clientData.id} clientName={clientData.name} filterMonth={selectedMonth} locale={clientData.locale} />
