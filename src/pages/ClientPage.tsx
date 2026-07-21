@@ -446,21 +446,49 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
                     {visibleColumnPosts.length > 0 && (
                       <div className="-mx-6 px-6">
                         <KanbanScrollWrapper>
-                          {visibleColumnPosts.map(({ column, posts: colPosts }) => (
-                            <div key={column.id} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
-                              <div className="mb-4 flex items-center gap-2 rounded-lg bg-background/80 backdrop-blur-sm px-3 py-2 shadow-sm border border-border/50">
-                                <span className="text-sm font-semibold text-foreground">{column.name}</span>
-                                <span className="text-xs text-muted-foreground">({colPosts.length})</span>
+                          {visibleColumnPosts.map(({ column, posts: colPosts }) => {
+                            const headerBg = column.color || "#000000";
+                            const m = headerBg.replace("#", "");
+                            const valid = /^[0-9a-fA-F]{6}$/.test(m);
+                            const r = valid ? parseInt(m.slice(0, 2), 16) : 0;
+                            const g = valid ? parseInt(m.slice(2, 4), 16) : 0;
+                            const b = valid ? parseInt(m.slice(4, 6), 16) : 0;
+                            const luminance = valid ? (0.299 * r + 0.587 * g + 0.114 * b) / 255 : 0;
+                            const isLight = luminance > 0.6;
+                            const textColor = isLight ? "#111827" : "#ffffff";
+                            const mutedColor = isLight ? "rgba(17,24,39,0.65)" : "rgba(255,255,255,0.75)";
+                            return (
+                              <div key={column.id} className="w-80 shrink-0 rounded-xl border bg-card/50 p-4">
+                                <div
+                                  className="mb-4 flex items-center gap-2 rounded-lg backdrop-blur-sm border border-l-4 px-3 py-2 shadow-sm"
+                                  style={{
+                                    backgroundColor: headerBg,
+                                    borderColor: isLight ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)",
+                                    borderLeftColor: column.color || (isLight ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.5)"),
+                                    color: textColor,
+                                  }}
+                                >
+                                  <span
+                                    className="h-2.5 w-2.5 rounded-full shrink-0 ring-1"
+                                    style={{
+                                      backgroundColor: column.color || "transparent",
+                                      borderColor: isLight ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.4)",
+                                      boxShadow: isLight ? "inset 0 0 0 1px rgba(0,0,0,0.15)" : "inset 0 0 0 1px rgba(255,255,255,0.35)",
+                                    }}
+                                  />
+                                  <span className="text-sm font-semibold break-words whitespace-normal" style={{ color: textColor }}>{column.name}</span>
+                                  <span className="text-xs ml-auto" style={{ color: mutedColor }}>({colPosts.length})</span>
+                                </div>
+                                <div className="space-y-4">
+                                  {sortByDate(colPosts).map((post) => (
+                                     <ErrorBoundary key={post.id} fallbackTitle={t("errorDisplayingPost")}>
+                                      <PostCard post={post} isAdmin={false} onEdit={() => setDetailPost(post)} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
+                                    </ErrorBoundary>
+                                  ))}
+                                </div>
                               </div>
-                              <div className="space-y-4">
-                                {sortByDate(colPosts).map((post) => (
-                                   <ErrorBoundary key={post.id} fallbackTitle={t("errorDisplayingPost")}>
-                                    <PostCard post={post} isAdmin={false} onEdit={() => setDetailPost(post)} allowEditCaption={clientData.allow_client_edit_caption} allowClientDownload={clientData.allow_client_download} />
-                                  </ErrorBoundary>
-                                ))}
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                           {/* Spacer to prevent last column from being clipped */}
                           <div className="shrink-0 w-1" aria-hidden="true" />
                         </KanbanScrollWrapper>
