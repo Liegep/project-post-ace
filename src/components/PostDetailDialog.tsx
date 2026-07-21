@@ -15,6 +15,7 @@ import { RichCaption } from "@/components/RichCaption";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { toast } from "sonner";
 import { getContrastColor } from "@/lib/utils";
+import { htmlToPlainText } from "@/lib/htmlToPlain";
 
 const RESET_LABEL: Record<string, string> = {
   pt: "Resetar para Pendente",
@@ -189,7 +190,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
                   type="button"
                   onClick={async () => {
                     try {
-                      await navigator.clipboard.writeText(post.caption || "");
+                      await navigator.clipboard.writeText(htmlToPlainText(post.caption || ""));
                       setCopied(true);
                       toast.success(t("copied") || "Copiado!");
                       setTimeout(() => setCopied(false), 2000);

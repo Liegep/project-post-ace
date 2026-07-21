@@ -30,6 +30,7 @@ import { BrandBrainSidePanel } from "@/components/BrandBrainSidePanel";
 import { useBrandBrain } from "@/hooks/useBrandBrain";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Sparkles } from "lucide-react";
+import { htmlToPlainText } from "@/lib/htmlToPlain";
 
 const STATUS_KEYS: Record<PostStatus, string> = {
   entrada: "statusEntry",
@@ -216,7 +217,7 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                   {caption && (
                     <button
                       type="button"
-                      onClick={() => { navigator.clipboard.writeText(caption); toast({ title: "Legenda copiada!" }); }}
+                      onClick={() => { navigator.clipboard.writeText(htmlToPlainText(caption)); toast({ title: "Legenda copiada!" }); }}
                       className="inline-flex items-center justify-center h-6 w-6 rounded-md bg-white border border-black/10 text-black hover:bg-white/90 shadow-sm"
                       aria-label="Copiar legenda"
                       title="Copiar legenda"
