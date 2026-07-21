@@ -189,7 +189,7 @@ export const PostDetailDialog = ({ post, open, onOpenChange, tags, t, onApprove,
                   type="button"
                   onClick={async () => {
                     try {
-                      await navigator.clipboard.writeText(post.caption || "");
+                      await navigator.clipboard.writeText(htmlToPlainText(post.caption || ""));
                       setCopied(true);
                       toast.success(t("copied") || "Copiado!");
                       setTimeout(() => setCopied(false), 2000);
