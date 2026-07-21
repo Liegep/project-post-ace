@@ -172,7 +172,7 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
   const visibleColumnPosts = visibleColumns.map((col) => ({
     column: col,
     posts: posts.filter((p) => p.columnId === col.id),
-  })).filter((g) => g.posts.length > 0);
+  }));
 
   const sortByDate = (list: typeof posts) =>
     [...list].sort((a, b) => {
