@@ -311,7 +311,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl h-[85vh] max-h-[85vh] sm:h-[min(85vh,900px)] p-0 overflow-hidden flex flex-col bg-card text-card-foreground border-border">
+      <DialogContent className="max-w-[min(95vw,1200px)] w-[min(95vw,1200px)] h-[92vh] max-h-[92vh] p-0 overflow-hidden flex flex-col bg-card text-card-foreground border-border">
         {body}
       </DialogContent>
     </Dialog>
