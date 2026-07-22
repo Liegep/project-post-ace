@@ -195,9 +195,9 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
             </Button>
           </div>
         )}
-        <div className="rounded-lg bg-white p-5 border border-border shadow-sm">
+        <div className="rounded-lg bg-white p-8 border border-border shadow-sm min-h-[720px] max-w-[820px] mx-auto">
           <article
-            className="prose prose-sm sm:prose max-w-none leading-[1.8] text-black [&_*]:!text-black [&_a]:!text-primary [&_a]:underline [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
+            className="prose prose-base sm:prose-lg max-w-none leading-[1.8] text-black [&_*]:!text-black [&_a]:!text-primary [&_a]:underline [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
             dangerouslySetInnerHTML={{ __html: content.body }}
           />
         </div>
@@ -311,7 +311,7 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl h-[85vh] max-h-[85vh] sm:h-[min(85vh,900px)] p-0 overflow-hidden flex flex-col bg-card text-card-foreground border-border">
+      <DialogContent className="max-w-[min(95vw,1200px)] w-[min(95vw,1200px)] h-[92vh] max-h-[92vh] p-0 overflow-hidden flex flex-col bg-card text-card-foreground border-border">
         {body}
       </DialogContent>
     </Dialog>
