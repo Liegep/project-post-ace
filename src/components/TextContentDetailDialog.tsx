@@ -195,9 +195,9 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
             </Button>
           </div>
         )}
-        <div className="rounded-lg bg-white p-5 border border-border shadow-sm">
+        <div className="rounded-lg bg-white p-8 border border-border shadow-sm min-h-[720px] max-w-[820px] mx-auto">
           <article
-            className="prose prose-sm sm:prose max-w-none leading-[1.8] text-black [&_*]:!text-black [&_a]:!text-primary [&_a]:underline [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
+            className="prose prose-base sm:prose-lg max-w-none leading-[1.8] text-black [&_*]:!text-black [&_a]:!text-primary [&_a]:underline [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded"
             dangerouslySetInnerHTML={{ __html: content.body }}
           />
         </div>
