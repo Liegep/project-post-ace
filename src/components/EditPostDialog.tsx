@@ -227,7 +227,10 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                   )}
                 </div>
                 {mediaItems.length === 0 && !externalLink.trim() ? (
-                  <div className="rounded-md border border-input bg-white overflow-hidden">
+                  <div
+                    className="rounded-md border border-input bg-white overflow-auto"
+                    style={{ resize: "both", minHeight: 200, minWidth: 280, height: 320 }}
+                  >
                     <RichTextEditor content={caption} onChange={setCaption} placeholder={t("captionPlaceholder")} />
                   </div>
                 ) : (
@@ -236,7 +239,8 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                     value={/<\/?[a-z][\s\S]*>/i.test(caption) ? htmlToPlainText(caption) : caption}
                     onChange={(e) => setCaption(e.target.value)}
                     placeholder={t("captionPlaceholder")}
-                    className="min-h-[160px] bg-white text-black"
+                    className="min-h-[160px] bg-white text-black resize-y"
+                    style={{ resize: "both" }}
                   />
                 )}
               </div>
