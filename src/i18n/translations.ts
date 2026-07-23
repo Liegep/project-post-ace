@@ -787,6 +787,7 @@ const it: TranslationKeys = {
   statusWritingCaption: "Scrittura Didascalia",
   statusReady: "Pronto",
   statusDesignReady: "Design Pronto",
+  statusApprovedBoss: "Approvato dalla boss ❤️",
   statusFinalized: "Finalizzato",
   statusChangeRequested: "Modifica Richiesta",
   statusScheduled: "Programmato",
