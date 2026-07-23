@@ -27,6 +27,7 @@ type TranslationKeys = {
   statusWritingCaption: string;
   statusReady: string;
   statusDesignReady: string;
+  statusApprovedBoss: string;
   statusFinalized: string;
   statusChangeRequested: string;
   statusScheduled: string;
@@ -298,6 +299,8 @@ const pt: TranslationKeys = {
   statusWritingCaption: "Escrevendo Legenda",
   statusReady: "Enviar para Cliente",
   statusDesignReady: "Design Pronto",
+  statusApprovedBoss: "Aprovado pela boss ❤️",
+  statusApprovedBoss: "Aprovado pela boss ❤️",
   statusFinalized: "Finalizado",
   statusChangeRequested: "Alteração Solicitada",
   statusScheduled: "Agendado",
@@ -542,6 +545,7 @@ const en: TranslationKeys = {
   statusWritingCaption: "Writing Caption",
   statusReady: "Ready",
   statusDesignReady: "Design Ready",
+  statusApprovedBoss: "Approved by the boss ❤️",
   statusFinalized: "Finalized",
   statusChangeRequested: "Change Requested",
   statusScheduled: "Scheduled",
@@ -1026,6 +1030,7 @@ const es: TranslationKeys = {
   statusWritingCaption: "Escribiendo Leyenda",
   statusReady: "Listo",
   statusDesignReady: "Diseño Listo",
+  statusApprovedBoss: "Aprobado por la jefa ❤️",
   statusFinalized: "Finalizado",
   statusChangeRequested: "Cambio Solicitado",
   statusScheduled: "Programado",
@@ -1268,6 +1273,7 @@ const sv: TranslationKeys = {
   statusWritingCaption: "Skriver Bildtext",
   statusReady: "Klart",
   statusDesignReady: "Design Klar",
+  statusApprovedBoss: "Von der Chefin genehmigt ❤️",
   statusFinalized: "Avslutat",
   statusChangeRequested: "Ändring Begärd",
   statusScheduled: "Schemalagd",
