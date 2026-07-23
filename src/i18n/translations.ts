@@ -300,7 +300,6 @@ const pt: TranslationKeys = {
   statusReady: "Enviar para Cliente",
   statusDesignReady: "Design Pronto",
   statusApprovedBoss: "Aprovado pela boss ❤️",
-  statusApprovedBoss: "Aprovado pela boss ❤️",
   statusFinalized: "Finalizado",
   statusChangeRequested: "Alteração Solicitada",
   statusScheduled: "Agendado",
