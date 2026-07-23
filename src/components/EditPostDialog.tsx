@@ -38,6 +38,7 @@ const STATUS_KEYS: Record<PostStatus, string> = {
   escrevendo_legenda: "statusWritingCaption",
   design_pronto: "statusDesignReady",
   pronto: "statusReady",
+  aprovado_boss: "statusApprovedBoss",
   finalizado: "statusFinalized",
   alteracao_solicitada: "statusChangeRequested",
   agendado: "statusScheduled",
