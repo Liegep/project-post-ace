@@ -142,7 +142,7 @@ export const PostCard = memo(
       .map((tagId) => tags.find((t) => t.id === tagId))
       .filter(Boolean);
 
-    const ALL_STATUSES: PostStatus[] = ["entrada", "em_desenvolvimento", "escrevendo_legenda", "design_pronto", "pronto", "finalizado", "alteracao_solicitada", "agendado"];
+    const ALL_STATUSES: PostStatus[] = ["entrada", "em_desenvolvimento", "escrevendo_legenda", "design_pronto", "pronto", "aprovado_boss", "finalizado", "alteracao_solicitada", "agendado"];
 
     const handleToggleStatus = (s: PostStatus) => {
       const next = post.status.includes(s)
