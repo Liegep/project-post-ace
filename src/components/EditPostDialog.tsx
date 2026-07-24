@@ -209,7 +209,19 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
               <div>
 
                 <Label htmlFor="edit-title" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("title")}</Label>
-                <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} className="text-lg font-bold mt-1" />
+                <Input
+                  id="edit-title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleSubmit(e as any);
+                    }
+                  }}
+                  placeholder={t("titlePlaceholder")}
+                  className="text-lg font-bold mt-1"
+                />
               </div>
 
               <div>
