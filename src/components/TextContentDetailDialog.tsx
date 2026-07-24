@@ -226,17 +226,17 @@ export function TextContentDetailDialog({ content, open, onOpenChange, isAdmin, 
                   key={c.id}
                   className={`rounded-lg p-3 border ${
                     c.author_role === "admin"
-                      ? "bg-primary/5 border-primary/20"
-                      : "bg-muted/40 border-border"
+                      ? "bg-primary/10 border-primary/30"
+                      : "bg-white border-zinc-200"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-semibold text-foreground">{c.author_name}</span>
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-xs font-semibold !text-black">{c.author_name}</span>
+                    <span className="text-[10px] !text-black/60">
                       {format(new Date(c.created_at), "dd/MM HH:mm")}
                     </span>
                   </div>
-                  <p className="text-sm text-foreground whitespace-pre-wrap">{c.message}</p>
+                  <p className="text-sm !text-black whitespace-pre-wrap break-words">{c.message}</p>
                 </div>
               ))}
             </div>
