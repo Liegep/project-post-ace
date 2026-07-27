@@ -741,6 +741,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [trackingVisibleToClient, setTrackingVisibleToClient] = useState(clientData.tracking_visible_to_client ?? false);
   const [trackingColumnIds, setTrackingColumnIds] = useState<string[]>(((clientData as any).tracking_column_ids as string[]) ?? []);
   const [showUpcomingPosts, setShowUpcomingPosts] = useState((clientData as any).show_upcoming_posts ?? false);
+  const [allowClientSearch, setAllowClientSearch] = useState((clientData as any).allow_client_search ?? false);
   const [allowClientEditBrandBrain, setAllowClientEditBrandBrain] = useState((clientData as any).allow_client_edit_brand_brain ?? false);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -1197,6 +1198,16 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
                 <Switch checked={showUpcomingPosts} onCheckedChange={async (checked) => {
                   setShowUpcomingPosts(checked);
                   await supabase.from("clients").update({ show_upcoming_posts: checked } as any).eq("id", clientData.id);
+                }} />
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground flex items-center gap-2">
+                  <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                  Busca no cliente
+                </label>
+                <Switch checked={allowClientSearch} onCheckedChange={async (checked) => {
+                  setAllowClientSearch(checked);
+                  await supabase.from("clients").update({ allow_client_search: checked } as any).eq("id", clientData.id);
                 }} />
               </div>
               <div className="flex items-center justify-between">

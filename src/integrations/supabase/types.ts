@@ -1049,6 +1049,7 @@ export type Database = {
           allow_client_download: boolean
           allow_client_edit_brand_brain: boolean
           allow_client_edit_caption: boolean
+          allow_client_search: boolean
           allow_quick_access: boolean
           billing_currency: string
           billing_description: string
@@ -1097,6 +1098,7 @@ export type Database = {
           allow_client_download?: boolean
           allow_client_edit_brand_brain?: boolean
           allow_client_edit_caption?: boolean
+          allow_client_search?: boolean
           allow_quick_access?: boolean
           billing_currency?: string
           billing_description?: string
@@ -1145,6 +1147,7 @@ export type Database = {
           allow_client_download?: boolean
           allow_client_edit_brand_brain?: boolean
           allow_client_edit_caption?: boolean
+          allow_client_search?: boolean
           allow_quick_access?: boolean
           billing_currency?: string
           billing_description?: string
