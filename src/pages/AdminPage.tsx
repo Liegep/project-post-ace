@@ -1202,6 +1202,16 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
               </div>
               <div className="flex items-center justify-between">
                 <label className="text-sm text-foreground flex items-center gap-2">
+                  <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                  Busca no cliente
+                </label>
+                <Switch checked={allowClientSearch} onCheckedChange={async (checked) => {
+                  setAllowClientSearch(checked);
+                  await supabase.from("clients").update({ allow_client_search: checked } as any).eq("id", clientData.id);
+                }} />
+              </div>
+              <div className="flex items-center justify-between">
+                <label className="text-sm text-foreground flex items-center gap-2">
                   <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                   Editar Brand Brain
                 </label>
