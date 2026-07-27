@@ -1,0 +1,1 @@
+ALTER TABLE public.clients ADD COLUMN IF NOT EXISTS allow_client_search boolean NOT NULL DEFAULT false;
