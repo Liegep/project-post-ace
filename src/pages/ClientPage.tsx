@@ -441,6 +441,35 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
               </div>
             )}
 
+            {clientData.allow_client_search && (
+              <div className="mx-auto mb-6 flex w-full max-w-md items-center gap-2">
+                <div className="relative flex-1">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={
+                      locale === "en" ? "Search posts (e.g. EP. 012)" :
+                      locale === "es" ? "Buscar posts (ej. EP. 012)" :
+                      locale === "it" ? "Cerca post (es. EP. 012)" :
+                      locale === "sv" ? "Sök inlägg (t.ex. EP. 012)" :
+                      "Buscar posts (ex. EP. 012)"
+                    }
+                    className="h-10 rounded-full border-2 pl-9 pr-9 text-sm"
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      aria-label="Clear"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
 
             {clientData.tracking_enabled && clientData.tracking_visible_to_client && (
               <TrackingDrawer
