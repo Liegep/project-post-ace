@@ -161,18 +161,31 @@ const ClientPageInner = ({ clientData }: { clientData: ClientData }) => {
     }
   };
 
-  const readyPosts = posts.filter((p) => p.status.includes("pronto") && p.clientLabel !== "aprovado");
+  const [searchQuery, setSearchQuery] = useState("");
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const matchesSearch = useCallback(
+    (p: Post) => {
+      if (!normalizedQuery) return true;
+      return (
+        (p.title || "").toLowerCase().includes(normalizedQuery) ||
+        (p.caption || "").toLowerCase().includes(normalizedQuery)
+      );
+    },
+    [normalizedQuery]
+  );
+
+  const readyPosts = posts.filter((p) => p.status.includes("pronto") && p.clientLabel !== "aprovado" && matchesSearch(p));
 
   const entradaColumn = columns.find((c) => c.name.toLowerCase() === "entrada");
   const entradaPosts = entradaColumn
-    ? posts.filter((p) => p.columnId === entradaColumn.id && p.status.includes("em_desenvolvimento"))
+    ? posts.filter((p) => p.columnId === entradaColumn.id && p.status.includes("em_desenvolvimento") && matchesSearch(p))
     : [];
 
   // Columns explicitly visible to client (excluding entrada which has its own section)
   const visibleColumns = columns.filter((c) => c.visibleToClient && c.id !== entradaColumn?.id);
   const visibleColumnPosts = visibleColumns.map((col) => ({
     column: col,
-    posts: posts.filter((p) => p.columnId === col.id),
+    posts: posts.filter((p) => p.columnId === col.id && matchesSearch(p)),
   }));
 
   const sortByDate = (list: typeof posts) =>
