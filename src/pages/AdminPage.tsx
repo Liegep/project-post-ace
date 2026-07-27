@@ -741,6 +741,7 @@ const AdminPageInner = ({ clientData }: { clientData: ClientData }) => {
   const [trackingVisibleToClient, setTrackingVisibleToClient] = useState(clientData.tracking_visible_to_client ?? false);
   const [trackingColumnIds, setTrackingColumnIds] = useState<string[]>(((clientData as any).tracking_column_ids as string[]) ?? []);
   const [showUpcomingPosts, setShowUpcomingPosts] = useState((clientData as any).show_upcoming_posts ?? false);
+  const [allowClientSearch, setAllowClientSearch] = useState((clientData as any).allow_client_search ?? false);
   const [allowClientEditBrandBrain, setAllowClientEditBrandBrain] = useState((clientData as any).allow_client_edit_brand_brain ?? false);
 
   const [searchParams, setSearchParams] = useSearchParams();
