@@ -52,6 +52,7 @@ interface ClientData {
   tracking_enabled: boolean;
   tracking_visible_to_client: boolean;
   show_upcoming_posts: boolean;
+  allow_client_search: boolean;
   client_portal_title: string;
 }
 
