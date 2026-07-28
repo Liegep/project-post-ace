@@ -207,9 +207,16 @@ const KanbanBoard = ({
   const [activePost, setActivePost] = useState<Post | null>(null);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const [invoiceColumnTarget, setInvoiceColumnTarget] = useState<string | null>(null);
+  // Optimistic local ordering used ONLY during an active drag so cards visually
+  // reflow across columns as the pointer moves. Cleared on drop.
+  const [localPosts, setLocalPosts] = useState<Post[] | null>(null);
+  const displayPosts = localPosts ?? posts;
+
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } })
+    // Lower activation distance for a snappier feel; still enough to prevent
+    // accidental drags on click.
+    useSensor(PointerSensor, { activationConstraint: { distance: 3 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 6 } })
   );
 
   // Custom collision detection: prefer pointer-within (great for sparse columns),
@@ -230,22 +237,70 @@ const KanbanBoard = ({
     } else {
       const post = posts.find((p) => p.id === event.active.id);
       if (post) setActivePost(post);
+      // Seed local optimistic list from current posts
+      setLocalPosts(posts);
     }
+  };
+
+  // Live reorder while dragging: mutate localPosts so cards visually shift
+  // (including across columns) as the pointer moves over targets.
+  const handleDragOver = (event: DragOverEvent) => {
+    if (activeColumnId !== null) return; // column drag handled by SortableContext
+    const { active, over } = event;
+    if (!over) return;
+    const activeId = active.id as string;
+    const overId = over.id as string;
+    if (activeId === overId) return;
+
+    setLocalPosts((prev) => {
+      const base = prev ?? posts;
+      const activePost = base.find((p) => p.id === activeId);
+      if (!activePost) return prev;
+
+      // Resolve target column
+      let targetColumnId: string | null | undefined;
+      if (overId === UNASSIGNED_COLUMN_ID) targetColumnId = null;
+      else if (columns.some((c) => c.id === overId)) targetColumnId = overId;
+      else {
+        const overPost = base.find((p) => p.id === overId);
+        if (!overPost) return prev;
+        targetColumnId = overPost.columnId;
+      }
+
+      // Rebuild ordered target column
+      const targetPosts = base
+        .filter((p) => p.columnId === targetColumnId && p.id !== activeId)
+        .sort((a, b) => a.position - b.position);
+      const overIndex = targetPosts.findIndex((p) => p.id === overId);
+      const insertAt = overIndex >= 0 ? overIndex : targetPosts.length;
+      const movedPost = { ...activePost, columnId: targetColumnId ?? null };
+      targetPosts.splice(insertAt, 0, movedPost);
+
+      // Assign new positions in the target column
+      const reindexedTarget = targetPosts.map((p, i) => ({ ...p, position: i }));
+      // Keep other posts unchanged
+      const others = base.filter(
+        (p) => p.columnId !== targetColumnId && p.id !== activeId
+      );
+      return [...others, ...reindexedTarget];
+    });
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const wasColumnDrag = activeColumnId !== null;
+    const finalPosts = localPosts;
     setActivePost(null);
     setActiveColumnId(null);
+    setLocalPosts(null);
     const { active, over } = event;
     if (!over) return;
 
     const activeId = active.id as string;
     const overId = over.id as string;
-    if (activeId === overId) return;
 
     // Handle column reorder
     if (wasColumnDrag) {
+      if (activeId === overId) return;
       const activeColId = activeId.replace("col-", "");
       const overColId = overId.replace("col-", "");
       const oldIndex = columns.findIndex((c) => c.id === activeColId);
@@ -257,54 +312,30 @@ const KanbanBoard = ({
       return;
     }
 
-    // Handle post reorder
+    // Commit optimistic order to backend
+    const source = finalPosts ?? posts;
     const postId = activeId;
+    const movedPost = source.find((p) => p.id === postId);
+    if (!movedPost) return;
 
-    // Determine target column
-    let targetColumnId: string | null = null;
-    if (overId === UNASSIGNED_COLUMN_ID) {
-      targetColumnId = null;
-    } else if (columns.some((c) => c.id === overId)) {
-      targetColumnId = overId;
-    } else {
-      const overPost = posts.find((p) => p.id === overId);
-      if (overPost) {
-        targetColumnId = overPost.columnId;
-      } else {
-        return;
-      }
-    }
+    const targetColumnId = movedPost.columnId ?? null;
+    const orderedIds = source
+      .filter((p) => (p.columnId ?? null) === targetColumnId)
+      .sort((a, b) => a.position - b.position)
+      .map((p) => p.id);
 
-    const currentPost = posts.find((p) => p.id === postId);
-    if (!currentPost) return;
-
-    // Get posts in the target column (sorted by position)
-    const targetPosts = posts
-      .filter((p) => p.columnId === targetColumnId && p.id !== postId)
-      .sort((a, b) => a.position - b.position);
-
-    // Find insert index
-    const overIndex = targetPosts.findIndex((p) => p.id === overId);
-    const newOrder = [...targetPosts];
-    if (overIndex >= 0) {
-      newOrder.splice(overIndex, 0, currentPost);
-    } else {
-      newOrder.push(currentPost);
-    }
-
-    reorderPostsInColumn(targetColumnId, newOrder.map((p) => p.id));
+    reorderPostsInColumn(targetColumnId, orderedIds);
   };
 
-  const allPostIds = posts.map((p) => p.id);
   const columnSortIds = columns.map((c) => `col-${c.id}`);
 
   return (
     <>
-    <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
       <KanbanScrollWrapper fillHeight>
         <SortableContext items={columnSortIds} strategy={horizontalListSortingStrategy}>
           {columns.map((col) => {
-            const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
+            const columnPosts = displayPosts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
             const headerBg = col.color || "#000000";
             const luminance = (() => {
               const m = headerBg.replace("#", "");
@@ -477,15 +508,20 @@ const KanbanBoard = ({
         </SortableContext>
 
         {/* Unassigned posts column */}
-        {unassignedPosts.length > 0 && (
+        {(() => {
+          const displayUnassigned = localPosts
+            ? displayPosts.filter((p) => !p.columnId).sort((a, b) => a.position - b.position)
+            : unassignedPosts;
+          if (displayUnassigned.length === 0) return null;
+          return (
           <div className="w-80 shrink-0 rounded-xl border bg-muted/30 p-4 flex flex-col h-full min-h-0">
             <div className="mb-4 flex items-center gap-2 shrink-0">
               <span className="text-sm font-semibold text-muted-foreground">{t("noColumn")}</span>
-              <span className="text-xs text-muted-foreground">({unassignedPosts.length})</span>
+              <span className="text-xs text-muted-foreground">({displayUnassigned.length})</span>
             </div>
-            <SortableContext items={unassignedPosts.map((p) => p.id)} strategy={verticalListSortingStrategy}>
+            <SortableContext items={displayUnassigned.map((p) => p.id)} strategy={verticalListSortingStrategy}>
               <DroppableColumn id={UNASSIGNED_COLUMN_ID}>
-                {unassignedPosts.map((post) => (
+                {displayUnassigned.map((post) => (
                   <DraggablePostCard
                     key={post.id}
                     post={post}
@@ -501,7 +537,8 @@ const KanbanBoard = ({
               </DroppableColumn>
             </SortableContext>
           </div>
-        )}
+          );
+        })()}
 
         {/* Add column button */}
         <div className="w-80 shrink-0">
