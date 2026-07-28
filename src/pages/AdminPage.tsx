@@ -508,15 +508,20 @@ const KanbanBoard = ({
         </SortableContext>
 
         {/* Unassigned posts column */}
-        {unassignedPosts.length > 0 && (
+        {(() => {
+          const displayUnassigned = localPosts
+            ? displayPosts.filter((p) => !p.columnId).sort((a, b) => a.position - b.position)
+            : unassignedPosts;
+          if (displayUnassigned.length === 0) return null;
+          return (
           <div className="w-80 shrink-0 rounded-xl border bg-muted/30 p-4 flex flex-col h-full min-h-0">
             <div className="mb-4 flex items-center gap-2 shrink-0">
               <span className="text-sm font-semibold text-muted-foreground">{t("noColumn")}</span>
-              <span className="text-xs text-muted-foreground">({unassignedPosts.length})</span>
+              <span className="text-xs text-muted-foreground">({displayUnassigned.length})</span>
             </div>
-            <SortableContext items={unassignedPosts.map((p) => p.id)} strategy={verticalListSortingStrategy}>
+            <SortableContext items={displayUnassigned.map((p) => p.id)} strategy={verticalListSortingStrategy}>
               <DroppableColumn id={UNASSIGNED_COLUMN_ID}>
-                {unassignedPosts.map((post) => (
+                {displayUnassigned.map((post) => (
                   <DraggablePostCard
                     key={post.id}
                     post={post}
@@ -532,7 +537,8 @@ const KanbanBoard = ({
               </DroppableColumn>
             </SortableContext>
           </div>
-        )}
+          );
+        })()}
 
         {/* Add column button */}
         <div className="w-80 shrink-0">
