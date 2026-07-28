@@ -84,7 +84,6 @@ const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, onArchive, 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.4 : 1,
   };
   // Wrap pointer-down listener so right-click (button !== 0) does not start a drag
   // and Radix ContextMenu can open + receive clicks normally.
@@ -98,18 +97,30 @@ const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, onArchive, 
         },
       };
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...dragListeners}>
-      <PostCard
-        post={post}
-        isAdmin
-        onStatusChange={onStatusChange}
-        onDelete={onDelete}
-        onEdit={onEdit}
-        onArchive={onArchive}
-        selectionMode={selectionMode}
-        isSelected={isSelected}
-        onToggleSelect={onToggleSelect}
-      />
+    <div ref={setNodeRef} style={style} {...attributes} {...dragListeners} className="relative">
+      {isDragging && (
+        <div
+          className="absolute inset-0 z-10 rounded-xl border-2 border-dashed border-accent bg-accent/10 backdrop-blur-[1px] flex items-center justify-center pointer-events-none"
+          aria-hidden
+        >
+          <span className="text-xs font-medium text-accent-foreground/80 bg-background/70 px-2 py-1 rounded-md border border-accent/40 shadow-sm">
+            Soltar aqui
+          </span>
+        </div>
+      )}
+      <div style={{ visibility: isDragging ? "hidden" : "visible" }}>
+        <PostCard
+          post={post}
+          isAdmin
+          onStatusChange={onStatusChange}
+          onDelete={onDelete}
+          onEdit={onEdit}
+          onArchive={onArchive}
+          selectionMode={selectionMode}
+          isSelected={isSelected}
+          onToggleSelect={onToggleSelect}
+        />
+      </div>
     </div>
   );
 };
