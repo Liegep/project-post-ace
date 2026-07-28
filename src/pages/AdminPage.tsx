@@ -331,11 +331,11 @@ const KanbanBoard = ({
 
   return (
     <>
-    <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} collisionDetection={collisionDetection} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
       <KanbanScrollWrapper fillHeight>
         <SortableContext items={columnSortIds} strategy={horizontalListSortingStrategy}>
           {columns.map((col) => {
-            const columnPosts = posts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
+            const columnPosts = displayPosts.filter((p) => p.columnId === col.id).sort((a, b) => a.position - b.position);
             const headerBg = col.color || "#000000";
             const luminance = (() => {
               const m = headerBg.replace("#", "");
