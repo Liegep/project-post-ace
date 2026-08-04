@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { ClientBillingConfig } from "@/components/billing/ClientBillingConfig";
@@ -100,14 +100,15 @@ const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, onArchive, 
     <div ref={setNodeRef} style={style} {...attributes} {...dragListeners} className="relative">
       {isDragging && (
         <div
-          className="absolute inset-0 z-10 rounded-xl border-2 border-dashed border-accent bg-accent/10 backdrop-blur-[1px] flex items-center justify-center pointer-events-none"
+          className="absolute inset-0 z-10 rounded-xl border-2 border-dashed border-primary bg-primary/15 ring-2 ring-primary/40 flex items-center justify-center pointer-events-none animate-pulse"
           aria-hidden
         >
-          <span className="text-xs font-medium text-accent-foreground/80 bg-background/70 px-2 py-1 rounded-md border border-accent/40 shadow-sm">
+          <span className="text-xs font-semibold text-primary bg-background px-2.5 py-1 rounded-md border-2 border-primary/50 shadow-md">
             Soltar aqui
           </span>
         </div>
       )}
+
       <div style={{ visibility: isDragging ? "hidden" : "visible" }}>
         <PostCard
           post={post}
@@ -230,16 +231,26 @@ const KanbanBoard = ({
     useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 6 } })
   );
 
-  // Custom collision detection: prefer pointer-within (great for sparse columns),
-  // fall back to rectangle intersection, then closest-corners. Makes dropping into
-  // empty space inside a column and swapping with adjacent cards much easier.
+  // Custom collision detection. IMPORTANT: card (post) targets always win over
+  // column container targets — otherwise the column droppable "steals" the
+  // collision and the card jumps to the end of the list.
+  const containerIds = useMemo(
+    () => new Set<string>([UNASSIGNED_COLUMN_ID, ...columns.map((c) => c.id)]),
+    [columns]
+  );
+
   const collisionDetection: CollisionDetection = useCallback((args) => {
-    const pointerCollisions = pointerWithin(args);
-    if (pointerCollisions.length > 0) return pointerCollisions;
-    const rectCollisions = rectIntersection(args);
-    if (rectCollisions.length > 0) return rectCollisions;
-    return closestCorners(args);
-  }, []);
+    const run = () => {
+      const pointerCollisions = pointerWithin(args);
+      if (pointerCollisions.length > 0) return pointerCollisions;
+      const rectCollisions = rectIntersection(args);
+      if (rectCollisions.length > 0) return rectCollisions;
+      return closestCorners(args);
+    };
+    const collisions = run();
+    const cardCollisions = collisions.filter((c) => !containerIds.has(String(c.id)));
+    return cardCollisions.length > 0 ? cardCollisions : collisions;
+  }, [containerIds]);
 
   const handleDragStart = (event: DragStartEvent) => {
     const data = event.active.data.current;
@@ -265,37 +276,66 @@ const KanbanBoard = ({
 
     setLocalPosts((prev) => {
       const base = prev ?? posts;
-      const activePost = base.find((p) => p.id === activeId);
-      if (!activePost) return prev;
+      const activePostItem = base.find((p) => p.id === activeId);
+      if (!activePostItem) return prev;
+
+      const activeColId = activePostItem.columnId ?? null;
+      const overIsContainer = containerIds.has(overId);
 
       // Resolve target column
-      let targetColumnId: string | null | undefined;
+      let targetColumnId: string | null;
       if (overId === UNASSIGNED_COLUMN_ID) targetColumnId = null;
-      else if (columns.some((c) => c.id === overId)) targetColumnId = overId;
+      else if (overIsContainer) targetColumnId = overId;
       else {
         const overPost = base.find((p) => p.id === overId);
         if (!overPost) return prev;
-        targetColumnId = overPost.columnId;
+        targetColumnId = overPost.columnId ?? null;
       }
+
+      // Hovering the empty area of the column we're already in: keep position
+      // (prevents the card from jumping to the end / flickering).
+      if (overIsContainer && targetColumnId === activeColId) return prev;
 
       // Rebuild ordered target column
       const targetPosts = base
-        .filter((p) => p.columnId === targetColumnId && p.id !== activeId)
+        .filter((p) => (p.columnId ?? null) === targetColumnId && p.id !== activeId)
         .sort((a, b) => a.position - b.position);
-      const overIndex = targetPosts.findIndex((p) => p.id === overId);
-      const insertAt = overIndex >= 0 ? overIndex : targetPosts.length;
-      const movedPost = { ...activePost, columnId: targetColumnId ?? null };
+
+      let insertAt = targetPosts.length;
+      if (!overIsContainer) {
+        const overIndex = targetPosts.findIndex((p) => p.id === overId);
+        if (overIndex >= 0) {
+          // Insert before/after the hovered card depending on pointer direction
+          const activeRect = active.rect.current.translated;
+          const overRect = over.rect;
+          const isBelow =
+            !!activeRect &&
+            activeRect.top + activeRect.height / 2 > overRect.top + overRect.height / 2;
+          insertAt = isBelow ? overIndex + 1 : overIndex;
+        }
+      }
+
+      const movedPost = { ...activePostItem, columnId: targetColumnId };
       targetPosts.splice(insertAt, 0, movedPost);
+
+      // No visual change? bail out to avoid re-render jitter.
+      const prevTarget = base
+        .filter((p) => (p.columnId ?? null) === targetColumnId)
+        .sort((a, b) => a.position - b.position)
+        .map((p) => p.id)
+        .join(",");
+      if (prevTarget === targetPosts.map((p) => p.id).join(",")) return prev;
 
       // Assign new positions in the target column
       const reindexedTarget = targetPosts.map((p, i) => ({ ...p, position: i }));
       // Keep other posts unchanged
       const others = base.filter(
-        (p) => p.columnId !== targetColumnId && p.id !== activeId
+        (p) => (p.columnId ?? null) !== targetColumnId && p.id !== activeId
       );
       return [...others, ...reindexedTarget];
     });
   };
+
 
   const handleDragEnd = (event: DragEndEvent) => {
     const wasColumnDrag = activeColumnId !== null;
