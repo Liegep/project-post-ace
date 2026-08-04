@@ -100,14 +100,15 @@ const DraggablePostCard = ({ post, onStatusChange, onDelete, onEdit, onArchive, 
     <div ref={setNodeRef} style={style} {...attributes} {...dragListeners} className="relative">
       {isDragging && (
         <div
-          className="absolute inset-0 z-10 rounded-xl border-2 border-dashed border-accent bg-accent/10 backdrop-blur-[1px] flex items-center justify-center pointer-events-none"
+          className="absolute inset-0 z-10 rounded-xl border-2 border-dashed border-primary bg-primary/15 ring-2 ring-primary/40 flex items-center justify-center pointer-events-none animate-pulse"
           aria-hidden
         >
-          <span className="text-xs font-medium text-accent-foreground/80 bg-background/70 px-2 py-1 rounded-md border border-accent/40 shadow-sm">
+          <span className="text-xs font-semibold text-primary bg-background px-2.5 py-1 rounded-md border-2 border-primary/50 shadow-md">
             Soltar aqui
           </span>
         </div>
       )}
+
       <div style={{ visibility: isDragging ? "hidden" : "visible" }}>
         <PostCard
           post={post}
