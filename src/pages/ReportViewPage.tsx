@@ -13,7 +13,7 @@ import { ReportCharts } from "@/components/reports/ReportCharts";
 import {
   ArrowLeft, TrendingUp, Minus, Instagram, Facebook,
   Calendar, Star, AlertTriangle, Lightbulb, BarChart3,
-  Eye, MessageSquareText, ArrowUpRight, ArrowDownRight, Send, Check
+  Eye, MessageSquareText, ArrowUpRight, ArrowDownRight, Send, Check, Pencil
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
