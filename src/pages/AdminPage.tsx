@@ -311,13 +311,16 @@ const KanbanBoard = ({
 
       // Resolve target column
       let targetColumnId: string | null;
-      if (overId === UNASSIGNED_COLUMN_ID) targetColumnId = null;
-      else if (overIsContainer) targetColumnId = overId;
-      else {
+      if (overIsContainer) {
+        const resolved = resolveColumn(overId);
+        if (resolved === undefined) return prev;
+        targetColumnId = resolved;
+      } else {
         const overPost = base.find((p) => p.id === overId);
         if (!overPost) return prev;
         targetColumnId = overPost.columnId ?? null;
       }
+
 
       // Hovering the empty area of the column we're already in: keep position
       // (prevents the card from jumping to the end / flickering).
