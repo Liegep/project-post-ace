@@ -399,13 +399,30 @@ const KanbanBoard = ({
     const movedPost = source.find((p) => p.id === postId);
     if (!movedPost) return;
 
-    const targetColumnId = movedPost.columnId ?? null;
+    // Fallback: if the optimistic pass never registered the last hovered target
+    // (e.g. dropping straight into an empty column), resolve it from the drop target.
+    let targetColumnId = movedPost.columnId ?? null;
+    if (containerIds.has(overId)) {
+      const resolved = resolveColumn(overId);
+      if (resolved !== undefined) targetColumnId = resolved;
+    } else {
+      const overPost = source.find((p) => p.id === overId);
+      if (overPost) targetColumnId = overPost.columnId ?? null;
+    }
+
     const orderedIds = source
-      .filter((p) => (p.columnId ?? null) === targetColumnId)
+      .filter((p) => (p.columnId ?? null) === targetColumnId && p.id !== postId)
       .sort((a, b) => a.position - b.position)
       .map((p) => p.id);
+    const existingIndex = source
+      .filter((p) => (p.columnId ?? null) === targetColumnId)
+      .sort((a, b) => a.position - b.position)
+      .findIndex((p) => p.id === postId);
+    if (existingIndex >= 0) orderedIds.splice(existingIndex, 0, postId);
+    else orderedIds.push(postId);
 
     reorderPostsInColumn(targetColumnId, orderedIds);
+
   };
 
   const columnSortIds = columns.map((c) => `col-${c.id}`);
