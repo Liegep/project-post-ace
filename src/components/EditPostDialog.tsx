@@ -584,10 +584,10 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                   className="mt-0.5 h-4 w-4 accent-amber-500 cursor-pointer"
                 />
                 <label htmlFor="is-pauta-toggle" className="cursor-pointer flex-1">
-                  <span className={`block text-xs font-bold uppercase tracking-wide ${isPauta ? "text-amber-700" : "text-foreground"}`}>
+                  <span className={`block text-xs font-bold uppercase tracking-wide ${isPauta ? "!text-amber-900" : "text-foreground"}`}>
                     Pauta para aprovação
                   </span>
-                  <span className="block text-[11px] text-muted-foreground mt-0.5">
+                  <span className={`block text-[11px] mt-0.5 ${isPauta ? "!text-amber-800" : "text-muted-foreground"}`}>
                     O cliente verá este card com visual de pauta (ideia/rascunho), não como post final.
                   </span>
                 </label>
