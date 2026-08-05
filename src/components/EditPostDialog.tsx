@@ -598,9 +598,13 @@ export const EditPostDialog = ({ post, open, onOpenChange }: EditPostDialogProps
                 <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="w-full justify-between mt-1 text-xs h-9">
-                      <span>{status.map((s) => t(STATUS_KEYS[s] as any)).join(", ") || "Selecionar"}</span>
-                      <ChevronDown className="h-3.5 w-3.5 ml-1 opacity-50 text-primary-foreground" />
+                    <Button variant="outline" size="sm" className="w-full justify-between mt-1 text-xs h-9 bg-white text-black hover:bg-white/90 hover:text-black">
+                      <span className="truncate text-black font-medium">
+                        {status.length > 0
+                          ? status.map((s) => t(STATUS_KEYS[s] as any)).join(", ")
+                          : t(STATUS_KEYS["entrada"] as any)}
+                      </span>
+                      <ChevronDown className="h-3.5 w-3.5 ml-1 opacity-50 text-black" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-52 p-2" align="start">
