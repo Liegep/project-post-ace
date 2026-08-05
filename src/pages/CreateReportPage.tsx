@@ -195,6 +195,11 @@ export default function CreateReportPage() {
         text: observations,
         top_content: topContent,
       });
+      // Remove undefined values so Postgres receives a clean JSON object
+      const clean = (obj: SocialReportMetrics) =>
+        Object.fromEntries(
+          Object.entries(obj || {}).filter(([, v]) => v !== undefined && v !== null && !Number.isNaN(v as number)),
+        );
       const payload = {
         client_id: clientId,
         title: title || `Relatório ${client?.name || ""} - ${platform}`,
@@ -203,8 +208,8 @@ export default function CreateReportPage() {
         platform,
         strategic_comment: strategicComment,
         recommendations,
-        metrics: metrics as any,
-        previous_metrics: prevMetrics as any,
+        metrics: clean(metrics) as any,
+        previous_metrics: clean(prevMetrics) as any,
         best_content: bestContent,
         worst_content: worstContent,
         best_format: bestFormat,
@@ -214,7 +219,8 @@ export default function CreateReportPage() {
       };
       let reportId = editId;
       if (isEditMode && editId) {
-        await updateReport.mutateAsync({ id: editId, ...payload });
+        const updated = await updateReport.mutateAsync({ id: editId, ...payload });
+        if (!updated) throw new Error("Nenhuma linha atualizada (permissão negada)");
       } else {
         const created = await createReport.mutateAsync({ ...payload, created_by: userId });
         reportId = created.id;
@@ -225,9 +231,14 @@ export default function CreateReportPage() {
       }
 
       toast({ title: status === "published" ? (isEditMode ? "Relatório republicado!" : "Relatório publicado!") : "Rascunho salvo!" });
-      navigate(`/reports/${reportId}`);
-    } catch {
-      toast({ title: "Erro ao salvar", variant: "destructive" });
+      navigate(`/reports/${reportId}`, { replace: true, state: { refresh: Date.now() } });
+    } catch (e: any) {
+      console.error("[CreateReportPage] save error", e);
+      toast({
+        title: "Erro ao salvar",
+        description: e?.message || "Tente novamente",
+        variant: "destructive",
+      });
     } finally {
       setSaving(false);
     }

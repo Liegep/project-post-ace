@@ -102,11 +102,15 @@ export function useUpdateReport() {
         .update(updates as any)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle();
       if (error) throw error;
+      if (!data) throw new Error("Não foi possível salvar: você não tem permissão para editar este relatório.");
       return data as unknown as SocialReport;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["social-reports"] }),
+    onSuccess: (data) => {
+      qc.invalidateQueries({ queryKey: ["social-reports"] });
+      qc.invalidateQueries({ queryKey: ["social-report", (data as any)?.id] });
+    },
   });
 }
 
