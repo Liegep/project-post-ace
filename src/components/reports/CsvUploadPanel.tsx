@@ -78,9 +78,18 @@ function toNumber(raw: unknown): number | null {
     } else {
       s = s.replace(/,/g, "");
     }
-  } else if (hasComma) {
-    s = s.replace(/\./g, "").replace(",", ".");
+  } else if (hasComma || hasDot) {
+    const sep = hasComma ? "," : ".";
+    const parts = s.split(sep);
+    // Thousands grouping: every group after the first has exactly 3 digits (e.g. 2,223 / 2.223 / 1.234.567)
+    const isGrouping = parts.length > 1 && parts.slice(1).every((p) => /^\d{3}$/.test(p));
+    if (isGrouping) {
+      s = parts.join("");
+    } else if (hasComma) {
+      s = s.replace(",", ".");
+    }
   }
+
   const n = parseFloat(s);
   return isNaN(n) ? null : n;
 }
