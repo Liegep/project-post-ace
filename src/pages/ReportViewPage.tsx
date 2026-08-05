@@ -118,7 +118,11 @@ export default function ReportViewPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => navigate(`/reports/${report.id}/edit`)}>
+              <Pencil className="h-3.5 w-3.5" /> Editar métricas
+            </Button>
             {report.status === "draft" && (
+
               <Button size="sm" className="h-8 text-xs gap-1.5 bg-gradient-to-r from-primary to-accent hover:opacity-90" onClick={handlePublish}>
                 <Send className="h-3.5 w-3.5" /> {t.publishAndSend}
               </Button>
