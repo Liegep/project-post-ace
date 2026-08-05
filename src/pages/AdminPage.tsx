@@ -235,7 +235,29 @@ const KanbanBoard = ({
   // column container targets — otherwise the column droppable "steals" the
   // collision and the card jumps to the end of the list.
   const containerIds = useMemo(
-    () => new Set<string>([UNASSIGNED_COLUMN_ID, ...columns.map((c) => c.id)]),
+    () =>
+      new Set<string>([
+        UNASSIGNED_COLUMN_ID,
+        ...columns.map((c) => c.id),
+        // The sortable column wrappers are droppables too (`col-<id>`); they must
+        // NOT be mistaken for card targets, otherwise the drop resolves to nothing
+        // and the card snaps back to where it came from.
+        ...columns.map((c) => `col-${c.id}`),
+      ]),
+    [columns]
+  );
+
+  // Maps any droppable id to the column it represents (null = unassigned,
+  // undefined = not a container).
+  const resolveColumn = useCallback(
+    (overId: string): string | null | undefined => {
+      if (overId === UNASSIGNED_COLUMN_ID) return null;
+      if (overId.startsWith("col-")) {
+        const id = overId.slice(4);
+        return columns.some((c) => c.id === id) ? id : undefined;
+      }
+      return columns.some((c) => c.id === overId) ? overId : undefined;
+    },
     [columns]
   );
 
@@ -249,8 +271,13 @@ const KanbanBoard = ({
     };
     const collisions = run();
     const cardCollisions = collisions.filter((c) => !containerIds.has(String(c.id)));
-    return cardCollisions.length > 0 ? cardCollisions : collisions;
+    if (cardCollisions.length > 0) return cardCollisions;
+    // No card under the pointer: prefer the inner column droppable over the
+    // outer `col-<id>` wrapper so empty columns accept drops.
+    const inner = collisions.filter((c) => !String(c.id).startsWith("col-"));
+    return inner.length > 0 ? inner : collisions;
   }, [containerIds]);
+
 
   const handleDragStart = (event: DragStartEvent) => {
     const data = event.active.data.current;
@@ -284,13 +311,16 @@ const KanbanBoard = ({
 
       // Resolve target column
       let targetColumnId: string | null;
-      if (overId === UNASSIGNED_COLUMN_ID) targetColumnId = null;
-      else if (overIsContainer) targetColumnId = overId;
-      else {
+      if (overIsContainer) {
+        const resolved = resolveColumn(overId);
+        if (resolved === undefined) return prev;
+        targetColumnId = resolved;
+      } else {
         const overPost = base.find((p) => p.id === overId);
         if (!overPost) return prev;
         targetColumnId = overPost.columnId ?? null;
       }
+
 
       // Hovering the empty area of the column we're already in: keep position
       // (prevents the card from jumping to the end / flickering).
@@ -369,13 +399,30 @@ const KanbanBoard = ({
     const movedPost = source.find((p) => p.id === postId);
     if (!movedPost) return;
 
-    const targetColumnId = movedPost.columnId ?? null;
+    // Fallback: if the optimistic pass never registered the last hovered target
+    // (e.g. dropping straight into an empty column), resolve it from the drop target.
+    let targetColumnId = movedPost.columnId ?? null;
+    if (containerIds.has(overId)) {
+      const resolved = resolveColumn(overId);
+      if (resolved !== undefined) targetColumnId = resolved;
+    } else {
+      const overPost = source.find((p) => p.id === overId);
+      if (overPost) targetColumnId = overPost.columnId ?? null;
+    }
+
     const orderedIds = source
-      .filter((p) => (p.columnId ?? null) === targetColumnId)
+      .filter((p) => (p.columnId ?? null) === targetColumnId && p.id !== postId)
       .sort((a, b) => a.position - b.position)
       .map((p) => p.id);
+    const existingIndex = source
+      .filter((p) => (p.columnId ?? null) === targetColumnId)
+      .sort((a, b) => a.position - b.position)
+      .findIndex((p) => p.id === postId);
+    if (existingIndex >= 0) orderedIds.splice(existingIndex, 0, postId);
+    else orderedIds.push(postId);
 
     reorderPostsInColumn(targetColumnId, orderedIds);
+
   };
 
   const columnSortIds = columns.map((c) => `col-${c.id}`);
