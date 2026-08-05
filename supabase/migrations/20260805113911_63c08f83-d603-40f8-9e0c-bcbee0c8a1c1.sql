@@ -1,0 +1,2 @@
+update social_reports set metrics = jsonb_set(jsonb_set(metrics::jsonb,'{impressions}','2223'),'{views}','2223') where id = '57a116eb-e8ff-4389-8a46-9ce0dc366687';
+update social_reports set metrics = jsonb_set(jsonb_set(metrics::jsonb,'{impressions}','1288'),'{views}','1288') where id = '326e3aec-5886-4d29-95de-e606b1db4113';
