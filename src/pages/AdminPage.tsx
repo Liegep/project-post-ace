@@ -235,7 +235,29 @@ const KanbanBoard = ({
   // column container targets — otherwise the column droppable "steals" the
   // collision and the card jumps to the end of the list.
   const containerIds = useMemo(
-    () => new Set<string>([UNASSIGNED_COLUMN_ID, ...columns.map((c) => c.id)]),
+    () =>
+      new Set<string>([
+        UNASSIGNED_COLUMN_ID,
+        ...columns.map((c) => c.id),
+        // The sortable column wrappers are droppables too (`col-<id>`); they must
+        // NOT be mistaken for card targets, otherwise the drop resolves to nothing
+        // and the card snaps back to where it came from.
+        ...columns.map((c) => `col-${c.id}`),
+      ]),
+    [columns]
+  );
+
+  // Maps any droppable id to the column it represents (null = unassigned,
+  // undefined = not a container).
+  const resolveColumn = useCallback(
+    (overId: string): string | null | undefined => {
+      if (overId === UNASSIGNED_COLUMN_ID) return null;
+      if (overId.startsWith("col-")) {
+        const id = overId.slice(4);
+        return columns.some((c) => c.id === id) ? id : undefined;
+      }
+      return columns.some((c) => c.id === overId) ? overId : undefined;
+    },
     [columns]
   );
 
@@ -249,8 +271,13 @@ const KanbanBoard = ({
     };
     const collisions = run();
     const cardCollisions = collisions.filter((c) => !containerIds.has(String(c.id)));
-    return cardCollisions.length > 0 ? cardCollisions : collisions;
+    if (cardCollisions.length > 0) return cardCollisions;
+    // No card under the pointer: prefer the inner column droppable over the
+    // outer `col-<id>` wrapper so empty columns accept drops.
+    const inner = collisions.filter((c) => !String(c.id).startsWith("col-"));
+    return inner.length > 0 ? inner : collisions;
   }, [containerIds]);
+
 
   const handleDragStart = (event: DragStartEvent) => {
     const data = event.active.data.current;
