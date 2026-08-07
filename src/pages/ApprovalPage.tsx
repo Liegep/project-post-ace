@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, MessageSquare, AlertTriangle, Lock, ChevronLeft, ChevronRight, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { translations, Locale } from "@/i18n/translations";
+import { RichCaption } from "@/components/RichCaption";
 
 interface ApprovalPost {
   id: string;
@@ -308,7 +309,7 @@ const ApprovalPage = () => {
                   <div className="p-4 space-y-3">
                     <h3 className="font-semibold text-foreground">{post.title}</h3>
                     {post.caption && (
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap select-all">{post.caption}</p>
+                      <RichCaption text={post.caption} className="text-sm select-all" />
                     )}
 
                     {isCompleted ? (
