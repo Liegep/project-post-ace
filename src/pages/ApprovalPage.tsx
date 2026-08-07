@@ -308,7 +308,7 @@ const ApprovalPage = () => {
                   <div className="p-4 space-y-3">
                     <h3 className="font-semibold text-foreground">{post.title}</h3>
                     {post.caption && (
-                      <p className="text-sm text-muted-foreground whitespace-pre-wrap select-all">{post.caption}</p>
+                      <RichCaption text={post.caption} className="text-sm select-all" />
                     )}
 
                     {isCompleted ? (
