@@ -1,3 +1,4 @@
+import { RichCaption } from "@/components/RichCaption";
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -441,7 +442,7 @@ export default function CalendarPage() {
           {detailPost.caption && (
             <div>
               <p className="text-xs text-muted-foreground">Legenda</p>
-              <p className="text-sm whitespace-pre-wrap bg-muted p-3 rounded-lg mt-1">{detailPost.caption}</p>
+              <div className="text-sm bg-white p-3 rounded-lg mt-1"><RichCaption text={detailPost.caption} className="text-sm" /></div>
             </div>
           )}
           {detailPost.media_urls?.length > 1 && (

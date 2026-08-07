@@ -21,6 +21,7 @@ import {
   ContextMenuCheckboxItem,
 } from "@/components/ui/context-menu";
 import { LinkedText } from "@/components/LinkedText";
+import { RichCaption } from "@/components/RichCaption";
 import { MediaLightbox } from "@/components/MediaLightbox";
 import { Archive, Calendar, Copy, Download, MessageCircle, Pencil, Play, Send, SendHorizontal, Tag as TagIcon, Trash2, X, Check, ListChecks } from "lucide-react";
 import { SendPostToClientDialog } from "@/components/SendPostToClientDialog";
@@ -539,8 +540,8 @@ export const PostCard = memo(
               {/* Caption preview + Read More */}
               {post.caption && (
                 <div className="space-y-1.5">
-                  <div className="text-xs text-foreground whitespace-pre-wrap leading-relaxed line-clamp-3">
-                    <LinkedText text={post.caption} />
+                  <div className="text-xs text-foreground leading-relaxed line-clamp-3">
+                    <RichCaption text={post.caption} className="text-xs [&_*]:text-foreground" />
                   </div>
                   {post.caption.length > 120 && (
                     <button
@@ -643,8 +644,8 @@ export const PostCard = memo(
                     />
                   </div>
                 ) : (
-                  <div className="rounded-xl bg-white text-black p-4 sm:p-5 text-[18px] leading-[1.6] whitespace-pre-wrap font-medium">
-                    <LinkedText text={post.caption} />
+                  <div className="rounded-xl bg-white text-black p-4 sm:p-5 text-[18px] leading-[1.6] font-medium">
+                    <RichCaption text={post.caption} className="text-[18px] leading-[1.6]" />
                   </div>
                 )}
               </div>
