@@ -3247,6 +3247,10 @@ export type Database = {
         Args: { _client_id: string }
         Returns: boolean
       }
+      client_has_active_token: {
+        Args: { _client_id: string }
+        Returns: boolean
+      }
       delete_orphaned_media_files: {
         Args: { older_than_hours?: number }
         Returns: number
@@ -3407,6 +3411,15 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      token_allows_comment_on_post: {
+        Args: { _post_id: string }
+        Returns: boolean
+      }
+      token_allows_post: {
+        Args: { _client_id: string; _post_id: string }
+        Returns: boolean
+      }
+      token_id_is_active: { Args: { _token_id: string }; Returns: boolean }
     }
     Enums: {
       app_role:
