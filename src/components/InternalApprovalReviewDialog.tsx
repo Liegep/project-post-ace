@@ -1,3 +1,4 @@
+import { RichCaption } from "@/components/RichCaption";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -182,7 +183,7 @@ export function InternalApprovalReviewDialog({ open, onOpenChange, postId }: Int
 
               {post.caption && (
                 <div className="text-sm text-white/80 whitespace-pre-wrap leading-relaxed bg-white/95 rounded-lg p-3 text-black">
-                  <LinkedText text={post.caption} />
+                  <RichCaption text={post.caption} />
                 </div>
               )}
 
